@@ -1,0 +1,26 @@
+[[!summary chatGPT: A developer modified a qt torrent example to create a gui-less torrent downloader and found a solution to a problem with the code.]]
+[[!meta date="2010-10-11 15:27"]]
+[[!tag qt p2p technology usability]]
+
+[[!img media/peertopeer.png alt="" style="float: right" caption="see [2] for license"]]
+
+# motivation
+
+**adding torrent support for a qt project should be as easy as using QHttp** (IMHO). as there is no QTorrent base class in qt network yet one can use the qt torrent example [1].
+
+i've modified [1] to **create a gui-less torrent downloader** as i was searching for an issue with that example. my problem was that [1] worked nicely but my adaption of the torrent code did not.
+
+**it connected to the tracker and it reported that there was a peer but it did never find a seed.**
+
+a few hours later i found the **solution** to that problem: **one has to initialize the upload/download rates** (as the default value is 0).
+
+anyway: [2] features a very minimal codebase which is very easy to adapt to your qt project.
+
+
+# links
+
+* [1] <http://doc.qt.nokia.com/4.2/network-torrent.html>
+* [2] <http://github.com/qknight/torrent>
+* [3] <http://bugreports.qt.nokia.com>
+
+update: i've already reported this issues at [3]

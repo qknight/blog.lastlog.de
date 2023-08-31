@@ -1,0 +1,102 @@
+[[!meta date="2023-04-10 10:58"]]
+[[!summary example how to compute your pulse using js/css from a pankat markdown article using copilot]]
+[[!tag javascript BPM pulse]]
+
+<style>
+ .circle {
+        width: 120px;
+        height: 120px;
+        line-height: 120px;
+        border-radius: 50%;
+        background-color: #67aacc;
+        text-align: center;
+        border: 1px solid black;
+        // bold font
+        font-weight: bold;
+        font-size: 32px;
+        color: #fff;
+          -webkit-user-select: none; /* Safari */
+          -ms-user-select: none; /* IE 10 and IE 11 */
+          user-select: none; /* Standard syntax */
+}
+
+</style>
+
+# motivation
+
+below is a circle, **click it for every pulse you feel** for about 11 to 20 samples.
+if you **click too early or too late** it is **not so important**, missing an event actually is.
+
+only the last 20 samples are used for measurement, so if the overall pulse changes the measurement will also adapt.
+
+note: **to reset it, just wait 2 seconds without clicking then start over (will show reset text)**
+
+## measurement
+
+value is in BPM (beats per minute):
+
+<div id="circle" class="circle" onClick="pulse()"></div>
+<div id="status" class="status" ></div>
+<div id="samples" class="samples" ></div>
+
+## quality assurance
+
+i used this in the F12 shell of firefox to generate some pulses:
+
+    setInterval(function(){ document.getElementById("circle").click(); }, 1000); // 60 bpm
+
+and for manual clicking i was using this:
+
+<https://www.youtube.com/watch?v=iwYhgHscEtg>
+
+# summary
+
+the pulse is computed as the average of the last 20 samples, the average is computed as the time difference between
+the first and the last sample divided by the number of samples - 1.
+
+some **notable mentions** are that parts of the code was written from **copilot (chatGPT)** and all inline in the _pulse_check.mdwn_
+document. **i used goland with copilot integration and both programs totally figured out that this is a wild mix of markdown, inline
+html/css and inline javascript and my own pankat plugins.**
+
+you can view the code, just click the link 'article source' below.
+
+<script>
+var last = new Date();
+var pulses = [];
+
+function pulse()
+{
+    var now = new Date();
+    if (now - last > 2000) {
+        // reset pulses
+        pulses.length = 0;
+        document.getElementById("status").innerHTML = "reset";
+        document.getElementById("circle").innerHTML = "";
+        document.getElementById("samples").innerHTML = "";
+        last = now;
+        pulses.push(now);
+        return;
+    }
+    last = now;
+    document.getElementById("status").innerHTML = "";
+    if (pulses.length > 19) {
+        // drop the oldest sample
+        pulses.shift();
+    }
+    pulses.push(now);
+    if (pulses.length < 2) {
+        return;
+    }
+    bpm_ms = (now - pulses[0]) / (pulses.length - 1);
+    var bpm = 60000 / bpm_ms;
+    document.getElementById("circle").innerHTML = bpm.toFixed(1);
+    document.getElementById("samples").innerHTML = pulses.length + " samples";
+}
+
+//setInterval(function(){ document.getElementById("pulse").click(); }, 125); // 480 bpm
+//setInterval(function(){ document.getElementById("pulse").click(); }, 250); // 240 bpm
+//setInterval(function(){ document.getElementById("pulse").click(); }, 500); // 120 bpm
+//setInterval(function(){ document.getElementById("pulse").click(); }, 1000); // 60 bpm
+
+</script>
+

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="shinken_1.2.4_on_ubuntu_desktop_12.10.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>shinken 1.2.4 on ubuntu desktop 12.10</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/shinken/shinken_1.2.4_on_ubuntu_desktop_12.10.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="NAT_traversal_library.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="shinken_1.2.4_on_ubuntu_desktop_12.10_ii.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::shinken" title="article series shinken" class="seriesbtn btn btn-primary">shinken</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="shinken_0.6_on_gentoo.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="shinken_1.2.4_on_ubuntu_desktop_12.10_ii.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">shinken 1.2.4 on ubuntu desktop 12.10</h1>
+    <div id="date"><p><span id="lastupdated">26 feb 2013</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::shinken" class="tagbtn btn btn-primary">shinken</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a></p></div>
+    <p><a href="media/shinken.png"><img src=media/shinken.png alt="copied from shinken-monitoring.org" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>need to get <strong>shinken-1.2.4</strong> working on ubuntu desktop
+12.10 and later i want to run it on a raspberry pi.</p>
+<p><a href="media/shinken_on_ubuntu_1210.png"><img src=media/shinken_on_ubuntu_1210.png caption="shinken on ubuntu desktop 12.10 - Impact graph"></a></p>
+<h2 data-number="2" id="shinken-installation">shinken installation</h2>
+<p>in general we follow the installation guide from [1]</p>
+<ol start="0" type="1">
+<li><p>BUT first install libmysql-dev or you will hit issue [2][3]:</p>
+<pre><code> apt-get install libmysqlclient-dev
+ apt-get install python-dev
+ apt-get install python-pip</code></pre>
+<p><strong>note:</strong> if you don’t install libmysqlclient-dev the
+pip installation of MySQL-python==1.2.4b2 will bail out with an
+error</p></li>
+<li><p>since the most recent MySQL-python has an issue with distribute,
+we downgrade it:</p>
+<pre><code> pip install distribute==0.6.28
+ pip install MySQL-python==1.2.4b2</code></pre>
+<p><strong>note:</strong> if you don’t install MySQL-python==1.2.4b2
+then the shinken 1.2.4 installer might have a problem</p>
+<pre><code> # pip install distribute==0.6.28
+ Downloading/unpacking distribute==0.6.28
+   Downloading distribute-0.6.28.tar.gz (627Kb): 627Kb downloaded
+   Running setup.py egg_info for package distribute
+
+ Installing collected packages: distribute
+   Found existing installation: distribute 0.6.28dev-r0
+     Uninstalling distribute:
+       Successfully uninstalled distribute
+   Running setup.py install for distribute
+     Before install bootstrap.
+     Scanning installed packages
+     Setuptools installation detected at /usr/lib/python2.7/dist-packages
+     Non-egg installation
+     Removing elements out of the way...
+     Already patched.
+     /usr/lib/python2.7/dist-packages/setuptools.egg-info already patched.
+
+     Installing easy_install script to /usr/local/bin
+     Installing easy_install-2.7 script to /usr/local/bin
+     After install bootstrap.
+     Don&#39;t have permissions to write /usr/local/lib/python2.7/dist-packages/setuptools-0.6c11-py2.7.egg-info, skipping
+     Creating /usr/local/lib/python2.7/dist-packages/setuptools-0.6c11-py2.7.egg-info
+     Creating /usr/local/lib/python2.7/dist-packages/setuptools.pth
+ Successfully installed distribute
+ Cleaning up...
+
+ #  pip install MySQL-python==1.2.4b2
+ Downloading/unpacking MySQL-python==1.2.4b2
+   Downloading MySQL-python-1.2.4b2.tar.gz (77Kb): 77Kb downloaded
+   Running setup.py egg_info for package MySQL-python
+
+ Installing collected packages: MySQL-python
+   Running setup.py install for MySQL-python
+     building &#39;_mysql&#39; extension
+     gcc -pthread -fno-strict-aliasing -DNDEBUG -g -fwrapv -O2 -Wall -Wstrict-prototypes -fPIC -Dversion_info=(1,2,4,&#39;beta&#39;,2) -D__version__=1.2.4b2 -I/usr/include/mysql -I/usr/include/python2.7 -c _mysql.c -o build/temp.linux-x86_64-2.7/_mysql.o -DBIG_JOINS=1 -fno-strict-aliasing -g
+     In file included from _mysql.c:44:0:
+     /usr/include/mysql/my_config.h:422:0: warning: &quot;HAVE_WCSCOLL&quot; redefined [enabled by default]
+     In file included from /usr/include/python2.7/Python.h:8:0,
+                      from _mysql.c:29:
+     /usr/include/python2.7/pyconfig.h:890:0: note: this is the location of the previous definition
+     gcc -pthread -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro build/temp.linux-x86_64-2.7/_mysql.o -L/usr/lib/x86_64-linux-gnu -lmysqlclient_r -lpthread -lz -lm -lrt -ldl -o build/lib.linux-x86_64-2.7/_mysql.so
+
+ Successfully installed MySQL-python
+ Cleaning up...</code></pre></li>
+<li><p>fixing the pnp4nagios from 2.17 to 2.18</p>
+<p>bugfix, see [6], for the (2.18 release). if we don’t updated from
+2.17 to 2.18 our pnp4nagios will only produce an empty document and thus
+no RRD graphics.</p>
+<pre><code> Bugfix: Blank screen on PHP 5.4 fixed</code></pre>
+<p>get the source of shinken:</p>
+<pre><code> wget http://www.shinken-monitoring.org/pub/shinken-1.2.4.tar.gz
+ tar xfz shinken-1.2.4.tar.gz
+ cd shinken-1.2.4</code></pre>
+<p>now change <strong>install.d/shinken.conf</strong>:</p>
+<pre><code> install.d/shinken.conf -&gt; export PNPRELEASE=&quot;17&quot; </code></pre>
+<p>to</p>
+<pre><code> install.d/shinken.conf -&gt; export PNPRELEASE=&quot;18&quot; </code></pre>
+<p>for more details how i learned about this issue, see
+[[shinken_1.2.4_on_ubuntu_desktop_12.10/#index1h2]]</p></li>
+<li><p>execute the installation</p>
+<pre><code> ./install -i
+ ./install -p nagios-plugins
+ ./install -p check_mem
+ ./install -p manubulon
+ ./install -p check_netint 
+ ./install -a pnp4nagios</code></pre>
+<p>and then restart the services</p>
+<pre><code>  /etc/init.d/shinken restart
+  /etc/init.d/npcd restart</code></pre>
+<p><strong>some parts of that script seem to run forever so be
+patient</strong></p>
+<pre><code> # ./install -i
+ +--------------------------------------------------------------------------------
+ | Verifying compatible distros
+ +--------------------------------------------------------------------------------
+  &gt; Found DEBIAN (Ubuntu 12 x86_64)
+  &gt; Version checking for Ubuntu is not needed
+ +--------------------------------------------------------------------------------
+ | Checking for existing installation
+ +--------------------------------------------------------------------------------
+ +--------------------------------------------------------------------------------
+ | Checking prerequisites
+ +--------------------------------------------------------------------------------
+  &gt; Checking for wget: OK
+  &gt; Checking for sed: OK
+  &gt; Checking for gawk: NOT FOUND. Installing it!
+  &gt; Checking for grep: OK
+  &gt; Checking for python: OK
+  &gt; Checking for bash: OK
+  &gt; Checking for sudo: OK
+  &gt; Installing build-essential libperl-dev python-setuptools libsqlite3-dev python-dev pyro sqlite3 nmap unzip libmysqlclient-dev python-ldap libevent-dev python-paste
+  &gt; Module paramiko (paramiko) not found. Installing...
+  &gt; Module netifaces (netifaces) not found. Installing...
+  &gt; Module simplejson (simplejson) not found. Installing...
+  &gt; Module pysqlite found.
+  &gt; Module MySQL_python found.
+  &gt; Module pymongo (pymongo) not found. Installing...
+  &gt; Module kombu (kombu) not found. Installing...
+ +--------------------------------------------------------------------------------
+ | Creating user
+ +--------------------------------------------------------------------------------
+ +--------------------------------------------------------------------------------
+ | Relocate source tree to /usr/local/shinken
+ +--------------------------------------------------------------------------------
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/enable_npcd.macro
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/disable_npcd.macro
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/set_webui_ouptput_length.macro
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/enable_log_mongo.macro
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/enable_retention.macro
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/control_satelites.macro
+  &gt; relocating macro /usr/local/shinken/install.d/tools/macros/enable_retention_mongo.macro
+  &gt; relocate nagios plugin path
+ +--------------------------------------------------------------------------------
+ | Set some configuration directives
+ +--------------------------------------------------------------------------------
+  &gt; Processing /usr/local/shinken/etc/brokerd.ini
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/brokerd.ini
+  &gt; Setting user to shinken in /usr/local/shinken/etc/brokerd.ini
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/brokerd.ini
+  &gt; Setting group to shinken in /usr/local/shinken/etc/brokerd.ini
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/brokerd.ini
+  &gt; Processing /usr/local/shinken/etc/pollerd.ini
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/pollerd.ini
+  &gt; Setting user to shinken in /usr/local/shinken/etc/pollerd.ini
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/pollerd.ini
+  &gt; Setting group to shinken in /usr/local/shinken/etc/pollerd.ini
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/pollerd.ini
+  &gt; Processing /usr/local/shinken/etc/reactionnerd.ini
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/reactionnerd.ini
+  &gt; Setting user to shinken in /usr/local/shinken/etc/reactionnerd.ini
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/reactionnerd.ini
+  &gt; Setting group to shinken in /usr/local/shinken/etc/reactionnerd.ini
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/reactionnerd.ini
+  &gt; Processing /usr/local/shinken/etc/receiverd.ini
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/receiverd.ini
+  &gt; Setting user to shinken in /usr/local/shinken/etc/receiverd.ini
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/receiverd.ini
+  &gt; Setting group to shinken in /usr/local/shinken/etc/receiverd.ini
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/receiverd.ini
+  &gt; Processing /usr/local/shinken/etc/schedulerd.ini
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/schedulerd.ini
+  &gt; Setting user to shinken in /usr/local/shinken/etc/schedulerd.ini
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/schedulerd.ini
+  &gt; Setting group to shinken in /usr/local/shinken/etc/schedulerd.ini
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/schedulerd.ini
+  &gt; Processing /usr/local/shinken/etc/skonf.cfg
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/skonf.cfg
+  &gt; Setting user to shinken in /usr/local/shinken/etc/skonf.cfg
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/skonf.cfg
+  &gt; Setting group to shinken in /usr/local/shinken/etc/skonf.cfg
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/skonf.cfg
+  &gt; Processing /usr/local/shinken/etc/nagios.cfg
+  &gt; Going to /usr/local/shinken
+  &gt; Setting workdir to /usr/local/shinken/var in /usr/local/shinken/etc/nagios.cfg
+  &gt; Setting shinken_user to shinken in /usr/local/shinken/etc/nagios.cfg
+  &gt; Setting shinken_group to shinken in /usr/local/shinken/etc/nagios.cfg
+  &gt; Setting local_log to /usr/local/shinken/var/arbiter.log in /usr/local/shinken/etc/nagios.cfg
+  &gt; Setting lock_file to /usr/local/shinken/var/arbiter.pid in /usr/local/shinken/etc/nagios.cfg
+  &gt; Enable retention for broker scheduler and arbiter
+  &gt; Installing startup scripts
+  &gt; Enabling Ubuntu startup script
+ +--------------------------------------------------------------------------------
+ | Install mongodb server
+ +--------------------------------------------------------------------------------
+  &gt; repository configuration not found. Adding 10 gen repository
+  &gt; Installing mongodb server
+ +--------------------------------------------------------------------------------
+ | Applying various fixes
+ +--------------------------------------------------------------------------------
+  &gt; updated configuration of module[3] passwd=/usr/local/shinken/etc/htpasswd.users updated configuration of module[3] passwd=/usr/local/shinken/etc/htpasswd.users
+  &gt; Make files permissions and owners good
+  &gt; Add Shinken entry for skonf in sudoers
+ /tmp/sudoers.shinken: parsed OK
+ /etc/sudoers.d/README: parsed OK
+  &gt; Starting shinken
+ +------------------------------------------------------------------------------
+ | Shinken is now installed on your server 
+ | The install location is: /usr/local/shinken
+ | The configuration folder is: /usr/local/shinken/etc
+ | 
+ | The Web Interface is available at: http://localhost:7767
+ | The default credentials for the webui are admin/admin
+ | 
+ | You can now learn how to configure shinken at: http://www.shinken-monitoring.org/wiki
+ +------------------------------------------------------------------------------
+
+ # ./install -p nagios-plugins
+ &gt; Found installation parameters
+ --&gt; ETC=/usr/local/shinken/etc
+ --&gt; VAR=/usr/local/shinken/var
+ --&gt; LIBEXEC=/usr/local/shinken/libexec
+ --&gt; TARGET=/usr/local/shinken
+ &gt; checking if shinken is installed in /usr/local/shinken
+ +--------------------------------------------------------------------------------
+ |Install nagios plugins
+ +--------------------------------------------------------------------------------
+ &gt; Installing prerequisites
+ &gt; Getting nagios-plugins archive
+ &gt; Extract archive content 
+ &gt; Configure source tree
+ &gt; Building ....
+ &gt; Installing
+
+ # ./install -p check_mem
+  &gt; Found installation parameters
+  --&gt; ETC=/usr/local/shinken/etc
+  --&gt; VAR=/usr/local/shinken/var
+  --&gt; LIBEXEC=/usr/local/shinken/libexec
+  --&gt; TARGET=/usr/local/shinken
+  &gt; checking if shinken is installed in /usr/local/shinken
+ +--------------------------------------------------------------------------------
+ | Install check_mem
+ +--------------------------------------------------------------------------------
+  &gt; Downloading check_mem
+  &gt; Extracting archive
+  &gt; Installing plugin
+
+
+ # ./install -p manubulon
+  &gt; Found installation parameters
+  --&gt; ETC=/usr/local/shinken/etc
+  --&gt; VAR=/usr/local/shinken/var
+  --&gt; LIBEXEC=/usr/local/shinken/libexec
+  --&gt; TARGET=/usr/local/shinken
+  &gt; checking if shinken is installed in /usr/local/shinken
+ +--------------------------------------------------------------------------------
+ | Install manubulon plugins
+ +--------------------------------------------------------------------------------
+  &gt; Installing prerequisites
+  &gt; Getting manubulon archive
+  &gt; Extract archive content
+  &gt; Relocate libs
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_boostedge.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_cpfw.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_css_main.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_css.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_env.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_int.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_linkproof_nhr.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_load.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_mem.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_nsbox.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_process.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_storage.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_vrrp.pl
+  =&gt; Processing /tmp/nagios_plugins/check_snmp_win.pl
+  =&gt; Installing
+  &gt; Found installation parameters
+  --&gt; ETC=/usr/local/shinken/etc
+  --&gt; VAR=/usr/local/shinken/var
+  --&gt; LIBEXEC=/usr/local/shinken/libexec
+  --&gt; TARGET=/usr/local/shinken
+  &gt; checking if shinken is installed in /usr/local/shinken
+
+ # ./install -p check_netint
+  &gt; Found installation parameters
+  --&gt; ETC=/usr/local/shinken/etc
+  --&gt; VAR=/usr/local/shinken/var
+  --&gt; LIBEXEC=/usr/local/shinken/libexec
+  --&gt; TARGET=/usr/local/shinken
+  &gt; checking if shinken is installed in /usr/local/shinken
+ +--------------------------------------------------------------------------------
+ | Install install_check_netint
+ +--------------------------------------------------------------------------------
+  &gt; Installing pre-requisites.
+  &gt; Downloading check_netint
+  &gt; install check_netint
+
+ # ./install -a pnp4nagios
+
+  &gt; Found installation parameters
+  --&gt; ETC=/usr/local/shinken/etc
+  --&gt; VAR=/usr/local/shinken/var
+  --&gt; LIBEXEC=/usr/local/shinken/libexec
+  --&gt; TARGET=/usr/local/shinken
+  &gt; checking if shinken is installed in /usr/local/shinken
+ +--------------------------------------------------------------------------------
+ | Install pnp4nagios addon
+ +--------------------------------------------------------------------------------
+  &gt; Found installation parameters
+  --&gt; ETC=/usr/local/shinken/etc
+  --&gt; VAR=/usr/local/shinken/var
+  --&gt; LIBEXEC=/usr/local/shinken/libexec
+  --&gt; TARGET=/usr/local/shinken
+  &gt; Installing prerequisites
+  &gt; Getting pnp4nagios archive
+  &gt; Extracting archive
+  &gt; Configuring source tree
+  &gt; Building ....
+  &gt; Installing
+  &gt; Fix htpasswd.users path
+  &gt; Enable npcd startup
+  &gt; Enable npcdmod
+  &gt; using ip address: 192.168.11.114
+  &gt; Starting npcd</code></pre></li>
+<li><p>fix the installation:</p>
+<p>many parts of the installation are broken, so for basic operation
+here are some fixes:</p>
+<ul>
+<li><p>create a common secret key (for pnp4nagios and npcd
+communication):</p>
+<pre><code>  cat /dev/urandom | tr -dc _A-Z-a-z-0-9 | head -c${1:-32} &gt; /usr/local/pnp4nagios/etc/secret.key
+  chown shinken:shinken /usr/local/pnp4nagios/etc/secret.key</code></pre></li>
+<li><p>fix pnp4nagios to use the common key file by looking at
+<strong>/usr/local/pnp4nagios/etc/process_perfdata.cfg</strong>: disable
+<strong>KEY = should_be_changed</strong> and enable <strong>KEY_FILE =
+/usr/local/pnp4nagios/etc/secret.key</strong> (see this example how it
+should look like):</p>
+<pre><code> ...
+ # enables or disables encryption. It is strongly
+ # advised to not disable encryption. Anybody will be
+ # able to inject packages to your worker.
+ # Encryption is enabled by default and you have to
+ # explicitly disable it.
+ # When using encryption, you will either have to
+ # specify a shared password with KEY = ... 
+ # Default is 1.
+ #
+ ENCRYPTION = 1
+
+ # A shared password which will be used for
+ # encryption of data pakets. Should be at least 8
+ # bytes long. Maximum length is 32 characters.
+ #
+ #KEY = should_be_changed
+
+ # The shared password will be read from this file.
+ # Use either key or keyfile. Only the first 32
+ # characters will be used.
+ KEY_FILE = /usr/local/pnp4nagios/etc/secret.key </code></pre></li>
+<li><p>finally, restart the services:</p>
+<pre><code>  /etc/init.d/shinken restart
+  /etc/init.d/npcd restart</code></pre></li>
+</ul>
+<p><strong>note:</strong> cpu/load/memory/NetworkUsage all fail for
+localhost at my machine but i get ping latency statistics and RRD graphs
+(it says: Cpu UNKNOWN36m 2s (Service Check Timed Out))</p></li>
+<li><p>finally, open these two pages in your browser:</p>
+<ul>
+<li><a href="http://localhost:7767"
+class="uri">http://localhost:7767</a></li>
+<li><a href="http://localhost/pnp4nagios"
+class="uri">http://localhost/pnp4nagios</a></li>
+</ul>
+<p><strong>note:</strong> it could take 2minutes for pnp4nagios to
+generate RRD graphics</p></li>
+<li><p>see the logs:</p>
+<pre><code> tail -f  /usr/local/shinken/var/*.log</code></pre>
+<p><strong>note:</strong> in case you want to debug npcd, see
+[[shinken_1.2.4_on_ubuntu_desktop_12.10/#index1h2]]</p></li>
+<li><p>since monitoring localhost is not enough:</p>
+<p>go to /usr/local/shinken/etc/hosts and add a file like
+wiki.serverkommune.de.cfg:</p>
+<pre><code> # cat wiki.serverkommune.de.cfg
+
+ define host{
+ host_name                      wiki.serverkommune.de
+ contact_groups                 admins
+ address                        wiki.serverkommune.de
+ use                            http
+ }</code></pre>
+<p>afterwards restart shinken:</p>
+<pre><code> /etc/init.d/shinken restart</code></pre></li>
+<li><p>security: change the admin user password:</p>
+<pre><code> cd /usr/local/shinken/etc
+ htpasswd htpasswd.users admin</code></pre></li>
+</ol>
+<h3 data-number="2.1" id="hacking-shinken">hacking shinken</h3>
+<p>when i select a server which i do monitor, like
+wiki.serverkommune.de, there is the ‘Graphics’ tab which says:</p>
+<pre><code> Oh snap! No graphs available!</code></pre>
+<p>i tried to debug this to no avail!</p>
+<p>this string seems to be references from:
+<strong>shinken/webui/plugins/eltdetail/views/eltdetail.tpl</strong></p>
+<pre><code> %uris = app.get_graph_uris(elt, graphstart, graphend)
+ ...
+ &lt;div class=&quot;font-red&quot;&gt;&lt;strong&gt;Oh snap!&lt;/strong&gt; No graphs available!&lt;/div&gt;</code></pre>
+<p>so i tried to find references to get_graph_uris:</p>
+<pre><code> shinken/modules/webui_broker/webui_broker.py:    def get_graph_uris(self, elt, graphstart, graphend, source = &#39;detail&#39;):
+ shinken/modules/webui_broker/webui_broker.py:                f = getattr(mod, &#39;get_graph_uris&#39;, None)
+ shinken/modules/graphite_ui.py:    def get_graph_uris(self, elt, graphstart, graphend, source = &#39;detail&#39;):
+ shinken/modules/pnp_ui.py:    def get_graph_uris(self, elt, graphstart, graphend, source = &#39;detail&#39;):</code></pre>
+<p>according to the devs this page should work: <a
+href="http://192.168.11.114/pnp4nagios"
+class="uri">http://192.168.11.114/pnp4nagios</a> (for me it is an empty
+page)</p>
+<p>because of the fact that there were no graphics i started looking at
+pnp4nagios and found npcd [Nagios Performance Data C Daemon]:</p>
+<pre><code> /etc/init.d/npcd status
+ npcd (pid 994) is running...</code></pre>
+<p>a look at the task</p>
+<pre><code> ps aux | grep npcd
+ shinken    994  0.0  0.2  90776  1028 ?        S    02:41   0:00 /usr/local/pnp4nagios/bin/npcd -d -f /usr/local/pnp4nagios/etc/npcd.cfg</code></pre>
+<p>i’ve played with various values in the configuration file:</p>
+<ul>
+<li>log_level</li>
+<li>/usr/local/pnp4nagios/libexec/process_perfdata.pl</li>
+</ul>
+<p>but it seems that the npcd service cleares the
+<strong>perfdata_spool_dir =
+/usr/local/pnp4nagios/var/spool/</strong></p>
+<p>the error must be somewhere in there!</p>
+<p>a closer look at
+<strong>/usr/local/pnp4nagios/libexec/process_perfdata.pl</strong>:</p>
+<ul>
+<li><p>it seems that: <strong>/usr/local/pnp4nagios/etc/rra.cfg</strong>
+does not exist</p></li>
+<li><p>however,
+<strong>/usr/local/pnp4nagios/etc/rra.cfg-sample</strong> does</p></li>
+<li><p><strong>/usr/local/pnp4nagios/etc/secret.key</strong> is not
+there either</p></li>
+<li><p><strong>/usr/local/pnp4nagios/var/perfdata</strong> exists and
+contains files:</p>
+<pre><code>ls -la  /usr/local/pnp4nagios/var/perfdata/serverkommune.de/
+total 1912
+drwxrwxr-x  2 shinken shinken   4096 Feb 25 03:40 .
+drwxr-xr-x 13 shinken shinken   4096 Feb 20 08:54 ..
+-rw-rw-r--  1 shinken shinken 768224 Feb 25 03:40 Http.rrd
+-rw-rw-r--  1 shinken shinken 768224 Feb 25 03:39 Https.rrd
+-rw-rw-r--  1 shinken shinken   2475 Feb 25 03:39 Https.xml
+-rw-rw-r--  1 shinken shinken   2464 Feb 25 03:40 Http.xml
+-rw-rw-r--  1 shinken shinken 384952 Feb 25 03:37 smtp.rrd
+-rw-rw-r--  1 shinken shinken   1815 Feb 25 03:37 smtp.xml
+-rw-rw-r--  1 shinken shinken      0 Feb 21 09:34 smtp.xml.2972</code></pre></li>
+<li><p>looking at the log
+<strong>/usr/local/pnp4nagios/var/perfdata.log</strong></p>
+<pre><code>less /usr/local/pnp4nagios/var/perfdata.log
+2013-02-21 09:26:57 [2856] [0] RRDs::update /usr/local/pnp4nagios/var/perfdata/serverkommune.de/Http.rrd 1361459985:0.631224:1817
+2013-02-21 09:26:57 [2856] [0] RRDs::update ERROR /usr/local/pnp4nagios/var/perfdata/serverkommune.de/Http.rrd: illegal attempt to update using time 1361459985 when last update time is 1361460284 (minimum one second step)
+2013-02-25 02:42:16 [997] [0] *** TIMEOUT: Timeout after 15 secs. ***
+2013-02-25 02:42:39 [997] [0] *** TIMEOUT: Deleting current file to avoid NPCD loops
+2013-02-25 02:42:39 [997] [0] *** TIMEOUT: Please check your process_perfdata.cfg
+2013-02-25 02:42:39 [997] [0] *** TIMEOUT: Could not delete /usr/local/pnp4nagios/var/spool//perfdata.1361460886-PID-997:No such file or directory
+2013-02-25 02:42:39 [997] [0] *** Timeout while processing Host: &quot;.pnp-internal&quot; Service: &quot;runtime&quot;
+2013-02-25 02:42:39 [997] [0] *** process_perfdata.pl terminated on signal ALRM</code></pre></li>
+<li><p>looking at
+<strong>/usr/local/pnp4nagios/etc/process_perfdata.cfg</strong> it seems
+that a password was missing and the secret file wasn’t set either</p>
+<pre><code># enables or disables encryption. It is strongly
+# advised to not disable encryption. Anybody will be
+# able to inject packages to your worker.
+# Encryption is enabled by default and you have to
+# explicitly disable it.
+# When using encryption, you will either have to
+# specify a shared password with KEY = ... 
+# Default is 1.
+#
+ENCRYPTION = 1
+
+# A shared password which will be used for
+# encryption of data pakets. Should be at least 8
+# bytes long. Maximum length is 32 characters.
+#
+KEY = should_be_changed
+
+# The shared password will be read from this file.
+# Use either key or keyfile. Only the first 32
+# characters will be used.
+# KEY_FILE = /usr/local/pnp4nagios/etc/secret.key </code></pre></li>
+<li><p>what about pnp4nagios vhost? apache seems to be running:</p>
+<pre><code>/etc/init.d/apache2 status
+Apache2 is running (pid 1459).</code></pre></li>
+<li><p><strong>/var/log/apache2/error.log</strong></p>
+<pre><code>tail -f  /var/log/apache2/error.log 
+[Thu Feb 21 09:28:20 2013] [error] [client 192.168.11.104] File does not exist: /var/www/favicon.ico
+[Mon Feb 25 02:43:16 2013] [notice] Apache/2.2.22 (Ubuntu) mod_fcgid/2.3.7 PHP/5.4.6-1ubuntu1.1 configured -- resuming normal operations
+[Mon Feb 25 02:44:09 2013] [error] [client 192.168.11.104] File does not exist: /var/www/favicon.ico
+[Mon Feb 25 02:49:33 2013] [error] [client 192.168.11.104] user admin: authentication failure for &quot;/pnp4nagios/index.php/image&quot;: Password Mismatch, referer: http://192.168.11.114:7767/all</code></pre></li>
+<li><p>the secret key:</p>
+<pre><code> echo &quot;abcdefghijklmnopqrstuvwxyz0000000000000000000&quot; &gt; /usr/local/pnp4nagios/etc/secret.key
+ chown shinken:shinken /usr/local/pnp4nagios/etc/secret.key</code></pre></li>
+<li><p>restarting shinken</p>
+<pre><code> /etc/init.d/shinken restart
+ /etc/init.d/npcd restart</code></pre></li>
+<li><p>so what can i do now? visit #pnp4nagios@irc.freenode.net</p>
+<pre><code>   (14:33) &lt;   qknight&gt; when i type: http://192.168.11.114/pnp4nagios/graph?host=blog.lastlog.de i get a total empty page (no html source code)
+   (14:34) &lt;   qknight&gt; http://blog.lastlog.de/posts/shinken_1.2.4_on_ubuntu_12.10_LTS/
+   (14:34) &lt;   qknight&gt; and i don&#39;t know where to start debugging the setup
+   (14:35) &lt; _pitchfor&gt; pnp4nagios verison?
+   (14:35) &lt; _pitchfor&gt; PHP Version?
+   (14:38) &lt; _pitchfor&gt; you site points to the old 0.4.x docs
+   (14:38) &lt; _pitchfor&gt; qknight:  so which version of pnp4nagios do you use?
+   (14:39) &lt;   qknight&gt; _pitchfork_: npcd 0.6.17 - $Revision: 637 $
+   (14:40) &lt; _pitchfor&gt; and why do you link to the 0.4.x docs?
+   (14:40) &lt; _pitchfor&gt; anyway
+   (14:40) &lt; _pitchfor&gt; which PHP version do you use?
+   (14:40) &lt;   qknight&gt; pnp4nagios-0.6.17
+   (14:41) &lt; _pitchfor&gt; PHP not PNP
+   (14:41) &lt; _pitchfor&gt; http://docs.pnp4nagios.org/pnp-0.6/dwnld#changelog
+   (14:41) &lt;   qknight&gt; PHP Version =&gt; 5.4.6-1ubuntu1.1
+   (14:41) &lt; _pitchfor&gt; http://docs.pnp4nagios.org/pnp-0.6/dwnld#changelog
+   (14:41) &lt; _pitchfor&gt; fixed with pnp4nagios 0.6.18
+   (14:41) &lt; _pitchfor&gt; happy updating ;)
+   (14:42) &lt;   qknight&gt; _pitchfork_: what is fixed with that new version?
+   (14:42) &lt; _pitchfor&gt; http://docs.pnp4nagios.org/pnp-0.6/dwnld#changelog
+   (14:44) &lt;   qknight&gt; _pitchfork_: sorry?
+   (14:44) &lt;   qknight&gt; i will try to update now
+   (14:44) &lt; _pitchfor&gt; qknight:  -&gt; Bugfix: Blank screen on PHP 5.4 fixed
+   (14:44) &lt;   qknight&gt; oh, right
+   (14:44) &lt;   qknight&gt; thanks!</code></pre></li>
+<li><p>finally the fix (very simple one indeed): in the installer of
+shinken change
+<strong>shinken-1.2.4/install.d/shinken.conf</strong>:</p>
+<pre><code>  install.d/shinken.conf -&gt; export PNPRELEASE=&quot;17&quot; # must be updated to 18 instead!</code></pre></li>
+</ul>
+<p><strong>note:</strong> see bugfix in [6] for the 2.18 release</p>
+<pre><code>Bugfix: Blank screen on PHP 5.4 fixed</code></pre>
+<h2 data-number="3" id="shinken-review">shinken review</h2>
+<h3 data-number="3.1" id="packaging">packaging</h3>
+<p>summary:</p>
+<ul>
+<li>i <strong>tried third party packages for shinken but it failed
+horribly</strong> (as usually when i do something with third party stuff
+on ubuntu/debian).</li>
+<li><strong>source deployment seems to be a good idea for the time
+being</strong> - until someone packages it for ubuntu</li>
+</ul>
+<p><strong>anyway, when being used to nixpkgs this seems to
+<em>horribly</em> wrong!!1!</strong></p>
+<h3 data-number="3.2" id="usability">usability</h3>
+<p>this screenshot shows the shinken UI:</p>
+<p><a href="media/shinken_on_ubuntu_1210_2.png"><img src=media/shinken_on_ubuntu_1210_2.png caption="shinken on ubuntu desktop 12.10 - all"></a></p>
+<p>but:</p>
+<ul>
+<li><strong>the layout (picture above) is not structured in a
+clean/obvious way</strong>, i often need several moments to realise
+which result belongs to which server</li>
+<li>when <strong>hoovering the mouse over a latency meassure</strong>
+(as shown in the picture above) it sometimes does weird things when the
+page is being reset</li>
+<li><strong>expanding several hosts makes the lower part of the page
+unusable</strong> as pageresets frequently reset the view to the
+top</li>
+<li><strong>sometimes hoovering does not work</strong> so there won’t be
+any graph</li>
+<li>there is <strong>no indicator when the data was refreshed the last
+time</strong>, so once i thought everything is alright even though it
+was not!</li>
+<li><strong>when being in a host view i can’t use the ‘Graphs’ tab
+directly</strong> (it would show ‘Oh snap! No graphs available!’) but
+instead i have to select a service in the ‘Impacts’ tab first. why is
+this ‘Graphs’ tab there then?!</li>
+<li><strong>i could’t get CPU/Load/Memory check for localhost
+working</strong></li>
+</ul>
+<p>i tested all this both with ff and chrome. in general i like shinken
+and maybe someone benefits from this guide? how knows ;-)</p>
+<h2 data-number="4" id="future-steps">future steps</h2>
+<ul>
+<li>using NRPE (Nagios Remote Plugin Executor) to monitor remote
+machines. see [7][8][9]</li>
+<li>put shinken behind apache, thus make the service use 80/443, see
+[10]</li>
+<li>consider using thruk, see [11]</li>
+</ul>
+<h2 data-number="5" id="summary">summary</h2>
+<p>i’ve wasted about 3 days debugging shinken for ubuntu desktop 12.10.
+anyway, i need this setup as i want to run it on a raspberry pi! i like
+the documentation on the webpage and also the installer and installation
+steps is quite usable.</p>
+<p>i really love the impact graph. can’t wait to see it in our more
+complex setup here!</p>
+<h3 data-number="5.1" id="consider-using-centosrhel">consider using
+Centos/RHEL</h3>
+<p>hvad@shinken#irc.freenode.net recommended to use Centos/RHEL 6.x by
+using the EPEL repository. since i want to run shinken on the raspberry
+pi this is no option right now ;-P</p>
+<p><strong>thanks for the help to hvad/Issif/oliv-</strong></p>
+<p>#links * [1] <a
+href="http://www.shinken-monitoring.org/wiki/shinken_10min_start#minute_shinken_installation_guide"
+class="uri">http://www.shinken-monitoring.org/wiki/shinken_10min_start#minute_shinken_installation_guide</a>
+* [2] <a href="https://github.com/naparuba/shinken/issues/735"
+class="uri">https://github.com/naparuba/shinken/issues/735</a> * [3] <a
+href="https://forums.aws.amazon.com/thread.jspa?messageID=386426"
+class="uri">https://forums.aws.amazon.com/thread.jspa?messageID=386426</a>
+* [4] <a href="http://docs.pnp4nagios.org/de/pnp-0.4/verify"
+class="uri">http://docs.pnp4nagios.org/de/pnp-0.4/verify</a> * [5] <a
+href="http://www.thomas-krenn.com/de/wiki/Icinga_Graphen_mit_PNP_unter_Debian_6.0_Squeeze"
+class="uri">http://www.thomas-krenn.com/de/wiki/Icinga_Graphen_mit_PNP_unter_Debian_6.0_Squeeze</a>
+* [6] <a href="http://docs.pnp4nagios.org/pnp-0.6/dwnld#changelog"
+class="uri">http://docs.pnp4nagios.org/pnp-0.6/dwnld#changelog</a> * [7]
+<a href="http://www.nagios-wiki.de/nagios/howtos/nrpe"
+class="uri">http://www.nagios-wiki.de/nagios/howtos/nrpe</a> * [8] <a
+href="http://www.nsclient.org/nscp/wiki/doc/usage/nagios/nrpe"
+class="uri">http://www.nsclient.org/nscp/wiki/doc/usage/nagios/nrpe</a>
+* [9] <a
+href="http://blog.admin-linux.org/supervision/howto-install-nrpe-sous-ubuntu-server-via-les-sources"
+class="uri">http://blog.admin-linux.org/supervision/howto-install-nrpe-sous-ubuntu-server-via-les-sources</a>
+* [10] <a
+href="http://www.shinken-monitoring.org/forum/index.php?topic=192.0"
+class="uri">http://www.shinken-monitoring.org/forum/index.php?topic=192.0</a>
+* [11] <a href="http://www.thruk.org/documentation.html"
+class="uri">http://www.thruk.org/documentation.html</a></p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/shinken/shinken_1.2.4_on_ubuntu_desktop_12.10.mdwn" title="posts\shinken\shinken_1.2.4_on_ubuntu_desktop_12.10.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

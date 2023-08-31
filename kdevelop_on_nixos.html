@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="kdevelop_on_nixos.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>kdevelop on nixos</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/kdevelop_on_nixos.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="system_services_on_nixos.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="n900_findings.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">kdevelop on nixos</h1>
+    <div id="date"><p><span id="lastupdated">17 oct 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::visualization" class="tagbtn btn btn-primary">visualization</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="issue-1">issue 1</h2>
+<p>i’ve adapted to a nixos only desktop and i’m facing new problems
+every day, lately i wanted to use kdevelop but it wasn’t able to import
+a normal ’Makefile’based project. next i installed lots of packages
+somehow mentioned at [1]. still that alone didn’t help so i ran:</p>
+<pre><code>kbuildsycoca4</code></pre>
+<p>kbuildsycoca4 is a utility which generates a cache of .desktop files
+and such to be used by programs. PovAddict#kde-devel@irc.freenode.net
+recommended to set KDEDIRS correctly because when doing so running
+kbuildsycoca4 manually wouldn’t be neccessary.</p>
+<p>not sure how to solve this problem correctly yet but in case i find
+out i will add it to this post.</p>
+<p><strong>update: 30.06.2012</strong></p>
+<p>in /etc/nixos/configuration.nix write:</p>
+<pre><code>environment.systemPackages = with pkgs; [
+  kde4.kdevelop
+];</code></pre>
+<p><strong>after nixos-rebuild kdevelop will have makefile and cmake
+support.</strong> however, at least for proper cmake support, needed
+when kdevelop should build the project, you will need to <strong>prepare
+a decent environment where all the needed programs and dependencies are
+listed</strong>, see [2]</p>
+<h2 data-number="2" id="issue-2">issue 2</h2>
+<p>another point which bugs me is that auto-completion doesn’t work
+correctly as there is no such thing as /usr/include on nixos as one
+might expect when coming from a different linux distribution. didn’t
+find a solution here yet either…</p>
+<p><strong>update: 30.06.2012 - found a nice solution to this problem,
+just have a look at [2] as well</strong></p>
+<h2 data-number="3" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="http://techbase.kde.org/Projects/KDevelop4/HowToCompile"
+class="uri">http://techbase.kde.org/Projects/KDevelop4/HowToCompile</a></li>
+<li>[2] <a
+href="http://invalidmagic.wordpress.com/2012/03/23/developing-software-using-nixos/"
+class="uri">http://invalidmagic.wordpress.com/2012/03/23/developing-software-using-nixos/</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/kdevelop_on_nixos.mdwn" title="posts\kdevelop_on_nixos.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

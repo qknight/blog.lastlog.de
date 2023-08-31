@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="openmoko_-_xbuffer_screwup_issue.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>openmoko - xbuffer screwup issue</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/openmoko_-_xbuffer_screwup_issue.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="p2p_networks_decentralized.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="centralized_vs_decentralized_infrastructures.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">openmoko - xbuffer screwup issue</h1>
+    <div id="date"><p><span id="lastupdated">19 may 2009</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::openmoko" class="tagbtn btn btn-primary">openmoko</a></p></div>
+    <p><a href="media/om.jpg"><img src=media/om.jpg alt="today i had the already mentioned problem: **xbuffer screwup**" style="float: right"></a></p>
+<p>i played with the openmoko to get an idea what could cause this and i
+come up with this:</p>
+<ul>
+<li>system widgets are not affected much but they are.</li>
+<li>tangogps draws the map on the screen afterwards it draws an overlay
+over the map: this overlay is used to draw the track with red color, you
+probably have used this already the funny thing is that on a move event
+of the map the second layer isn’t drawn and does NOT contain screwed
+images. after i release the screen the overlay is drawn and the map is
+filled with black random pixels and some other colors as well.</li>
+<li>later i restarted tangogps and then all the pixmaps were screwed no
+matter if i used the map move or not</li>
+</ul>
+<p><strong>openmoko using shr # dmesg</strong></p>
+<pre><code>[   63.660000] Restarting tasks ... done.
+[   86.405000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+[  189.895000] JFFS2 notice: (445) check_node_data: wrong data CRC in data node at 0x0d93a5bc: read 0x41c01a60, calculated 0x8116099a.
+[  266.440000] HDQ error: 1
+[  266.455000] HDQ responds again
+[ 1470.260000] g_ether gadget: full speed config #1: CDC Ethernet (ECM)
+[ 1470.270000] ADDRCONF(NETDEV_CHANGE): usb0: link becomes ready
+[ 1472.610000] pcf50633 0-0073: usb curlim to 500 mA
+[ 1480.365000] usb0: no IPv6 routers present
+[ 2267.715000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+[ 2282.025000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+[ 2293.020000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+[ 2317.940000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 2317.940000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 2317.940000] mmcblk0: error -110 sending status comand&lt;3&gt;mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 2317.950000] mmcblk0: error -110 requesting status
+[ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 2317.950000] end_request: I/O error, dev mmcblk0, sector 10486864
+[ 2317.950000] Buffer I/O error on device mmcblk0p1, logical block 1310856
+[ 2317.950000] lost page write due to I/O error on mmcblk0p1
+[ 2330.500000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+[ 2467.610000] rxerr: port=1 ch=0x2e, rxs=0x00000001
+[ 3152.305000] rxerr: port=1 ch=0x12, rxs=0x00000001
+[ 3335.135000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+[ 3336.000000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.000000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.000000] mmcblk0: error -110 sending status comand&lt;3&gt;mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+[ 3336.010000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.010000] glamo-mci glamo-mci.0: Error after cmd: 0x8120
+[ 3336.010000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.020000] mmcblk0: error -110 requesting status
+[ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.020000] end_request: I/O error, dev mmcblk0, sector 10208
+[ 3336.020000] end_request: I/O error, dev mmcblk0, sector 10216
+[ 3336.020000] end_request: I/O error, dev mmcblk0, sector 10224
+[ 3336.035000] Aborting journal on device mmcblk0p1.
+[ 3336.055000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.055000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.055000] mmcblk0: error -110 sending status comand&lt;3&gt;mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3336.085000] mmcblk0: error -110 requesting status
+[ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3336.085000] end_request: I/O error, dev mmcblk0, sector 4176
+[ 3336.085000] Buffer I/O error on device mmcblk0p1, logical block 520
+[ 3336.085000] lost page write due to I/O error on mmcblk0p1
+[ 3363.365000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3363.365000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3363.365000] mmcblk0: error -110 sending status comand&lt;3&gt;mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+[ 3363.380000] mmcblk0: error -110 requesting status
+[ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+[ 3363.380000] end_request: I/O error, dev mmcblk0, sector 15204384
+[ 3363.380000] Buffer I/O error on device mmcblk0p1, logical block 1900546
+[ 3363.380000] lost page write due to I/O error on mmcblk0p1</code></pre>
+<p>currently i would like to fix that issue since it seems to happen
+frequently</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/openmoko_-_xbuffer_screwup_issue.mdwn" title="posts\openmoko_-_xbuffer_screwup_issue.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

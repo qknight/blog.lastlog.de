@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="request_tracker_kanban_extension.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>request tracker kanban extension</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/request_tracker_kanban_extension.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="nixos_pxe_booting.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="emscripten-1.36.4_on_nixos.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">request tracker kanban extension</h1>
+    <div id="date"><p><span id="lastupdated">12 mar 2016</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::javascript" class="tagbtn btn btn-primary">javascript</a><a href="timeline.html?filter=tag::html5" class="tagbtn btn btn-primary">html5</a><a href="timeline.html?filter=tag::RT" class="tagbtn btn btn-primary">RT</a><a href="timeline.html?filter=tag::perl" class="tagbtn btn btn-primary">perl</a><a href="timeline.html?filter=tag::mojolicious" class="tagbtn btn btn-primary">mojolicious</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p>lately we extended the famous <a
+href="https://en.wikipedia.org/wiki/Request_Tracker">request tracker</a>
+software with a <a
+href="https://en.wikipedia.org/wiki/Kanban">看板</a>-interface:</p>
+<p><a href="media/kanban.jpg"><img src=media/kanban.jpg></a></p>
+<h2 data-number="2" id="features">features</h2>
+<ul>
+<li><p>jQuery UI</p></li>
+<li><p>drag’n’drop operations:</p>
+<ul>
+<li>drag ticket to other ‘state’</li>
+<li>drag ticket to lane ‘user’ to have it assigned to a certain
+user+status</li>
+<li>using the javascript callback you can basically do many cool &amp;
+creative things</li>
+</ul></li>
+<li><p>WebSocket are used to update all kanban-views in realtime after a
+ticket has changed</p></li>
+<li><p>by <em>overriding perl functions</em> we added an introspection
+layer on <code>sub _Set()</code>, <code>sub Create()</code> and
+<code>sub MergeInto()</code> function calls</p></li>
+<li><p>using a <strong>reverse proxy</strong> (apache) we made
+example.com/rt look like one webpage even though it is internally served
+using two webservers</p></li>
+<li><p>mojolicious reuses the <code>session cookies</code> form RT to
+indirectly verify user credentials</p></li>
+<li><p>using the <code>REST 1.0</code> interface of RT tickets are
+queried from the kanban-view</p></li>
+</ul>
+<h2 data-number="3" id="backend">backend</h2>
+<p>we first started with twiggy + AnyEvent but it turned out that it was
+so much easier implementing it using <strong>mojolicious due to its
+async nature, feature richness and wonderful documentation</strong>.</p>
+<p><a href="media/internals-and-setup.png"><img src=media/internals-and-setup.png class="noFancy"></a></p>
+<h3 data-number="3.1" id="redis-normalization">redis &amp;
+normalization</h3>
+<p><a href="http://redis.io/">redis</a> was used as <strong>IPC</strong>
+between the two webservers. one <strong>problem</strong> was that RT
+would <strong>often send 4 ticket updates</strong> for the same ticket
+within 200ms, thus we had to add a <code>normalizer</code> to reduce the
+amount of events passed to the UI.</p>
+<h3 data-number="3.2" id="sessionscookies">sessions/cookies</h3>
+<p>since the <strong>reverse proxy</strong> forwards all the cookies
+from the browser, not only to RT but also to the mojolicious webserver,
+we just used that to check if a user is allowed to subscribe to the
+ticket-life update feed.<br />
+this was implemented by brute-forcing the <code>REST 1.0</code>
+interface with a bogus query and the given cookies.</p>
+<h3 data-number="3.3" id="ui-consistency">UI consistency</h3>
+<p>the UI requires to catch all events but a user might have used
+‘suspend’ or was otherwise disconnect for a short time-period. we
+implemented a <code>sequence number</code> and thus every sent updates
+increases it. if the client notices that his internal
+<code>sequence number</code> differs from the supplied one it will just
+‘rest’ the view by reloading all tickets.</p>
+<h3 data-number="3.4" id="usability">usability</h3>
+<p>the merge/link buttons have a <code>auto-completion</code> feature
+using <a href="https://jqueryui.com/autocomplete/">jQuery’s
+autocomplete</a> which is very cool. just play with it and see how easy
+it is to integrate into your webpages!</p>
+<p>we also integrated a full-screen mode so that you can put the kanban
+on a big screen.</p>
+<h2 data-number="4" id="documentation">documentation</h2>
+<p>if you like to play with the implementation or are interested in the
+source code:</p>
+<ul>
+<li><a href="https://github.com/nixcloud/rt-extension-kanban"
+class="uri">https://github.com/nixcloud/rt-extension-kanban</a></li>
+<li><a href="https://github.com/nixcloud/rt-coreExtension-websocket"
+class="uri">https://github.com/nixcloud/rt-coreExtension-websocket</a></li>
+</ul>
+<h2 data-number="5" id="conclusion">conclusion</h2>
+<p>this was a very cool project and we think that the mojolicious
+implementation can be adapted/used for other rt-extensions or even other
+perl based projects.</p>
+<p>we would like to thank <a href="http://lihas.de/">LiHAS</a> (sponsor)
+and Best Practical Solutions and #perl ppl for their help.</p>
+<p>best wishes,<br />
+joachim &amp; paul</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/request_tracker_kanban_extension.mdwn" title="posts\request_tracker_kanban_extension.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

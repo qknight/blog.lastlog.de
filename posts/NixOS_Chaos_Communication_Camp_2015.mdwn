@@ -1,0 +1,21 @@
+[[!meta date="2015-07-12 20:58"]]
+[[!tag nixos]]
+[[!summary NixOS @ chaos communication camp 2015]]
+[[!img media/nixos-lores.png alt="" style="float: right" class="noFancy"]]
+
+# announcement
+i want to have **a major NixOS hacking/workshop event** [1] at the Chaos Communication Camp 2015.
+
+if you want to help with the preparations and even helping with the workshop(s), that'd be great. just see and modify the wiki at [1]! we will do all management and announcements in the wiki at [1] also!
+
+**hope to see you there!**
+
+best wishes,
+
+qknight
+
+# links
+
+* [1] <https://nixos.org/wiki/NixOS_Chaos_Communication_Camp_2015>
+* [2] <https://events.ccc.de/camp/2015/wiki/Main_Page>
+* [3] <http://events.ccc.de/tag/chaos-communication-camp/>

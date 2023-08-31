@@ -1,0 +1,119 @@
+[[!summary chatGPT: This post lists a collection of documentaries and podcasts, including space science documentaries, energy-related documentaries, and various podcasts on different topics.]]
+[[!meta date="2012-02-25 00:29"]]
+[[!tag society technology documentary podcast]]
+
+[[!img media/purple_podcasts.png caption="purple_podcasts from harenome razanajato" style="float: right" size=170x]]
+
+
+# documentaries
+
+here is a bunch of documentaries which i would like to point out because of their exceptional quality:
+
+## space science related documentaries
+	
+  * extreme astronomy - horizon: seeing stars. 720p - bbc (very good)
+
+    * [http://www.youtube.com/watch?v=lnw6jY-iUI8](http://www.youtube.com/watch?v=lnw6jY-iUI8)
+	
+  * destination titan - bbc very good)
+	
+    * [http://www.bbc.co.uk/programmes/b0109ccd](http://www.bbc.co.uk/programmes/b0109ccd)
+	
+  * space shuttle the final mission - bbc
+	
+    * [http://www.bbc.co.uk/programmes/b012x69w](http://www.bbc.co.uk/programmes/b012x69w)
+	
+  * BBC SPACE (very good) but i can't provide a link as i can't find any... *bummer*
+	
+    * BBC Space/1 - Star Stuff
+    * BBC Space/2 - Are We Alone
+    * BBC Space/3 - Staying Alive
+    * BBC Space/4 - New Worlds
+    * BBC Space/5 - Black Hole
+    * BBC Space/6 - Boldly Go
+
+**note:** for all this nasa missions i wonder how they get all the funding. and why there is so much military involvement (especially in 'extreme astronomy')?
+
+## energy related
+	
+  * feldheim: das erste energieautarke dorf (very good)
+	
+    * [http://www.anti-atom-piraten.de/2011/04/feldheim-das-erste-energieautarke-dorf/](http://www.anti-atom-piraten.de/2011/04/feldheim-das-erste-energieautarke-dorf/)
+	
+  * grenzenlose windkraft (3sat documentary about the enercon e126)
+	
+    * [http://www.youtube.com/watch?v=ek_lUxEuwBI](http://www.youtube.com/watch?v=ek_lUxEuwBI)
+	
+  * alles im griff - arte (very good)
+	
+    * [http://www.arte.tv/de/2151166,CmC=3785858.html](http://www.arte.tv/de/2151166,CmC=3785858.html)
+	
+  * deadly dust - todesstaub uranmunition und ihre folgen (very good)
+
+    * [http://www.youtube.com/watch?v=GTRaf23TCUI](http://www.youtube.com/watch?v=GTRaf23TCUI)
+	
+  * quarks und co : 20110322 and 20110426
+
+	
+    * <http://www.podcast.de/episode/2158063/Quarks%2B%2526%2BCo%253A%2B26.04.2011%252C%2BDie%2BAtom-Ruinen%2Bvon%2BTschernobyl%2Bund%2BFukushima/>
+    * http://www.podcast.de/episode/2109512/Quarks%2B%2526%2BCo%253A%2B22.03.2011%252C%2BMensch%2Bgegen%2BStrahlung/>
+
+  * quarks und co - blackout in deutschland (very good)
+	
+    * [http://www.youtube.com/watch?v=Y4knU0b3UiU&feature=player_embedded](http://www.youtube.com/watch?v=Y4knU0b3UiU&feature=player_embedded)
+
+
+
+
+	
+  * die wahre geschichte von tschernobyl (one of many versions it seems - still interesting to see the historic images)
+
+	
+    * [http://nuoviso.tv/dokumentationen/wirtschaft/288-die-wahre-geschichte-von-tschernobyl](http://nuoviso.tv/dokumentationen/wirtschaft/288-die-wahre-geschichte-von-tschernobyl)
+
+	
+    * http://nuoviso.tv/ has many other interesting and inflammatory documentaries
+
+
+
+
+	
+  * antiatompiraten.de (very good blog about nuclear energy; occasionally contains documentaries which are usually extraordinary)
+
+	
+    * [http://antiatompiraten.de/](http://antiatompiraten.de/)
+
+
+
+**note:** if you are interested in a sustainable concept on how to solve the energy problem with 100% renewables, read the books from **hermann scheer**:
+
+
+	
+  * [http://www.hermannscheer.de/de/](http://www.hermannscheer.de/de/) (very good)
+
+## podcasts (audio only)
+
+
+a few different podcasts i liked very much:
+	
+  * paul graham (very good) - wise words, listen carefully!
+
+
+    * OSCON 2004: <http://itc.conversationsnetwork.org/shows/detail188.html>
+	
+    * OSCON 2005: <http://itc.conversationsnetwork.org/shows/detail657.html>
+
+
+	
+  * CRE028 extreme programming
+
+	
+    * [http://cre.fm/cre028](http://cre.fm/cre028)
+  * CRE084 LISP
+
+	
+    * [http://cre.fm/cre084](http://cre.fm/cre084)
+	
+  * seradio-episode84 dick gabriel on LISP (very good)
+
+    * [http://www.se-radio.net/2008/01/episode-84-dick-gabriel-on-lisp/](http://www.se-radio.net/2008/01/episode-84-dick-gabriel-on-lisp/)

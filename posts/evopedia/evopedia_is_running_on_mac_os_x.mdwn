@@ -1,0 +1,126 @@
+[[!summary chatGPT: The article provides instructions on how to deploy Evopedia 0.4.2 on Mac OS X using Homebrew or native Qt tools, as well as the option to download a pre-built dmg image.]]
+[[!meta date="2011-02-21 19:29"]]
+[[!tag macosx packagemanager qt usability]]
+[[!series evopedia]]
+
+# evopedia is running on mac os x
+
+<del>two weeks ago</del> long time ago i created a build of evopedia 0.4.2 for mac os x [snow leopard].
+
+[[!img media/evopedia_download_dialog1.png]]
+
+# two ways of deploying to max os x
+
+### using homebrew
+
+since executing binaries requires a lot of trust i prefer installing from source (source deployment).
+
+- drawbacks include:
+
+  * **installing xcode** (requires lots of space)
+  * **need to compile from source** (as homebrew does 'source deployment')
+  * need to **compile and install qt 4.7.1** (takes much time)
+  * need to **compile and install pbzip2**
+  * needs to **compile and install evopedia 0.4.2**
+
+software you have to install manually:
+
+	
+  * **install xcode** (requires lots of space, requires apple developer id)
+  * **install homebrew** (takes 2minutes) [2]
+  * requires the **evopedia homebrew formula** [4]
+
+in contrast to most evopedia builds i created already, using homebrew's build makes use of pbzip2 [3]. but evopedia does not benefit much from the parallelization as the archive extraction (when reading an article) only lasts several milliseconds. and less powerful architectures we support, as the nokia n900, do have one processor only anyway.
+
+so how to reproduce?
+
+	
+  * install xcode
+  * install homebrew (see manual)
+
+    **ruby -e "$(curl -fsSLk https://gist.github.com/raw/323731/install_homebrew.rb)"**
+
+  * type '**brew edit evopedia**' and copy'n'paste the contents of  [4] into it
+  * now in a shell (terminal) type:
+
+    **brew install evopedia**
+	
+  * finally launch evopedia using:
+
+# evopedia (from a shell)
+
+
+this installation will take quite some time as it needs to compile qt from source.
+
+## using homebrew to create a self contained binary
+
+i've not seen this yet but it could be possible. benefits would include:
+	
+  * **one developer would build a binary** as described above in 'using homebrew' but then
+  * he would **collect all libraries needed and bundle the software** and
+  * finally **upload the dmg image** so that users can download it easily
+  * users could now download the dmg NOT using homebrew: 'binary deployment' vs 'source deployment'
+
+the benefit would be that everyone who wants to do source code modification can setup the build environment easily using homebrew. it would also be easy to create a self contained dmg later on.
+
+## using native qt tools
+
+
+in contrast to the former mentioned homebrew installation you could 'simply' download the self-contained  evopedia binary runner. therefore we need:
+
+  * qt library with the QTCreator IDE [5]
+  * evopedia git version [1]
+
+### loading the project into qtcreator
+
+after installing the qt library using the installer start 'qtcreator' using the quick starter. then in the main menu select "file - open file or project" and select the evopedia.pro in the git directory.
+
+  * **in project settings set a directory where to build**, build it outside the source directory, for example: ~/Desktop/evopedia-build-release
+  * **check that you build a 'release' target**
+  * **next hit the play** button which will start the build.
+
+**NOTE**: you might want to edit the src.pri and remove the evopedia.icns line with a # sign if the **evopedia.icns is missing** in your checkout.  i already uploaded it to my git repository of evopedia.
+
+
+### how to deploy this build
+
+
+after you **checked that the evopedia application was running** invoked from  qtcreator (after you hit play) we need to **bundle it** with all the needed libraries to make it run on a computer where no qt framework is installed. therefore [6] comes in handy.
+
+
+    cd ~/Desktop/evopedia-build-release
+    macdeployqt -dmg evopedia.app/
+
+
+this will copy all the needed *.dylib files into the bundle, so that it can be executed everywhere
+
+**Note:** the bundled application has **37mb** of binary stuff: **22mb QtGui, 5.6mb QtCore** and others
+
+**Note:** the current configuration should build a **universal binary for 32bit x86 and 64bit x86** support
+
+**the evopedia.dmg can now be distributed**, download it at [7].
+
+### installation of the dmg image
+
+
+download the dmg at [7], load it on mac os x and copy the contents (that is one file) into your application folder. this is probably very easy!
+
+    sha256sum evopedia-universal-0.4.2.dmg
+    4e8e584743bc9d20eb2d1d9773a7395f715f12aa4f832e1dc86f7c780d9f6a35  evopedia-universal-0.4.2.dmg
+
+# summary
+
+both ways of doing the deployment actually work. dependent on the trust you can use the 'fast' way and download the dmg or build it yourself. whatever suits you.
+
+**Note**: when having problems, just contact me via mail: js addd lastlog dod de
+
+
+# links
+
+* [1] <http://evopedia.info/>
+* [2] <http://mxcl.github.com/homebrew/>
+* [3] <http://compression.ca/pbzip2/>
+* [4] <http://lastlog.de/misc/wordpress/evopedia_homebrew_formula>
+* [5] <http://qt.nokia.com/products/platform/qt-for-mac>
+* [6] <http://doc.qt.nokia.com/latest/deployment-mac.html>
+* [7] <http://lastlog.de/misc/wordpress/evopedia-universal-0.4.2.dmg>

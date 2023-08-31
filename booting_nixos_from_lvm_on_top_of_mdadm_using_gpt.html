@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="booting_nixos_from_lvm_on_top_of_mdadm_using_gpt.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>booting nixos from lvm on top of mdadm using gpt</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/booting_nixos_from_lvm_on_top_of_mdadm_using_gpt.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="quantium_cracking.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="newspages_quotability_and_wikis.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">booting nixos from lvm on top of mdadm using gpt</h1>
+    <div id="date"><p><span id="lastupdated">28 apr 2012</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::hetzner" class="tagbtn btn btn-primary">hetzner</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right"></a></p>
+<p>#what is this?</p>
+<p>i recently <strong>upgraded my hetzner root server</strong> and
+therefore had a system with <strong>2x3tb disks</strong>. <strong>as
+fdisk can’t be used to partition disks &gt; 2tb i had to use gpt
+instead</strong> which was quite tricky until it was working. so here is
+my installation guide. parts of it applies also to other
+distributions.</p>
+<p>this guide uses concepts from the <strong>hetzner wiki OpenBSD
+installation guide</strong> [1].</p>
+<p><strong>note:</strong></p>
+<ul>
+<li><strong>gpt is used</strong> for both disks</li>
+<li>there is <strong>no extra /boot</strong> partition (the system will
+<strong>directly boot from the lvm which is on top of the
+mdadm</strong>); this works since grub2</li>
+<li>this setup is <strong>pretty similar to using fdisk (MBR)
+partitions</strong></li>
+<li>this <strong>guide still uses BIOS to boot</strong> (no
+EFI/UEFI)</li>
+<li><strong>/dev/sda1 </strong>and** /dev/sdb1 <strong>are</strong> very
+small partitions (2Mib); <strong>they are used to </strong>store the
+grub2 boot stages**, see [5]</li>
+</ul>
+<h3 data-number="0.1" id="disk-layout">disk layout</h3>
+<p><a href="media/nix9000-disklayout3.jpg"><img src=media/nix9000-disklayout3.jpg alt="" size=500x></a></p>
+<p>update: 26.5.2012: updated the image according to the
+<strong>swap</strong> comment from <strong>nbp. </strong>swap should not
+be in the lvm as it might degrade the performance.</p>
+<h3 data-number="0.2" id="the-installation">the installation</h3>
+<h4 data-number="0.2.1"
+id="first-remove-old-partitionsmdadm-setups">first remove old
+partitions/mdadm setups</h4>
+<h4 data-number="0.2.2" id="uninstall">uninstall:</h4>
+<pre><code>lvremove /dev/myvolgrp/home
+lvremove /dev/myvolgrp/system
+lvremove /dev/myvolgrp/swap
+vgremove myvolgrp
+pvremote /dev/md0
+mdadm --stop /dev/md0
+# to remove the md0 permanently
+mdadm --zero-superblock /dev/sda1
+mdadm --zero-superblock /dev/sdb1</code></pre>
+<h4 data-number="0.2.3" id="creating-the-partitions">creating the
+partitions</h4>
+<p><strong>update 26.5.2012: also add the swap partition here (not done
+below!).</strong></p>
+<pre><code>parted /dev/sda
+mklabel gpt
+mkpart non-fs 0 2
+mkpart primary 2 3001G
+p
+Number Start End Size File system Name Flags
+1 17.4kB 2000kB 1983kB non-fs
+2 2097kB 3001GB 3001GB primary
+     
+set 1 bios_grub on
+p
+Number Start End Size File system Name Flags
+1 17.4kB 2000kB 1983kB non-fs bios_grub
+2 2097kB 3001GB 3001GB primary</code></pre>
+<h4 data-number="0.2.4"
+id="creating-the-new-mdadm-softraid-device">creating the new mdadm
+softraid device</h4>
+<pre><code>mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda2 /dev/sdb2
+mdadm: Note: this array has metadata at the start and
+may not be suitable as a boot device. If you plan to
+store &#39;/boot&#39; on this device please ensure that
+your boot-loader understands md/v1.x metadata, or use
+--metadata=0.90
+Continue creating array? y
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md0 started.</code></pre>
+<h4 data-number="0.2.5" id="lvmfilesystems">LVM+filesystems</h4>
+<pre><code>pvcreate /dev/md0
+Physical volume &quot;/dev/md0&quot; successfully created
+
+vgcreate myVolGrp /dev/md0
+Volume group &quot;myVolGrp&quot; successfully created
+
+lvcreate -n system -L50G myVolGrp
+lvcreate -n swap -L8G myVolGrp
+
+mkfs.ext4 -O dir_index -j -L system /dev/myVolGrp/system
+mkswap -L swap /dev/myVolGrp/swap</code></pre>
+<p><strong>note: </strong>the disk layout diagram mentiones a tmp
+partition which** happended to be added later ;-)**</p>
+<h4 data-number="0.2.6"
+id="using-a-virtual-machine-vnc-to-boot-the-iso-image">using a virtual
+machine + vnc to boot the iso image</h4>
+<p>preparing the host system:</p>
+<pre><code>iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code></pre>
+<h4 data-number="0.2.7" id="on-the-hostsystem">on the hostsystem</h4>
+<pre><code>#download latest console only 64bit nixos installer
+nixos-minimal-0.1pre33860-33874-x86_64-linux.iso</code></pre>
+<p>make sure /dev/myVolGrp/system and /dev/myVolGrp/swap are not in
+use:</p>
+<pre><code>apt-get install sudo
+qemu-system-x86_64 -enable-kvm -m 1024 -hda /dev/md0 -net nic -net tap -cdrom nixos-minimal-0.1pre33860-33874-x86_64-linux.iso -boot d -vnc localhost:0</code></pre>
+<p><strong>note:</strong> in contrast to original article [1] i use
+‘-enable-kvm’ which speeds things up!</p>
+<h4 data-number="0.2.8" id="from-your-homecomputer">from your
+homecomputer</h4>
+<p>execute this two commands (in two different shells):</p>
+<pre><code>ssh -L 5900:localhost:5900 root@176.9.99.117
+vncviewer localhost</code></pre>
+<h4 data-number="0.2.9"
+id="inside-the-qemukvm-system-via-vncviewer">inside the qemu/kvm system
+via vncviewer</h4>
+<p>how we have to prepare install the system on the devices we had
+preparted in the steps before:</p>
+<pre><code>inside do:
+login as root
+mount -L system /mnt
+
+cd /mnt
+nixos-option --install
+vi /etc/nixos/configuration.nix
+
+stop dhcpcd
+ip a add 172.2.0.2/16 dev eth0
+ip r add via 172.2.0.1
+echo &quot;nameserver 8.8.8.8&quot; &gt; /etc/resolv.conf
+# use ping www.google.de to verfy that the routing is working
+
+# example url, configuration.nix is appended to this article
+curl http://lastlog.de/configuration.nix
+mv configuration.nix /mnt/etc/nixos/configuration.nix
+# now the installation, make sure you read the nixos installation guide as well, but in short:
+nixos-install
+# only the grub2 installation should have failed (as there is no /dev/sda1 in the virtual machine!)
+#finally we halt the system
+halt</code></pre>
+<p>im hostsystem we need to install grub2:</p>
+<pre><code>apt-get install grub2
+grub-install --no-floppy --root-directory=/mnt --recheck /dev/sda
+Installation finished. No error reported.
+
+grub-install --no-floppy --root-directory=/mnt --recheck /dev/sdb
+Installation finished. No error reported.
+
+# now we add a ssh key so we can login into this system later on
+cd /mnt
+mkdir root
+cd root
+mkdir .ssh
+chown 0700 .ssh/
+cd .ssh
+echo &quot;ssh-rsa AAAAB3Nz.....aU79sGVhyOPRz joachim@ebooK&quot; &gt; authorized_keys</code></pre>
+<p>from your homecomputer login into the installed system (reboot the
+host) and then issue this command:</p>
+<pre><code>ssh root@176.9.99.117 -i ~/.ssh/myprivatekey</code></pre>
+<p>after the first login, nixos-rebuild switch might fail with this
+error message:</p>
+<pre><code>nixos-rebuild switch --fast
+building the system configuration...
+updating GRUB 2 menu...
+installing the GRUB bootloader on /dev/sda...
+/nix/store/iaypdz5mm1qk8izs9412cb28v9vwwcn4-grub-1.99/sbin/grub-probe: error: no such disk.
+Auto-detection of a filesystem of /dev/mapper/myVolGrp-system failed.
+Try with --recheck.
+If the problem persists please report this together with the output of 
+&quot;/nix/store/iaypdz5mm1qk8izs9412cb28v9vwwcn4-grub-1.99/sbin/grub-probe --device-map=&quot;/boot/grub/device.map&quot; 
+--target=fs -v /boot/grub&quot; to
+grub-probe --device-map=&quot;/boot/grub/device.map&quot; --target=fs -v /boot/grub
+grub-probe: info: Cannot stat `/dev/disk/by-id/scsi-35000c5003f556643&#39;, skipping.
+grub-probe: info: Cannot stat `/dev/disk/by-id/scsi-35000c5003f5363a6&#39;, skipping.
+grub-probe: info: changing current directory to /dev.
+grub-probe: info: changing current directory to pts.
+grub-probe: info: changing current directory to shm.
+grub-probe: info: changing current directory to myVolGrp.
+grub-probe: info: changing current directory to md.
+grub-probe: info: changing current directory to disk.
+grub-probe: info: changing current directory to by-label.
+grub-probe: info: changing current directory to by-uuid.
+grub-probe: info: changing current directory to by-partlabel.
+grub-probe: info: changing current directory to by-partuuid.
+grub-probe: info: changing current directory to by-path.
+grub-probe: info: changing current directory to by-id.
+grub-probe: info: changing current directory to snd.
+grub-probe: info: changing current directory to mapper.
+grub-probe: info: opening myVolGrp-system.
+grub-probe: error: no such disk.</code></pre>
+<p>so what is inside this device.map anyway?</p>
+<pre><code>cd /boot/grub
+cat device.map
+(hd0) /dev/disk/by-id/scsi-35000c5003f556643
+(hd1) /dev/disk/by-id/scsi-35000c5003f5363a6</code></pre>
+<p><strong>Jordan_U#grub@irc.freenode.net</strong>
+<strong>recommended</strong> to <strong>remove the device.map.</strong>
+that made it work:</p>
+<pre><code>rm /boot/grub/device.map</code></pre>
+<h3 data-number="0.3"
+id="rescue-system-state-by-going-to-the-previous-version">rescue system
+state by going to the previous version</h3>
+<p>in theory you should be able to use vkvm from hetzner, which does
+basically what i am doing here, but it didn’t work for me since non of
+my browsers worked with the java plugin and i had problems with the
+vncviewer on port 47774.</p>
+<p>boot the hetzner 64 bit linux rescue system which contains
+qemu+kvm:</p>
+<pre><code>apt-get install sudo
+qemu-system-x86_64 -enable-kvm -m 1024 -hda /dev/md0 -cdrom nixos-minimal-0.1pre33860-33874-x86_64-linux.iso -boot d -vnc localhost:0
+
+ssh -L 5900:localhost:5900 root@176.9.99.117
+vncviewer localhost</code></pre>
+<p>now inside the vncviewer</p>
+<pre><code>mount /dev/myVolGrp/system /mnt
+cd /mnt
+for a in dev proc sys; do mount --bind /$a /mnt/$a; done;
+chroot . /bin/sh</code></pre>
+<p>now inside that new shell, type:</p>
+<pre><code>ls -l /nix/var/nix/profiles/system-*
+lrwxrwxrwx 1 root root 76 Jul  3 23:31 /nix/var/nix/profiles/system-67-link -&gt; /nix/store/d146zhm0mzdbb8v41yr782v96zncqhxa-nixos-0.2pre4832_edab9e4-e533af9
+lrwxrwxrwx 1 root root 76 Jul  7 22:45 /nix/var/nix/profiles/system-68-link -&gt; /nix/store/d0l5zg81x6yc3mxbrd3zxv3m4xhwabs7-nixos-0.2pre4832_edab9e4-9e98650</code></pre>
+<p>since we want to go to the previous boot entry, we type:</p>
+<pre><code>/nix/var/nix/profiles/system-67-link/bin/switch-to-configuration boot</code></pre>
+<p>since we are done here, type:</p>
+<pre><code>exit      # this will exit from the chroot into the rescue system
+cd / 
+umount /mnt
+reboot</code></pre>
+<h2 data-number="1" id="summary">summary</h2>
+<p>took quite some time to figure all this out so i guess someone else
+might have interested in this guide as well. i also tried to install,
+using EFI, but soon discovered that this might be a very complicated
+road to go and therefore skipped that. it is cool to see that there is a
+<strong>very helpful community surrounding key projects</strong>
+required to get this installation done. i would have had to spend much
+more time if i wouldn’t have had someone to ask from time to time.</p>
+<h3 data-number="1.1" id="links">links</h3>
+<ul>
+<li>[1] <a href="http://wiki.hetzner.de/index.php/OpenBSD"
+class="uri">http://wiki.hetzner.de/index.php/OpenBSD</a></li>
+<li>[2] <a href="https://wiki.archlinux.de/title/Gpt"
+class="uri">https://wiki.archlinux.de/title/Gpt</a></li>
+<li>[3] <a
+href="https://wiki.archlinux.org/index.php/GRUB2#GPT_specific_instructions"
+class="uri">https://wiki.archlinux.org/index.php/GRUB2#GPT_specific_instructions</a></li>
+<li>[4] <a href="http://www.wensley.org.uk/gpt"
+class="uri">http://www.wensley.org.uk/gpt</a></li>
+<li>[5] <a href="http://en.wikipedia.org/wiki/GNU_GRUB#GRUB_version_2"
+class="uri">http://en.wikipedia.org/wiki/GNU_GRUB#GRUB_version_2</a>
+&gt;</li>
+</ul>
+<h3 data-number="1.2" id="configuration.nix">configuration.nix</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit this configuration file which defines what would be installed on the</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># system. To Help while choosing option value, you can watch at the manual</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># page of configuration.nix or at the last chapter of the manual available</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># on the virtual console 8 (Alt+F8).</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="ex">{config,</span> pkgs, ...}:</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="ex">require</span> = [</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Include the configuration for part of your system which have been</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># detected automatically.</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="ex">./hardware-configuration.nix</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span><span class="kw">;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="ex">boot.initrd.kernelModules</span> = [</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify all kernel modules that are necessary for mounting the root</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co"># file system.</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;ext4&quot; &quot;ata_piix&quot;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;af_packet&quot;</span> <span class="st">&quot;snd_pcm_oss&quot;</span> <span class="st">&quot;snd_mixer_oss&quot;</span> <span class="st">&quot;rtc_cmos&quot;</span> <span class="st">&quot;rtc_core&quot;</span> <span class="st">&quot;rtc_lib&quot;</span> <span class="st">&quot;snd_hda_codec_via&quot;</span> <span class="st">&quot;i915&quot;</span> </span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;joydev&quot;</span> <span class="st">&quot;drm_kms_helper&quot;</span> <span class="st">&quot;snd_hda_intel&quot;</span> <span class="st">&quot;rng_core&quot;</span> <span class="st">&quot;drm&quot;</span> <span class="st">&quot;snd_hda_codec&quot;</span> <span class="st">&quot;thermal&quot;</span> <span class="st">&quot;i2c_algo_bit&quot;</span> </span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;button&quot;</span> <span class="st">&quot;snd_hwdep&quot;</span> <span class="st">&quot;intel_agp&quot;</span> <span class="st">&quot;psmouse&quot;</span> <span class="st">&quot;i2c_i801&quot;</span> <span class="st">&quot;evdev&quot;</span> <span class="st">&quot;snd_pcm&quot;</span> <span class="st">&quot;video&quot;</span> <span class="st">&quot;agpgart&quot;</span> <span class="st">&quot;pcspkr&quot;</span> </span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;serio_raw&quot;</span> <span class="st">&quot;iTCO_wdt&quot;</span> <span class="st">&quot;i2c_core&quot;</span> <span class="st">&quot;snd_timer&quot;</span> <span class="st">&quot;output&quot;</span> <span class="st">&quot;e1000e&quot;</span> <span class="st">&quot;snd&quot;</span> <span class="st">&quot;soundcore&quot;</span> <span class="st">&quot;snd_page_alloc&quot;</span> </span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;sg&quot;</span> <span class="st">&quot;loop&quot;</span> <span class="st">&quot;ipv6&quot;</span> <span class="st">&quot;kvm&quot;</span> <span class="st">&quot;freq_table&quot;</span> <span class="st">&quot;processor&quot;</span> <span class="st">&quot;thermal_sys&quot;</span> <span class="st">&quot;hwmon&quot;</span> <span class="st">&quot;ext4&quot;</span> <span class="st">&quot;mbcache&quot;</span> <span class="st">&quot;jbd2&quot;</span> </span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;crc16&quot;</span> <span class="st">&quot;raid456&quot;</span> <span class="st">&quot;async_pq&quot;</span> <span class="st">&quot;async_xor&quot;</span> <span class="st">&quot;xor&quot;</span> <span class="st">&quot;async_memcpy&quot;</span> <span class="st">&quot;async_raid6_recov&quot;</span> <span class="st">&quot;raid6_pq&quot;</span> </span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;async_tx&quot;</span> <span class="st">&quot;md_mod&quot;</span> <span class="st">&quot;sd_mod&quot;</span> <span class="st">&quot;crc_t10dif&quot;</span> <span class="st">&quot;sata_sil&quot;</span> <span class="st">&quot;ata_piix&quot;</span> <span class="st">&quot;dm_mod&quot;</span> <span class="st">&quot;usb_storage&quot;</span> </span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;usb_libusual&quot;</span> <span class="st">&quot;usbhid&quot;</span> <span class="st">&quot;hid&quot;</span> <span class="st">&quot;ohci1394&quot;</span> <span class="st">&quot;ieee1394&quot;</span> <span class="st">&quot;ahci&quot;</span> <span class="st">&quot;libata&quot;</span> <span class="st">&quot;scsi_mod&quot;</span> <span class="st">&quot;ehci_hcd&quot;</span> </span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;uhci_hcd&quot;</span> <span class="st">&quot;usbcore&quot;</span> <span class="st">&quot;nls_base&quot;</span> <span class="st">&quot;scsi_wait_scan&quot;</span> <span class="st">&quot;unix&quot;</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span><span class="kw">;</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="ex">boot.loader.grub</span> = {</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Use grub 2 as boot loader.</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a><span class="bu">enable</span> = true<span class="kw">;</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="ex">version</span> = 2<span class="kw">;</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Define on which hard drive you want to install Grub.</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="ex">devices</span> = [ <span class="st">&quot;/dev/sda&quot;</span> <span class="st">&quot;/dev/sdb&quot;</span> ]<span class="kw">;</span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="kw">};</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a><span class="ex">boot.extraKernelParams</span> = [ <span class="st">&quot;vga=normal&quot;</span> <span class="st">&quot;nomodeset&quot;</span> ]<span class="kw">;</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="ex">networking</span> = {</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="ex">hostName</span> = <span class="st">&quot;nix9000&quot;</span><span class="kw">;</span> <span class="co"># Define your hostname.</span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="co"># wireless.enable = true; # Enables Wireless.</span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="er">}</span><span class="kw">;</span></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Add file system entries for each partition that you want to see mounted</span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a><span class="co"># at boot time. You can add filesystems which are not mounted at boot by</span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a><span class="co"># adding the noauto option.</span></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="ex">fileSystems</span> = [</span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Mount the root file system</span></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="ex">mountPoint</span> = <span class="st">&quot;/&quot;</span><span class="kw">;</span></span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a><span class="co">#device = &quot;/dev/sda2&quot;;</span></span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a><span class="ex">label</span> = <span class="st">&quot;system&quot;</span><span class="kw">;</span></span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a><span class="co">#{ mountPoint = &quot;/boot&quot;;</span></span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="co"># label = &quot;boot&quot;;</span></span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="co">#}</span></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy &amp; Paste &amp; Uncomment &amp; Modify to add any other file system.</span></span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a><span class="co"># { mountPoint = &quot;/data&quot;; # where you want to mount the device</span></span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a><span class="co"># device = &quot;/dev/sdb&quot;; # the device or the label of the device</span></span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a><span class="co"># # label = &quot;data&quot;;</span></span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a><span class="co"># fsType = &quot;ext3&quot;; # the type of the partition.</span></span>
+<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a><span class="co"># options = &quot;data=journal&quot;;</span></span>
+<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span>
+<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span><span class="kw">;</span></span>
+<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a><span class="ex">swapDevices</span> = [</span>
+<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="co"># List swap partitions that are mounted at boot time.</span></span>
+<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="ex">label</span> = <span class="st">&quot;swap&quot;</span><span class="kw">;</span> <span class="kw">}</span></span>
+<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span><span class="kw">;</span></span>
+<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a><span class="co"># Select internationalisation properties.</span></span>
+<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a><span class="co"># i18n = {</span></span>
+<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a><span class="co"># consoleFont = &quot;lat9w-16&quot;;</span></span>
+<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a><span class="co"># consoleKeyMap = &quot;us&quot;;</span></span>
+<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a><span class="co"># defaultLocale = &quot;en_US.UTF-8&quot;;</span></span>
+<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a><span class="co"># };</span></span>
+<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-84"><a href="#cb20-84" aria-hidden="true" tabindex="-1"></a><span class="co"># List services that you want to enable:</span></span>
+<span id="cb20-85"><a href="#cb20-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a><span class="co"># Add an OpenSSH daemon.</span></span>
+<span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a><span class="ex">services.openssh.enable</span> = true<span class="kw">;</span></span>
+<span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a><span class="co"># Add CUPS to print documents.</span></span>
+<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a><span class="co"># services.printing.enable = true;</span></span>
+<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a><span class="co"># Add XServer (default if you have used a graphical iso)</span></span>
+<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a><span class="co"># services.xserver = {</span></span>
+<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a><span class="co"># enable = true;</span></span>
+<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a><span class="co"># layout = &quot;us&quot;;</span></span>
+<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a><span class="co"># xkbOptions = &quot;eurosign:e&quot;;</span></span>
+<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a><span class="co"># };</span></span>
+<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a><span class="ex">environment.systemPackages</span> = with pkgs<span class="kw">;</span> <span class="bu">[</span></span>
+<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a>zsh wget wgetpaste <span class="er">vimprobable2</span></span>
+<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span><span class="kw">;</span></span>
+<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the NixOS Manual on virtual console 8</span></span>
+<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="co">#services.nixosManual.showManual = true;</span></span>
+<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/booting_nixos_from_lvm_on_top_of_mdadm_using_gpt.mdwn" title="posts\booting_nixos_from_lvm_on_top_of_mdadm_using_gpt.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

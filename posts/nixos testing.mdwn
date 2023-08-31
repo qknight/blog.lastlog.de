@@ -1,0 +1,8 @@
+[[!meta date="2023-08-05 10:58"]]
+[[!tag nixos]]
+[[!summary xxx]]
+[[!draft]]
+
+# motivation
+
+nixos tests currently support KVM. maybe it can be extended to support evaluation in docker, lxc or kubernetes.

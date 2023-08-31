@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="magic_dhcp_stuff_isc_dynamic_host_configuration_protocol.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>magic dhcp stuff isc dynamic host configuration protocol</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/magic_dhcp_stuff_isc_dynamic_host_configuration_protocol.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="kernel_2_6_25_and_udev_141_issue.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="acronis_true_image_2009.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">magic dhcp stuff isc dynamic host configuration protocol</h1>
+    <div id="date"><p><span id="lastupdated">27 mar 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a></p></div>
+    <p><a href="media/internet_systems_consortium.jpg"><img src=media/internet_systems_consortium.jpg size=400x style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>a friend of mine, <strong>Andreas Korsten</strong>, showed me how to
+execute custom scripts when a dhcp-lease is passed to a client. this is
+interesting stuff and since it seems <strong>not to be
+documented</strong>anywhere yet, i decided to blog it. it is probably of
+use for other admins out there - thanks to Andreas Korsten!</p>
+<h2 data-number="2" id="concept">concept</h2>
+<p><strong>idea: run a custom script when a lease is passed to the
+client.</strong>in the example below every client in the netboot group
+will trigger ‘custom logging’ and additionally execute a script.</p>
+<h2 data-number="3" id="isc-dynamic-host-configuration-protocol">ISC
+Dynamic Host Configuration Protocol</h2>
+<p>It is about: net-misc/dhcp-3.1.2_p1 (gentoo, portage), see [1]
+<strong>No special useflags</strong> were used:
+<strong>+kernel_linux</strong>-doc -minimal -selinux -static</p>
+<h2 data-number="4" id="setup-etcdhcpdhcp.conf">setup
+/etc/dhcp/dhcp.conf</h2>
+<pre><code># vim: set noet ts=4 sw=4:
+    
+allow booting;
+allow bootp;
+
+server-name &quot;myServer&quot;;
+default-lease-time 3000;
+max-lease-time 6000;
+ddns-update-style none;
+
+subnet 10.0.0.0 netmask 255.255.255.0 {
+ range 10.0.0.10 10.0.0.20;
+ option subnet-mask 255.255.255.0;
+ option domain-name-servers 10.0.0.1;
+ option domain-name &quot;myPool&quot;;
+
+group netboot {
+ next-server 10.0.0.1;
+ #server-identifier 10.0.0.1;
+ #filename &quot;pxelinux.0&quot;;
+
+#on commit { execute (&quot;/tmp/dhcpcommit.sh&quot;, hardware , &quot;fnord&quot;, host-decl-name, &quot;foo&quot;, leased-address, &quot;bar&quot; ); }
+ #on commit { execute (&quot;/tmp/dhcpcommit.sh&quot;, host-decl-name ); }
+ #on commit { execute (&quot;/tmp/dhcpcommit.sh&quot;, leased-address ); }
+
+# helpful: https://lists.isc.org/pipermail/dhcp-users/2008-September/007167.html
+ on commit { 28 set ClientIP = binary-to-ascii(10, 8, &quot;.&quot;, leased-address); 29 set ClientMac = binary-to-ascii(16, 8, &quot;:&quot;, substring(hardware, 1, 6)); 30 log(concat(&quot;Commit: IP: &quot;, ClientIP, &quot; Mac: &quot;, ClientMac)); 31 execute(&quot;/tmp/dhcpcommit.sh&quot;, &quot;commit&quot;, ClientIP, ClientMac); 32
+ #if(execute(&quot;/root/scripts/dhcp-event&quot;, &quot;commit&quot;, ClientIP, ClientMac) = 0) {
+ #if(execute(&quot;/tmp/dhcpcommit.sh&quot;, &quot;commit&quot;, ClientIP, ClientMac) = 0)
+ #{
+ # log(concat(&quot;Sent DHCP Commit Event For Client &quot;, ClientIP));
+ #}
+ #} else {
+ # log(concat(&quot;Error Sending DHCP Commit Event For Client &quot;, ClientIP));
+ #}
+ }
+
+host router5 { hardware ethernet 00:40:ff:aa:b0:44; fixed-address 10.0.0.5; option host-name &quot;router5&quot;; }
+ #include &quot;/etc/dhcp/dhcpd.otherhosts.conf&quot;;
+ }
+}</code></pre>
+<h2 data-number="5" id="the-script">the script</h2>
+<p><strong>you could send an email or jabber message or just do some
+advanced logging. consider: if you have a server-farm it might be
+interesting to see if a reboot actually worked</strong>. the arguments
+to the bash script can be processed within the script. the order of the
+arguments is given by the dhcpd.conf file, see above.</p>
+<h2 data-number="6" id="possible-errors">possible errors</h2>
+<p>always review the logs, in my case /var/log/syslog and since the
+dhcpd service on gentoo is running as user ‘dhcp’ and the script was not
+accessable for the user ‘dhcp’ this error could be found:</p>
+<pre><code>debug: Mar 27 13:45:17 dhcpd: Commit: IP: 10.0.0.5 Mac: 0:40:ff:aa:b0:44
+debug: Mar 27 13:45:17 dhcpd: execute_statement argv[0] = /tmp/dhcpcommit.sh
+debug: Mar 27 13:45:17 dhcpd: execute_statement argv[1] = commit
+debug: Mar 27 13:45:17 dhcpd: execute_statement argv[2] = 10.0.0.5
+debug: Mar 27 13:45:17 dhcpd: execute_statement argv[3] = 0:40:ff:aa:b0:44
+err: Mar 27 13:45:17 dhcpd: Unable to execute /tmp/dhcpcommit.sh: Permission denied
+err: Mar 27 13:45:17 dhcpd: execute: /tmp/dhcpcommit.sh exit status 32512
+info: Mar 27 13:45:17 dhcpd: DHCPREQUEST for 10.0.0.5 (10.0.0.1) from 0:40:ff:aa:b0:44 via ath0
+info: Mar 27 13:45:17 dhcpd: DHCPACK on 10.0.0.5 to 0:40:ff:aa:b0:44 via ath0</code></pre>
+<p>right after i corrected the permission issue:</p>
+<pre><code>debug: Mar 27 13:52:32 dhcpd: Commit: IP: 10.0.0.5 Mac: 0:40:ff:aa:b0:44
+debug: Mar 27 13:52:32 dhcpd: execute_statement argv[0] = /tmp/dhcpcommit.sh
+debug: Mar 27 13:52:32 dhcpd: execute_statement argv[1] = commit
+debug: Mar 27 13:52:32 dhcpd: execute_statement argv[2] = 10.0.0.5
+debug: Mar 27 13:52:32 dhcpd: execute_statement argv[3] = 0:40:ff:aa:b0:44
+info: Mar 27 13:52:32 dhcpd: DHCPREQUEST for 10.0.0.5 from 0:40:ff:aa:b0:44 via ath0
+info: Mar 27 13:52:32 dhcpd: DHCPACK on 10.0.0.5 to 00:40:ff:aa:b0:44 via ath0</code></pre>
+<h2 data-number="7" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://www.isc.org/products/DHCP"
+class="uri">http://www.isc.org/products/DHCP</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/magic_dhcp_stuff_isc_dynamic_host_configuration_protocol.mdwn" title="posts\magic_dhcp_stuff_isc_dynamic_host_configuration_protocol.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

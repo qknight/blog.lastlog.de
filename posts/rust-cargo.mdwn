@@ -1,0 +1,125 @@
+[[!meta date="2016-12-14 19:35"]]
+[[!tag nixos nixcloud rust cargo nix]]
+
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!summary avoiding cargo usage in nixpkgs.]]
+
+# motivation
+
+our latest encounter with `rust` was `cargo` which we replaced in a way that it is not used for deployment in nixos anymore.
+
+more can be found at: <https://github.com/nixcloud/nixcrates>
+
+## tar-example
+
+here is a tiny example using the [tar-crate](https://crates.io/crates/tar) with the source from https://github.com/alexcrichton/tar-rs#writing-an-archive
+
+### tar-example source code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix }
+tar-example = stdenv.mkDerivation rec {
+  name = "tar-example";
+  src = ./example/src3;
+  buildInputs = with allCrates; [ tar filetime libc xattr ]; 
+  buildPhase = ''
+    ${symlinkCalc buildInputs}
+
+    # this creates the files needed for the test
+    echo "hu" > file1.txt
+    echo "bar" > file2.txt
+    echo "batz" > file3.txt 
+
+    ${rustcNightly}/bin/rustc $src/main.rs --crate-type "bin" --emit=dep-info,link --crate-name main -L dependency=mylibs --extern tar=${allCrates.tar}/libtar.rlib
+    ./main
+    if [ -f foo.tar ]; then
+      echo -e "---------\nSUCCESS: tar-example was executed successfully!   \n--------"
+    else
+      echo "FAIL: not working!"
+    fi
+  '';
+  installPhase=''
+    mkdir $out
+  '';
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   
+### after executing it
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash } 
+nix-build  -A tar-example
+these derivations will be built:
+  /nix/store/wmfbc5x59pnhmvh4fdql7gnbymsli33w-tar.drv
+  /nix/store/sr1cgvkapz044wgx1rw6261hl7d9682y-tar-example.drv
+building path(s) ‘/nix/store/hgravz7r38n3ic8msn94qy761zzi6jyw-tar’
+unpacking sources
+tar-0.4.9/.gitignore
+tar-0.4.9/.travis.yml
+tar-0.4.9/Cargo.toml
+tar-0.4.9/LICENSE-APACHE
+tar-0.4.9/LICENSE-MIT
+tar-0.4.9/README.md
+tar-0.4.9/appveyor.yml
+tar-0.4.9/examples/extract_file.rs
+tar-0.4.9/examples/list.rs
+tar-0.4.9/examples/raw_list.rs
+tar-0.4.9/examples/write.rs
+tar-0.4.9/src/archive.rs
+tar-0.4.9/src/builder.rs
+tar-0.4.9/src/entry.rs
+tar-0.4.9/src/entry_type.rs
+tar-0.4.9/src/error.rs
+tar-0.4.9/src/header.rs
+tar-0.4.9/src/lib.rs
+tar-0.4.9/src/pax.rs
+tar-0.4.9/tests/all.rs
+tar-0.4.9/tests/archives/directory.tar
+tar-0.4.9/tests/archives/duplicate_dirs.tar
+tar-0.4.9/tests/archives/empty_filename.tar
+tar-0.4.9/tests/archives/file_times.tar
+tar-0.4.9/tests/archives/link.tar
+tar-0.4.9/tests/archives/pax.tar
+tar-0.4.9/tests/archives/reading_files.tar
+tar-0.4.9/tests/archives/simple.tar
+tar-0.4.9/tests/archives/spaces.tar
+tar-0.4.9/tests/archives/sparse.tar
+tar-0.4.9/tests/archives/xattrs.tar
+tar-0.4.9/tests/entry.rs
+tar-0.4.9/tests/header/mod.rs
+patching sources
+configuring
+no configure script, doing nothing
+building
+tar -  --extern libc=/nix/store/nc2jvn8rzbrbbqdwfwc7clzl99za9w2r-libc/liblibc.rlib --extern filetime=/nix/store/a5rr0mvyqnvq3mawhacwb49i101lyp4v-filetime/libfiletime.rlib
+namefix tar
+name tar
+About to use rustc to compile some lib - tar
+installing
+post-installation fixup
+shrinking RPATHs of ELF executables and libraries in /nix/store/hgravz7r38n3ic8msn94qy761zzi6jyw-tar
+patching script interpreter paths in /nix/store/hgravz7r38n3ic8msn94qy761zzi6jyw-tar
+building path(s) ‘/nix/store/m0kslv072cphsk11n4696lzncc6rprc1-tar-example’
+unpacking sources
+unpacking source archive /nix/store/3q2yq22lh5shr0w4fxhcw8h1s61p6q9y-src3
+source root is src3
+patching sources
+configuring
+no configure script, doing nothing
+building
+warning: unused import: `std::io::prelude::*;`, #[warn(unused_imports)] on by default
+ --> /nix/store/3q2yq22lh5shr0w4fxhcw8h1s61p6q9y-src3/main.rs:3:5
+  |
+3 | use std::io::prelude::*;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+---------
+SUCCESS: tar-example was executed successfully!   
+--------
+installing
+post-installation fixup
+shrinking RPATHs of ELF executables and libraries in /nix/store/m0kslv072cphsk11n4696lzncc6rprc1-tar-example
+patching script interpreter paths in /nix/store/m0kslv072cphsk11n4696lzncc6rprc1-tar-example
+/nix/store/m0kslv072cphsk11n4696lzncc6rprc1-tar-example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# summary
+
+the project is still in its early stages but evolves into a reimplementation of `cargo`. however, it is pretty easy to be used and works for many crates already.

@@ -1,0 +1,72 @@
+[[!summary chatGPT: The user is experiencing issues with Acronis True Image Home 2009 backup software on Windows XP and is looking for a solution regarding incremental backups and consolidation. They disabled the "create a new backup after x incremental or differential backups" option in order to fix the issue. The user suggests that the GUI design could be improved and mentions that they have also tried the 2010 version of the software with no success. They are seeking help or suggestions for a solution.]]
+[[!meta date="2010-03-29 18:55"]]
+[[!tag usability visualization windows]]
+
+[[!img media/acronis_logotype.png size=300x style="float: right"]]
+i have a windows xp server on which i use 'acronis true image home 2009' for periodical backups.
+
+
+# my problem:
+
+
+my** 1TB backup storage was filled with incremental/full backups **although i've used incremental backups with consolidation enabled.
+
+to investigate the issue i've installed a windows xp into a VirtualBox on my linux machine - to experiment - in the hope to find some easy solution. previously i'd been searching in forums for a fix to the issue but it seems a lot of ppl have the same issues, too, without providing a fix.
+
+the acronis documentation does no explain what 'acronis' actually does or it is far to complicated. i've read the manual (not the printed version but instead the acronis help when pressing the '?' button on the 'backups - incremental' dialog) a few times but i did not understand it as it is quite complex and i don't like how they explain the single steps.
+
+
+# what i want:
+
+
+first let's see what i want:
+
+  1. a **incremental backup** should be made every day (the first backup is a full backup of course)
+  2. the main archive (the first full backup) should be **validated on every backup**
+  3. if more than 6 backups are there, **delete the oldest one**
+  4. **the old backup may only be deleted if the new backup is 100% consistent**
+  5. **the backup must always be in a consistent state, no merging of a full+diff when not having another full backup around**
+
+i'm not sure if the backup merge (merging a full and a incremental backup) is atomic, which would mean that if the merge fails the old files are not lost. after some experiments i'm not sure but i doubt that it is atomic. **i have a bad feeling about this**. so i think (4) and (5) can't be done directly. maybe with two backup jobs, one every 'odd day', the other every 'even day' would be a solution. but there are so many indications which i can't take into account - so i currently think the best is to go with (1),(2) and (3) only while checking the backup from time to time manually (which i would do anyway).
+
+so here is the configuration of how i achieve** (1),(2) and(3) but NOT** (4) and (5) :
+
+[[!img media/acronis1.png]]
+
+[[!img media/acronis2.png]]
+
+[[!img media/acronis3.png]]
+
+
+# problem to exceed the harddrive capacity
+
+
+to recall: my primary problem was that the backups did exceed the harddrive capacity as no old archives were consolidated:
+
+that resulted from **the 'backup method'** where i also **checked the last point 'create a new backup after x incremental or differential backups'** which then would create a new backup. that means: **consolidation was never done since the counter for consolidation was 6** (shown in the screenshots from above) but a new backup was created after 3 successive backups (disabled in the first screenshot).
+
+it seems to me that the acronis is executing like this:
+
+if (sum(backups) > consolidation_threshold) -> consolidate backups
+
+**where sum(backups) is interpreted: accumulate all different types as full|incremental|differential**
+
+
+example: sum(one full backup and 3 differential backups) = 4
+
+
+however: **if the checkbox 'create a new backup on every x'th backup' is checked the algorithm is never executed when x is smaller than the consolidation_threshold leaving old backups undeleted!**
+
+
+# fix
+
+
+currently i **disable the 'create a new backup after x incremental or differential backups'.** that means all options are set as done in the 3 screenshots.
+
+
+# summary
+
+
+this is a very typical flaw in gui design as intuition misleads based on the facts presented. a very clear and intuitive approach would be a schedule visualization for the current setup. i'm not very happy with acronis currently.
+
+i've also purchased the more recent version of 'true image home 2010' but it still is the same issue. maybe someone understands this better than me, then please give me a hint.

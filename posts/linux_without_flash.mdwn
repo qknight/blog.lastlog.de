@@ -1,0 +1,44 @@
+[[!img media/flashblock.jpeg alt="" style="float: right"]]
+[[!meta date="2014-07-27 18:01"]]
+[[!tag flash linux technology usability]]
+[[!summary how to get rid of flash on linux]]
+
+# motivation
+adobe flash has always been a big issue for me, that is because of this:
+
+* **cpu usage issues and sometimes sound issues** on linux
+* usability: **on linux you can click fullscreen but if you focus a different widget (when watching a docu while programming something) it will revert fullscreen immediately** 
+* **insecure, the CVE records for adobe products are all speaking against using them!** see [1]
+* **not open source**, hassle to install/maintain
+* mainly used for ads anyway
+
+now the good news: thanks to steve jobs [1], i got rid of flash on my linux computer! this posting is about how i did it!
+
+# getting rid of flash
+on most webpages i leave the default user agent (which is either chrome or firefox, depending on the browser is use). occationally there is an embedded video and if it relies on flash, then i switch using the 'browser toolbar' icon of user agent switcher. 
+
+on youtube i have a permanent user-agent-switcher setting.
+
+[[!img media/flashblock-chrome-extensions.jpeg style="float: none" size=700x caption="chrome extensions: flashblock and user-agent-switcher"]]
+
+## occational usage
+if the page you visit embeds a flash video, just use the user-agent-switcher: click iOS, then iPad and after you reload the page, the video should be working. this way you can also download the video easily, but this is not my main focus.
+
+[[!img media/flashblock-chrome-extensions3.jpeg style="float: none" size=300x caption="chrome extension: user-agent-switcher"]]
+
+## permanent usage
+
+on youtube.com and golem.de, both sites i visit frequenly, i enabled a permanent user-agent spoofing [2]. so now i'm surfing as i was using an ipad. some pages look a little bogus but you get used to! this can be combined with flashblock [3], which blocks the flash execution until one explicitly clicks the flash-app to make it execute.
+
+
+[[!img media/flashblock-chrome-extensions2.jpeg style="float: none" size=700x caption="permanent spoof list of user-agent-switcher"]]
+
+**note**: you might have to reload the webpages, in order to clear the cache and make the identify change work.
+
+# summary
+it is quite sad that youtube still defaults to flash. **we have html5 now, so please: stop using flash**! despite of cpu usage improvements, i guess this increases browser security as well!
+
+# links 
+* [1] <https://www.apple.com/hotnews/thoughts-on-flash/>
+* [2] <https://addons.mozilla.org/en-US/firefox/addon/user-agent-switcher/>
+* [3] <https://addons.mozilla.org/en-US/firefox/addon/flashblock/?src=search>

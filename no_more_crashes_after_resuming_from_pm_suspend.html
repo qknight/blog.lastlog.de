@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="no_more_crashes_after_resuming_from_pm_suspend.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>no more crashes after resuming from pm suspend</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/suspend/no_more_crashes_after_resuming_from_pm_suspend.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="spamassassin_procmail_with_vpopmail_accounts.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="fixing_volume_change_in_linux.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">no more crashes after resuming from pm suspend</h1>
+    <div id="date"><p><span id="lastupdated">30 jun 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p><a href="media/hp-com-elitebook-8530w.jpg"><img src=media/hp-com-elitebook-8530w.jpg size=180x caption="hp elite book 8530w, source hp.com" style="float: right"></a></p>
+<p>i own a <strong>hp elitebook 8530w </strong>which is a good notebook
+if used with linux. it does have a nvidia card:</p>
+<p><strong>01:00.0 VGA compatible controller: nVidia Corporation G96M
+[Quadro FX 770M] (rev a1), </strong>according to lspci.</p>
+<p>i use it with <strong>Linux ebooK 2.6.34-rc5 #4 SMP PREEMPT Wed Jun
+30 10:48:22 CEST 2010 x86_64 Intel(R) Core(TM)2 Duo CPU T9600 @ 2.80GHz
+GenuineIntel GNU/Linux.</strong></p>
+<p>ever since i bought this laptop it often <strong>stuck at
+resume</strong>, using** pm-suspend** (sys-power/pm-utils).</p>
+<p>it’s probably a <strong>x11-drivers/nvidia-drivers</strong> issue but
+i’m not certain since usually i can’t see anything on the screen (the
+screen remains totally black, no backlight) but the computer isn’t
+accessable over the network (can’t login via ssh, after a broken
+resume). so today i wanted to fix that by installing the nouveau driver.
+that failed however. but it seems that i fixed the resume issue.</p>
+<p><strong>HINT:</strong> that means i can use the proprietary driver,
+as it is not a problem anymore.</p>
+<p><strong>HINT:</strong> that also fixed the problem that after the
+first pm-suspend (or hibernate-ram) the consoles alt+f1 … to … alt+f12
+weren’t accessable as they were blanked out completely. i might
+experiment with nouveau soon, but for now let’s blog how i fixed the
+resume issue:</p>
+<h3 data-number="1.1" id="updating-pm-utils">updating pm-utils</h3>
+<p>my old version: <strong>sys-power/pm-utils-1.2.5</strong> -&gt;
+<strong>pm-suspend</strong></p>
+<p>my current version: <strong>sys-power/pm-utils-1.3.0-r2</strong></p>
+<pre><code>emerge pm-utils
+[ebuild  N    ] sys-power/pm-quirks-20100316
+[ebuild  NS   ] app-text/docbook-xml-dtd-4.5-r1 [4.1.2-r6, 4.2-r1, 4.3-r1, 4.4-r2]
+[ebuild     U ] sys-power/pm-utils-1.3.0-r2 [1.2.5]</code></pre>
+<p>used with <strong>x11-drivers/nvidia-drivers-195.36.24</strong></p>
+<p>after updating pm-utils there was no crash after resuming. which felt
+like a miracle! however, the problem seems to be odd. after updating the
+crash was gone but the backlight was very dim. in fact it was the lowest
+setting possible. and the other problem was that i could not find any
+tool to fix that. searching in wikis and blogs for ages i remembered how
+i did it last time using my thinkpad (i had similar problems there).</p>
+<p>there is a <strong>kernel interface for controlling the screen
+brightness</strong> using <strong>acpi</strong>.</p>
+<h3 data-number="1.2" id="how-to-increase-the-brightness">how to
+increase the brightness?</h3>
+<p>ideal solution: using the Fn+F9 and Fn+F10 keys</p>
+<p>ok, first check if these keys are mapped via acpi:</p>
+<p>as root, i type:</p>
+<pre><code>acpi_listen
+fn+f9    video/brightnessdown BRTDN 00000087 00000000
+fn+f10   video/brightnessup BRTUP 00000086 00000000
+fn+f11   --nothing--</code></pre>
+<p>so fn+f11 seems to be connected directly (i don’t know how that
+exactly works) but the other two keys work fine with acpi_listen. so we
+can use these!</p>
+<p><strong>NOTE:</strong> i had the ‘ambient light sensor’ disabled
+using the BIOS but this didn’t help either. fn+f11 will switch to using
+the ‘ambient light sensor’ but somehow i usually think it’s still to dim
+most of the time. it is far better on the ‘mac book pro’.</p>
+<p>maybe nvidia-settings? <strong>NO</strong>! it does not control
+that.</p>
+<p>even restarting X didn’t fix it. and restarting the computer not
+either!?</p>
+<h3 data-number="1.3" id="what-next---the-acpi-interface">what next?
+-&gt; the acpi interface</h3>
+<p>the acpi interface was incomplete as <strong>there was no
+/proc/acpi/video/</strong></p>
+<p>after endless googling i realized that <strong>hp-wmi</strong> and
+<strong>wmi</strong> (CONFIG_HP_WMI=m) support was already included in
+my kernel as modules and even loaded but:</p>
+<pre><code>CONFIG_ACPI_VIDEO=m</code></pre>
+<p>was missing!</p>
+<p>so i added it, reinstalled a new kernel with the proper modules and
+after a reboot the video interface was there:</p>
+<pre><code>/proc/acpi/video/DGFX/</code></pre>
+<p>so experimenting with it:</p>
+<pre><code>cat /proc/acpi/video/DGFX/LCD/brightness
+levels:  0 5 10 15 20 25 30 33 36 40 43 46 50 55 60 65 70 75 80 83 86 90 93 96 100
+current: 30</code></pre>
+<p>now, let’s increase that value to the maximum:</p>
+<pre><code>echo &quot;100&quot; &gt; /proc/acpi/video/DGFX/LCD/brightness</code></pre>
+<p>and i’m finally there! i can actually see what i’m writing! ;-)</p>
+<h3 data-number="1.4" id="how-to-integrate-this-into-the-system">how to
+integrate this into the system?</h3>
+<p>we will combinecpi script that takes an entry for all actions</p>
+<pre><code>#!/bin/sh
+# /etc/acpi/default.sh
+# Default acpi script that takes an entry for all actions
+set $*
+group=${1%%/*}
+action=${1#*/}
+device=$2
+id=$3
+value=$4
+log_unhandled() {
+logger “ACPI event unhandled: $*”
+}
+case “$group” in
+video)
+case “$action” in
+brightnessup)
+/etc/acpi/brightness.sh up
+;;
+brightnessdown)
+/etc/acpi/brightness.sh down
+;;
+esac
+;;
+button)
+case “$action” in
+power)
+/sbin/init 0
+;;
+# if your laptop doesnt turn on/off the display via hardware
+# switch and instead just generates an acpi event, you can force
+# X to turn off the display via dpms.  note you will have to run
+# ‘xhost +local:0′ so root can access the X DISPLAY.
+#lid)
+#       xset dpms force off
+#       ;;
+sleep)
+/usr/sbin/pm-suspend
+;;
+*)      log_unhandled $* ;;
+esac
+;;
+ac_adapter)
+case “$value” in
+# Add code here to handle when the system is unplugged
+# (maybe change cpu scaling to powersave mode).  For
+# multicore systems, make sure you set powersave mode
+# for each core!
+#*0)
+#       cpufreq-set -g powersave
+#       ;;
+# Add code here to handle when the system is plugged in
+# (maybe change cpu scaling to performance mode).  For
+# multicore systems, make sure you set performance mode
+# for each core!
+#*1)
+#       cpufreq-set -g performance
+#       ;;
+*)      log_unhandled $* ;;
+esac
+;;
+*)      log_unhandled $* ;;
+esac </code></pre>
+<p>the acpi with the /proc interface to set a proper brightness level. a
+nice reference for doing so can be found at [1].</p>
+<p>i’ve written a <strong>script</strong> in
+<strong>/etc/acpi/events/default</strong> first <strong>but it didn’t
+work!</strong></p>
+<p><strong>NOTE:</strong> i did not restart acpid, this was probably the
+problem</p>
+<p>anyway: i integrated the events into
+<strong>/etc/acpi/default.sh</strong> instead. this is better as one can
+check that for syntax errors and one can experiment with it,
+example:</p>
+<p>first do a:</p>
+<pre><code>acpi_listen</code></pre>
+<p>and then create an acpi event, as for instance pressing fn+f9 (on my
+elitebook) to find how the event is called (which gets generated)</p>
+<p>for instance: <strong>pressing fn+f3</strong> here generates a
+“<strong>button/sleep SBTN 00000080 00000000</strong>”</p>
+<p>note this down, or copy it with the mouse. then invoke the default.sh
+script using it as parameter, leave the cryptic numbers aside.
+example:</p>
+<pre><code>./default.sh button/sleep</code></pre>
+<p>if this manual invocation works (no syntax errors in default.sh
+reported) you can also start using the acpi event by pressing fn+f3
+(instead of manually invoking the script).</p>
+<h4 data-number="1.4.1" id="the-etcacpibrightness.sh-script">the
+/etc/acpi/brightness.sh script</h4>
+<pre><code>if [ &quot;$1&quot;x == &quot;up&quot;x ]; then
+X=$( cat /proc/acpi/video/DGFX/LCD/brightness | grep current | awk &#39;{print $2}&#39;)
+Y=$(echo  &quot;$X+20&quot; | bc)
+for i in `seq $X $Y`; do
+echo $i &gt; /proc/acpi/video/DGFX/LCD/brightness
+done
+fi
+if [ &quot;$1&quot;x == &quot;down&quot;x ]; then
+X=$( cat /proc/acpi/video/DGFX/LCD/brightness | grep current | awk &#39;{print $2}&#39;)
+Y=$(echo  &quot;$X-20&quot; | bc)
+for i in `seq $X -1 $Y`; do
+echo $i &gt; /proc/acpi/video/DGFX/LCD/brightness
+done
+fi</code></pre>
+<h3 data-number="1.5" id="the-etcacpidefault.sh-script">the
+/etc/acpi/default.sh script</h3>
+<h2 data-number="2" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://www.gentoo.de/doc/de/power-management-guide.xml"
+class="uri">http://www.gentoo.de/doc/de/power-management-guide.xml</a></li>
+</ul>
+<h2 data-number="3" id="errata">errata</h2>
+<ul>
+<li>fixed: script path=“/etc/acpi/events/brightness” is now
+“/etc/acpi/brightness.sh” as it is wrong to put scripts into
+/etc/acpi/events/*</li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/suspend/no_more_crashes_after_resuming_from_pm_suspend.mdwn" title="posts\suspend\no_more_crashes_after_resuming_from_pm_suspend.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

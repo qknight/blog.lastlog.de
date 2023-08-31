@@ -1,0 +1,97 @@
+[[!summary chatGPT: This post discusses how to set up a Nix prefix installation on Gentoo Linux, including the pros and cons of both Gentoo prefix and Nix prefix. It provides instructions for downloading and using Nix prefix, and includes links for further information.]]
+[[!meta date="2011-01-21 12:04"]]
+[[!tag gentoo linux packagemanager technology]]
+
+[[!img media/nixos-lores.png style="float: right"]]
+
+# motivation
+
+
+**this posting is about how to setup a nix prefix installation on gentoo linux**. if you do not have permission to install software on your server you can install a package manager in your home directory.
+
+prefix distros:
+	
+  * [1] **gentoo prefix** (using portage)
+  * [2] **nix prefix** (using nixpkgs)
+  * source deployment (done manually)
+
+# gentoo prefix
+
+
++ pros:
+
+  * contains **many packages**
+  * **great documentation**
+  * **works in prefix** on: linux|mac|cygwin/interix
+  * **security** related **tools** available
+  * **Xorg stuff** as qt programs **will work**
+
+- cons:
+
+	
+  * **time consuming installation**
+  * **complicated**
+  * linux prefix setup uses the sun solaris guide, which is .... _strange_ at first
+
+
+
+
+# nix prefix
+
+
++ pros:
+
+	
+  * **binary deployment** (when **not altering**: --with-store-dir OR --localstatedir)
+this is only possible if root assists installation
+  * **assisted binary deployment** (when using self-made channel & a build robot as hydra)
+i have not tested this but it should be possible
+  * it is very **easy to experiment** with several **different versions** of a single program
+  * **Xorg stuff **as qt programs **will work**
+
+- cons:
+
+  * because you need to change the /store path, it is mainly source deployment at first
+  * no security tools
+  * compared to other linux distros a very small subset of packages available (as in ebuilds)
+
+# nix prefix - setup
+
+
+download the software from [2], then follow this guide:
+
+    tar xf nix-0.16.tar
+    cd nix-0.16
+    ./bootstrap
+    ./configure --prefix=~/nix **--localstatedir**=~nix/state **--with-store-di**r=~/nix/store
+    make
+    make install
+
+**NOTE:** --localstatedir is not visible when doing ./configure --help!
+
+# nix prefix - how to use
+
+
+next you have to add it to your PATH, do:
+
+    bash
+
+export PATH=~/.nix-profile/bin:$PATH
+
+
+**NOTE**: you have to do this every time you want to use your prefixed nix.
+
+this will alter your path to use program you install using 'nix-env' as:
+
+    nix-env -i wget
+
+this should download about 10-40 software components as gcc, binutils, libraries and finally wget. afterwards do:
+
+    which wget
+
+which should report: ~/.nix-profile/bin/wget
+
+# links
+
+* [1] <http://www.gentoo.org/proj/en/gentoo-alt/prefix/>
+* [2] <http://nixos.org/nix/>

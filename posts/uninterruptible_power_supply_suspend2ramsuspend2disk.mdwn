@@ -1,0 +1,35 @@
+[[!summary chatGPT: Using software raids on Linux can be problematic during power outages, but using a single device without software raid or using suspend2ram/suspend2disk can provide a solution.]]
+[[!meta date="2009-11-23 02:21"]]
+[[!tag gentoo linux technology usability]]
+
+# motivation
+Using software raids on linux '**mdadm**' is problematic if you hit a 'power outage'. Using a single device without a 'software raid' is not a problem since it uses a journal - **ext3++/xfs** for instance are quite stable in this regard. This is probably also true when using **LVM** - the 'logical volume manager' (but don't quote me there, my LVM 'use case' might differ from yours).
+
+# introduction
+
+Using the same filesystems with a **software raid** **makes the 'journal' useless, see [1] and [2]. Let's quote [2]:
+
+> **Power Loss and Ensuing Data Corruption**
+>     Many beginners think that they can test RAID by starting a disk-access     intensive job, and then unplugging the power while it is running.      This is usually guaranteed to cause some kind of data corruption,     and RAID does nothing to prevent it or to recover the resulting     lost data.  This kind of data corruption/loss can be avoided      by using a journaling file system, and/or a journaling database     server (to avoid data loss in a running SQL server when the system     goes down).  In discussions of journaling, there are typically     two types of protection that can be offered: journaled meta-data,     and journaled (user's) data.  The term "meta-data" refers to the     file name, the file owner, creation date, permissions, etc., whereas     "data" is that actual contents of the file.   By journaling     the meta-data, a journaling file system can guarantee fast system      boot times, by avoiding long integrity checks during boot.      However, journaling the meta-data does not prevent the contents of      the file from getting scrambled.  Note that most journaling     file systems journal only the meta-data, and not the data.     (Ext3fs can be made to journal data, but at a tremendous performance loss).     Note that databases have their own unique ways of guaranteeing     data integrity in the face of power loss or system crash.
+
+# new ideas
+
+Normally one would use a 'UPS' to shut down the system properly. But looking at my two **c2c** intel archs and my **32bit** intel laptop, I wonder how long this scenario will remain to be a 'default'.
+
+I'd expect suspend2ram or suspend2disk becoming a new way doing things better. Say the power outage is just 3minutes. Your suspend2ram takes **5secs**, resume **7secs** some users might not even notice your system was down.
+
+But if the power outage was say **1-3hours **and the system consumes **3W** of power you would need no powerful system. Say you use suspend2disk by default you can completely shutdown the system. A battery would have to stand the peak power usage of **130W** for about **7 secs** (this is just a guess, say c2c processor, several network cards, 4 3,5" harddrives (**10W**) each.
+
+I have two **low power gentoo fileservers**, both need less than **35W** and both use a different technology.
+
+  * VIA board with a VIA Nehemiah processor (tested using 2.6.24-tuxonice-r4)
+  * Intel board with Intel(R) Atom(TM) (untested)
+
+The **VIA board was** already **tested** for **support of suspend2ram/suspend2disk** with great **success**(and I don't mean  standby). I did not test the Intel board, but I'd expect it to work as well. You might wonder why I tested suspend2disk in the first place - this was not to check for power outage capabilities! I usually have no screen attached to the computer and it is located in a very uncomfortable location. When something goes wrong - for example I shut down the network by fault and I don't want to shut down the system I can suspend2disk this machine pressing the power button.  Next I pick that box up and put it on a desk and resume it with a screen attached. This works fine - trust me on that.
+
+On the other hand I don't use a '**software raid**' in these systems so '**a power fail is not a problem at all**'. I just wanted to bring up the idea - maybe someone already uses this the way I proposed?!
+
+# links
+
+* [1] <http://tldp.org/HOWTO/Software-RAID-0.4x-HOWTO-4.html>
+* [2] <http://linas.org/linux/raid.html>

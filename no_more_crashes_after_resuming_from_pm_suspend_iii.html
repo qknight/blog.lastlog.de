@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="no_more_crashes_after_resuming_from_pm_suspend_iii.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>no more crashes after resuming from pm suspend iii</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/suspend/no_more_crashes_after_resuming_from_pm_suspend_iii.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="qabstractitemmodel_vs_qstandarditemmodel.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="qgraphicsscene_used_as_a_qabstractitemview_iii.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">no more crashes after resuming from pm suspend iii</h1>
+    <div id="date"><p><span id="lastupdated">27 sep 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::audio" class="tagbtn btn btn-primary">audio</a><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a></p></div>
+    <p><a href="media/hp-com-elitebook-8530w.jpg"><img src=media/hp-com-elitebook-8530w.jpg size=180x caption="hp elite book 8530w, source hp.com" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>i’m still having several issues with this laptop, will it ever end?
+at least it’s not the nvidia proprietary driver again. so here are some
+details:</p>
+<p>used kernel: <strong>2.6.34-gentoo-r6</strong></p>
+<h2 data-number="2" id="problem">problem</h2>
+<ul>
+<li><strong>graphics</strong> causes problems with ‘sata - ahci’
+mode</li>
+<li><strong>sound</strong> sometimes crashes the system (module
+load/unload)</li>
+<li><strong>wlan</strong> sometimes crashes the system (module
+load/unload)</li>
+<li><strong>acpi</strong>, not all keys report acpi events</li>
+</ul>
+<h3 data-number="2.1" id="graphics">graphics</h3>
+<p>used driver: <strong>nvidia-drivers-256.53</strong> (nvidia
+proprietary)</p>
+<p>so far most things i need are working, which includes:</p>
+<ul>
+<li>2d acceleration (xvid extension using mplayer)</li>
+<li>3d acceleration</li>
+<li>console (alt+ctrl+f1) still works after pm-suspend’s resume cycle
+(not when no X was running prior pm-suspend)</li>
+<li>resume will resume X without issues</li>
+</ul>
+<p>untested:</p>
+<ul>
+<li>external monitor setups as vga/hdmi</li>
+<li>compositing: i still have compositing disabled as the system is much
+more responsive without it. still it would work well.</li>
+</ul>
+<p>problems:</p>
+<ul>
+<li>a new problem is the issue with the nvidia module and the sata ahci
+mode:</li>
+</ul>
+<p>Sep 25 18:24:56 ebooK kernel: [ 2989.757123] ata1: exception Emask
+0x10 SAct 0x0 SErr 0x10000 action 0xf Sep 25 18:24:56 ebooK kernel: [
+2989.757134] ata1: SError: { PHYRdyChg } Sep 25 18:24:56 ebooK kernel: [
+2989.757146] ata1: hard resetting link Sep 25 18:24:57 ebooK kernel: [
+2990.480057] ata1: SATA link up 3.0 Gbps (SStatus 123 SControl 300) Sep
+25 18:24:57 ebooK kernel: [ 2990.482352] ata1.00: ACPI cmd
+ef/10:03:00:00:00:a0 (SET FEATURES) filtered out Sep 25 18:24:57 ebooK
+kernel: [ 2990.485490] ata1.00: ACPI cmd ef/10:03:00:00:00:a0 (SET
+FEATURES) filtered out Sep 25 18:24:57 ebooK kernel: [ 2990.485935]
+ata1.00: configured for UDMA/133 Sep 25 18:24:57 ebooK kernel: [
+2990.485945] ata1: EH complete Sep 25 18:24:57 ebooK kernel: [
+2990.486235] sd 0:0:0:0: [sda] Write cache: enabled, read cache:
+enabled, doesn’t support DPO or FUA</p>
+<p>[1] seems to confirm this problem. when i disable ahci (and use ide
+mode) in the bios this error message is gone. currently i don’t know how
+DPO or FUA or this whole error influences my stability.
+<strong>however</strong>: when my system crashes i have a very high
+chance of file loss, this means: all kde settings are deleted, chromium
+restores to factory defaults and similar problems.</p>
+<h3 data-number="2.2" id="sound">sound</h3>
+<pre><code>00:1b.0 Audio device: Intel Corporation 82801I (ICH9 Family) HD Audio Controller (rev 03)</code></pre>
+<p>the soundsystem crashes the system when snd_* modules are reloaded
+using ‘rmmod’ or ‘modprobe -r’. a trace can be found at [2].</p>
+<ul>
+<li>this crash happens even if there was no pm-suspend cycle yet</li>
+<li>it does not matter if sound was played (mp3 or film), it crashes
+anyway</li>
+</ul>
+<p>-&gt; using <strong>/etc/init.d/alsasound restart</strong> does NOT
+remove loaded modules and it does NOT shut down programs using the
+soundcard prior to removing the modules. but i’m using a script which
+does so.</p>
+<p>i’ve written a mail to <strong>alsa-devel@alsa-project.org</strong>
+and i’m still waiting for feedback. maybe someone can help me.</p>
+<h3 data-number="2.3" id="wlan">wlan</h3>
+<pre><code>03:00.0 Network controller: Intel Corporation Ultimate N WiFi Link 5300</code></pre>
+<p>the wireless lan system crashes if the iwlagn module is loaded and
+then unloaded several times (‘rmmod iwlagn’ and ‘modprobe iwlagn’
+several times). a stack trace can be found at [4]. i’ve filed a bug
+report at [5].</p>
+<h3 data-number="2.4" id="acpi">acpi</h3>
+<p>my old 2.6.34 configuration reported acpi evnts for volume down/
+volume up, fn+f3, fn+f4 (maybe), fn+f8, fn+f9 and fn+f10 as well as for
+pwr button. with the fc13 kernel configuration i’ve experienced that
+some if not all acpi events were not sent. still have to find out why
+this happens.</p>
+<p>if i find out why that happens, i’ll post some news on that.</p>
+<h2 data-number="3" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="http://ubuntuforums.org/archive/index.php/t-1037819.html"
+class="uri">http://ubuntuforums.org/archive/index.php/t-1037819.html</a></li>
+<li>[2] <a
+href="http://lastlog.de/misc/wordpress/snd_hda_intel_backtrace"
+class="uri">http://lastlog.de/misc/wordpress/snd_hda_intel_backtrace</a></li>
+<li>[3] <a
+href="http://www.alsa-project.org/main/index.php/Help_To_Debug_Intel_HDA"
+class="uri">http://www.alsa-project.org/main/index.php/Help_To_Debug_Intel_HDA</a></li>
+<li>[4] <a href="http://lastlog.de/misc/wordpress/iwlagn_backtrace"
+class="uri">http://lastlog.de/misc/wordpress/iwlagn_backtrace</a></li>
+<li>[5] <a href="http://bugzilla.intellinuxwireless.org"
+class="uri">http://bugzilla.intellinuxwireless.org</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/suspend/no_more_crashes_after_resuming_from_pm_suspend_iii.mdwn" title="posts\suspend\no_more_crashes_after_resuming_from_pm_suspend_iii.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

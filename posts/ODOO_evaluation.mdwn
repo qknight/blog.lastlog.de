@@ -1,0 +1,93 @@
+[[!meta date="2015-02-13 10:58"]]
+[[!tag erp odoo python usability]]
+[[!summary is ODOO a modern ERP system written in python?]]
+[[!img media/company_logo.png alt="" style="float: right"]]
+
+# motivation
+i've been looking into various open source ERP systems on [1] and started with odoo version 8.0.
+
+# odoo
+
+the ERP i'm searching for must fulfill the following requirements:
+
+* html5 interface (with great usbility)
+* API for automated unit testing
+
+things i want to realise with it:
+
+* payment (accounting)
+* address database for customers
+    * room management
+* hosting data for creating a catalogue
+* statistics
+* data import (from previous ERP)
+
+## what i liked
+
+at first glance:
+
+* **pure html5 interface** on the client (there is xmlrpc [4] for scripting!)
+* **nice, clean and modern interface**
+    * consistent design, very nice!
+    * ajax use, for example in the search field
+
+        [[!img media/erp_odoo2.jpg alt="" ]]
+
+* written in python
+* **they use git** and github.com
+* **they use postgresql**
+* easy to install
+* documentation [4] and [5] seems to be well done
+* like the 'as a question' [6] which reminds me of stackoverflow
+
+## what i disliked
+
+at first glance:
+
+* **odoo use long-polling (not websockets) for the internal chat. all other modules i tried _lack_ support for such transparent updates.** this includes:
+
+    * calendar
+    * messaging
+    * fleet management  
+    * human resources
+    * sales
+
+    **this is hard to accept for me! webdesign from the 80ties! but compared to 'apache ofbiz' it seems pretty modern. anyway i hate systems which force me to press F5 when something changed!** this is annoying, especially in the fleet management where you have to click the drop down to see all data after each F5.
+
+* calendar
+
+    lacks room management?!
+
+    [[!img media/erp_odoo1.jpg alt="" ]]
+
+* **no REST interface**
+
+* **removing of optional components broke the interface** by leaving menus which just won't do anything (experienced with installing/removing the fleed module)
+
+* the installation for the ubuntu 14.04 [3] was incomplete:
+    * python-pypdf was missing 
+    * python-passlib was missing
+
+    thus **incomplete dependencies**! as a result the **initial database deployment was corrupted** and it took me quite a while until i realised i had to remove the database first and then restart the daemon afterwards which then recreated the db successfully. one solution would be to use nix on nixos!
+
+* using ``./odoo.py scraffoldd openacademy addons`` does not have any effect, as the scraffold**d** is accidentaly written with two d but ./odoo.py does not report any error!
+
+# conclusion
+
+i got mixed feelings about this <strike>project</strike> product:
+
+* **nice html5 interface** which at first glance seems good **but requires manual refresh -> ugly!**
+* **i need to implement my own module [5] to experience the API is well designed**
+* **don't like the odoo marketing** (too much design and fuss)
+* need to look into optional modules, but installing them is not straight forward ;P
+
+my overall impression is rather positive.
+
+# links
+
+* [1] <https://en.wikipedia.org/wiki/List_of_ERP_software_packages>
+* [2] <https://www.odoo.com/>
+* [3] <https://www.techreceptives.com/install-odoo-v8-ubuntu-14-04-lts/>
+* [4] <https://www.odoo.com/documentation/8.0/api_integration.html#calling-methods>
+* [5] <https://www.odoo.com/documentation/8.0/howtos/backend.html>
+* [6] <https://www.odoo.com/forum/help-1/question/are-the-translation-language-files-finished-for-odoo-v8-updated-9-feb-2015-64234>

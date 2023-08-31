@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="fixing_volume_change_in_linux.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>fixing volume change in linux</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/fixing_volume_change_in_linux.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="no_more_crashes_after_resuming_from_pm_suspend.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="enabling_vt_no_longer_chrases_x_on_my_hp_elitebook_8530w.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">fixing volume change in linux</h1>
+    <div id="date"><p><span id="lastupdated">10 jul 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::audio" class="tagbtn btn btn-primary">audio</a><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/img_0042.jpg"><img src=media/img_0042.jpg alt="" style="float: right" size=230x></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p><strong>windows xp</strong> changes volumes no matter what the user
+is doing. in linux this is often not possible because things are done
+differently (read: “wrong”). however, this guide will help you to fix it
+or at least tells you why it is done wrong. i’m experimenting with my
+‘<strong>hp elitebook 8530w</strong>’ using gentoo linux. in linux the
+volume keys are most often bound to X, as:
+<strong>XF86AudioRaiseVolume</strong> and
+<strong>XF86AudioLowerVolume</strong>, see this example ~/.Xmodmap (not
+mine)</p>
+<pre><code>keycode 176 = XF86AudioRaiseVolume
+keycode 174 = XF86AudioLowerVolume</code></pre>
+<p>this is a bad design because things don’t work well. a different
+concept was issued by my thinkpad t43: mute/increase/decrease of volume
+was done using a hardware mixer. this means alsa wasn’t used at all.</p>
+<p>this posting addresses alternative approaches on how to use the
+volume up/down/mute buttons in a global X independent way.</p>
+<h2 data-number="2" id="common-linux-audio-setup">common linux audio
+setup</h2>
+<p>currently linux features two desktop audio systems:</p>
+<ul>
+<li>alsa</li>
+<li>pulseaudio</li>
+<li>(jack audio connection kit)</li>
+</ul>
+<p>most often a weird combination of both simultaneously, with confusing
+results. <strong>point is</strong>: changing volumes.</p>
+<h2 data-number="3" id="volume-settings-issues">volume settings
+issues</h2>
+<p>volume levels can be changed for both: alsa and pulseaudio. the
+difference is that if you change the ‘master’ volume of alsa, you also
+change it for all pulseaudio clients. while changing an individual
+volume in a ‘pulseaudio client’ will only change the volume for that
+specific client.</p>
+<p>most of the time volume changes are redirected to alsa, for example
+‘<strong>kmix</strong>’ does catch events like
+<strong>XF86AudioRaiseVolume</strong> and changes the volume of the
+‘selected master channel’. one can select ‘master’ or ‘pcm’ as ‘master
+channel’ (others as well, depends on the audio setup). using this
+architecture has pitfalls, as you <strong>CAN NOT</strong> change
+volumes, when:</p>
+<ul>
+<li>playing fullscreen-<strong>games</strong> (using <strong>opengl
+</strong>or** sdl)**</li>
+<li>embedded <strong>adobe flash</strong> animations (<strong>skips
+fullscreen</strong> on <strong>XF86AudioRaiseVolume</strong>)</li>
+<li>X is NOT running (or has crashed)</li>
+<li><strong>system load is too high</strong> (X input handling is
+delayed)</li>
+<li><strong>kmix</strong> is not running (or kde is not running
+yet)</li>
+</ul>
+<h2 data-number="4" id="xorg-input-handling">xorg input
+handlin<strong>g</strong></h2>
+<p>the linux kernel adds input devices in
+‘<strong>/dev/input/</strong>’. <strong>xorg</strong> will use only
+devices configured in ‘/etc/X11/xorg.conf’. Let’s see
+‘<strong>/var/log/Xorg.0.log</strong>’:</p>
+<ul>
+<li><p><strong>/dev/input/mice</strong>
+(<strong>mouse</strong>)</p></li>
+<li><p><strong>/dev/input/event3 (keyboard)</strong></p>
+<pre><code>(II) config/hal: Adding input device AT Translated Set 2 keyboard
+(**) AT Translated Set 2 keyboard: always reports core events
+(**) AT Translated Set 2 keyboard: Device: &quot;**/dev/input/event3**&quot;
+(II) AT Translated Set 2 keyboard: Found keys
+(II) AT Translated Set 2 keyboard: Configuring as keyboard
+(II) XINPUT: Adding extended input device &quot;AT Translated Set 2 keyboard&quot; (type: KEYBOARD)</code></pre></li>
+<li><p><strong>/dev/input/event7 (HP multimedia keys)</strong> (II)
+config/hal: Adding input device HP WMI hotkeys (<strong>) HP WMI
+hotkeys: always reports core events (</strong>) HP WMI hotkeys: Device:
+“<strong>/dev/input/event7</strong>” (II) HP WMI hotkeys: Found keys
+(II) HP WMI hotkeys: Configuring as keyboard (II) XINPUT: Adding
+extended input device “HP WMI hotkeys” (type: KEYBOARD)</p></li>
+</ul>
+<p>one can get a complete list by typing “<strong>xinput list</strong>”
+as a normal user in a xterm. the default setup of X will use ‘hal’ to
+manage hardware.</p>
+<h2 data-number="5" id="monitoring-for-acpi-keys">monitoring for acpi
+keys</h2>
+<p>let’s see if one receives any of the acpi key-events using
+acpi_listen. <strong>i press</strong> ‘<strong>fn+f8</strong>’, which is
+a special key with a <strong>battery symbol</strong> on it.</p>
+<p><strong>xev</strong> reports (run as normal user):</p>
+<pre><code>KeyPress event, serial 45, synthetic NO, window 0x3200001,  root 0x27a, subw 0x0, time 26309626, (51,-20), root:(55,930),  state 0x0, keycode 244 (keysym 0x1008ff93, XF86Battery), same_screen YES,  XLookupString gives 0 bytes:  XmbLookupString gives 0 bytes:  XFilterEvent returns: False  KeyRelease event, serial 45, synthetic NO, window 0x3200001,   root 0x27a, subw 0x0, time 26309686, (51,-20), root:(55,930), state 0x0, keycode 244 (keysym 0x1008ff93, XF86Battery), same_screen YES,  XLookupString gives 0 bytes:  XFilterEvent returns: False</code></pre>
+<p><strong>acpi_listen</strong> reports (run as root or normal
+user):</p>
+<pre><code>button/battery BAT 00000080 00000000</code></pre>
+<p>repeating this experiment with a different keycombination as ‘fn+f1’
+resulted only in a xev event but NO acpi event was reported by
+acpi_listen.</p>
+<p>this means we can NOT just use any ‘fn+whatever’ combination as a
+acpi shortcut. we are probably limited to what is provided by the hp
+acpi firmware.</p>
+<p><strong>to sum up</strong>: this means some keys or key combinations
+provide an acpi event while also a normal key event (which is delivered
+to X and monitored using xev). acpi is independent of X so if the
+multimedia keys (volume up/down/mute) produce acpi events it is good. if
+not we still can do what we want but with a little more effort as it
+will require to monitor /dev/input/eventX for volume keys.</p>
+<h2 data-number="6"
+id="syncing-hardware-mute-with-software-mute">syncing hardware-mute with
+software-mute</h2>
+<p>my ‘hp elitebook 8530w’ does mute the soundcard directly (no
+operating system operation needed). this is helpful since instant muting
+sometimes is VERY IMPORTANT. however, if no kmix is running, then the
+XF86AudioMute isn’t processed and alsa still thinks the devices is
+unmuted (with an ‘out of the box setup’).</p>
+<p>the truth is that the audio-signal flow can be interrupted serially,
+in two ways:</p>
+<ul>
+<li>first by alsa, which does software mute</li>
+<li>but the ‘hp elitebook 8630w’ also does hardware muting</li>
+</ul>
+<p>if both are muted, using alsamixer to unmute won’t restore sound
+since the hardware mute still is set. this can be very confusing.</p>
+<p>my old thinkpad t43 was able to mask the hardware mute (on an acpi
+basis, see ibm-acpi [2]), in order to make ‘software’ mute the only
+option.</p>
+<ul>
+<li>this is nice as it is more intuitive</li>
+<li>this is bad as all the issues which this posting talks about were
+very problematic. most users would therefore NOT mask the hardware mixer
+mute as this could mean ‘not to be able to quickly mute’ in certain
+situations.</li>
+</ul>
+<h2 data-number="7" id="looking-at-the-hp-wmi.c-code">looking at the
+hp-wmi.c code</h2>
+<p>the handling of acpi can either be done using the generic acpi
+subsystem or with some special care as for example ibm-acpi [2]. since i
+can’t use the ibm-acpi with my hp laptop, let’s have a look what that
+hp-wmi thing does.</p>
+<p>‘<strong>/usr/src/linux/drivers/platform/x86/hp-wmi.c</strong>’ shows
+that this code is meant to:</p>
+<ul>
+<li>rfkill <strong>wireless</strong> lan</li>
+<li>rfkill <strong>bluetooth</strong> dongle</li>
+<li>wwan? (whatever that is)</li>
+<li>register a <strong>sysfs interface</strong></li>
+</ul>
+<p>on <strong>hp-wmi</strong> module load,
+‘<strong>/sys/devices/platform/hp-wmi</strong>’ is created. this is the
+interface used by ‘<strong>net-wireless/rfkill</strong>’.</p>
+<pre><code># rfkill list
+7: hci0: Bluetooth
+Soft blocked: no
+Hard blocked: no
+8: phy2: Wireless LAN
+Soft blocked: no
+Hard blocked: no
+15: hp-wifi: Wireless LAN
+Soft blocked: no
+Hard blocked: no
+16: hp-bluetooth: Bluetooth
+Soft blocked: no
+Hard blocked: no</code></pre>
+<p>this interface can be used to disable the devices. so this is not
+what we want. maybe the hp can’t mask the hardware mute at all.</p>
+<h2 data-number="8" id="but-how-is-the-mute-button-connected">but how is
+the mute button connected?</h2>
+<p>since i’m using a laptop, the mute button might just be a hard wired
+toggle for the soundcards mute state. let’s check that using an external
+multimedia usb keyboard. lsusb:</p>
+<pre><code>Bus 008 Device 003: ID 04b3:3003 IBM Corp. Rapid Access III Keyboard</code></pre>
+<p><strong>using the mute button there doesn’t change anything</strong>
+until i start ‘kmix’. so my first assumption might be correct.</p>
+<p>using ‘acpi-listen’ as root:</p>
+<pre><code>button/mute MUTE 00000080 00000000</code></pre>
+<p>but looking at /etc/acpi there does not seem to be any script caring
+about acpi event. looking at /var/log/messages:</p>
+<pre><code>tail -f /var/log/messages
+...
+Jul  5 16:24:21 ebooK logger: ACPI event unhandled: button/mute MUTE 00000080 00000000</code></pre>
+<p>so it’s probably a hard wired button toggle.</p>
+<p>my previous laptop, ‘thinkpad t43’, did handle the volume up/down and
+mute directly (similar of how the mute button is implemented on the
+elitebook 8530w). i quote from the ibm-acpi implementation documentation
+[2]:</p>
+<pre><code>0x1017  0x16    MUTE        **Mute internal mixer. This key is always handled by the firmware, even when unmasked.**</code></pre>
+<p>so this might be handled by the hp-wmi firmware as well.</p>
+<h2 data-number="9"
+id="etcacpidefault.sh-script-adapted">/etc/acpi/default.sh script
+(adapted)</h2>
+<pre><code>#!/bin/sh
+# /etc/acpi/default.sh
+# Default acpi script that takes an entry for all actions
+
+set $*
+
+group=${1%%/*}
+action=${1#*/}
+device=$2
+id=$3
+value=$4
+
+log_unhandled() {
+        logger &quot;ACPI event unhandled: $*&quot;
+}
+
+case &quot;$group&quot; in
+        video)
+                case &quot;$action&quot; in
+                        brightnessup)
+                        /etc/acpi/brightness.sh up
+                        ;;
+
+                        brightnessdown)
+                        /etc/acpi/brightness.sh down
+                        ;;
+                esac
+                ;;
+        button)
+                case &quot;$action&quot; in
+                        volumedown)
+                        /etc/acpi/volume.sh down
+                        ;;
+                        volumeup)
+                        /etc/acpi/volume.sh up
+                        ;;
+                        mute)
+                        /etc/acpi/volume.sh mute
+                        ;;
+
+                        power)
+                                #/sbin/init 0
+                                ;;
+
+                        # if your laptop doesnt turn on/off the display via hardware
+                        # switch and instead just generates an acpi event, you can force
+                        # X to turn off the display via dpms.  note you will have to run
+                        # &#39;xhost +local:0&#39; so root can access the X DISPLAY.
+                        #lid)
+                        #  xset dpms force off
+                        #  ;;
+
+                        sleep)
+                                /usr/sbin/pm-suspend
+                                ;;
+                        *)  log_unhandled $* ;;
+                esac
+                ;;
+
+        ac_adapter)
+                case &quot;$value&quot; in
+                        # Add code here to handle when the system is unplugged
+                        # (maybe change cpu scaling to powersave mode).  For
+                        # multicore systems, make sure you set powersave mode
+                        # for each core!
+                        #*0)
+                        #  cpufreq-set -g powersave
+                        #  ;;
+
+                        # Add code here to handle when the system is plugged in
+                        # (maybe change cpu scaling to performance mode).  For
+                        # multicore systems, make sure you set performance mode
+                        # for each core!
+                        #*1)
+                        #  cpufreq-set -g performance
+                        #  ;;
+
+                        *)  log_unhandled $* ;;
+                esac
+                ;;
+
+        *)  log_unhandled $* ;;
+esac</code></pre>
+<h2 data-number="10" id="etcacpivolume.sh">/etc/acpi/volume.sh</h2>
+<pre><code>#!/bin/bash
+# script to change the volume via acpi calls by joachim schiele 2010-06-30
+
+if [ &quot;$1&quot;x == &quot;up&quot;x ]; then
+        volume=$(amixer get Master | grep &quot;Front Left: Playback&quot; | awk &#39;{print $4}&#39;)
+        Y=$(echo  &quot;$volume+1&quot; | bc)
+        amixer set Master $Y
+        P=$(echo &quot;$Y/30*100&quot; | bc -l)
+fi
+
+if [ &quot;$1&quot;x == &quot;down&quot;x ]; then
+        volume=$(amixer get Master | grep &quot;Front Left: Playback&quot; | awk &#39;{print $4}&#39;)
+        Y=$(echo  &quot;$volume-1&quot; | bc)
+        amixer set Master $Y
+        P=$(echo &quot;$Y/30*100&quot; | bc -l)
+fi
+
+if [ &quot;$1&quot;x == &quot;mute&quot;x ]; then
+        $(amixer get Master | grep &quot;Front Left: Playback&quot; | grep &#39;\[off\]&#39;)
+        state=$?
+        volume=$(amixer get Master | grep &quot;Front Left: Playback&quot; | awk &#39;{print $4}&#39;)
+        Y=$(echo  &quot;$volume&quot;)
+        amixer set Master $Y
+        P=$(echo &quot;$Y/30*100&quot; | bc -l)
+
+        echo &quot;state=$state&quot;
+
+        if [ $state -ne 1 ]; then
+                amixer set Master unmute
+        else
+                amixer set Master mute
+        fi
+fi</code></pre>
+<h2 data-number="11"
+id="changing-volumes-not-using-kmix-using-acpi">changing volumes not
+using kmix (using acpi)</h2>
+<p>see my last posting [1] on how to use acpi to change the display
+brightness. this time we are going to <strong>change the volume
+level</strong> using <strong>acpi</strong>. volume script</p>
+<pre><code># cat /etc/acpi/events/volume</code></pre>
+<p>this script ignores stereo balance (left speaker louder than right
+speaker). but it works great for my laptop.</p>
+<pre><code># /etc/acpi/default.sh</code></pre>
+<p>one can find out the group and action with (run as root):</p>
+<pre><code>acpi_listen</code></pre>
+<p>and then create an event:</p>
+<pre><code>button/volumedown VOLDN 00000080 00000000
+button/volumedown VOLDN 00000080 00000000
+button/volumeup VOLUP 00000080 00000000
+button/volumeup VOLUP 00000080 00000000</code></pre>
+<p>now extract the needed information: ’<strong>button/volumedown’
+</strong>and** ’button/volumeup**’. put these into the
+/etc/acpi/default.sh script as i already did above. you can experiment
+with the script using the command line:</p>
+<pre><code>./default.sh button/volumedown</code></pre>
+<h2 data-number="12"
+id="changing-volumes-not-using-kmix-using-devinputeventx">changing
+volumes not using kmix (using /dev/input/eventX)</h2>
+<p>my laptop produces an acpi event (even for an externally attached usb
+keyboads) but i guess most computers won’t. this is why i’ve adapted a c
+program and a script [3] to parse /dev/input/eventX.</p>
+<p>using this program is very easy, just follow the steps in the
+README.</p>
+<pre><code># ./mediakeys-controller /dev/input/event3
+calling script for volume down
+calling script for volume down
+calling script for volume up
+calling script to toggle mute state</code></pre>
+<p>works perfectly here (but since the acpi stuff works also i’m using
+acpi). the reason is that [3] does not support hotplugging of new
+devices and it will only open one device at program start. this needs to
+be fixed but i think of it more as a prove of concept code.</p>
+<h2 data-number="13" id="fixing-the-x-bindings">fixing the
+X-bindings</h2>
+<p>there are still the bindings for the volume keys in X, we need to
+remove bindings for <strong>XF86AudioRaiseVolume,</strong>
+<strong>XF86AudioLowerVolume</strong> and
+<strong>XF86AudioMute</strong>. i simply removed the kmix key bindings
+for these keys. doing so works but one would have to remove keybindings
+from many applications.</p>
+<p>a far better approach is to remove the keymappings so that no such
+events are produced, done using: keycodes via ‘~/.Xmodmap’.</p>
+<p>let’s find the key bindings first:</p>
+<pre><code># xmodmap -diplay :0.0 -pke | grep -i vol
+keycode 122 = XF86AudioLowerVolume NoSymbol XF86AudioLowerVolume
+keycode 123 = XF86AudioRaiseVolume NoSymbol XF86AudioRaiseVolume</code></pre>
+<p>now let’s kill those bindings with empty assignments:</p>
+<pre><code>xmodmap -e &quot;keycode 122 =&quot;
+xmodmap -e &quot;keycode 123 =&quot;</code></pre>
+<p>do the same for:</p>
+<pre><code>keycode 121 = XF86AudioMute NoSymbol XF86AudioMute</code></pre>
+<p>to make these changes permanent, we need to create a ~/.Xmodmap, mine
+looks like this:</p>
+<pre><code># cat ~/.Xmodmap
+keycode 121 =
+keycode 122 =
+keycode 123 =</code></pre>
+<h2 data-number="14" id="installing-an-osd">installing an OSD</h2>
+<p>x11-libs/xosd is a very nice OSD. one can indicate volume change. but
+it somehow does look buggy from time to time:</p>
+<ul>
+<li>sometimes using osd_cat won’t show any osd (only X restart makes it
+work again)</li>
+<li>osd_cat does not work very good with mplayer</li>
+<li>it is not very fast and it does not look nice</li>
+</ul>
+<p>i would like to use the osd of kmix. as kmix already changes volumes
+(see the sliders when using alsamixer from the console) one would simply
+have to write an option in kmix settings to enable the osd also on
+passive changes (where kmix didn’t change the volume). i’ve not done
+this so far.</p>
+<h2 data-number="15" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="http://invalidmagic.wordpress.com/2010/06/30/no-more-crashes-after-resuming-from-pm-suspend/"
+class="uri">http://invalidmagic.wordpress.com/2010/06/30/no-more-crashes-after-resuming-from-pm-suspend/</a></li>
+<li>[2] <a href="http://ibm-acpi.sourceforge.net/README"
+class="uri">http://ibm-acpi.sourceforge.net/README</a></li>
+<li>[3] <a href="http://github.com/qknight/mediakeys-controller"
+class="uri">http://github.com/qknight/mediakeys-controller</a></li>
+</ul>
+<h2 data-number="16" id="errata">errata</h2>
+<p>update: fixed the <strong>/etc/acpi/default.sh</strong> script
+/etc/acpi/events/volume is now <strong>/etc/acpi/volume.sh</strong> for
+mute as well</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/fixing_volume_change_in_linux.mdwn" title="posts\fixing_volume_change_in_linux.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+[[!summary chatGPT: This article discusses the use of Nix (a package manager like apt or portage) on Windows, including how to build and use it on a Windows system, as well as limitations and potential applications.]]
+[[!meta date="2011-01-19 21:34"]]
+[[!tag linux packagemanager qt technology windows]]
+
+[[!img media/nixos-lores.png style="float: right"]]
+
+# motivation
+
+nix (see [2]) is a package manager like apt (used in debian/ubuntu) or portage (used in gentoo). windows does have a package manager which is typical among linux distributions. so here some recent findings and how to use nix (and nixpkgs) on windows.
+
+# reproduction of my nix system
+
+setup of my system:
+
+  * core 2 duo processor
+  * **windows xp sp3**
+  * **cygwin** (setup.exe version 2.738) with a full installation [1] (some 2-7 GB, 1h download)
+using setup.exe, do use 'default parameters' everywhere, expect for the software selection: use all (do not install the source, binaries are enough)
+  * **nix 0.16** release from [2]
+  * **install** (as mentioned in the docs) **to a ntfs partition**
+
+components i used (get installed using  cygwin::setup.exe:
+	
+  * **gcc** version **4.3.4** 20090804 (release1) (gcc), target i686-pc-cygwin
+  * **libtoolize** (GNU libtool) **2.4**
+  * **aclocal** (GNU automake) **1.11.1**
+  * **autoheader** (GNU Autoconf) **2.68**
+  * **automake** (GNU automake) **1.11.1**
+  * **autoconf** (GNU Autoconf) **2.68**
+
+# how to build
+
+
+as there is no windows installer (for example using NSIS) you have to bootstrap nix from source.
+	
+  1. **extract** nix-0.16 to c:\nix
+  2. **start the cygwin shell** (desktop icon)
+  3. in the shell, type: '**cd /cygdrive/c/nix/nix-0.16**'
+  4. type: '**./bootstrap.sh**' (this is very important)
+that is why several of my attempts to get nix running failed ;P
+  5. type: '**./configure**'
+  6. type: '**make install**'
+  7. afterwards you can use it with: '**nix-env -qa '*'**' for example
+
+# how to use nix
+
+this is quite easy but it does not work as mentioned in the documentation (which worked only for unix systems so far). the full cygwin installation installes many tools.
+
+  1. **check your environmen** for nix, type 'nix-env.exe' and test if that program works (should be in the path)
+  2. if 'nix-env.exe' does not work, check **/usr/local/bin** for a propper nix installation
+  3. check if there is a unrar tool already (not included in full-cygwin installation with: '**unrar.exe**'
+  4. you have to** subscribe to a nix channel**, see the nix documentation: chapter 2. quick start [4]
+  5. if 'nix-env.exe' works, **install 'unrar'** using: '**nix-env.exe -i unrar**'
+you should see compiler stuff and it installs a million *.drv files...
+  6. now type: '**unrar.exe**', should say: "bash: unrar.exe: command not found"
+  7. now type: "**export PATH=~./nix-profile/bin:$PATH**"
+  8. and try the command from step 5 again, now you should get a working 'unrar.exe' installation
+
+# what worked using nix on cygwin-windows
+
+most of the software related to X did not work, as windows and mesa don't go along nicely. i've tried a few programs:
+	
+  * **wget.exe worked** (checked with 'which wget') and a download
+  * **hello.exe worked **(GNU hello)
+  * **unrar.exe worked **(compiled, installed, probably to work, didn't extract anything)
+  * qt (nix throws a nix exception): unsupported platform for Mesa
+  * irssi (nix tries to compile the needed software but fails at glib-2.24.1)
+  * firefox (nix throws a nix exception): flashplayer is not supported on this platform
+
+# summary
+
+great to have nix on windows. no it's time to use it, here are a bunch of scenarios:
+
+  * use it to create windows software
+  * use it to create installers (using NSIS)
+
+but both points would be independent of nix, so this results in a very nice build system. maybe combined with hyrdra this is a great way to build software.
+
+# links
+
+* [1] <http://www.cygwin.com/cygwin-ug-net/setup-net.html>
+* [2] <http://nixos.org/nix/>
+* [3] <http://hydra.nixos.org/build/858291/download/1/manual/>
+* [4] <http://hydra.nixos.org/build/858291/download/1/manual/#chap-quick-start>

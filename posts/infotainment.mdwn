@@ -1,0 +1,281 @@
+[[!meta date="2013-07-28 19:23"]]
+[[!tag infotainment society technology usability linux]]
+[[!summary how infotainment in cars will be in a few years]]
+
+# motivation
+in this article i want to illustrate my vision of 'how infotainment in cars will be in a few years'. infotainment in cars causes a problem right now, as [1] puts it:
+
+> "Dailytech recently published an article titled 'Detroit Automakers Vie For App Devs Amid Infotainment Arms Race.' **Unfortunately for auto manufacturers, they are in a poor position to complete with companies like Google, Apple, Microsoft, etc...** and they should give up the arms race and take a different direction. Mobile operating systems and their associated hardware have a rapid release cycle that significantly outpaces vehicle infotainment systems. Additionally, mobile OSs are developed by specialized companies that can spend dump trucks filled with money on their platform. I'm sorry Dodge, Toyota, Honda and all your friends; you simply can't compete."
+
+i totally subscribe to this view. this posting is about how to fix this issue by:
+
+* **increase usability**
+* build on **replaceable hardware platforms**
+* use **open source** and **include the community**
+
+# usability
+
+usability is the most thriving factor for innovation. i want to illustrate this by an example: 
+
+**the desktop computer is currently in the process of being replaced by tablets** (btw.: not by microsoft tablets - since selling old concepts to new markets just doesn't work). 
+
+i expect that (on a worldwide view) the 'desktop computer market' (traditional PC standing under the desk) will completely vanish, replaced by a set of new devices: 
+
+* **tablets (2013)* will replace the slack**
+* **classical laptops (2013) will get a bigger market share for developers/engineers** 
+* **smartphones** (2013) will also shrink the 'desktop computer market' 
+* **smartpohnes** (2014+) - like the 'ubuntu edge' [15] - are about to put the final nail in the coffin
+
+\* thinking of a device of the year 2013      
+
+## the sudden advent of tablets
+
+the primary reason is that android/iOS tablets totally fit the average users requirements:
+
+* **communication** - chat/email
+* surfing the web
+* **watching videos**
+* playing games
+* handy new workflows:
+ * **responsive interfaces** 
+ * **multitouch/voice input**
+ * instant suspend/resume of the device 
+ * long lasting batteries
+ * **intuitive software/hardware design**
+ * **prize** - SoC is cheap!     
+
+usability is a thriving motor in innovation and this posting is about **how to make computers in cars more appealing to users**.
+
+## the human machine interface (HMI)
+
+[[!img media/iPad-Mount-Cars.jpg size=300x style="float: none" caption="Daimler research project, see [12]"]]
+
+in regards to display integration this design is my favourite (found at [12]), why? 
+
+* the tablet could be **operated both by a dial control or by touchscreen**
+* the **tablet implements the ''view/controller'' in the [MVC](http://de.wikipedia.org/wiki/Model_View_Controller "Wikipedia article on MVC")  patten**, thus the infotainment system can be replaced after 2-3 years
+* **developing costs for tablets are far cheaper compared to onboard computers**. also patching is not as complicated
+* the user could **unmount the tablet and use it for other things or even to remotely control the car and later remount it into the car**
+* **users see their smartphone and tablet as part of their being**, thus having a good integration in their car enhances their experience
+
+### needed HMI fixes for drivers
+
+the concept i'm thinking of is this:
+
+ * **infotainment system is based on a tablet**
+ * **an incar computer assists the tablet** in making everything interconnected
+ * the **tablet has an internet connection using UMTS/LTE but also a connection WiFi to the car**
+ * the car has a **communication module which is connected UMTS/LTE to the OEM 'data center'**
+
+now the user can either **use the tablet or a smartphone to query the stats of this car** using the 'data center' 
+
+[[!img media/infotainment.jpeg size=700x alt="created by joachim schiele" style="float: none" caption="'tablet as infotainment solution in a car' by joachim schiele"]]
+
+the 'data center' would make access to the following data available:
+
+ * steering wheel
+   * pressed keys
+   * orientation (angle) 
+ * pedals
+ * GPS position
+ * car speed
+ * MEMS-Gyroskop
+ * illumination sensor (inside car, outside car)
+ * temperature sensor (inside car, outside car, motor, cooling)
+ * speed of car (and speed of each tire)
+ * air preasure (inside car, outside car, each tire)
+ * oil/coolants/petroal/battey/wiping water levels
+ * heating / ventilation / climate control
+ * motor levels/settings
+ * gear level
+ * radar results (and whatever sensors are bult into the car you can think of)
+ * fual consumtion
+ * odometer values
+ * power consumption per component (like android does it)
+ * defect sensors
+ * cameras
+
+# replaceable hardware platform 
+
+ordinary **consumer tablets** probably won't survive intense heat for long, which is mostly a screen and battery issue. still we could use **industry grade tablets** (which usually survive from -10 to 90 degrees celcius) in the car.
+
+supporting consumer tablets might still be possible:
+
+* smartphones are probably a good target since nobody will leave them in the car
+* for tablets one could add a fan to cool it and
+* mount it in a way that there is less direct sun impact or
+* add a mechanic which protects the tablet when car is inactive (no fans)
+
+right now i see problems with supporting consumer tablets. using dedicated screens and forwarding sounds good at first but there are no open standards and the protocols which are deployed more often are proprietary and therefore no good target to be used. also it would require a device to stream to like a display. displays suffer the same problems as integrated computers do, they are outdated too soon.    
+
+so why not use industry grade tablets until consumer tablets get better? 
+
+here are three **industry grade tablets** which i find interesting:
+
+ * motorola ET1 enterprise tablet
+ * panasonic toughpad FZ-G1
+ * panasonic toughpad FZ-A1 
+
+### motorola ET1 Enterprise Tablet
+> Looking for a true enterprise-class tablet that you can deploy anywhere? The ET1 offers everything you need — from security and durability to flexibility and manageability. With WLAN or WWAN connectivity, you can count on the ET1 to deliver all the information your workforce needs to get the job done — whether they are inside the four walls or out in the field.
+
+[[!img media/ET1_TierOne_ProductImage.jpg alt="" style="float: none" caption="ET1 enterprise tablet"]]
+
+motorola ET1 specification states [2]:
+
+    Operating Temp.
+     32° to 122° F /0° to 50° C
+    Storage Temp.
+     -4° to 158° F /-20° to 70° C
+    Drop Specification
+     Multiple 4 ft./1.2 m drop per MIL STD 810G
+    Sealing
+     IP54
+    Vibration
+     4Gs peak, 5hz to 2khz, 1 hour duration per axis
+    Thermal Shock
+     -4° F to 158° F/-20° C to 70° C rapid
+    transition
+    ESD
+     15kv Air, 8kv contact, 2kv charge body
+    Humidity
+     10% to 95% RH (Non-condensing)
+
+### panasonic toughpad FZ-A1/FZ-G1
+
+> The first fully-ruggedized tablet powered by Android™ combines high-encryption data and device security with the seamless connectivity and enterprise-grade technology businesses and government agencies require.
+
+[[!img media/ToughPad_A1_2-250.jpg alt="" caption="Toughpad FZ-A1 [3]"]]
+[[!img media/fz-g1aabaxlm.jpg alt="" caption="Toughpad FZ-G1 [4]"]]
+
+btw: both devices [3] and [4] are [certified MIL-STD-810 certified](http://en.wikipedia.org/wiki/MIL-STD-810).
+
+## input via dial
+
+**being froced to use singletouch or multitouch is a real problem - especially when driving!** that is because most tablets were designed to be hold in your hands while being operated. however, consider an external control, like the 'bmw x5 idrive conroller', is added to the tablet (via bluetooth BT) and the tablet is used in a 'car mode' (for instance by using the app 'Car Home Ultra'). such an integration would seriously make a difference.
+
+[[!img media/320px-IDrive_controller_X5_2.JPG alt="from wikipedia - thanks to Andi2612" style="float: right" size=300x style="float: none" caption="bmw x5 idrive conroller"]]
+
+such dials could be modified to have a very sensitive surface which would allow to write letters, without having to glance at the screen, even while driving - probably everyone remembers when palm cam up with handwriting recognition. why not integrate that?
+
+## tablet audio output
+
+**audio output would be done using BT, like it is done with mobile phones in cars today.** if the tablet is mountable via a tablet mount then audio would still work after being removed. for instance when entering/leaving the car. triggers to issue a modeswitch after mounting the device could be done using NFC.
+
+# open source software and the community
+
+another major issues with OEMs, they ignore the community without realizing that the cummunity is the actual user. of course, most users having access to APIs and source code won't be able to use it like a developer could. but maybe a little example helps to understand that it only takes few to make cool things available to a broad audience: the linux kernel is developed by a small group compared to the sheer ammount of users - often unknowingly - using it.
+
+being open helps as you give others the possibility to contribute. see [16] and [17] how mighty this principle is. this graph illustrates the adaption rate to the linux kernel:
+
+[[!img media/osadl-linux-adaption-rate.png alt="" style="float: right" style="float: none" caption="from osadl.com (dr. carsten emde)"]]
+
+the graph shows a few interesting trends:
+
+ * the desktop market seems to be unreachable by linux
+ * the later in time a linux adaption started the faster it took a 100% market share
+ * linux dominates many different markets, still it uses the same code base 
+
+interestingly dr. emde also mentioned:
+
+> as it stands today one might ask what happens first: linux will also get a near 100% coverage of the desktop or the classical desktop will die out
+
+as i already mentioned, taken the tablet market and the desktop market together, then linux is also about to take the desktop market.
+
+anyway, when wanting to benefit of the community it is important to give them the tools they need to do cool things, and that is:
+
+ * the software (FLOSS licensed)
+ * the toolchain (FLOSS licensed)
+ * the API (for cloud services but also locally) 
+ * documentation
+
+[16] [17] [19]
+
+## API
+
+there is only one way to do proper tablet integration: you need a central computer in the car which is basically running each time you are going to make a request. this 'headless' computer interconnects all devices and sensors in the car. if wanted reports them even back into the data center for remote usage.
+
+a powerful API helps community developers to make maximum use of it.
+
+# a few interesting (community) projects OEMs could benefit from
+
+## open street map
+
+i always wondered why there is no adaption towards open street map [17] since the quality of the data is in many regards superios to other commercially available data sources. 
+
+## osmand
+
+osmand [13] is probably one of the best open streetmap related renderers. there are only two things i would like to have:
+
+ * better routing and better awareness model of where the car currently is or might be
+ * life traffic integration (like when using google maps or tomtom) 
+
+there exists a nice introduction video to osmand [14], the only problem seems it is french ;-)
+ 
+## interesting hardware hacking project
+
+yourfacetatooed on youtube.com has built a very interesting concealable tablet integration, see [11] (video position 1:20 onwards)
+
+[[!img media/yourfacetatooed-Motorized-galaxy-tablet-incar-install-open.jpeg alt="" style="float: right" size=500x style="float: none" caption=""]]
+
+[[!img media/yourfacetatooed-Motorized-galaxy-tablet-incar-install-closed.jpeg alt="" style="float: right" size=500x style="float: none" caption=""]]
+
+## bikelogger
+
+[5] 
+
+## garmin heads up display
+
+[6] 
+
+## eberspächer pre-heater
+
+[7]
+
+## nexus 7 built into the car
+
+[8]
+
+## another interesting integration of tablets in the car
+
+[9]
+
+## galaxy tab in the car
+
+[10]
+
+## apple carplay
+
+[24]
+
+## tomtom bridge tablet
+
+[25] ... this is 50% of what this posting is about ...
+
+# links
+
+* [1] <http://tech.slashdot.org/story/13/07/03/0131214/why-automakers-should-stop-the-infotainment-arms-race>
+* [2] <http://www.motorolasolutions.com/XC-DE/Business+Product+and+Services/Tablets/ET1+Enterprise+Tablet>
+* [3] <http://www.panasonic.com/business/toughbook/ultra-mobile-rugged-mca-toughpad_FZ-A1.asp>
+* [4] <http://www.golem.de/news/panasonic-fz-g1-im-test-massives-windows-8-tablet-im-aussendienst-1307-100064.html>
+* [5] <http://bikelogger.de/en>
+* [6] <http://wmpoweruser.com/garmin-releases-a-heads-up-display-for-in-car-navigation-compatible-with-windows-phone-8/>
+* [7] <http://www.eberspaecher-standheizung.com/bedienelemente/easystart-call.html>
+* [8] <http://www.androidnext.de/news/nexus-7-im-auto/>
+* [9] <http://www.all-electronics.de/texte/anzeigen/46521/Integration-von-Tablet-PCs-im-Pkw>
+* [10] <http://www.android-hilfe.de/samsung-galaxy-tab-forum/109394-galaxy-tab-golf-5-fest-der-mittelkonsole-einbauen-anstelle-von-orginalradio.html>
+* [11] <http://www.youtube.com/watch?v=rmaBP6mLEzQ&feature=player_embedded>
+* [12] <http://www.geeksugar.com/iPad-Mount-Cars-15602422>
+* [13] <http://www.youtube.com/watch?v=DWNK5Pk4wog> - Présentation d'osmand gps opensource.
+* [14] <http://osmand.net/>
+* [15] <http://www.indiegogo.com/projects/ubuntu-edge>
+* [16] <http://video.linux.com/videos/how-linux-is-built>
+* [17] <http://www.linux.com/news/featured-blogs/185-jennifer-cloer/715856-jim-zemlin-at-tedx-what-weve-learned-from-linus-torvalds>
+* [18] <http://osm.org>
+* [19] <http://www.linux.com/news/featured-blogs/200-libby-clark/719560-5-reasons-infotainment-is-the-first-target-for-open-source-software-in-cars>
+* [20] <http://garmin.blogs.com/my_weblog/2013/06/garmin-provides-portable-infotainment-for-vw-up-compact-car-.html>
+* [21] <http://www.golem.de/news/unu-tablet-smart-tv-und-spielekonsole-in-einem-1308-101059.html>
+* [22] <http://www.heise.de/newsticker/meldung/Autofahrern-ist-Smartphone-Anschluss-wichtiger-als-Pferdestaerken-1954996.html>
+* [23] <http://www.appszoom.com/android_applications/car+dock>
+* [24] <http://www.apple.com/ios/carplay/>
+* [25] <http://telematicsnews.info/2014/02/26/tomtom-bridge-tablet-will-provide-navigation-traffic-and-fleet-apps_f5263/>

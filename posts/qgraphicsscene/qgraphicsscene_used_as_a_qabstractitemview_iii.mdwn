@@ -1,0 +1,125 @@
+[[!summary chatGPT: This posting discusses using a QGraphicsScene/QGraphicsView with a QAbstractItemModel and introduces new concepts for setting up modules and connections, using a messenger class and interface, editing module properties with a QTreeView, and the possibility of using graphviz to layout a graph.]]
+[[!meta date="2010-10-05 21:13"]]
+[[!tag qt usability visualization]]
+[[!series qgraphicsscene]]
+
+# motiviation
+
+this posting is about using a QGraphicsScene/QGraphicsView with a QAbstractItemModel. i've blogged about this two times, see [1] and [2]. i've made progress and i created a few new concepts which might help _you_ and probably saves a lot of your time.
+
+it is important not to mix the two different Qt concepts: 'Qt way of ModelViewController', so let's revisit the docs:
+
+  1. a **QGraphicsScene/QGraphicsView** has it's own model and data storage. one QGraphicsScene (scene) can have several QGraphicsView(s) (views) attached
+  2. a **QAbstractItemModel** is used with **QTreeView/QTableView** and **QListView**
+
+
+IMPORTANT: **both concepts (1) and (2) can't be combined directly - normally (out of the box). what i'm doing here is actually _combining_ them. as you will see, this can be quite complicated.**
+
+# the basis
+
+the first blog posting refers to the automate project, the second to the 'spring random map generator'. this posting is mainly about the 'spring random map generator'. currently the automate codebase is deprecated and broken. i will eventually fix it. this is how the 'spring random map generator' looks like:
+
+[[!img media/spring-random-map-generator-interface61.png size=800x]]
+
+
+# so what is new since the last blog posting about this?
+	
+  1. i'm not **inheriting from QAbstractItemView** anymore, **instead** i'm **using a QGraphicsScene connected to the QAbstractItemModel** using Qt's 'signals&slots'
+  2. i've developed a **concept for setting up modules and connections in arbitrary order:
+**that means you can add a connection to the QGraphicsScene without having any module!
+this means **you can remove QGraphicsItem's in arbitrary oder as well** (no more crashes when shutting down the program)
+  3. both concepts are implemented in a messanger class: **GraphicsItemRelay** and a interface: **GraphcisItemRelayInterface**
+  4. module properties can be edited using a QTreeView (accessing the same QAbstractItemModel as the GraphicsScene), using a QSortFilterProxyModel
+  5. how to use graphviz to layout a graph
+
+so let's have a detailed discussion about every of those points.
+
+# 1. why not inherit from QAbastractItemView
+
+since most of the code given by the QAbstractItemView wasn't used anyway i removed it (refactoring). now the GraphicsScene is the new view and functionality is added using direct signal&slot connections.
+	
+  * connect( model, SIGNAL(modelReset ()), this, SLOT(reset()));
+  * connect( model, SIGNAL(layoutChanged ()), this, SLOT(layoutChanged()));
+  * connect( model, SIGNAL(rowsInserted ( const QModelIndex & , int , int  )), this, SLOT(rowsInserted ( const QModelIndex & , int , int  )));
+  * connect( model, SIGNAL(rowsAboutToBeRemoved ( const QModelIndex & , int , int  )), this, SLOT(rowsAboutToBeRemoved ( const QModelIndex & , int , int  )));
+  * connect( model, SIGNAL(dataChanged ( const QModelIndex & , const QModelIndex &  )), this, SLOT(dataChanged ( const QModelIndex & , const QModelIndex &  )));
+
+that is basically all you need to do, if you want to use your QGraphicsScene as a View on top of a QAbstractItemModel. it's better to have less code to care about!
+
+[[!img media/graphicssceneasabstractitemview.png size=700x]]
+
+# 2. adding/removing Modules/Connections in arbitrary order
+
+my first implementation of adding nodes and connections between them was very limited. see [4], the automate project. as a arrow in the diagramscene [5] i needed both other QGraphicsItems first in order to know the source and the destination coordinates to draw a line.
+
+  * that meant on the other hand: one would have to **insert all nodes first** and then **all connections later** when a QGraphicsScene/QGraphicsView got populated with items
+  * removing a a QGraphicsScene/QGraphicsView implies the same in opposite direction: first all connections, later all nodes
+
+not doing so would crash the program as the draw routine of the QGraphicsView, when drawing a connection, would query a QGraphicsItem's position (the node) which was simply not there anymore. note: this has a cyclic dependency:
+
+	
+  * moving a node (QGraphicsItem) does for a connection (QGraphicsItem) to redraw
+  * removing a connection requires both nodes (QGraphicsItem) to be there in order to unregister the connection (see previous point)
+
+
+see <http://github.com/qknight/automate/blob/595770383e34f4bea4beedb99aaa13e6b52b910d/src/GraphicsView/SceneItem_Node.cpp>:
+
+    QVariant SceneItem_Node::itemChange ( GraphicsItemChange change, const QVariant &value ) {
+
+to sum up: to reduce code and complexity it is important to make insertion and deletion in arbitrary order, see (3) how i did it.
+
+# 3. the GraphicsItemRelay and the GraphicsItemRelayInterface
+
+since problem (2) only requires the position of an object i decided to implement a messenger class:
+	
+  * <http://github.com/qknight/springrts.com-random-map-generator/blob/f4e8eb99f4e0b0c22491a2c8f608b6fd1a83ebd6/src/frontend/GraphicsItemRelayInterface.cpp>
+  * <http://github.com/qknight/springrts.com-random-map-generator/blob/f4e8eb99f4e0b0c22491a2c8f608b6fd1a83ebd6/src/frontend/GraphicsItemRelayInterface.h>
+  * <http://github.com/qknight/springrts.com-random-map-generator/blob/f4e8eb99f4e0b0c22491a2c8f608b6fd1a83ebd6/src/frontend/GraphicsItemRelay.cpp>
+  * <http://github.com/qknight/springrts.com-random-map-generator/blob/f4e8eb99f4e0b0c22491a2c8f608b6fd1a83ebd6/src/frontend/GraphicsItemRelay.h>
+
+
+the concept might look quite complex but it works great as one can remove connections or modules (ports) in arbitrary order, just what i discussed in (2).
+
+# 4. module properties and a QTreeView
+
+in the last posting [2] i wondered how to implement properties without adding yet another hierarchy layer. it seems it can be done by doing so. see the image in this posting: it features two different views using the same QAbstractItemModel.
+
+again, what was the problem?
+	
+  * a list of items should be editable just as done in 'qtdesigner' where you have a nice list on the right side hosting QObject attributes
+  * every element in the list should be accessed via a QModelIndex so that the model is used to set/get the values
+  * every time a property changes the view should be updated as the rendered image might (very likely) change as the parameter influence the image rendering process
+
+
+the problem was with the hierarchy layer:
+
+  * rootitem - module - port - connection
+
+which was extended by:
+
+  * rootitem - module - port - connection
+  * rootitem - module - property
+
+as there are two different views:
+
+  * QTreeView: used to make properties editable
+  * QGraphicsScene/QGraphicsView to visualize the graph
+
+that means we have to take care for the third layer as there can be a port or a property.
+
+the **QGraphicsScene/QGraphicsView ignores properties**. as it simply ignores them. the **QTreeView would render ports** but to avoid that one can use a **QFilterProxyModel which filters out all ports** (and all childs of them). this way only modules and properties are there.
+
+
+# 5. how to use graphiviz to layout a graph
+
+i always wanted to use graphiviz to layout my automate. i've found a implementation at [7] which describes how to do so. i did not find the time yet to use that code. maybe i find the time in the future.
+
+# links
+
+* [1] <http://invalidmagic.wordpress.com/2009/12/10/qgraphicsscene-used-as-a-qabstractitemmodel/>
+* [2] <http://invalidmagic.wordpress.com/2010/02/02/qgraphicsscene-used-as-a-qabstractitemview-ii/>
+* [3] <http://github.com/qknight/springrts.com-random-map-generator>
+* [4] <http://github.com/qknight/automate>
+* [5] <http://doc.trolltech.com/4.5/graphicsview-diagramscene.html>
+* [6] <http://labs.trolltech.com/blogs/2008/10/24/itemviews-the-next-generation/>
+* [7] <http://mupuf.org/blog/article/34/>

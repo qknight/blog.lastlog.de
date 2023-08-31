@@ -1,0 +1,21 @@
+[[!summary chatGPT: A list of various websites and resources for data visualization using JavaScript and SVG.]]
+[[!draft]]
+[[!meta date="2014-02-05 14:17"]]
+
+http://cutjs.org/
+
+
+http://d3js.org/
+http://snips.net/blog/posts/2014/05-04-fast-interactive_prototyping_with_d3_js_II.html
+http://visjs.org
+http://tympanus.net/Tutorials/TexturedText/index.html
+https://s3.amazonaws.com/macslow/index.html
+http://www.chartspree.com/
+http://sigmajs.org/
+http://sathomas.me/jsdataviz/index.html
+http://www.svgjs.com/
+http://rrdtool.org/rrdtool/gallery/index.en.html
+http://tympanus.net/Tutorials/InteractiveSVG/
+http://wijmo.com/html5-charting-with-jquery-and-svg/
+https://developer.mozilla.org/en-US/docs/SVG_In_HTML_Introduction
+

@@ -1,0 +1,73 @@
+[[!meta date="2015-06-21 20:58"]]
+[[!tag nixos linux]]
+[[!summary Discover the creative packaging techniques and practices in Nixpkgs, exploring innovative solutions for software packaging and distribution]]
+[[!img media/nixos-lores.png alt="" style="float: right" class="noFancy"]]
+
+# saleae logic analyzer
+just discovered an interesting hack for the logic analyzer [1] software worth sharing! this is about **tricking proprietary software**:
+
+theory: **if programmers don't understand the concept of storing files in $HOME but instead depend on writing data to the same directory as the binary is in, you are basically doomed on pretty much every linux distribution**, as this cannot be packaged by definition. in such situation you can only copy the whole program into your $HOME or some place else you have write permissions on.
+
+**the situation on nixos is even worse, since deploying proprietary software requires you to use nix by altering the interpreter and RPATH of the binary and also installing it into the read only nix-store. using patchelf as i've done in the FTL posting [4] is hacky, complicated and brings stateful breakages on updates as the dependencies are not seen by the nix garbage collector**.
+
+however, **Bjørn Forsman** made a very cool hack:
+
+1. first he patch the software, see [2]:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    # Patch it
+    patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" "$out/Logic"
+    patchelf --set-rpath "${stdenv.cc.cc}/lib:${stdenv.cc.cc}/lib64:${libPath}:\$ORIGIN/Analyzers:\$ORIGIN" "$out/Logic"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2. then a prepares a shared library:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    gcc -shared -fPIC -DOUT=\"$out\" "${./preload.c}" -o "$out/lib/preload.so" -ldl
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3. finally he creates a wrapper script:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    # Make wrapper script that uses the LD_PRELOAD library
+    mkdir -p "$out/bin"
+    cat > "$out/bin/saleae-logic" << EOF
+    #!${stdenv.shell}
+    export LD_PRELOAD="$out/lib/preload.so"
+    exec "$out/Logic" "\$@"
+    EOF
+    chmod a+x "$out"/bin/saleae-logic
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+4. the wrapper [3] basically filters fopen and fopen64:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+    FILE *fopen(const char *pathname, const char *mode) {...}
+    FILE *fopen64(const char *pathname, const char *mode) {...}
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+5. and finally replaces '/Settings/settings.xml' with '%s/.saleae-logic-settings.xml' when it is in the stream!
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+    new_path = pathname;
+    if (strcmp(OUT "/Settings/settings.xml", pathname) == 0) {
+        snprintf(buffer, PATH_MAX, "%s/.saleae-logic-settings.xml", homepath);
+        buffer[PATH_MAX-1] = '\0';
+        new_path = buffer;
+    }
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+this is just **amazing**!
+
+<div class="alert alert-info" role="alert">
+this is similar to [how linus torvalds repaired the broken flash plugin][linusrepair].
+</div>
+
+# links
+
+* [1] <http://saleae.com/>
+* [2] <https://github.com/NixOS/nixpkgs/blob/f3c6827373be102caae5dcbadd31e73ed60fa17f/pkgs/development/tools/misc/saleae-logic/default.nix>
+* [3] <https://github.com/NixOS/nixpkgs/blob/f3c6827373be102caae5dcbadd31e73ed60fa17f/pkgs/development/tools/misc/saleae-logic/preload.c>
+* [4] <http://blog.lastlog.de/posts/useflags_in_nixos/>
+
+[linusrepair]: http://blog.lastlog.de/posts/overwriting_glibc_library_functions/

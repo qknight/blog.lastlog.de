@@ -1,0 +1,33 @@
+[[!summary chatGPT: Prior to GUI toolkits, console programs were commonly used, but now GUIs like QMessageBox can be annoying; the proposed fix is to record output buffers and easily toggle a console containing the recorded buffer for debugging and usability purposes.]]
+[[!meta date="2009-10-16 15:05"]]
+[[!tag linux technology usability]]
+
+prior to todays gui toolkits console programs were used (i recall):
+	
+  * programs without any input toggle (maybe even without any output as well)
+  * programs with input toggles as -x -i -v -u ...
+  * programs with a prompt (interactive programs with a split main loop)
+  * console programs which have a gui (but still in a console) as (sys-libs/ncurses)
+
+still all these programs (not using any X painting stuff) hat one thing in common:
+	
+  * **stdout/stderr** still was** printed to the console**, you could not miss a valuable information
+  * **system wide errors** were also printed** to all attached consoles** (could be problematic on massive system error messages) since then you were spammed with error messages. for example when the harddrive produces errors due to hardware errors and the driver couldn't read certain sectors...
+
+**today with graphical interfaces (gui)** as (X or the equvalent windows 7 or mac os x) the problem is that every message a program wants to be printed to the user is using something like **QMessageBox** which **can be very annoying** if used excessiveley (for example the usage of windows xp bubble boxes - as nobody really reads them).
+
+my fix to this issue is:
+
+  * **record all the output buffers** of any graphical process (maybe with a limit of say 100kb of compressed text) for later use
+  * in case of an issue, say program behaves strangely one can simply** click the widget handler** (that is kwin for instance) and **toggle a console** which contains the previously recorded buffer
+  * it is very important (**usability wise**) to make this process very easy (_ALL_ systems i'm using FAIL BADLY in this regard).
+  * copying and pasting such console outputs is horrible when using cmd.exe for example
+  * i propose therefore a **standard framework as QDebug** for debugging on command lines using the above specifications while also adding a service as nopaste for debug output pastes
+
+no let's see how to attach a console (today) to a gui:
+	
+  * **restart the graphical application** from a console as 'konsole' or 'xterm' on linux or cmd.exe from windows (this fails of course if the button which starts the program adds different environment settings as PATH or other variables)
+  * edit the shortcut (either windows or kde/linux) and click '**execute using a console**'. (this is bad as well since you still have to restart the application).
+  * often programs don't use console output or it is disabled for a 'release' build completely. i don't see any good point about disabling it completely. (quake1/quake2 ... always had valuable information on the console, linux boot still does). i understand why some ppl want to hide such messages - not to disturb dump users - but stealing any debug possibility on the other hand for power and average users is an overreaction.
+
+

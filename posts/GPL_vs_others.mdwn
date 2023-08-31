@@ -1,0 +1,26 @@
+[[!summary chatGPT: Comparing the success of Linux and BSD, the author attributes Linux's popularity to the GPL license, which forces the release of source code upon request, while BSD's more permissive license allows closed-source programs. The author also mentions Minix and expresses interest in a Linux modification that combines Minix's design with Linux.]]
+[[!meta date="2009-07-06 00:09"]]
+[[!tag technology]]
+[[!img media/gnu.gif alt="the gnu gnu" style="float: right"]]
+
+
+i've always followed minix and linux discussions since linus and andrew had funny conversations about general development goals as the kernel architecture to be precise. reading 'just for fun' was a great pleasure and it made one thing clear - having linux using the gpl was an important coincidence for it's support.
+
+there is the bsd family of unix systems of which i've learned they have a very long history back to the beginning of unix. when linux emerged there was already a completely free and working unix to that time, did you know that? for the older readers this might be no surprise but for me it was.
+
+so one should wonder why linux had such great success while bsd did not. i think the main issue here is the license. the bsd license is very open and if mankind changes towards good it might get the license of choise. since that did not happen yet let's see what the bsd license can do for you:
+
+  * you can create closed source programs and sell them
+  * you are not enforced to release the source-code on request
+
+these two paragraphs in the bsd license enabled apple to create mac os x - a unix system using a unix environment on top of the mach kernel. i love mac os x so don't get this wrong but i doubt this is how software development should be. so bsd still has lot's of fans and development goes on but compared to the increase in linux usage it is minor. so i keep asking myself why?
+
+so what should be better about the gpl compared to the bsd license? **the gpl license forces everyone to release the sourcecode of the program on request.**
+
+this is very important and richard stallman is to be thanked for this wise concept. it is working. i don't want to do open source or 'open and free software' propaganda here. but looking at the usage speaks for itself.
+
+i think it is historically funny that linux made it and neither bsd nor minix. (yes both systems are cool and are in use but i think about mainstream usage here). i love minix for it's design and one day when windows vanishes from the desktop we can expect new different types of hardware as arm or any platform other than x86 i could think of a linux modification which implements the core concepts of minix into a linux system.
+
+it is somehow ironic to see that minix made the misstake chosing the bsd license. it seems the author of minix goes either egoistic proprietary or imprudent free.
+
+there are of course other factors behind the success of linux as for example the community but i won't discuss this here.

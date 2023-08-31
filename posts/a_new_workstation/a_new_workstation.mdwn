@@ -1,0 +1,52 @@
+[[!summary chatGPT: A user purchased an HP Elitebook 8530w laptop and had a positive experience with its performance and design, preferring it over other options due to its powerful NVIDIA graphics card and lack of AMD components. The user installed Gentoo on the laptop by cloning an image from another computer and had some initial difficulties with the installation but resolved them. The user praised the laptop's anti-glare display, low power drain in standby mode, and compatibility with Linux. The only issues encountered were with LAN, WLAN, webcam, and touchpad functionality. The user also mentioned using genkernel for creating a new initrd image for encryption support. Overall, the user highly recommends the HP Elitebook 8530w.]]
+[[!meta date="2009-12-07 22:24"]]
+[[!tag gentoo linux technology usability]]
+
+[[!img media/hp-com-elitebook-8530w.jpg alt="source hp.com" style="float: right" size=300x]]
+
+# motivation
+
+finally i bought a new workstation, a '**hp elitebook 8530w**'. this is unusual since i prefer 'ibm' computers in genreal - but i could not find any ibm computer which was as powerful as this hp laptop featuring a nvidia card. my first impression of the hp was that it's well designed and the fan wasn't bad at all. altough the fan is not perfect but i can live with it. another far more important point is that it DOES NOT HAVE ANY **ATI** (AMD) COMPONENT IN IT which means: NO more suffering. instead it uses a nvidia graphics card:
+
+
+    # lspci
+    01:00.0 VGA compatible controller: nVidia Corporation Device 065c (rev a1)
+
+
+    # cat /var/log/Xorg.0.log | grep Quadro
+    (II) NVIDIA(0): NVIDIA GPU Quadro FX 770M (G96GL) at PCI:1:0:0 (GPU-0)
+
+
+I did not install gentoo the usual way but instead i cloned the image from one of my desktop computers (which all happen to be intel c2c duos) with 64bit usage. So the installation was done in about 30minutes (with some help of [1]). i could not install gentoo right away since i considered 'bouncing the purchase'. the hard drive can be removed easily and the way it is mounted to the laptop looks 'rock solid' (it is fixed by 3 screws). so next i attached my desktop hard drive with a usb adapter but grub could not load the kernel and it came up with the mystic error code "error 17". soon i found out that the kernel needs to be in the first 1gb of disk space (or maybe 4gb? or 10gb?) i really don't care.  it was at about 120gib away from the first sector. so i removed the first partition (which wasn't in use) and installed a 100mb partition with xfs and i copied the kernel there. now everything worked and i could test the computer without having any problems with that 'windows vista' i didn't want to damage (else i would not be able to return the device). finally i removed windows vista after i found out that everything worked nice - which meant i would not return the device!
+
+The only things which didn't work then were:
+	
+  * lan 00:19.0 Ethernet controller: Intel Corporation 82567LM Gigabit Network Connection (rev 03)
+  * wlan 03:00.0 Network controller: Intel Corporation Device 4236
+  * webcam (don't need that)
+  * second mouse (touchpad - i don't need that either)
+
+suspend2ram works with the proprietary nvidia driver '**x11-drivers/nvidia-drivers-185.18.36**'. why should i bother with this amd open  source crap if a nvidia driven pc works out of the box? using spring (springrts.com, game) i have about 280fps peak (in windowed mode) while compositing is running. kde runs at 60fps. one would not expect that - but it's real!
+
+the power drain using** suspend2ram** is about **0.6W**!  the **display 1920 x 1200** Pixels **anti-glare** and it is very good compared to my 'thinkpad t43' and it is excellent compared to my wifes mac book pro's glare display. overall i'm so happy i didn't buy a 'mac book pro' since i'd be running linux on it and i would expect more problems with a mac book pro running linux than this 'hp elite book' - i could be wrong though.
+
+there was one problem. i usually protect my private data with some encryption -> luks and my static 32bit initrd didn't work anymore since cryptsetup segfaulted on boot. so i had to create a new initrd image which didn't work at all. i really don't know why. maybe init couldn't be loaded because busybox (although linked statically) couldn't find init. so i thought about giving up and do the installation without luks support - and just in that moment eliasp (a friend of mine) mentioned to me that he usually uses genkernel for doing that.
+
+so i tried that (not expecting **genkernel** to be able to help me). i simply couldn't imagine that someone wrote support for a lvm inside a luks-image which means:
+	
+  * /dev/sda3 is a luks volume which is first opened with cryptsetup luksOpen and
+  * afterwards the decrypted partition can be interpreted as lvm vg in '/dev/vg/'.
+
+but i was wrong with my assumption - the initrd image produced by genkernel worked out of the box, all i needed to do was issuing:
+
+    genkernel --lvm2 --luks ramdisk
+
+I have a more detailed installation guide at [2].
+
+To sum up: this device is a dream and if you should consider buying a laptop consider this one!
+
+#links
+
+* [1] <http://en.gentoo-wiki.com/wiki/HP_Elitebook_8530w>
+* [2] <http://lastlog.de/wiki/index.php/Festplatte_verschluesseln>
+

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="prove_binary_deployment_by_recompiling_and_comparing.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>prove binary deployment by recompiling and comparing</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/prove_binary_deployment_by_recompiling_and_comparing.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="bringing_nix_to_its_limits.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="a_new_workstation_iii.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">prove binary deployment by recompiling and comparing</h1>
+    <div id="date"><p><span id="lastupdated">16 feb 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::security" class="tagbtn btn btn-primary">security</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/debian_ubuntu_gentoo_package.png"><img src=media/debian_ubuntu_gentoo_package.png size=180x alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>‘<strong>binary deployment</strong>’ seems to be a good and fast
+solution nowadays (i’m talking about open source here). but what
+<strong>prove</strong> do i have to check if the source code was
+modified before compiled and signed (say by downstream::debian)?</p>
+<p><strong>Note:</strong> you can replace debian by any other
+distribution doing ‘binary deployment’ (it is just an example).</p>
+<h2 data-number="2" id="how-is-binary-deployment-actually-done">how is
+binary deployment actually done</h2>
+<p>this is very much distribution dependent. in general this workflow is
+used:</p>
+<ol type="1">
+<li><strong>download</strong> upstream source</li>
+<li><strong>arrange a build environment</strong></li>
+<li>apply ‘downstream’ <strong>patches</strong></li>
+<li><strong>install into DESTDIR/PREFIX</strong> and <strong>create an
+image</strong> from that</li>
+<li>finally <strong>distribute that image</strong></li>
+</ol>
+<ol type="1">
+<li>can be secured by signatures using cryptographic hashes and a sig
+file. (2) is complicated as a pure build environment CAN NOT be
+guaranteed by most distributions while a notable exception is nix as the
+build chain and all packages are pure (pure means that no mutual effects
+between two or more installed components do happen). (3) as downstream
+patches are usually very small they could be checked manually for
+security related issues.</li>
+</ol>
+<h3 data-number="2.1"
+id="security-problems-using-binary-deployment">security problems using
+binary deployment</h3>
+<p>downstream could simply add another ‘evil’ patch in step (3) but when
+the package got created, the source patch could be removed to hide the
+modification. this has happended already, see [2]. if the user wants to
+prevent such a situations there is a limited set of options. he
+could:</p>
+<ul>
+<li>choose to <strong>only do ‘source deployment’</strong> (like in
+gentoo)</li>
+<li><strong>setup his own build environment</strong> (debian) which
+would <strong>transform the ‘binary deployment’ into ‘source
+deployment’</strong></li>
+<li><strong>use tools like SELinux and AppArmor</strong> (but these
+tools work best on programs you can’t check as skype for instance or
+open source tools you assume ‘poor programming practice’ in regards to
+security)</li>
+</ul>
+<h3 data-number="2.2" id="another-option">.. another option</h3>
+<p>i’ve been plying with nix lately and as <strong>nix is a ‘purely
+functional package manager’</strong> this implies that step (2) effects
+are minimized as components don’t interfere. as a result this means:
+<strong>if you clone the original build chain, you could expect the same
+outcome using the same input.</strong> so i experimented with two
+components:</p>
+<ul>
+<li>vim</li>
+<li>apache-httpd</li>
+</ul>
+<p>the results are very promising as:</p>
+<ul>
+<li><strong>both projects have a 1:1 file mapping after
+reinstallation</strong> (that means reinstalling would result in the
+same files being created for each project)</li>
+<li><strong>only the binaries had differences</strong>, that is: both
+tools contain a timestamp which is of course different</li>
+<li><strong>DSO</strong> (dynamic shared objects) as
+<strong>modules/mod_cgi.so</strong> were not timestamped contrary to my
+expectation</li>
+</ul>
+<p><strong>Edit:</strong> it turns out that there was some research on
+this topic already, see [3] page 30. I quote it and hightlight some
+passages:</p>
+<blockquote>
+<p>To ascertain how well these measures work in preventing impurities in
+NixOS, <strong>we</strong> <strong>performed two builds of the Nixpkgs
+collection6 on two different NixOS machines</strong>. This consisted of
+building 485 non-fetchurl derivations. The output consisted of 165927
+files and directories. Of these, there was only one file name that
+differed between the two builds, namely in mono-1.1.4: a directory
+gac/IBM.Data.DB2/1.0.3008.37160 7c307b91aa13- d208 versus 1.0.3008.40191
+7c307b91aa13d208. The differing number is likely derived from the system
+time. We then compared the contents of each file. There were
+<strong>differences in 5059 files, or 3.4% </strong>of all regular
+files. We inspected the nature of the differences: almost all were
+caused by timestamps being encoded in files, such as in Unix object file
+archives or compiled Python code. 1048 compiled Emacs Lisp files
+differed because the hostname of the build machines were stored in the
+output. Filtering out these and other file types that are known to
+contain timestamps, we were <strong>left with 644 files, or
+0.4%</strong>. However, most of these differences (mostly in executables
+and libraries) are likely to be due to timestamps as well (such as a
+build process inserting the build time in a C string). This hypothesis
+is strongly supported by the fact that of those, <strong>only 42 (or
+0.03%) had different file sizes</strong>. None of these content
+differences have ever caused an observable difference in behaviour.</p>
+</blockquote>
+<h3 data-number="2.3" id="how-did-i-do-the-checks">how did i do the
+checks</h3>
+<p>i used a prefix installation of nix on gentoo. i set the store path
+to something like ‘~/mynix/store’ so that every program needs to be
+recompiled (nix limitation/feature). afterwards i did:</p>
+<pre><code>nix-env -i apache-httpd
+ls store| grep apache-httpd
+cp -R store/gyp2arhqcglbq6iq1hndclljs7v9n30k-apache-httpd-2.2.17/ apache1
+nix-env -e apache-http
+nix-env --delete-generations old
+nix-store --delete store/gyp2arhqcglbq6iq1hndclljs7v9n30k-apache-httpd-2.2.17/</code></pre>
+<p>and then do it again but copy to apache2/ instead. next start the
+comparing.</p>
+<h3 data-number="2.4"
+id="possible-solution-to-the-timestamp-problem">possible solution to the
+timestamp problem</h3>
+<p>as it seems that the timestamps are the only problems, here are some
+thoughts how to overcome this:</p>
+<ul>
+<li><p><strong>write a compare utility which ignores timestamps</strong>
+(of course one has to find such regions first)</p></li>
+<li><p><strong>always freeze the clock when compiling and setting it to
+a fixed time</strong>: this could be done by altering the libc library
+using LD_LIBRARY_PATH to map a indirection layer to the syscalls used
+for time/date things. remapping syscalls is nothing new (‘trickle is a
+portable lightweight userspace bandwidth shaper’ uses it).
+<strong>NOTE:</strong> this might have unknown side effects and needs to
+be evaluated as a fixed time will interfere with:</p>
+<ol type="1">
+<li>a build environment measuring build-time using the time command</li>
+<li>resetting the clock might result in ‘clock screw detected’ messages
+and stop building, therefore all files need to be ‘touched’ in order to
+make that work</li>
+</ol></li>
+<li><p><strong>adding a PACKAGE_MANAGER_BUILD_TIME variable to the build
+environment</strong>. this implies one would either have to alter the
+buildchain (gcc timestamps) or one would have to patch upstream’s source
+dependent where that timestamp is applied. but the effect would be that
+the same timestamp is used resulting in a 1:1 match</p></li>
+</ul>
+<h2 data-number="3" id="summary">summary</h2>
+<ul>
+<li>i would really love to experiment further on this topic but i don’t
+have the time right now to do so. i hope that someone else might take
+over.</li>
+<li><strong>i also could imagine a ‘chain of trust’ using gpg
+signatures</strong>. this way we could have a several automated build
+systems monitoring the sanity of the builds.</li>
+<li>i also don’t think that the ‘possible solutions’ are of limited use
+for distributions like debian (i think debian has some kind of build
+purity but i can’t find the docs right now) and alike.</li>
+</ul>
+<h2 data-number="4" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://monkey.org/~marius/pages/?page=trickle"
+class="uri">http://monkey.org/~marius/pages/?page=trickle</a></li>
+<li>[2] <a
+href="https://www.redhat.com/archives/fedora-announce-list/2008-August/msg00012.html"
+class="uri">https://www.redhat.com/archives/fedora-announce-list/2008-August/msg00012.html</a></li>
+<li>[3] <a
+href="http://www.st.ewi.tudelft.nl/~dolstra/pubs/nixos-jfp-final.pdf"
+class="uri">http://www.st.ewi.tudelft.nl/~dolstra/pubs/nixos-jfp-final.pdf</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/prove_binary_deployment_by_recompiling_and_comparing.mdwn" title="posts\prove_binary_deployment_by_recompiling_and_comparing.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

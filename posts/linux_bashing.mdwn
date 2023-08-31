@@ -1,0 +1,38 @@
+[[!summary chatGPT: The author is experiencing multiple problems with their Gentoo Linux system, including mouse devices not working, file losses, crashes, slow performance, and instability. They are considering switching to Windows or trying a different desktop environment like XFCE4.]]
+[[!meta date="2010-01-01 04:15"]]
+[[!tag gentoo linux society technology usability]]
+
+# motivation
+i'm a linuxuser for years now and after migrating from debian to gentoo made the linux experience much better since many ABI incompatibilities were solvable by a simple reinstallation of the program. these kind of problems usually come up after library update and the error message usually is something like 'unresolved symbols'.
+
+right now i face several problems which i can't ignore:
+	
+  * after a reboot the two mouse devices on my laptop stop working and on the next reboot they do work. i don't know why yet?! my current fix is to rely on an external mouse ;P
+  * **i hit the 'xfs/ext3 journal' bug with two massive kde file losses which meant a lot of reconfiguration**
+  * i lost all 'notes' which were saved in the plasma widget called 'notes' and all kmail settings as well as all kaddressbook settings (yes i have a backup but this all costs a lot of time to figure out what exactly is gone). also all bookmarks in konqueror as well as other things i don't remember are 'gone'.
+  * i use thunderbird right now but the selfsigned ssl certificate error pops up every time i start the application. if i don't hit the 'ok' button in say 2minutes the connection timeout forces me to restart the application or i won't be able to read the mails at all. why isn't there a simple button to 'permanently' trust the selfsigned certificate as there is in kmail?
+  * my **system** seems to be **very unstable** as for instance working on the 'automate' project (which is qt4 based) let's me 'lock up'  my computer nearly instantly. that means the **io load goes high while i get serious OOM problems**. it could be the 'io wait bug' but using 'noop' instead of 'cfq' does not make things better here so i doubt that
+  * **my system crashed after a hibernate resume with a blinking cursor using nvidia.ko and now i can't use the proprietary nvidia.ko driver anymore since it would lock my system right after reboot. **currently i'm using 'nv' with all it's slowness
+  * **neither nv nor nvidia.ko seem to be able to work reliably for hibernate-ram**. nv does not enable the backlight so my screen stays back after resume so at least i can reboot with pressing the power button. using the nvidia.ko module will crash it no matter which version i try
+  * **i don't get ****hdmi** working and hot-switching using nvidia.ko does not work well either
+  * io in general seems to be very slow and **many processes have a high 'io wait' issue**. using htop one can see that both cpus have about 90% gray bars with the rest - 10%  - is valid cpu load (a mixture of user/kernel space)
+  * **booting** linux using **grub** works fine but **is very slow **(probably caused by slow nvidia console rendering)
+  * **kde4 is very slow** as well (might be a consequence of the io-wait issue already mentioned) but using kde3 this issue wasn't noticeable. the problem is that there are no kde3 ebuilds anymore.
+  * **konqueror** seems to crash all 5minutes (i use it to access samba shares using **smb://** as well as sftp shares)
+  * **krunner** other kde components seem to crash frequently as well (seems to be a random pattern)
+  * **amarok** does not work reliably from time to time then i can't listen to music from magnatune and other webradios but local music works
+  * **smb4k** is totally broken here
+  * **kdevelop4** is a great software and i really love it but it is very unstable and crashes very often
+  * out of curiosity i've installed **umbrello** 4.3.3 and imported the automate project which instantly created a segfault
+  * since **kde3** is '**obsolete**' i lose a very cool application: konqueror 3 file size view'er, see [http://risto.kurppa.fi/blog/2008/10/disk-space-analyzers/](http://risto.kurppa.fi/blog/2008/10/disk-space-analyzers/) there seems to be a kde4 plugin for konqueror as well but i can't find it
+  * after resume **dbus often has crashed** and i need to restart it
+
+
+so now one would think the hardware is bad (which is what i would be thinking as well) but i've played some shooter demos and 'sacred 2' using windows xp for quite a while and this runs rock solid. the only issue windows shares is that after 'standby' the screen remains black (back-lit off) as well.
+
+# summary
+**to sum up**: i'm not sure what to do now but this situation is **absolutely depressing since linux can't be used AT ALL with that many problems**. lately i consider installing win7. the 'macbook pro' of my wife is doing a great job  and it runs stable although the fan makes some serious noise signaling it is damaged. i hate kde4 and the concept of their release policies. i consider kde4 not usable in a productive system and since kde3 has been removed there is no working alternative worth using (maybe xfce4).
+
+i'm not sure what to do now? is the problem 'open source'? why does nobody care for quality? am i using the wrong distribution again?
+
+happy new year ;P

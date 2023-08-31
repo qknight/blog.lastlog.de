@@ -1,0 +1,579 @@
+[[!meta date="2014-08-03 13:38"]]
+
+[[!img media/nixos-lores.png alt="" style="float: right" class="noFancy"]]
+[[!img media/nodejs.png alt="" width="150px" style="float: right" class="noFancy"]]
+[[!summary deploying node.js applications on nixos]]
+
+[[!tag nixos linux npm node.js]]
+[[!series nix-language-atlas]]
+
+# motivation
+**i want to give an overview on the status of node.js in nixos**. in the nixpkgs documentation [1] we have a great gap regarding the 'support for specific programming languages'. 
+
+currently there are two ways to deploy node applications on nixos:
+
+* **statefully** using **nix-shell**
+* **stateless** packaging it using **npm2nix**
+
+we will look into both here!
+
+## benefits integrating LL-PM
+**npm is a third party tool, and does not integrate in the nixos world**. **npm** is a classical example for a **language level package management (LL-PM)** system, while **nix-env (one of the nix tools)** is a classic example for **distribution level package management (DL-PM)**. so we need to answer this question:
+
+Q: why integrate language level package management (LL-PM) into nixpkgs?
+
+A: you can then:
+
+ * you can **track all dependencies using the operating system's package manager** (no monolithic deployment) for **security, usage statistics**
+ * you get **complete dependencies, thus you can move the closure from one to another machine easily** - nix-copy-closure
+ * **share libraries in different instances** (they are just symlinked, aka 'npm link')
+ * use system tools, written in ``<pick your language>`` and never end up in ''dependency hell'' while, again, having complete dependencies!
+
+so what other advantages does it bring? more interesting:
+
+ * **nix does wrap** your node application into 
+  * **an systemd service** (thus restarts the app when it crashes), 
+  * this **includedes logging**, 
+  * **runs your app as a 'different' user** (which does not have a login on the system)
+  * **makes the app read only** (kinda a 'harvard architecture', yet increased security)
+  * documentation (created automatically for your individual deployment)
+  * you can **easily run different node versions or versions of your application in parallel**
+ * you can use **NixOS's configuration.nix or nixOps to deploy webservices declaratively** (see [7])
+ * you can redo the same deployment on different machines, yet get the same expected output!
+
+**summary**: it makes operating the applications much easier.
+
+# deployment using nix-shell/npm 
+
+a typical node applicaton developer uses npm to handle the dependencies (**npm lists 80k node packaged modules** on jul 2014). exploringdata.github.io [4] has a excellent visualization of some of these. 
+
+[[!img media/nodejs-dependencies.jpeg caption="http://exploringdata.github.io/vis/npm-packages-dependencies" style="float: none"]]
+
+**even though npm could be used to deploy the whole application it is usually not AFAIK**. i didn't find any numbers about this but: 
+
+* proprietary applications are probably not deployed this way (but one could replicate the npm registry, see [16])
+* **'free and open source' applications** are deployed using npm sometimes (this would look like: npm install myapp) but, AFAIK, usually **are not either**
+
+## deploying etherpad lite
+
+i want to use etherpad lite 1.4.0 [14] as example. it is deployed on nixos 14.10pre46084.0a750e0 (Caterpillar) using npm in a nix-shell, thus statefully as it would be done on all other linux distributions:
+
+* **etherpad lite only uses npm for dependency management** and
+* contains its own bin/run.sh script (read 'starter script')
+
+ether-etherpad-lite-c3a6a23/src/packages.json contains the required libraries (documentation [7]), see lines 13 onwards below:
+
+    # cat -n ether-etherpad-lite-c3a6a23/src/packages.json
+     1	{
+     2	  "name"           : "ep_etherpad-lite",
+     3	  "description"    : "A Etherpad based on node.js",
+     4	  "homepage"       : "https://github.com/ether/etherpad-lite",
+     5	  "keywords"       : ["etherpad", "realtime", "collaborative", "editor"],
+     6	  "author"         : "Peter 'Pita' Martischka <petermartischka@googlemail.com> - Primary Technology Ltd",
+     7	  "contributors"   : [
+     8	                      { "name": "John McLear" },
+     9	                      { "name": "Hans Pinckaers" },
+    10	                      { "name": "Robin Buse" },
+    11	                      { "name": "Marcel Klehr" }
+    12	                     ],
+    13	  "dependencies"   : {
+    14	                      "yajsml"                  : "1.1.6",
+    15	                      "request"                 : "2.9.100",
+    16	                      "require-kernel"          : "1.0.5",
+    17	                      "resolve"                 : "0.2.x",
+    18	                      "socket.io"               : "0.9.x",
+    19	                      "ueberDB"                 : "0.2.x",
+    20	                      "express"                 : "3.1.0",
+    21	                      "async"                   : "0.1.x",
+    22	                      "connect"                 : "2.7.x",
+    23	                      "clean-css"               : "0.3.2",
+    24	                      "uglify-js"               : "1.2.5",
+    25	                      "formidable"              : "1.0.9",
+    26	                      "log4js"                  : "0.6.6",
+    27	                      "nodemailer"              : "0.3.x",
+    28	                      "jsdom-nocontextifiy"     : "0.2.10",
+    29	                      "async-stacktrace"        : "0.0.2",
+    30	                      "npm"                     : "1.4.x",
+    31	                      "ejs"                     : "0.6.1",
+    32	                      "graceful-fs"             : "1.1.5",
+    33	                      "slide"                   : "1.1.3",
+    34	                      "semver"                  : "1.0.13",
+    35	                      "security"                : "1.0.0",
+    36	                      "tinycon"                 : "0.0.1",
+    37	                      "underscore"              : "1.3.1",
+    38	                      "unorm"                   : "1.0.0",
+    39	                      "languages4translatewiki" : "0.1.3",
+    40	                      "swagger-node-express"    : "1.2.3",
+    41	                      "channels"                : "0.0.x",
+    42	                      "jsonminify"              : "0.2.2",
+    43	                      "measured"                : "0.1.3"
+    44	                     },
+    45	  "bin":             { "etherpad-lite": "./node/server.js" },
+    46	  "devDependencies": {
+    47	                      "wd"      : "0.0.31"
+    48	                     },
+    49	  "engines"        : { "node" : ">=0.6.3",
+    50	                       "npm"  : ">=1.0"
+    51	                     },
+    52	  "repository"     : { "type" : "git",
+    53	                       "url" : "http://github.com/ether/etherpad-lite.git"
+    54	                     },
+    55	  "version"        : "1.4.0"
+    56	}
+
+one could do:
+
+    nix-shell -p nodejs
+    cd ether-etherpad-lite-c3a6a23/src
+    npm install -d
+
+**this would download all the dependencies but the etherpad lite devs wrote their "own installer"**, so running:
+
+    cd ether-etherpad-lite-c3a6a23
+    bin/run.sh
+
+would then download the dependencies (as done manually above), install the etherpad lite app using a symlink and finally run:
+
+    cd ether-etherpad-lite-c3a6a23
+    node $SCRIPTPATH/node_modules/ep_etherpad-lite/node/server.js $*
+
+**note:** it is important that ether-etherpad-lite-c3a6a23 is the directory the interpreter is in before running node with the server.js in order to make the execution work. also the "bin" in package.json isn't used.
+
+i was wondering what 'best practice' the node running ops teams came up with and was surprised [14] how hard it can be to run a node application as a service:
+
+* running it on ubuntu is quite a lot of manual work 
+* Cloudfoundry (quote: "In case you're not familiar with Cloud Foundry, it's an opensource platform as a service (PaaS) project sponsored by VMware. https://github.com/cloudfoundry") looks interesting 
+* i didn't play with the ansible deployment to be honest
+*c on nodejitsu.com charlie robbins recommended to run etherpad using forever [15], which i guess is something a dev would do but why not use systemd for that?
+
+## what did npm do?
+
+so after we installed etherpad lite node dependencies using 'npm install -d', you now should have:
+
+    ls src/node_modules/
+    async                 connect     graceful-fs              log4js      request         
+    async-stacktrace      ejs         jsdom-nocontextifiy      measured    require-kernel  
+    channels              express     jsonminify               nodemailer  resolve         
+    clean-css             formidable  languages4translatewiki  npm         security          
+    semver                tinycon     unorm
+    slide                 ueberDB     wd
+    socket.io             uglify-js   yajsml
+    swagger-node-express  underscore        
+
+afterwards. as well as:
+
+    ls  ~/.npm/
+    active-x-obfuscator  cookie-signature  fast-list             inherits                 
+    addressparser        core-util-is      follow-redirects      isarray                  
+    async                cssom             formidable            jsdom-nocontextifiy      
+    async-stacktrace     debug             fresh                 jsonminify               
+    base64id             deprecate         generic-pool          languages4translatewiki  
+    buffer-crc32         dequeue           graceful-fs           log4js                   
+    bytes                dirty             hashish               mailcomposer             
+    channels             dkim-signer       he                    measured                 
+    clean-css            docco             helenus               methods                  
+    commander            ejs               helenus-thrift        mime                     
+    connect              encoding          htmlparser            mimelib                  
+    cookie               express           iconv-lite            minimist                   
+    mkdirp               policyfile        semver                uglify-js         
+    ms                   punycode          send                  underscore
+    mysql                q                 simplesmtp            unorm
+    nan                  qs                slide                 vargs
+    nodemailer           rai               socket.io             wd
+    node-redis           range-parser      socket.io-client      wordwrap
+    node-uuid            readable-stream   string_decoder        ws
+    npm                  redis             swagger-node-express  xmlhttprequest
+    optimist             request           tinycolor             xoauth2
+    options              require-kernel    tinycon               yajsml
+    pause                resolve           traverse              zeparser
+    pg                   security          ueberDB                             
+
+and
+
+    ls ~/.node-gyp/
+    0.10.28
+
+on my system that is:
+
+    [nix-shell:~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ du -sh ~/.node-gyp/
+    20M     /home/joachim/.node-gyp/
+    
+    [nix-shell:~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ du -sh ~/.npm
+    65M     /home/joachim/.npm
+
+and interestingly:
+
+    [nix-shell:~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ du -sh node_modules/
+    284K    node_modules/
+
+**note**: npm basically writes random crap into $HOME/.npm and $HOME/.node-gyp and pollutes the workspace with about 85M!
+
+# how npm dependencies work
+
+let's analyze what 'npm install -d' in the etherpad lite deployment did:
+
+'npm install -d' queries http://registry.npmjs.org/ (see [16])
+
+    ~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ rm -Rf ~/.npm ~/.node-gyp/ src/node_modules/
+    ~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ nix-shell -p nodejs -p python
+    [nix-shell:~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ npm install -d
+    npm info it worked if it ends with ok
+    npm info using npm@1.4.9
+    npm info using node@v0.10.28
+    npm info preinstall ep_etherpad-lite@1.4.0
+    npm info trying registry request attempt 1 at 11:45:08
+    npm http GET https://registry.npmjs.org/require-kernel
+    npm info trying registry request attempt 1 at 11:45:08
+    npm http GET https://registry.npmjs.org/ueberDB
+    npm info trying registry request attempt 1 at 11:45:08
+    npm http GET https://registry.npmjs.org/log4js
+    npm info trying registry request attempt 1 at 11:45:08
+    npm http GET https://registry.npmjs.org/formidable
+    
+    ...
+    skipped lots of lines
+    ...
+
+    /bin/sh: pg_config: command not found
+    gyp: Call to 'pg_config --libdir' returned exit status 127. while trying to load binding.gyp
+    gyp ERR! configure error 
+    gyp ERR! stack Error: `gyp` failed with exit code: 1
+    gyp ERR! stack     at ChildProcess.onCpExit (/nix/store/rbhmm2sk7267bl4c4hzqszcnhnbiawgw-nodejs-0.10.28/lib/node_modules/npm/node_modules/node-gyp/lib/configure.js:340:16)
+    gyp ERR! stack     at ChildProcess.EventEmitter.emit (events.js:98:17)
+    gyp ERR! stack     at Process.ChildProcess._handle.onexit (child_process.js:807:12)
+    gyp ERR! System Linux 3.12.18
+    gyp ERR! command "node" "/nix/store/rbhmm2sk7267bl4c4hzqszcnhnbiawgw-nodejs-0.10.28/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js" "rebuild"
+    gyp ERR! cwd /home/joachim/Desktop/etherpad/etherpad/ether-etherpad-lite-c3a6a23/src/node_modules/ueberDB/node_modules/pg
+    gyp ERR! node -v v0.10.28
+    gyp ERR! node-gyp -v v0.13.0
+    gyp ERR! not ok 
+    
+    ...
+    skpped lots of lines
+    ...
+    
+    express@3.1.0 node_modules/express
+    ├── methods@0.0.1
+    ├── fresh@0.1.0
+    ├── range-parser@0.0.4
+    ├── cookie-signature@0.0.1
+    ├── buffer-crc32@0.1.1
+    ├── cookie@0.0.5
+    ├── commander@0.6.1
+    ├── mkdirp@0.3.3
+    ├── debug@1.0.4 (ms@0.6.2)
+    ├── connect@2.7.2 (pause@0.0.1, bytes@0.1.0, qs@0.5.1, formidable@1.0.11)
+    └── send@0.1.0 (mime@1.2.6)
+    
+    nodemailer@0.3.44 node_modules/nodemailer
+    ├── simplesmtp@0.3.32 (rai@0.1.11, xoauth2@0.1.8)
+    ├── optimist@0.6.1 (wordwrap@0.0.2, minimist@0.0.10)
+    └── mailcomposer@0.2.12 (follow-redirects@0.0.3, mime@1.2.11, he@0.3.6, dkim-signer@0.1.2, mimelib@0.2.16)
+    
+    socket.io@0.9.17 node_modules/socket.io
+    ├── base64id@0.1.0
+    ├── policyfile@0.0.4
+    ├── redis@0.7.3
+    └── socket.io-client@0.9.16 (xmlhttprequest@1.4.2, ws@0.4.31, active-x-obfuscator@0.0.1)
+    npm info ok 
+    npm install -d  10.96s user 2.02s system 20% cpu 1:04.05 total
+
+
+**note**: pg_config wasn't found so compiling ws failed, but 'npm install -d' terminated with 0 exit code anway which seems wrong. googling for pg_config points to postgresql, so let's do a nix-shell with it:
+
+    ~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ nix-shell -p nodejs -p postgresql -p python
+    [nix-shell:~/foo/etherpad/ether-etherpad-lite-c3a6a23]$ npm install -d
+    npm info install ws@0.4.31
+    
+    > ws@0.4.31 install /home/joachim/Desktop/etherpad/etherpad/ether-etherpad-lite-c3a6a23/src/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws
+    > (node-gyp rebuild 2> builderror.log) || (exit 0)
+    
+    make: Entering directory `/home/joachim/Desktop/etherpad/etherpad/ether-etherpad-lite-c3a6a23/src/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws/build'
+      CXX(target) Release/obj.target/bufferutil/src/bufferutil.o
+      SOLINK_MODULE(target) Release/obj.target/bufferutil.node
+      SOLINK_MODULE(target) Release/obj.target/bufferutil.node: Finished
+      COPY Release/bufferutil.node
+      CXX(target) Release/obj.target/validation/src/validation.o
+      SOLINK_MODULE(target) Release/obj.target/validation.node
+      SOLINK_MODULE(target) Release/obj.target/validation.node: Finished
+      COPY Release/validation.node
+    make: Leaving directory `/home/joachim/Desktop/etherpad/etherpad/ether-etherpad-lite-c3a6a23/src/node_modules/socket.io/node_modules/socket.io-client/node_modules/ws/build'
+    
+
+so what programs were compiled?
+
+    find . -executable -type f -exec file -i '{}' \; | grep 'x-sharedlib'
+    ./ueberDB/node_modules/pg/build/Release/obj.target/binding.node: application/x-sharedlib; charset=binary
+    ./ueberDB/node_modules/pg/build/Release/binding.node: application/x-sharedlib; charset=binary
+    ./socket.io/node_modules/socket.io-client/node_modules/ws/build/Release/obj.target/bufferutil.node: application/x-sharedlib; charset=binary
+    ./socket.io/node_modules/socket.io-client/node_modules/ws/build/Release/obj.target/validation.node: application/x-sharedlib; charset=binary
+    ./socket.io/node_modules/socket.io-client/node_modules/ws/build/Release/bufferutil.node: application/x-sharedlib; charset=binary
+    ./socket.io/node_modules/socket.io-client/node_modules/ws/build/Release/validation.node: application/x-sharedlib; charset=binary
+
+it turns out that node-gyp compiles at least:
+
+* node_modules/ueberDB/node_modules/pg
+* node_modules/socket.io/node_modules/socket.io-client/node_modules/ws
+
+and that node-gyp requires python, thus 'nix-shell -p nodejs -p python'
+
+summary: **node package modules sometimes depend on python, might compile binaries like ueberDB or socket.io and depend on system tools like pg_config (from postgresql). currently nixpkgs does not have a way to reflect such dependencies.**
+
+a very nice tool to visualized dependencies interactively is colony [17] (i was using it on NixOS using nix-shell):
+
+[[!img media/nodejs-dependencies-of-etherpad-lite-using-colony.jpeg caption="etherpad lite dependencies visualized using colony (screenshot)" style="float: none"]]
+
+## cyclic dependencies
+
+node package module can be used in a cyclic way (see [6], package 'd'), in short: 
+
+* d, 
+* es5-ext, 
+* es6-iterator, 
+* es6-symbol
+
+[[!img media/nodejs-dependencies-es5-ext-using-colony.jpeg caption="es5-ext dependencies visualized using colony" style="float: none"]]
+
+summary deploying cyclic dependencies: 
+
+* **statefull deployment (via nix-shell) does not not have an issue**
+* **stateless deployment (via npm2nix) can't do that yet**, see [5]
+
+# npm unit tests
+
+inspired by nodechecker [9] i digged into npm tests and was disappointed as most node package modules shipped via npmjs.org (read: via npm) are not including unit tests, when downloaded using npm. the only solution was to use **npm info express | grep git** and afterwards clone the git repo and run the tests from the clone.
+
+[[!img media/nodejs-dependencies-nodechecker.jpeg caption="nodechecker homepage" style="float: none"]]
+
+interestingly they test about 71k npm(s):
+
+* 20175 OK 28%
+* 15326 NOK 21%
+* 34866 Not Tested 49%
+* 919 Timedout 1%
+
+the source code for nodechecker can be found at [11]. **it would be awesome if we had that same setup but with hydra and nixos, instead of docker.**
+
+## 'express' unit test 
+
+so let's see how the unit test of express works on NixOS using npm in a nix-shell:
+
+    nix-shell -p nodejs
+    npm info express | grep git
+      repository: { type: 'git', url: 'git://github.com/visionmedia/express' },
+      homepage: 'https://github.com/visionmedia/express',
+       [ 'Aaron Heckmann <aaron.heckmann+github@gmail.com>',
+      bugs: { url: 'https://github.com/visionmedia/express/issues' },
+nix-shell -p nodejs -p git
+    cd $(mktemp -d)
+    git clone git://github.com/visionmedia/express
+    cd express
+    npm install -d
+
+finally run the unit test:
+
+    [nix-shell:/tmp/tmp.Px73DkAeW4/express]$ npm test
+    
+    > express@4.4.5 test /tmp/aaaa/express
+    > mocha --require test/support/env --reporter dot --check-leaks test/ test/acceptance/
+    
+      ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+      ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+      ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+      ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+      ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+      ․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․․
+    
+      603 passing (2s)
+
+**summary**: **using nix-shell (stateful deployment) i was able to execute the express unit test successfully.** the question weather this can be automated and how to package this on nixos. at least for express there was no further dependency introduced, like a third party testing framework written in ``<pick your language>``,  which looks promising.
+
+# deployment using npm2nix
+**in essence npm2nix wraps npm by reimplementing its npm deployment concept. however, only for npm's coming from npmjs.org** 
+
+currently npm2nix can be used for:
+
+* **apps which are deployed from npmjs.org** but 
+* does not for programs like etherpad-lite
+
+so here is the steps i was (ab)using npm2nix for etherpad anyway:
+
+[[!img media/npm2nix-explained.jpg caption="npm2nix explained" size=700x style="float: none"]]
+
+if you want to use it to deploy etherpad lite, as i did, you have to make some hacks to make it work.
+
+1. append (or modify) the node-packages.json based on package.json from etherpad lite
+
+2. generate the node-packages-generated.nix from the adapted package.json
+
+        pkgs/top-level/node-packages.json pkgs/top-level/node-packages-generated.nix
+
+3. copy code from pkgs/development/web/nodejs/build-node-package.nix
+
+        # this was copied from pkgs/development/web/nodejs/build-node-package.nix (thanks to Shea Levy)
+        # if etherpad-lite was in npm one could possibliy use build-node-packge.nix instead of copying it here
+        mkdir -p .bin
+        ${concatStrings (map (dep: ''
+          test -d ${dep}/bin && (for b in $(ls ${dep}/bin); do
+            ln -sv -t .bin ${dep}/bin/$b
+          done)
+        '') nodeDeps)}
+        ${concatStrings (concatMap (dep: map (name: ''
+          ln -sv ${dep}/lib/node_modules/${name} .
+        '') dep.names) nodeDeps)}
+        popd
+
+4. append the deps to the etherpad-lite/default.nix
+
+        let nodeDeps = with nodePackages; [ 
+          # hack: "socket.io" <- quotes are needed since socket.io would be interpreted otherwise
+          nodePackages."socket.io"
+          async
+          async-stacktrace
+          channels
+          clean-css
+          connect
+          ejs
+          # how to depend on express-3.1.0 here?
+          express
+          formidable
+          graceful-fs
+          jsdom-nocontextifiy
+          jsonminify
+          languages4translatewiki
+          log4js
+          measured
+          nodemailer
+          npm
+          request
+          require-kernel
+          resolve
+          security
+          semver
+          slide
+          swagger-node-express
+          tinycon
+          ueberDB
+          uglify-js
+          underscore
+          unorm
+          wd
+          yajsml
+        ];
+
+  **note**: i wonder how to select a nodePackage with a special version with the nix syntax from above (since in node it happens quite frequently that a npm called foo is used in many different versions at the same time).
+
+5. nix service expression used for etherpad lite
+
+  since i wanted to be able to have more than one etherpad instance i wondered if there is something more advanced than using a 'reverse proxy' in combination to one nixos-container per etherpad instance. it turns out that we have that already and it is called **types.submodule**, see nixos/modules/services/networking/spiped.nix for inspiration.
+
+  this new **types.submodule let's you basically use the services.etherpad.<whatever>** to have as many records as you wish, example:
+
+        # exceprt from /etc/nixos/configuration.nix
+        services.etherpad.foo = {
+          ip="127.0.0.1";
+          port=9001;
+          sessionKey="amks3l7ayr0ywcv9gwr42";
+          mysqlPassword="";
+        };
+        services.etherpad.pad2 = {
+          enable = true;
+          ip="127.0.0.1";
+          port=9002;
+          sessionKey="ks3l7ayr0ywcv9gwr42am";
+          mysqlPassword="";
+        };
+
+  and **it also guaranties you that the used ports inside this record are unique**:
+
+        port = mkOption {
+          default = 9001;
+          type = types.uniq types.int;
+          description = "Port used by node instance.";
+        };
+
+  finally **each configuration gets its own individual configuration file**, like /etc/etherpad/settings-foo.json, using:
+
+        # Setup etherpad config files (minimal config, copied from spiped)
+        environment.etc = mapAttrs' (name: cfg: nameValuePair "etherpad/settings-${name}.json"
+          { text = ''
+              /*
+                This file must be valid JSON. But comments are allowed
+              {
+              ...
+
+**note**: we should **apply this pattern to all system services because with reverse proxies or port-forwardings this opens new ways to compose system services side by side without having to use nixos-containers.**
+
+**summary**: see [11] for the etherpad lite nix expressions. i've packaged it as a system service as well but since the expression is still kind of broken i don't want to upload it to nixpkgs just yet.
+
+# open problems
+a discussion about npm2nix, node.js and npm issues which still need to be addressed by the nixos cummunity.
+
+## npm2nix issues
+**shlevy designed npm2nix to wrap npm using nix (solely for node packaged modules from npmjs.org (read dependency management within the domain of npm)) but not for dependency management of applications like etherpad lite for instance.**
+
+call for action:
+
+* we need to adapt npm2nix to make it usable for etherpad lite deployment (so we don't need the hacks i applied)
+* also fix cyclic dependency generation, see issue [5]
+
+## reproducibility 
+
+* **each computer, which redoes source deployment, must come to the exactly same dependency chain - currently only possible with shrinkwrap [12] as npmjs.org does not have a way to checkout the database based on a position in time**
+* also, we **can't** do global updates like we used to for c/c++
+* also we must take care of archs, since npm's do use c/c++ code sometimes (as shown)
+
+using shrinkwrap means that we have to update the ``npm-shrinkwrap.json`` individually for each node application, from time to time, but it is the only option to get reproducibility as there is no way to set the node packaged module (npmjs.org, using npm) database to a certain state in time. in contrast to what we do with c/c++ applications in nixpkgs which do depend on librarys, which are also defined in nixpkgs. 
+
+**IMHO we should**: 
+
+* commit the ``npm shrinkwrap`` generated ``npm-shrinkwrap.json`` into **nixpkgs**, along with the ``etherpad-lite/default.nix``
+* add a ``top-level/node-shrinkwraps.nix`` where all the ``npm-shirinkwrap.json`` files are aggregated (similar to ``top-level/all-packages.nix``). generate ``node-packages-generated.nix`` from ``top-level/node-shrinkwraps.nix`` and commit it to **nixpkgs**
+* ``top-level/node-packages.json`` is not needed anymore, therefore remove it
+
+[[!img media/npm2nix-shrinkwrap.jpg caption="npm2nix workflow change" size=700x style="float: none"]]
+
+**summary**: this is a much cleaner approach, compared to editing the ``node-packages.json`` as we used to, and by using shrinkwrap we also get reproducibility!
+
+## pkgs dependencies 
+node packaged module's usually don't use software from the host system. exceptions to the rule are ueberDB/socket.io (what was shown above):
+
+* gcc
+* python
+* postgresql
+
+**yet, if an npm wants to use a system software, we don't have any way of describing such a dependency per wrapped npm.**
+
+**note**: for node applications like etherpad lite, which use npm to manage libraries, this is a completely different story as we can depend on certain pkgs easily: 
+
+    pkgs/webapp/etherpad-lite/default.nix View
+     { stdenv, fetchurl, unzip, nodejs, bash, curl, postgresql, python, utillinux}:
+
+**summary**: in contrast, for python libraries, we created a nix expression for each package and can add such pkgs dependencies individually. in the future we might have to do that for npm's as well.
+
+## cabal2nix vs npm2nix
+i would like to avoid nix-shell usage for developing node.js apps but i don't have a clue just yet how to do this. here is a nice example how it is done for haskell: see [18].
+
+# conclusion
+the good news is, that you can do development of node.js apps on nixos already using nix-shell (this is the 'devs' part). **nixos does not yet give you an environment as good other linux distributions (or hosting services, like heroku) and this needs fixing (the 'ops' part)**.
+
+# links
+
+* [1] <http://nixos.org/nixpkgs/manual/#chap-language-support>
+* [2] <https://github.com/joyent/node/wiki/Projects,-Applications,-and-Companies-Using-Node>
+* [3] <http://zef.me/5981/deploying-a-simple-node-js-application-with-nixops>
+* [4] <http://exploringdata.github.io/info/npm-packages-dependencies/>
+* [5] <https://github.com/NixOS/npm2nix/issues/3>
+* [6] <https://www.npmjs.org/package/d>
+* [7] <http://nixos.org/nixops/manual/#ex-logical-multi.nix>
+* [8] <https://www.npmjs.org/doc/json.html>
+* [9] <http://nodechecker.com/>
+* [10] <https://github.com/apocas/nodechecker-crawler>
+* [11] <https://github.com/qknight/nixpkgs/tree/etherpad-lite>
+* [12] <http://blog.nodejs.org/2012/02/27/managing-node-js-dependencies-with-shrinkwrap/>
+* [13] <http://fuuzetsu.co.uk/blog/posts/2014-06-28-My-experience-with-NixOS.html>
+* [14] <https://github.com/ether/etherpad-lite/wiki#set-up>
+* [15] <http://blog.nodejitsu.com/keep-a-nodejs-server-up-with-forever/>
+* [16] <https://www.npmjs.org/doc/misc/npm-registry.html>
+* [17] <https://github.com/hughsk/colony>
+* [18] <http://fuuzetsu.co.uk/blog/posts/2014-06-28-My-experience-with-NixOS.html>

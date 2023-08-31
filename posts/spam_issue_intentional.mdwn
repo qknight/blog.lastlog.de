@@ -1,0 +1,11 @@
+[[!summary chatGPT: Big email hosters like Gmail could benefit from concentration efforts to handle spam efficiently, while small installations struggle with the resources needed for effective sorting, leading to potential legal Denial-of-Service (DoS) attacks by spam on their competitors.]]
+[[!meta date="2009-05-15 18:37"]]
+[[!tag DoS email spam]]
+
+reading about spam lately makes me think even more about concentration efforts of big email hosters. what benefit would a big email provider like gmail & co have? well consider the cost for a small installation of a mailserver and the amount of time one has to spent to get spam sorted out properly.
+
+to operate a mailserver you need someone with a high skill to do that and you gona need someone you can trust.
+
+**i don't accuse gmail in particular but all big email hosters in general.** consider spam as a way to do legal DoS to their competitors. on the other hand big email hosters can handle spam - on the big scale - pretty well since they can filter pretty efficient.
+
+what do you think?

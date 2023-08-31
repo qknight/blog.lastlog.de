@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="ogre_3d.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>ogre 3d</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/ogre/ogre_3d.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="qgraphicsscene_used_as_a_qabstractitemview_ii.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="package_managers.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::ogre" title="article series ogre" class="seriesbtn btn btn-primary">ogre</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft">  </div>
+          <div id="seriesRight">   <a href="ogre_3d_-_2.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">ogre 3d</h1>
+    <div id="date"><p><span id="lastupdated">9 feb 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::ogre3d" class="tagbtn btn btn-primary">ogre3d</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/ogrelogo-small.jpg"><img src=media/ogrelogo-small.jpg alt="" style="float: right" size=400x></a></p>
+<h2 data-number="1"
+id="ogre-3d-problems-on-gentoo-and-general-ogre-3d-concept-discussions">ogre
+3d problems on gentoo and general ogre 3d concept discussions</h2>
+<p>i’ve been using ogre 3d lately and here are some issues i had:</p>
+<ul>
+<li><p>in gentoo there is no way to install ogre WITH the samples in one
+go, if one wants the samples as well one would have to install the
+library based from the source (bypassing the package manager) or hack
+the ebuild</p></li>
+<li><p>to update ogre i had to uninstall ‘ogre’ with <strong>emerge -C
+ogre</strong> first and then install the new version with
+‘<strong>emerge ogre</strong>’ in a second go. if not done so ogre would
+screw up the build for some unknown reason?! if i recall correctly that
+was a linker issue</p></li>
+<li><p><strong>autotools is so ugly</strong>, i don’t see any way to
+compile the samples when not using ./configure from the base library
+directory which means also compiling all the library as well…</p></li>
+<li><p>i think that writing all the ogre documentation must have taken a
+lot of time - and i honor that - but i prefer how the trolltech guys do
+it. <strong>the trolls use a ‘incode documetation’ syntax (probably
+doxygen with some markup) and no external documentation.</strong> in
+contrast the ogre developers use a mixture of mediawiki/html
+documetation/library doxygen/internal samples and external samples. if
+they would for instance only use templates in the wiki. currently not
+doing so makes it very confusing finding related things.</p></li>
+<li><p>most of the <strong>ogre examples don’t include any
+screenshot</strong> of what is actually done, this makes searching much
+more ‘fun’…</p></li>
+<li><p>they use <strong>autotools</strong> for the library and they use
+<strong>autotools for the samples</strong>. i used cmake for my project
+instead. since i don’t know much about autotools i had problems finding
+out what linker and compiler switches i needed and since my package
+manager removed all Makefiles after installation of the samples (or
+probably never build them at all) i had to do ugly things to find out
+how things work. <strong>FIX</strong>: so if you want to find that out i
+urge you to download the ogre release by hand (bypassing the package
+manager) and use ./configure; make, then have a look at the samples
+directory</p></li>
+<li><p>the ‘package manager’ of gentoo (portage) has the latest ogre
+included but kubuntu didn’t, so we had to use the custom build script
+there by hand…</p></li>
+<li><p>using the package manager of gentoo i set the useflag for
+<strong>double-precision</strong> which resulted in linker errors and
+also ‘our’ codebase which worked on a different machine using the custom
+build of ogre probably not using ‘double-precision’ at all using mesa
+for 3d rendering. but it did not work on my laptop after i removed the
+linker error. it just showed a black screen. took me hours to find out
+with lots of library recompiles…</p></li>
+<li><p>the <strong>kubuntu defaults for the ogre library are
+acceptable</strong> but they had only a <strong>very old
+version</strong> in contrast gentoo didn’t provide good defaults since
+<strong>cg</strong> and <strong>devil</strong> was disabled but had a
+very recent version of ogre. funny, isn’t it? this is how i have it
+working now: <strong>% equery u ogre</strong> [ Searching for packages
+matching ogre… ] [ Colour Code : set unset ] [ Legend : Left column (U)
+- USE flags from make.conf ] [ : Right column (I) - USE flags packages
+was installed with ] [ Found these USE variables for
+dev-games/ogre-1.6.5 ] U I + + cg : NVIDIA toolkit plugin + + devil :
+image loading support with DevIL + + doc : Adds extra documentation
+(API, Javadoc, etc) - - double-precision : more precise calculations at
+the expense of speed + + examples : Install examples, usually source
+code + + gtk : Adds support for x11-libs/gtk+ (The GIMP Toolkit) + +
+threads : Adds threads support for various packages. Usually pthreads
+you might wonder what that there is a ‘<strong>examples</strong>’ use
+flag. but all it does it to install the example source but not the
+compiled examples NOR any Makefile, so …. again this autotools issue i
+don’t know how to compile it then… not in any documentation i could find
+either.</p></li>
+<li><p><strong>documentation how to use custom shaders is really missing
+in ogre</strong>, i managed to compile my own shader (cg file) with cgc
+(that is the nvidia shader compiler) but the library wasn’t able to use
+it no matter what i tried… it seems that most developers use windows and
+directX anyway which makes the situation on linux even worse.</p></li>
+<li><p>in ogre one has several cfg files which are essential to run a
+sample application. <strong>but one has to create these files
+individually for every sample. so mixing a ‘package manager ogre library
+install’ with a ‘bypassing source ogre library build’ makes the
+situation even worse.</strong> the files are:</p>
+<ul>
+<li><p><strong>ogre.cfg</strong> (can be deleted, since it can be
+generated at program start with a gui)</p></li>
+<li><p><strong>plugins.cfg</strong> (i hate this file since it is
+required but no sample includes it after build), basically this file
+contains paths to shared objects .so files which are used by the ogre
+core backend</p></li>
+<li><p><strong>resources.cfg</strong> (this file contains a list of used
+textures, shaders and other graphics related stuff), this needs to be
+done per application. but there is a collection of Media files for the
+samples but the copyright is somehow strange since parts of it may not
+be redistributed…. so why do they included it at all?</p></li>
+</ul></li>
+<li><p>ogre contains OIS for input handling but i couldn’t figure out
+how to get joystick support working. this probably might be broken
+completely. so instead of using OIS for joystick handling i had to
+include libSDL for that. i wrote a libSDL joystick example some time
+ago, can be found [1] on my wiki. <strong>i wonder what that
+joystick-support in OIS is all about…?</strong></p></li>
+<li><p>in general there are tutorials, about how to use ogre from an
+ide, in the wiki. there is also tutorials how to use ogre and how to
+import objects from blender and stuff. finding these resources is very
+time consuming. they have the tendency to be for ‘pro uses’ only and
+tend to be incomplete as well.</p></li>
+<li><p><strong>there is a ogre documentation which covers the basic
+concepts</strong>. i’ve been reading some stuff and it seems to be very
+good. however i can’t tell if it’s complete as my current use case is
+quite limited.</p></li>
+</ul>
+<h2 data-number="2" id="my-project">my project</h2>
+<p>you can find the code at [2]. but i’d like to warn you since:</p>
+<ul>
+<li><p>we didn’t have much time so guess how the code looks</p></li>
+<li><p>has no documentation</p></li>
+<li><p>might not compile</p></li>
+<li><p>voids many coding standards (especially c++ class/file naming
+schemes)</p></li>
+</ul>
+<p>but still it might still be useful for some coders to look at, for
+instance the joystick integration or how i did use cmake with ogre…</p>
+<h2 data-number="3" id="so-why-do-i-write-this-post-at-all">so why do i
+write this post at all?</h2>
+<ul>
+<li><p><strong>i hate the fact that there are multiple distributions -
+all factoring the same package of ogre - one more incomplete than the
+other…. </strong></p></li>
+<li><p>the samples are not pre-built - if included at all <strong>i
+found a forum thread where developers did not see the samples as part of
+the ogre core distribution at all - how backward is that? examples and
+documentation is basically everything if one distributes a
+‘library’!</strong></p></li>
+<li><p>the buildsystem of ogre and the samples is very confusing and
+badly documented</p></li>
+<li><p>there is <strong>no qtdemo like program for ogre
+included</strong>, although there was a summer of code project assigned
+and completed recently, it’s refered as ‘sample interface’ and will be
+included in ogre 1.7 - i love that!</p></li>
+<li><p>despite the fact that there is no ‘sample interface’ the samples
+are hard to build, no documentation about ‘how they can be built’ is
+included in the release</p></li>
+</ul>
+<p><strong>summary:</strong> i don’t like the way the documentation is
+handled in the ogre project and i don’t like the build system as well.
+<strong>my main criticism however is that the distributions do a very
+bad job at including the library (with all the samples missing &amp;
+misc quirks).</strong></p>
+<p><strong>possible fix:</strong> take a look at how trolltech did it
+with the qt release. they have assistant for the documentation (no need
+to open a webbrowser with a distribution specific installation of the
+doxygen and html documents). they have qtdemo and they build all the
+examples while also having the source around. they don’t have any
+external documentation as in a wiki for instance.</p>
+<h2 data-number="4" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://lastlog.de/wiki/index.php/SDL-joystick"
+class="uri">http://lastlog.de/wiki/index.php/SDL-joystick</a></li>
+<li>[2] <a href="http://github.com/qknight/space-game"
+class="uri">http://github.com/qknight/space-game</a></li>
+<li>[3] <a
+href="http://www.ogre3d.org/2009/08/27/google-summer-of-code-2009-projects-coding-time-is-up"
+class="uri">http://www.ogre3d.org/2009/08/27/google-summer-of-code-2009-projects-coding-time-is-up</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/ogre/ogre_3d.mdwn" title="posts\ogre\ogre_3d.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

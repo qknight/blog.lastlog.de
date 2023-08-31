@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="nix-language-atlas_javascript.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>nix-language-atlas javascript</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/nix-language-atlas_javascript.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="nixcloud-webservices_tests.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="nix-language-atlas_emscripten.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::nix-language-atlas" title="article series nix-language-atlas" class="seriesbtn btn btn-primary">nix-language-atlas</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="nix-language-atlas_nodejs.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="nix-language-atlas_emscripten.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">nix-language-atlas javascript</h1>
+    <div id="date"><p><span id="lastupdated">21 feb 2018</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::javascript" class="tagbtn btn btn-primary">javascript</a><a href="timeline.html?filter=tag::yarn" class="tagbtn btn btn-primary">yarn</a><a href="timeline.html?filter=tag::npm" class="tagbtn btn btn-primary">npm</a><a href="timeline.html?filter=tag::node2nix" class="tagbtn btn btn-primary">node2nix</a><a href="timeline.html?filter=tag::npm2nix" class="tagbtn btn btn-primary">npm2nix</a><a href="timeline.html?filter=tag::yarn2nix" class="tagbtn btn btn-primary">yarn2nix</a></p></div>
+    <!-- <a href="media/nixcloud.png"><img src=media/nixcloud.png size=30x class="noFancy" style="float: right"></a> -->
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>in the nix-language-atlas series on lastlog.de/blog i want to discuss
+how well programming languages, for which i’m familiar with, integrate
+with nix. let’s revisit javascript, as there had been major improvements
+since <a
+href="https://lastlog.de/blog/posts/nodejs_on_nixos_status.html">i wrote
+about it last time</a>. we won’t look into the <a
+href="https://lastlog.de/blog/posts/xmlmirror.html#emscripten">emscripten
+toolchain</a>.</p>
+<h2 data-number="2" id="dsl-pm-in-general">DSL-PM in general</h2>
+<p>are ‘domain specific language package manager(s)’ (DSL-PM) as npm or
+yarn a good thing?</p>
+<ul>
+<li>pro(s):
+<ul>
+<li>npm/yarn is a <a
+href="https://en.wikipedia.org/wiki/Domain-specific_language">DSL</a></li>
+<li>npm/yarn works on linux/mac/windows (in contrast nix 1.x only works
+with linux/mac due to the shell/unix requirements but <a
+href="https://www.reddit.com/r/NixOS/comments/64xyd7/nix_package_manager_works_flawlessly_in_windows/">nix
+2.x on windows 10 tells another story</a>)</li>
+<li>DSL-PM often use semantic versioning <a
+href="https://www.npmjs.com/">npm</a>, <a
+href="https://github.com/golang/dep">golang dep</a>, <a
+href="https://crates.io/">rust cargo</a> while <a
+href="https://matrix.ai/2016/04/04/content-addressed-dependencies-vs-semantic-versioning/">nix
+intentionally has no semantic versioning</a>. to be fair, go isn’t the
+best example for semantic versioning and rust does pretty well without
+it as <a
+href="https://github.com/nixclohttps://github.com/nixcloud/nixcratesud/nixcrates">nixcrates</a>
+proved.</li>
+</ul></li>
+<li>con(s):
+<ul>
+<li>DSL-PMs like npm often lack support for <a
+href="https://github.com/svanderburg/node2nix#adding-unspecified-dependencies">inter
+domain dependency management</a>, interestingly something which was
+better with autotools based build system where one was forced to pass
+arguments to not only header and libraries but also to binaries. this is
+where node2nix shines compared to yarn2nix</li>
+<li>bundling/vendoring of dependencies: outside DSL-PM as bundling
+openssl c-code but often also inside of the DSL-PM most often seen with
+<a
+href="https://golang.org/cmd/go/#hdr-Vendor_Directories">golang</a></li>
+<li>deployment not reproducible: <a
+href="https://github.com/svanderburg/node2nix#generating-packages-for-nodejs-8x">npm
+5.x that supports lock files pinpointing the exact versions used of all
+dependencies and transitive dependencies, and a content addressable
+cache.</a></li>
+</ul></li>
+</ul>
+<h3 data-number="2.1" id="integrate-dsl-pms-into-nixnixpkgs">integrate
+DSL-PM(s) into nix/nixpkgs</h3>
+<p>DSL-PM properties nix requires:</p>
+<ul>
+<li>reproducible dependency calculations/downloads
+<ul>
+<li>npm: only since <a
+href="https://github.com/svanderburg/node2nix#generating-packages-for-nodejs-8x">npm
+5.x</a>, see also <a
+href="https://medium.com/@Quigley_Ja/everything-you-wanted-to-know-about-package-lock-json-b81911aa8ab8">package-lock.json</a></li>
+<li>yarn: <a
+href="https://yarnpkg.com/lang/en/docs/yarn-lock/">yarn.lock</a> made it
+easy, before that it required much effort</li>
+</ul></li>
+<li>reproducible configuration, build &amp; installation into the store
+of each dependency</li>
+<li>reproducible configuration, build &amp; installation into the store
+of main target</li>
+</ul>
+<h2 data-number="3" id="dsl-pm-evolution-javascript">DSL-PM evolution
+(javascript)</h2>
+<ul>
+<li>npm -&gt; <a href="https://github.com/NixOS/npm2nix">npm2nix</a>
+-&gt; <a
+href="https://github.com/svanderburg/node2nix">node2nix</a></li>
+<li>yarn -&gt; <a
+href="https://github.com/moretea/yarn2nix">yarn2nix</a></li>
+<li>bower -&gt; <a
+href="https://github.com/rvl/bower2nix">bower2nix</a></li>
+</ul>
+<p>note: <a
+href="https://www.alexkras.com/understanding-differences-between-npm-yarn-and-pnpm/">read
+this if you are interested in npm/yarn differences</a>. it seems that
+yarn forced many of its concepts into npm.</p>
+<h2 data-number="4" id="yarn2nix-workflow">yarn2nix workflow</h2>
+<p>let’s see a simple example how to integrate a <code>yarn</code> based
+project into your <code>nix</code> codebase:</p>
+<ol type="1">
+<li><p>we clone an example:</p>
+<pre><code>git clone https://github.com/yarnpkg/example-yarn-package
+cd example-yarn-package
+mkdir bin
+touch bin/myapp
+chmod u+x bin/myapp</code></pre></li>
+<li><p>let’s add a default.nix</p>
+<pre><code>{ pkgs ? import &lt;nixpkgs&gt; {} }:
+let
+  yarn2nixSrc = pkgs.fetchFromGitHub {
+    owner = &quot;moretea&quot;;
+    repo = &quot;yarn2nix&quot;;
+    rev = &quot;0472167f2fa329ee4673cedec79a659d23b02e06&quot;;
+    sha256 = &quot;10gmyrz07y4baq1a1rkip6h2k4fy9is6sjv487fndbc931lwmdaf&quot;;
+  };
+  yarn2nixRepo = pkgs.callPackage yarn2nixSrc {};
+  inherit (yarn2nixRepo) mkYarnPackage;
+in
+  mkYarnPackage {
+    src = ./.;
+  }</code></pre>
+<p>and add contents to <code>bin/myapp</code></p>
+<pre><code>#!/usr/bin/env node
+
+&#39;use strict&#39;;
+
+// For package depenency demonstration purposes only
+var multiply = require(&#39;lodash/multiply&#39;);
+
+console.log(&quot;h&quot; + multiply(2,0.5) + &quot;, it works!&quot;)</code></pre>
+<p>add a “bin” to <code>package.json</code>, see this patch:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode Diff"><code class="sourceCode diff"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">diff --git a/package.json b/package.json</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>index 36952fd..a38ceaf 100644</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">--- a/package.json</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dt">+++ b/package.json</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -18,6 +18,7 @@</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>   &quot;devDependencies&quot;: {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>     &quot;jest-cli&quot;: &quot;15.1.1&quot;</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>   },</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="va">+  &quot;bin&quot; : { &quot;myapp&quot; : &quot;bin/myapp&quot; },</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>   &quot;jest&quot;: {</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>     &quot;testEnvironment&quot;: &quot;node&quot;</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>   }</span></code></pre></div></li>
+<li><p>now build the source</p>
+<pre><code>nix-build -Q
+building path(s) ‘/nix/store/gkdb8hsykw3idp4xpv6by618wad5s052-offline’
+building path(s) ‘/nix/store/b6kiqlcaacxrlq4nnjgk69mwjnrlvkpv-yarn2nix-modules-0.1.0’
+building
+yarn config v1.3.2
+success Set &quot;yarn-offline-mirror&quot; to &quot;/nix/store/gkdb8hsykw3idp4xpv6by618wad5s052-offline&quot;.
+Done in 0.10s.
+yarn install v1.3.2
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+[4/4] Building fresh packages...
+warning Ignored scripts due to flag.
+Done in 4.99s.
+...
+&lt;skipped many lines&gt;&gt;
+...
+building path(s) ‘/nix/store/7yg1mah963w35dhxjcylw5q0r62bkk83-yarn.nix’
+these derivations will be built:
+  /nix/store/07xy1c1yp4ada1sjiz7m416ic2i1b908-webidl-conversions-3.0.1.tgz.drv
+  /nix/store/0c2xgds6pzsnsp1hmxdgaqh1n28d68k5-lodash.isarray-3.0.4.tgz.drv
+  /nix/store/0dj6mwhpmzvnxzz2122isdbw85mjg0wv-regex-cache-0.4.3.tgz.drv
+  /nix/store/0in2pcwsc3ln6glqkab5fsx98m28vq8g-lodash._baseassign-3.2.0.tgz.drv
+  /nix/store/1rhagnq3gz68x5lbhca6z4rsx9jnabgh-is-dotfile-1.0.2.tgz.drv
+  /nix/store/1vq9rlkn3qdy2acndj2q47ryswiv5yir-lodash.assign-4.2.0.tgz.drv
+  /nix/store/2a4kqk4p54nvm31cyy2nnl2vzr4klyb8-babel-generator-6.14.0.tgz.drv
+  /nix/store/2mf2dr0gx3bqxiqbpqdhhp8bhz95d34h-arr-diff-2.0.0.tgz.drv
+  /nix/store/2pbiyjyqg57dnn0apj24lrvqp1cbix9f-expand-brackets-0.1.5.tgz.drv
+  /nix/store/31h1f7rair2xq0di3b3agr7g2xfgncyz-jest-matcher-utils-15.1.0.tgz.drv
+  /nix/store/3l6amqm7wdx1c45mypbgh8xgsl92zw76-exec-sh-0.2.0.tgz.drv
+  /nix/store/3w6wxplb811vzfky5sgvbifm6j5p6fac-babel-core-6.14.0.tgz.drv
+  /nix/store/48d8jwrpgg2pxm8mkyqvavrv4k5i2nab-lodash.keys-3.1.2.tgz.drv
+  /nix/store/4l0s8plnxw2nzszbjjdicrr5np9cc2ni-jest-resolve-15.0.1.tgz.drv
+  /nix/store/4mn98xigyzybcnsb71731pw8biirzzax-micromatch-2.3.11.tgz.drv
+...
+&lt;skipped many lines&gt;&gt;
+...
+building path(s) ‘/nix/store/chsx89ifr7dk7mc00d6789indh0rn41x-to-fast-properties-1.0.2.tgz’
+building path(s) ‘/nix/store/sqpsd9y77kkq1vvfpfcfzk9q347dwg14-walker-1.0.7.tgz’
+building path(s) ‘/nix/store/j7fp6iz0wj6dcp8ibsqyph2vy4p007wk-watch-0.10.0.tgz’
+building path(s) ‘/nix/store/nv5p8ijp15mc2kbpp26mvd8pn7vqlwyy-webidl-conversions-3.0.1.tgz’
+building path(s) ‘/nix/store/a3amdrmhzrvd3v1lsy1ih5rfpdamyj46-whatwg-url-3.0.0.tgz’
+building path(s) ‘/nix/store/vhwym48w1pvgzli9i57fnzqw0pjp3a83-window-size-0.2.0.tgz’
+building path(s) ‘/nix/store/2dg59ikzfrdwbcpkwg2xwjxs9rhpilb8-worker-farm-1.3.1.tgz’
+building path(s) ‘/nix/store/497p7kg9iyb09ah0vvqx88dpq3bn843p-yargs-5.0.0.tgz’
+building path(s) ‘/nix/store/w3lmwwq4cac653nhajnvyl1k2vhivaws-yargs-parser-3.2.0.tgz’
+building path(s) ‘/nix/store/ywn6ysmnvrkyzjwpdiwr4iivk9z9kx2y-offline’
+building path(s) ‘/nix/store/pnbb86igrhhfw3bdv9kcqnyz4hxgfkmd-example-yarn-package-modules-1.0.0’
+building path(s) ‘/nix/store/r9s6cmq5ik47c0s1hd48xz3r6pixmm1r-example-yarn-package-1.0.0’
+/nix/store/r9s6cmq5ik47c0s1hd48xz3r6pixmm1r-example-yarn-package-1.0.0</code></pre>
+<p>note: the last output line of nix-build is what we are interested
+in!</p></li>
+<li><p>checking the result</p>
+<pre><code>ls -lathr result/node_modules/
+
+...
+&lt;skipped many lines&gt;&gt;
+...
+lrwxrwxrwx 1 root root  102  1. Jan 1970  align-text -&gt; /nix/store/pnbb86igrhhfw3bdv9kcqnyz4hxgfkmd-example-yarn-package-modules-1.0.0/node_modules/align-text
+lrwxrwxrwx 1 root root  105  1. Jan 1970  acorn-globals -&gt; /nix/store/pnbb86igrhhfw3bdv9kcqnyz4hxgfkmd-example-yarn-package-modules-1.0.0/node_modules/acorn-globals
+lrwxrwxrwx 1 root root   97  1. Jan 1970  acorn -&gt; /nix/store/pnbb86igrhhfw3bdv9kcqnyz4hxgfkmd-example-yarn-package-modules-1.0.0/node_modules/acorn
+lrwxrwxrwx 1 root root   98  1. Jan 1970  abbrev -&gt; /nix/store/pnbb86igrhhfw3bdv9kcqnyz4hxgfkmd-example-yarn-package-modules-1.0.0/node_modules/abbrev
+lrwxrwxrwx 1 root root   96  1. Jan 1970  abab -&gt; /nix/store/pnbb86igrhhfw3bdv9kcqnyz4hxgfkmd-example-yarn-package-modules-1.0.0/node_modules/abab</code></pre></li>
+<li><p>execute the binary</p>
+<pre><code>/nix/store/r9s6cmq5ik47c0s1hd48xz3r6pixmm1r-example-yarn-package-1.0.0/bin/myapp
+h1, it works!</code></pre></li>
+</ol>
+<p>using <code>nix-build</code> we declaratively built the node
+package!</p>
+<h2 data-number="5" id="yarn2nix-internals">yarn2nix internals</h2>
+<style>
+.boxStyle {
+    border-radius: 6px;
+    margin: 0px;
+    padding: 0px;
+}
+.boxHeader {
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    background-color: #7e98fd;
+    margin: 0px;
+    padding-left: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+.boxHeader p {
+    margin: 0px;
+    padding: 0px;
+
+}
+.boxFooter {
+    background-color: #abbbf7;
+    margin-bottom: 20px;
+    padding: 0px;
+    padding-top: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding-bottom: 10px;
+
+}
+</style>
+<div class="boxStyle">
+<div class="boxHeader">
+<p>yarn (imperative)</p>
+</div>
+<div class="boxFooter">
+<ol type="1">
+<li><p><code>yarn</code> -&gt; read <code>yarn.lock</code></p></li>
+<li><p>make / build all the downloads</p></li>
+<li><p>come up with <code>node_packages</code> folder</p></li>
+<li><p><code>yarn install</code></p>
+<p>note: in general we skip step (4.)</p></li>
+</ol>
+</div>
+</div>
+<div class="boxStyle">
+<div class="boxHeader" style="background-color: #ffd42a;">
+<p>yarn (declarative)</p>
+</div>
+<div class="boxFooter" style="background-color: #ffe680;">
+<ol type="1">
+<li><p><code>yarn2nix</code> -&gt; read <code>yarn.lock</code></p></li>
+<li><p>translate each dependency into a <code>mkDerivation</code></p>
+<p>each is a <code>mkDerivation</code> residing in /nix/store/…</p>
+<p><a href="media/nix-language-atlas-javascript-mkderivation1.png"><img src=media/nix-language-atlas-javascript-mkderivation1.png size=30x class="noFancy"></a></p></li>
+<li><p>evaluate each <code>mkDerivation</code>, gain store path</p></li>
+<li><p>call <code>yarn</code> with the list of all
+<code>mkDerivation(s)</code>, <code>yarn</code> comes up with
+<code>node_modules</code></p>
+<p>a single <code>mkDerivation</code> also residing in /nix/store/… but
+encapsulating other /nix/store entries</p>
+<p><a href="media/nix-language-atlas-javascript-mkderivation2.png"><img src=media/nix-language-atlas-javascript-mkderivation2.png size=30x class="noFancy"></a></p></li>
+<li><p>final <code>mkDerivation</code> uses this
+<code>node_modules</code> and creates the store path we are interested
+in</p></li>
+</ol>
+</div>
+</div>
+<h2 data-number="6" id="conclusion">conclusion</h2>
+<ul>
+<li>take notice, and i can’t stress this enough, we map
+<code>yarn.lock</code> entries into single
+<code>pkgs.stdenv.mkDerivation</code> (by calling
+<code>mkYarnPackage</code>) but later pass all these into
+<code>yarn</code> which creates the <code>node_modules</code> contents
+from this. this is exactly how a DSL-PM must be designed to be easily
+integrated</li>
+<li><code>yarn.lock</code> obsoletes the requirement of manually
+creating a dependency file per project:
+<ul>
+<li>shown in the example above where i only added a
+<code>default.nix</code></li>
+<li>i’d wish <a href="https://github.com/golang/dep">dep’s</a>
+<code>Gopkg.lock</code> used with <code>go</code> would also contain a
+hash already but they are using GIT and we have to call
+<code>nix-prefetch-git</code> to generate a sha256 hash manually</li>
+</ul></li>
+<li><code>yarn2nix</code> might not be as advanced as
+<code>node2nix</code> but we at nixcloud.io use it for all projects.
+<code>yarn</code>/<code>yarn2nix</code> is really fast, in dependency
+calculation and deployment, compared what we had before</li>
+<li>i’d wish that npm’s sha1 would be replaced by something more recent
+but in comparison to <code>dep</code> they at least have a hash of some
+sort</li>
+<li><code>yarn2nix</code> is not a part of <code>nixpkgs</code> yet, see
+https://github.com/moretea/yarn2nix/issues/5</li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/nix-language-atlas_javascript.mdwn" title="posts\nix-language-atlas_javascript.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

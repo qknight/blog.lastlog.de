@@ -1,0 +1,141 @@
+[[!summary chatGPT: The author discusses their issues with using Ogre 3D on Gentoo, including installation problems, lack of documentation and samples, and issues with the build system. They suggest looking at how Trolltech handles their Qt release as a possible fix.]]
+[[!meta date="2010-02-09 16:02"]]
+[[!tag gentoo linux ogre3d technology usability]]
+[[!series ogre]]
+
+[[!img media/ogrelogo-small.jpg alt="" style="float: right" size=400x]]
+
+
+# ogre 3d problems on gentoo and general ogre 3d concept discussions
+i've been using ogre 3d lately and here are some issues i had:
+	
+  * in gentoo there is no way to install ogre WITH the samples in one go, if one wants the samples as well one would have to install the library based from the source (bypassing the package manager) or hack the ebuild
+	
+  * to update ogre i had to uninstall 'ogre' with **emerge -C ogre** first and then install the new version with '**emerge ogre**' in a second go. if not done so ogre would screw up the build for some unknown reason?! if i recall correctly that was a linker issue
+	
+  * **autotools is so ugly**, i don't see any way to compile the samples when not using ./configure from the base library directory which means also compiling all the library as well...
+
+  * i think that writing all the ogre documentation must have taken a lot of time - and i honor that - but i prefer  how the trolltech guys do  it. **the trolls use a 'incode documetation' syntax (probably doxygen with some markup) and no external documentation.** in contrast the ogre developers use a mixture of  mediawiki/html documetation/library doxygen/internal samples and external samples. if they would for instance only use  templates in the wiki. currently not doing so makes it very confusing finding related things.
+
+	
+  * most of the **ogre examples don't include any screenshot** of what is actually done, this makes searching much more 'fun'...
+
+	
+  * they use **autotools** for the library and they use **autotools for the samples**. i used cmake for my project instead. since i don't know much about autotools i had problems finding out what linker and compiler switches i needed and since my package manager removed all Makefiles after installation of the samples (or probably never build them at all) i had to do ugly things to find out how things work.
+**FIX**: so if you want to find that out i urge you to download the ogre release by hand (bypassing the package manager) and use ./configure; make, then have a look at the samples directory
+
+	
+  * the 'package manager' of gentoo (portage) has the latest ogre included but kubuntu didn't, so we had to use the custom build script there by hand...
+
+	
+  * using the package manager of gentoo i set the useflag for **double-precision** which resulted in linker errors and also 'our' codebase which worked on a different machine using the custom build of ogre probably not using 'double-precision' at all using mesa for 3d rendering. but it did not work on my laptop after i removed the linker error. it just showed a black screen. took me hours to find out with lots of library recompiles...
+
+	
+  * the **kubuntu defaults for the ogre library are acceptable** but they had only a **very old version** in contrast gentoo didn't provide good defaults since **cg** and **devil** was disabled but had a very recent version of ogre. funny, isn't  it?
+  this is how i have it working now:
+        **% equery u ogre**
+        [ Searching for packages matching ogre... ]
+        [ Colour Code : set unset ]
+        [ Legend : Left column  (U) - USE flags from make.conf              ]
+        [        : Right column (I) - USE flags packages was installed with ]
+        [ Found these USE variables for dev-games/ogre-1.6.5 ]
+        U I
+        + + cg               : NVIDIA toolkit plugin
+        + + devil            : image loading support with DevIL
+        + + doc              : Adds extra documentation (API, Javadoc, etc)
+        - - double-precision : more precise calculations at the expense of speed
+        + + examples         : Install examples, usually source code
+        + + gtk              : Adds support for x11-libs/gtk+ (The GIMP Toolkit)
+        + + threads          : Adds threads support for various packages. Usually pthreads
+  you might wonder what that there is a '**examples**' use flag. but all it does it to install the example source but not the compiled examples NOR any Makefile, so .... again this autotools issue i don't know how to compile it then... not in any documentation i could find either.
+
+	
+  * **documentation how to use custom shaders is really missing in ogre**, i managed to compile my own shader (cg file) with cgc (that is the nvidia shader compiler) but the library wasn't able to use it no matter what i tried...
+it seems that most developers use windows and directX anyway which makes the situation on linux even worse.
+
+	
+  * in ogre one has several cfg files which are essential  to run a sample application. **but one has to create these files individually for every sample. so mixing a 'package manager ogre library install' with a 'bypassing source ogre library build' makes the situation even worse.** the files are:
+
+	
+    * **ogre.cfg** (can be deleted, since it can be generated at program start with a gui)
+
+	
+    * **plugins.cfg** (i hate this file since it is required but no sample includes it after build), basically this file contains paths to shared objects .so files which are used by the ogre core backend
+
+	
+    * **resources.cfg** (this file contains a list of used textures, shaders and other graphics related stuff), this needs to be done per application. but there is a collection of Media files for the samples but the copyright is somehow strange since parts of it may not be redistributed.... so why do they included it at all?
+
+
+
+
+
+
+	
+  * ogre contains OIS for input handling but i couldn't figure out how to get joystick support working. this probably might be broken completely. so instead of using OIS for joystick handling i had to include libSDL for that. i wrote a libSDL joystick example some time ago, can be found [1] on my wiki. **i wonder what that joystick-support in OIS is all about...?**
+
+	
+  * in general there are tutorials, about how to use ogre from an ide, in the wiki. there is also tutorials how to use ogre and how to import objects from blender and stuff. finding these resources is very time consuming. they have the tendency to be for 'pro uses' only and tend to be incomplete as well.
+
+	
+  * **there is a ogre documentation which covers the basic concepts**. i've been reading some stuff and it seems to be very good. however i can't tell if it's complete as my current use case is quite limited.
+
+
+
+
+# my project
+
+
+you can find the code at [2]. but i'd like to warn you since:
+
+
+
+	
+  * we didn't have much time so guess how the code looks
+
+	
+  * has no documentation
+
+	
+  * might not compile
+
+	
+  * voids many coding standards (especially c++ class/file naming schemes)
+
+
+but still it might still be useful for some coders to look at, for instance the joystick integration or how i did use cmake with ogre...
+
+
+# so why do i write this post at all?
+
+
+
+
+
+	
+  * **i hate the fact that there are multiple distributions - all factoring the same package of ogre - one more incomplete than the other....
+**
+
+	
+  * the samples are not pre-built - if included at all
+**i found a forum thread where developers did not see the samples as part of the ogre core distribution at all - how backward is that? examples and documentation is basically everything if one distributes a 'library'!**
+
+	
+  * the buildsystem of ogre and the samples is very confusing and badly documented
+
+	
+  * there is **no qtdemo like program for ogre included**, although there was a summer of code project assigned and completed recently,  it's refered as  'sample interface' and will be included in ogre 1.7 - i love that!
+
+	
+  * despite the fact that there is no 'sample interface' the samples are hard to build, no documentation about 'how they can be built' is included in the release
+
+
+**summary:** i don't like the way the documentation is handled in the ogre project and i don't like the build system as well. **my main criticism however is that the distributions do a very bad job at including the library (with all the samples missing & misc quirks).**
+
+**possible fix:** take a look at how trolltech did it with the qt release. they have assistant for the documentation (no need to open a webbrowser with a distribution specific installation of the doxygen and html documents). they have qtdemo and they build all the examples while also having the source around. they don't have any external documentation as in a wiki for instance.
+
+
+# links
+
+* [1] <http://lastlog.de/wiki/index.php/SDL-joystick>
+* [2] <http://github.com/qknight/space-game>
+* [3] <http://www.ogre3d.org/2009/08/27/google-summer-of-code-2009-projects-coding-time-is-up>

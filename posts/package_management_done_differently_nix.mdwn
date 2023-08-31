@@ -1,0 +1,157 @@
+[[!summary chatGPT: This article discusses the author's experience with different Linux distributions and their package managers, highlighting the shortcomings and challenges they faced. They then introduce NIX OS, a package manager with unique features such as the ability to install multiple versions of a program, atomic installations, and easy roll-backs. NIX also replaces other build tools like Make and CMake. The author provides an example of creating a Nix component and installing it on Nix OS.]]
+
+[[!meta date="2010-12-24 17:14"]]
+[[!tag tech]]
+
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+# motivation
+package management is great when it just works. but often 'edge cases' reveal shortcomings in the respective package manager. a very innovative approach to package deployment is implemented in the NIX package manager.
+
+if you are only interested in the technical side of my recent findings about NIX, skip chapter::'my linux journey' and read on at chapter::'NIX OS', below.
+
+
+# my linux journey, so far....
+
+
+originally i started my** linux journey** with **redhat**, impressed by the **debian** package manager **apt**, i soon changed over to **debian linux**.
+
+i've used debian when kde 3 was finally released and altough i was quite happy with kde 2 soon i realized that kde 2 had to give way for the kde 3 integration. if i recall correctly it was quite hard to use kde 2 in parallel. at that time kde 3 (the first days/weeks after the release in debian) was unusable and crashed all over the place. that keept this way until the relese of kde '3.5'.
+
+so the main problem with kde 3 was that it contained arts (an audio daemon like ESD) which was tightly coupled to 'kde 3.x'. a normal desktop user would never had issues with that but as i always was interested in jackd, the 'audio connection kit' for low latency audio stuff. the main problem was that the dependencies for arts somehow made it very complicated when wanting also jackd installed on the same system. as there were no useflags, as in gentoo linux, i didn't have much joy, as i had to decide between kde or jackd.
+
+in the end i experimented with **gentoo linux** and that's what i'm stuck with until today. but back then one could install kde 3 and jackd at the same time without much burden. but soon after i moved from debian to gentoo there was a kde 4 release. this resulted in horrible kde3 vs kde4 problems. finally i had to remove my beloved, back then stable 3.5 kde installation and was forced to use the kde 4 alpha release quality software.
+
+in gentoo there had been support for a '**prefix**' **installation** of '**kde 3.x and 4.x**' which also made several parallel kde 4 installations possible. of course one could also install kde3 and kde4 at the same time. but support for the 'kde prefix' installation is probably gone by now and with it the kde3 support.
+
+so NIX OS does solve two problems at the same time:
+
+* to some degree it has use flags, as gentoo does
+* all installed software is installed as done in gentoo when doing a kde prefix installation
+
+anyway, enough kde history, let's see what nix actually is...
+
+# NIX OS
+
+
+i've been experimenting with **NIX OS** lately. NIX is a package manager, or in nix terms a 'component deployment tool'. Nix has some very unique and innovative features i've not yet seen yet.
+
+here is a incomplete list of features i like:
+
+
+
+	
+  * one can install **several different version of a single program at the same time**
+  * still only one 'selected' version is executed, when typing "firefox" for instance
+  * **installation of components is atomic**, no system breakage after hitting 'reset' too early
+  * **if a upgrade to a more recent version fails, one can roll-back nearly instantly**
+  * there is **no difference between source deployment and binary deployment** anymore
+  * **all packages are now 'read only'**, so one could say that a package could be copied between systems even after installation
+  * **nix can be used ad-hoc** in linux distributions and even on windows and mac os x
+  * **nix can be used to produce cross platform builds or to automate processes with dependencies in general**
+  * services (or in nix terms compositions) can be cloned from one computer to another very easily
+  * **NIX replaces Make/Autotools/CMake and similar tools**
+
+
+most points listed here, can also be found at [1].
+
+in **other package managers** as (**portage, apt**, ...) there is only a **global namespace** which is dictated by the distribution. this name dictates package names and dependencies. i would like to call this a 'build time' namespace. **nix moves this 'build time' namespace issue into a runtime namespace issue** as one can have two different versions of the same program installed but only one can be marked as active (read: used in a profile).
+
+
+# how is a 'Nix component' composed?
+
+
+to learn how Nix works i decided to make the 'evopedia' [2] project available on Nix OS.
+
+
+## 1. creating a component
+
+
+looking at the **nix manual** [3] and the very informative **phd-thesis** [4] from **Eelco Dolstra** i've decided to start in:
+
+
+    cd ﻿/etc/nixos/nixpkgs/pkgs/applications/science/misc/
+    mkdir evopedia
+    cd evopedia
+    vi default.nix
+
+
+
+
+## 2. default.nix (for evopedia)
+
+
+
+    
+[[!format  Lisp """
+{stdenv, fetchurl, bzip2, qt, libX11}:
+
+stdenv.mkDerivation rec {
+  name = "evopedia-0.4.2";
+
+  src = fetchurl {
+    url = "http://evopedia.info/src/${name}.tar.gz";
+    sha256 = "79e372d78e34e252e363a64c55cf6952d4930b226c01110452770faf189ff88b";
+  };
+
+  configurePhase = ''
+    qmake PREFIX=$out
+  '';
+
+  buildInputs = [ bzip2 qt libX11 ];
+
+  meta = {
+    description = "Offline Wikipedia Viewer";
+    homepage = http://www.evopedia.info;
+    license = "GPLv3+";
+    maintainers = with stdenv.lib.maintainers; [viric];
+    platforms = with stdenv.lib.platforms; linux;
+  };
+}
+"""]]
+
+
+
+
+## 3. injecting the new component into the system
+
+
+/etc/nixos/nixpkgs/pkgs/top-level/all-packages.nix should contain this:
+
+    
+[[!format  Lisp """
+evopedia = callPackage ../applications/science/misc/evopedia {
+  qt = qt4;
+};
+"""]]
+
+
+compared to c, this is like a **#include "foo.h"** statement, inserting the evopedia expression somewhere.
+
+
+## 4. installation
+
+    nix-env -i evopedia
+
+# summary
+
+
+evopedia can be found in nixpkgs already, so you don't have to do this in order to use evopedia.
+
+think about this as an example how to deploy your software on Nix os.
+
+
+# thanks
+
+
+i'm very thankful for the support from developers at **irc.freenode.net#nixos**
+
+
+# links
+
+
+* [1] <http://nixos.org/>
+* [2] <http://evopedia.info>
+* [3] <http://hydra.nixos.org/build/565033/download/1/manual/>
+* [4] <http://nixos.org/docs/papers.html>
+[^1]: this is the footnote

@@ -1,0 +1,181 @@
+[[!summary chatGPT: The main purpose is to create a 'high availability' file storage with two servers, one with fast disks for file caching and another with slow but large disks. The setup involves using fscache, virtualbox, and Ubuntu 10.10. The experiment also includes testing fscache with NFS and ext2/ext4 filesystems, as well as performance experiments to determine if the setup is worth it. The conclusion is that hot data can be used with the NFS workaround, but not without it. It would be nice to have a similar feature to fscache for any filesystem. ]]
+[[!meta date="2011-06-15 10:03"]]
+[[!tag linux]]
+
+# motivation
+
+
+the main purpose is a 'high availability' file storage with with two servers: main and failover. the main server has two raid systems:
+
+  * one with **fast** disks and **moderate disk sizes** and
+  * another raid with **slow** but very **big disks**
+
+the idea is to find a way to use the fast raid for** file-caching similar to ZFS or BTRFS'.**
+
+[[!img media/serverlayout.png alt="" size=600x]]
+
+the goal of this experimental setup is to experiment with **fscache** [1]. so far it seems that fscache is either bound to NFS, AFS or ISOFS (or a similar network fs technology).
+
+experiment using:
+	
+  * **virtualbox 3.x** on gentoo linux
+  * **ubuntu 10.10 (guest)**
+  * currently only main is in the experimental setup and **DRBD is not used yet**
+  * **not shown** in the diagram is the PV/VG/LV stuff (LVM)
+
+there are two interesting documentations:
+
+  * [3] how to use fscache
+  * [4] how fscache is implemented (and how to debug it)
+
+# setup using nfs
+
+
+this is a small setup to test if the mount and fscache are working on the target platform. in this case it was working great with ubuntu 10.10 desktop. setup steps:
+
+  1. using [2] we install the needed tools on ubuntu linux:
+
+        apt-get install nfs-kernel-server nfs-common
+
+  2. cat /etc/exports
+
+        /media/share 127.0.0.1(async,no_subtree_check,rw,insecure,all_squash)
+
+  3. nfs-kernel-server neustarten:
+
+        /etc/init.d/nfs-kernel-server restart
+
+  4. change the permissions on /media/share
+
+        chmod 0777 /media/share
+
+  5. only to test if the nfs export works we do:
+
+        mount -t nfs 127.0.0.1:/media/share /mnt/mounted-Share
+
+  6. after a successful test we unmount it:
+
+        umount /mnt/mounted-Share
+
+  7. create the cacheDir disk:
+
+        dd if=/dev/zero bs=1M count=512 of=cacheLoopDevice.dd
+        mkfs.ext4 /mnt/cacheLoopDevice.dd
+
+      according to [3]:
+
+        tune2fs -o user_xattr /mnt/cacheLoopDevice.dd
+        mount -o loop,user_xattr /mnt/cacheLoopDevice.dd /mnt/cacheDir
+
+  8. enable the cachefilesd daemon:
+
+        vi /etc/default/cachefilesd # remove the # before RUN=yes
+        change the **dir=...** in /etc/cachefilesd.conf:
+        dir /mnt/cacheDir
+        /etc/init.d/cachefilesd restart
+
+  9. finally let's mount it again but this time using 'fscache':
+
+        mount 127.0.0.1:/media/share /mnt/cached-Share/ -o fsc
+
+  10. let's do a functionality tests:
+
+        touch /mnt/cached-Share/a
+        ls -la /media/share
+
+# setup using nfs - no networking filesystem
+
+as shown in the two following examples, it does not work with ext2 or ext4. it seems as if fscache forces the use of NFS/AFS/ISOFS.
+
+## ext2
+
+
+
+    mkfs.ext2 /dev/sdb1 
+    mount /dev/sdb1 /mnt/cached-Share/ 
+    umount /mnt/cached-Share/
+    mount /dev/sdb1 /mnt/cached-Share/ -o fsc
+
+
+the error message (response to the shell command):
+
+    mount: wrong fs type, bad option, bad superblock on /dev/sdb1,
+    missing codepage or helper program, or other error
+    In some cases useful info is found in syslog - try
+    dmesg | tail  or so
+
+
+## ext4
+
+
+    mkfs.ext4 /dev/sdb1 
+    mount /dev/sdb1 /mnt/cached-Share/ 
+    umount /mnt/cached-Share/
+    mount /dev/sdb1 /mnt/cached-Share/ -o fsc
+
+
+the error message (response to the shell command):
+
+
+    mount: wrong fs type, bad option, bad superblock on /dev/sdb1,
+    missing codepage or helper program, or other error
+    In some cases useful info is found in syslog - try
+    dmesg | tail  or so
+
+
+the error message in (/var/log/messages):
+
+
+    [  846.008443] EXT4-fs (sdb1): Unrecognized mount option "fsc" or missing value
+
+
+
+
+# some performance experiments
+
+
+to answer the question if all this setup is worth the effort, lets' make some experiments:
+
+
+
+	
+  * time cp /usr/src/linux /mnt/cached-Share/
+  * grep "__" /usr/src/linux -R
+  * time rm -Rf /mnt/cached-Share/usr
+
+
+**please note:** i've changed the described setup a little bit: the virtual machine guest was given a virtual disk which was stored on a SSD driver.
+
+**performance tests inside a virtualbox guests seem to be worthless. i have to repeat similar tests on the target machine. but using a local NFS just to get 'fscache' working seems to be a bad design IMHO. we'll see if it is worth it.
+**
+
+
+# conclusion
+
+
+seems hot-data can be used with the **NFS workaround** but **not without it**. in contrast: zfs/btrfs have direct support for adding 'hot' data cache:
+
+
+
+	
+  * btrfs: '**hot data relocation**' functionality [5]
+
+	
+  * zfs: this is referred to as '**Separate Cache Devices**' [6]  or '**ssd caching**' [7]
+
+
+it would be nice to have a similar feature to **fscache** but for any filesystem (not limited to NFS/AFS/ISOFS) with the ability to be added dynamically (maybe using **remount**, so one does not have to unmount/mount the filesystem).
+
+**Edit:** bcache [8] is what i actually wanted.
+
+
+# links
+
+ * [1] <http://en.wikipedia.org/wiki/CacheFS>
+ * [2] <http://www.ubuntu-forum.de/artikel/32272/nfs-server-unter-ubuntu-einrichten.htm>
+ * [3] /usr/share/doc/cachefilesd/howto.txt.gz (coming with deb-package: **cachefilesd**)
+ * [4] /usr/src/linux/Documentation/filesystems/caching/fscache.txt (found on my Gentoo system in 2.6.36-gentoo-r5)
+ * [5] <http://lwn.net/Articles/397643/>
+ * [6] <http://www.solarisinternals.com/wiki/index.php/ZFS_Best_Practices_Guide#Separate_Cache_Devices>
+ * [7] <http://blogs.oracle.com/brendan/entry/test>
+ * [8] <http://bcache.evilpiepirate.org/>

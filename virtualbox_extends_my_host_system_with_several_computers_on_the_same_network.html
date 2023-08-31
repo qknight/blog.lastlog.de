@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="virtualbox_extends_my_host_system_with_several_computers_on_the_same_network.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>virtualbox extends my host system with several computers on the same network</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/virtualbox_extends_my_host_system_with_several_computers_on_the_same_network.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="evopedia_is_running_on_gentoo_linux.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="evopedia_is_running_on_arch_linux.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">virtualbox extends my host system with several computers on the same network</h1>
+    <div id="date"><p><span id="lastupdated">21 dec 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a></p></div>
+    <p>to <strong>experiment with deployment</strong> i’ve installed several
+linux distributions using <strong>virtualbox</strong> (based on iso
+images). i had some problems with the networking but today i got rid of
+the complicated setup, used previously.</p>
+<h2 data-number="1" id="what-i-want">what i want</h2>
+<pre><code>|-------------------------------------------|
+|       fedora      debian       windows    |
+|  10.0.0.100    10.0.0.101   10.0.0.102    |
+|          |          |          |          |
+|          --------|||||||-------|          |
+|                     | switch              |
+|---------------------|---------------------|
+                      |
+                      | vboxnet0 10.0.0.1/24</code></pre>
+<p>virtualbox adds the <strong>vboxnet0</strong> (<strong>host only
+network adapter</strong>) using the preferences dialog in the main gui.
+additionally i added masquerading, using a external script, in order to
+have all hosts inside the ‘host only networking’ accessing the internet.
+the switch is created by virtualbox automatically when selecting ‘host
+only networking’ using <strong>vboxnet0</strong> per
+<strong>appliance</strong>.</p>
+<p>i was using ‘=app-emulation/virtualbox-ose-3.2.10’.</p>
+<h2 data-number="2" id="how-to-do-it">how to do it</h2>
+<p>the setup is quite easy, i just wanted to write it down anyway in
+case it is of help for others.</p>
+<h2 data-number="3" id="masquerading">masquerading</h2>
+<p>in order to get each <strong>virtualbox appliance connected with the
+internet</strong>, masquerading is used. this is basically a one way
+internet connection but in my scenario there are no services provided to
+the outside world.</p>
+<pre><code>iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward</code></pre>
+<h2 data-number="4" id="dhcp-server">dhcp server</h2>
+<p><strong>as the virtualbox-built-in dhcp server did not work at
+all</strong>, i decided to use =<strong>net-misc/dhcp-3.1.2-p1</strong>
+instead. so here is the configuration:</p>
+<pre><code>dhcp.conf
+# option definitions common to all supported networks...
+option domain-name &quot;example.org&quot;;
+option domain-name-servers 10.0.0.1;
+
+default-lease-time 600;
+max-lease-time 7200;
+ddns-update-style ad-hoc;
+
+log-facility local7;
+
+subnet 10.0.0.0 netmask 255.255.255.0 {
+  option domain-name-servers 8.8.8.8;
+  range 10.0.0.10 10.0.0.200;
+  option routers 10.0.0.1;
+}
+
+subnet 192.168.56.0 netmask 255.255.255.0 {
+  option domain-name-servers 8.8.8.8;
+  range 192.168.56.101 192.168.56.202;
+  option routers 192.168.56.1;
+}</code></pre>
+<p>i run this server from a script which is also started at boot
+time:</p>
+<pre><code>dhcp eth0 vboxnet0</code></pre>
+<p>this is helpful as i can configure static IPs for known mac
+addresses. but also automatic assignment should be quite stable as all
+parameters can be tuned as used to.</p>
+<h2 data-number="5" id="the-clients">the clients</h2>
+<p>as mentioned already, each <strong>client</strong> has to be
+<strong>assinged</strong> to the ’<strong>host only network’
+adapter</strong>: <strong>vboxnet0</strong>. most linux distributions
+will try to get the host address via dhcp automatically. also each host
+can communicated with each other, so it is easy to do maintainance
+stuff.</p>
+<p><strong>update: 2010-12-21</strong> modified article as it’s not
+clear why some things are done the way they are</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/virtualbox_extends_my_host_system_with_several_computers_on_the_same_network.mdwn" title="posts\virtualbox_extends_my_host_system_with_several_computers_on_the_same_network.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

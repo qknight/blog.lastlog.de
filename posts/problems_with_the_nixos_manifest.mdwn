@@ -1,0 +1,87 @@
+[[!summary chatGPT: How to fix the error message and update Nix archives in NixOS]]
+[[!meta date="2012-06-06 19:50"]]
+[[!tag nixos packagemanager]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+
+# what is this?
+lately nix-channel stopped working with this error message:
+
+    # nix-channel --update
+    fetching list of Nix archives at `http://nixos.org/releases/nixos/channels/nixos-unstable/MANIFEST.bz2'...
+     % Total % Received % Xferd Average Speed Time Time Time Current
+     Dload Upload Total Spent Left Speed
+    100 421 100 421 0 0 5212 0 --:--:-- --:--:-- --:--:-- 10023
+     0 0 0 0 0 0 0 0 --:--:-- --:--:-- --:--:-- 0
+    caching /nix/store/2n6ifd0gyw3cg4v780yxdl307sfi4mmv-MANIFEST.bz2...
+    bzip2: (stdin) is not a bzip2 file.
+    you have an old-style or corrupt manifest `/nix/var/nix/manifests/nixos-unstable nixos-d8b23fa7b687df69ca99c50a659cb9b7.nixmanifest'; please delete it at /nix/store/gq4mqkg155jbpdzs44s6nc6ys1q3aqmh-nix-1.0pre2614_005d1e4/lib/perl5/site_perl/5.14.2/x86_64-linux-thread-multi/Nix/Manifest.pm line 346.
+    cannot pull cache manifest from `http://nixos.org/releases/nixos/channels/nixos-unstable' at /var/run/current-system/sw/bin/nix-channel line 88.
+    
+
+# the fix
+
+
+    # ls -la /nix/var/nix/manifests/
+    
+    total 28
+    drwxr-xr-x 2 root root 4096 Jun 6 20:19 ./
+    drwxr-xr-x 11 root root 4096 Jun 4 12:36 ../
+    -rw-r--r-- 1 root root 0 Jun 6 19:44 cache.lock
+    -rw-r--r-- 1 root root 10240 Jun 6 19:44 cache.sqlite
+    -rw-r--r-- 1 root root 0 Jun 6 20:19 cache.sqlite-journal
+    lrwxrwxrwx 1 root root 56 Jun 6 20:19 nixos-unstable-1b76fe40b585f44b15266540562d24b5.nixmanifest -> /nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2
+    -rw-r--r-- 1 root root 64 Jun 6 20:19 nixos-unstable-1b76fe40b585f44b15266540562d24b5.url
+    lrwxrwxrwx 1 root root 56 Jun 6 19:44 nixos-unstable\ nixos-d8b23fa7b687df69ca99c50a659cb9b7.nixmanifest -> /nix/store/2n6ifd0gyw3cg4v780yxdl307sfi4mmv-MANIFEST.bz2
+    -rw-r--r-- 1 root root 70 Jun 6 19:44 nixos-unstable\ nixos-d8b23fa7b687df69ca99c50a659cb9b7.url
+
+
+## first, remove all the manifests
+
+
+    # rm /nix/var/nix/manifests/*
+
+
+## then we can remove the store entry:
+
+
+    # nix-store --delete /nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2 1 888 3 pts/17 /nix/var/nix/manifests root@eliteBook-8530w 12-06-06 21:35:59
+    finding garbage collector roots...
+    removing stale link from `/nix/var/nix/gcroots/auto/v6aa8ai44dd10ypv8vg6shf8b5mzkhfn' to `/nix/var/nix/gcroots/per-user/root/channels.tmp'
+    deleting `/nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2'
+    1 store paths deleted, 6557759 bytes (6.25 MiB, 12840 blocks) freed
+
+
+## afterwards nix-channel --update works
+
+
+    # nix-channel --update
+    fetching list of Nix archives at `http://nixos.org/releases/nixos/channels/nixos-unstable/MANIFEST.bz2'...
+     % Total % Received % Xferd Average Speed Time Time Time Current
+     Dload Upload Total Spent Left Speed
+    100 421 100 421 0 0 5191 0 --:--:-- --:--:-- --:--:-- 10023
+     0 0 0 0 0 0 0 0 --:--:-- --:--:-- --:--:-- 0
+    cached contents of ‘http://nixos.org/releases/nixos/channels/nixos-unstable/MANIFEST.bz2’ disappeared, redownloading...
+     % Total % Received % Xferd Average Speed Time Time Time Current
+     Dload Upload Total Spent Left Speed
+    100 421 100 421 0 0 5221 0 --:--:-- --:--:-- --:--:-- 10268
+    100 6404k 100 6404k 0 0 1499k 0 0:00:04 0:00:04 --:--:-- 1705k
+    caching /nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2...
+    downloading Nix expressions from `http://nixos.org/releases/nixos/channels/nixos-unstable/nixexprs.tar.bz2'...
+     % Total % Received % Xferd Average Speed Time Time Time Current
+     Dload Upload Total Spent Left Speed
+    100 425 100 425 0 0 5417 0 --:--:-- --:--:-- --:--:-- 10365
+    100 3701k 100 3701k 0 0 1404k 0 0:00:02 0:00:02 --:--:-- 1627k
+    unpacking channel Nix expressions...
+    these derivations will be built:
+     /nix/store/4yd4l79h2nifm56rjpxq7hx10q57yz48-channels.drv
+    building path(s) `/nix/store/r3i2m2by6hcsa3ic99nyhjdb7p551izl-channels'
+    unpacking channel nixos-unstable
+
+
+# summary
+
+
+i don't know why it stopped working. maybe i did checkout the wrong channel by mistake? but maybe someone else might find himself in the same situation and this posting might help to get things going quickly.
+
+thanks to niksnut@freenode#nixos

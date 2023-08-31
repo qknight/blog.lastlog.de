@@ -1,0 +1,23 @@
+[[!summary chatGPT: The author has released nNull, a client/server program that can execute various scripts and is not limited to network scripts, with a console qt program for the server and a QWidget for the client.]]
+[[!meta date="2009-11-27 03:04"]]
+[[!tag gentoo linux qt technology usability n0]]
+
+# motivation
+
+I've released nNull, please see [1] as official page and find the source at [2].
+
+Some words on the release:
+	
+  * you can use this client/server to execute any kind of script, not only network scripts (might be handy for other things as well)
+  * qt4.5+/dbus/GPLv3
+  * nNull-server is a console qt program (uses no gui)
+  * nNull-client is a normal QWidget with a systray icon, the icon has a context menu
+
+see source at [1] and [2].
+
+maybe someone likes it? if so, please drop me a mail ;-)
+
+# links 
+* [1] <http://www.lastlog.de/wiki/index.php/NNull>
+* [2] <http://github.com/qknight/nNull>
+

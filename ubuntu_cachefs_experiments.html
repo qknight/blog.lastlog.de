@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="ubuntu_cachefs_experiments.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>ubuntu cachefs experiments</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/ubuntu_cachefs_experiments.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="mediawiki_clean_skin_relocated.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="new_nixos_org_mediawiki_theme.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">ubuntu cachefs experiments</h1>
+    <div id="date"><p><span id="lastupdated">15 jun 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p>the main purpose is a ‘high availability’ file storage with with two
+servers: main and failover. the main server has two raid systems:</p>
+<ul>
+<li>one with <strong>fast</strong> disks and <strong>moderate disk
+sizes</strong> and</li>
+<li>another raid with <strong>slow</strong> but very <strong>big
+disks</strong></li>
+</ul>
+<p>the idea is to find a way to use the fast raid for** file-caching
+similar to ZFS or BTRFS’.**</p>
+<p><a href="media/serverlayout.png"><img src=media/serverlayout.png alt="" size=600x></a></p>
+<p>the goal of this experimental setup is to experiment with
+<strong>fscache</strong> [1]. so far it seems that fscache is either
+bound to NFS, AFS or ISOFS (or a similar network fs technology).</p>
+<p>experiment using:</p>
+<ul>
+<li><strong>virtualbox 3.x</strong> on gentoo linux</li>
+<li><strong>ubuntu 10.10 (guest)</strong></li>
+<li>currently only main is in the experimental setup and <strong>DRBD is
+not used yet</strong></li>
+<li><strong>not shown</strong> in the diagram is the PV/VG/LV stuff
+(LVM)</li>
+</ul>
+<p>there are two interesting documentations:</p>
+<ul>
+<li>[3] how to use fscache</li>
+<li>[4] how fscache is implemented (and how to debug it)</li>
+</ul>
+<h2 data-number="2" id="setup-using-nfs">setup using nfs</h2>
+<p>this is a small setup to test if the mount and fscache are working on
+the target platform. in this case it was working great with ubuntu 10.10
+desktop. setup steps:</p>
+<ol type="1">
+<li><p>using [2] we install the needed tools on ubuntu linux:</p>
+<p>apt-get install nfs-kernel-server nfs-common</p></li>
+<li><p>cat /etc/exports</p>
+<p>/media/share
+127.0.0.1(async,no_subtree_check,rw,insecure,all_squash)</p></li>
+<li><p>nfs-kernel-server neustarten:</p>
+<p>/etc/init.d/nfs-kernel-server restart</p></li>
+<li><p>change the permissions on /media/share</p>
+<p>chmod 0777 /media/share</p></li>
+<li><p>only to test if the nfs export works we do:</p>
+<p>mount -t nfs 127.0.0.1:/media/share /mnt/mounted-Share</p></li>
+<li><p>after a successful test we unmount it:</p>
+<p>umount /mnt/mounted-Share</p></li>
+<li><p>create the cacheDir disk:</p>
+<p>dd if=/dev/zero bs=1M count=512 of=cacheLoopDevice.dd mkfs.ext4
+/mnt/cacheLoopDevice.dd</p>
+<p>according to [3]:</p>
+<p>tune2fs -o user_xattr /mnt/cacheLoopDevice.dd mount -o
+loop,user_xattr /mnt/cacheLoopDevice.dd /mnt/cacheDir</p></li>
+<li><p>enable the cachefilesd daemon:</p>
+<p>vi /etc/default/cachefilesd # remove the # before RUN=yes change the
+<strong>dir=…</strong> in /etc/cachefilesd.conf: dir /mnt/cacheDir
+/etc/init.d/cachefilesd restart</p></li>
+<li><p>finally let’s mount it again but this time using ‘fscache’:</p>
+<p>mount 127.0.0.1:/media/share /mnt/cached-Share/ -o fsc</p></li>
+<li><p>let’s do a functionality tests:</p>
+<p>touch /mnt/cached-Share/a ls -la /media/share</p></li>
+</ol>
+<h2 data-number="3"
+id="setup-using-nfs---no-networking-filesystem">setup using nfs - no
+networking filesystem</h2>
+<p>as shown in the two following examples, it does not work with ext2 or
+ext4. it seems as if fscache forces the use of NFS/AFS/ISOFS.</p>
+<h3 data-number="3.1" id="ext2">ext2</h3>
+<pre><code>mkfs.ext2 /dev/sdb1 
+mount /dev/sdb1 /mnt/cached-Share/ 
+umount /mnt/cached-Share/
+mount /dev/sdb1 /mnt/cached-Share/ -o fsc</code></pre>
+<p>the error message (response to the shell command):</p>
+<pre><code>mount: wrong fs type, bad option, bad superblock on /dev/sdb1,
+missing codepage or helper program, or other error
+In some cases useful info is found in syslog - try
+dmesg | tail  or so</code></pre>
+<h3 data-number="3.2" id="ext4">ext4</h3>
+<pre><code>mkfs.ext4 /dev/sdb1 
+mount /dev/sdb1 /mnt/cached-Share/ 
+umount /mnt/cached-Share/
+mount /dev/sdb1 /mnt/cached-Share/ -o fsc</code></pre>
+<p>the error message (response to the shell command):</p>
+<pre><code>mount: wrong fs type, bad option, bad superblock on /dev/sdb1,
+missing codepage or helper program, or other error
+In some cases useful info is found in syslog - try
+dmesg | tail  or so</code></pre>
+<p>the error message in (/var/log/messages):</p>
+<pre><code>[  846.008443] EXT4-fs (sdb1): Unrecognized mount option &quot;fsc&quot; or missing value</code></pre>
+<h2 data-number="4" id="some-performance-experiments">some performance
+experiments</h2>
+<p>to answer the question if all this setup is worth the effort, lets’
+make some experiments:</p>
+<ul>
+<li>time cp /usr/src/linux /mnt/cached-Share/</li>
+<li>grep “__” /usr/src/linux -R</li>
+<li>time rm -Rf /mnt/cached-Share/usr</li>
+</ul>
+<p><strong>please note:</strong> i’ve changed the described setup a
+little bit: the virtual machine guest was given a virtual disk which was
+stored on a SSD driver.</p>
+<p><strong>performance tests inside a virtualbox guests seem to be
+worthless. i have to repeat similar tests on the target machine. but
+using a local NFS just to get ‘fscache’ working seems to be a bad design
+IMHO. we’ll see if it is worth it. </strong></p>
+<h2 data-number="5" id="conclusion">conclusion</h2>
+<p>seems hot-data can be used with the <strong>NFS workaround</strong>
+but <strong>not without it</strong>. in contrast: zfs/btrfs have direct
+support for adding ‘hot’ data cache:</p>
+<ul>
+<li><p>btrfs: ‘<strong>hot data relocation</strong>’ functionality
+[5]</p></li>
+<li><p>zfs: this is referred to as ‘<strong>Separate Cache
+Devices</strong>’ [6] or ‘<strong>ssd caching</strong>’ [7]</p></li>
+</ul>
+<p>it would be nice to have a similar feature to
+<strong>fscache</strong> but for any filesystem (not limited to
+NFS/AFS/ISOFS) with the ability to be added dynamically (maybe using
+<strong>remount</strong>, so one does not have to unmount/mount the
+filesystem).</p>
+<p><strong>Edit:</strong> bcache [8] is what i actually wanted.</p>
+<h2 data-number="6" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://en.wikipedia.org/wiki/CacheFS"
+class="uri">http://en.wikipedia.org/wiki/CacheFS</a></li>
+<li>[2] <a
+href="http://www.ubuntu-forum.de/artikel/32272/nfs-server-unter-ubuntu-einrichten.htm"
+class="uri">http://www.ubuntu-forum.de/artikel/32272/nfs-server-unter-ubuntu-einrichten.htm</a></li>
+<li>[3] /usr/share/doc/cachefilesd/howto.txt.gz (coming with
+deb-package: <strong>cachefilesd</strong>)</li>
+<li>[4] /usr/src/linux/Documentation/filesystems/caching/fscache.txt
+(found on my Gentoo system in 2.6.36-gentoo-r5)</li>
+<li>[5] <a href="http://lwn.net/Articles/397643/"
+class="uri">http://lwn.net/Articles/397643/</a></li>
+<li>[6] <a
+href="http://www.solarisinternals.com/wiki/index.php/ZFS_Best_Practices_Guide#Separate_Cache_Devices"
+class="uri">http://www.solarisinternals.com/wiki/index.php/ZFS_Best_Practices_Guide#Separate_Cache_Devices</a></li>
+<li>[7] <a href="http://blogs.oracle.com/brendan/entry/test"
+class="uri">http://blogs.oracle.com/brendan/entry/test</a></li>
+<li>[8] <a href="http://bcache.evilpiepirate.org/"
+class="uri">http://bcache.evilpiepirate.org/</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/ubuntu_cachefs_experiments.mdwn" title="posts\ubuntu_cachefs_experiments.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

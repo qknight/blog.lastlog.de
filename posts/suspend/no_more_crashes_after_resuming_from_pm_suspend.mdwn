@@ -1,0 +1,213 @@
+[[!summary chatGPT: The author shares their experience of owning an HP Elitebook 8530w and encountering issues with the nvidia card when resuming from suspend, but was able to fix the issue by updating pm-utils and using the acpi interface to adjust the screen brightness.]]
+[[!meta date="2010-06-30 15:38"]]
+[[!tag gentoo linux]]
+
+# motivation
+
+[[!img media/hp-com-elitebook-8530w.jpg size=180x caption="hp elite book 8530w, source hp.com" style="float: right"]]
+
+i own a **hp elitebook 8530w **which is a good notebook if used with linux. it does have a nvidia card:
+
+**01:00.0 VGA compatible controller: nVidia Corporation G96M [Quadro FX 770M] (rev a1), **according to lspci.
+
+i use it with **Linux ebooK 2.6.34-rc5 #4 SMP PREEMPT Wed Jun 30 10:48:22 CEST 2010 x86_64 Intel(R) Core(TM)2 Duo CPU T9600 @ 2.80GHz GenuineIntel GNU/Linux.**
+
+ever since i bought this laptop it often **stuck at resume**,  using** pm-suspend** (sys-power/pm-utils).
+
+it's probably a **x11-drivers/nvidia-drivers** issue but i'm not certain since usually i can't see anything on the screen (the screen remains totally black, no backlight) but the computer isn't accessable over the network (can't login via ssh, after a broken resume).  so today i wanted to fix that by installing the nouveau driver. that failed however. but it seems that i fixed the resume issue.
+
+**HINT:** that means i can use the proprietary driver, as it is not a problem anymore.
+
+**HINT:** that also fixed the problem that after the first pm-suspend (or hibernate-ram) the consoles alt+f1 ... to ... alt+f12 weren't accessable as they were blanked out completely.  i might experiment with nouveau soon, but for now let's blog how i fixed the resume issue:
+
+
+## updating pm-utils
+
+my old version: **sys-power/pm-utils-1.2.5** -> **pm-suspend**
+
+my current version: **sys-power/pm-utils-1.3.0-r2**
+
+    emerge pm-utils
+    [ebuild  N    ] sys-power/pm-quirks-20100316
+    [ebuild  NS   ] app-text/docbook-xml-dtd-4.5-r1 [4.1.2-r6, 4.2-r1, 4.3-r1, 4.4-r2]
+    [ebuild     U ] sys-power/pm-utils-1.3.0-r2 [1.2.5]
+
+
+used with **x11-drivers/nvidia-drivers-195.36.24**
+
+after updating pm-utils there was no crash after resuming. which felt like a miracle! however, the problem seems to be odd. after updating the crash was gone but the backlight was very dim. in fact it was the lowest setting possible. and the other problem was that i could not find any tool to fix that. searching in wikis and blogs for ages i remembered how i did it last time using my thinkpad (i had similar problems there).
+
+
+
+
+there is a **kernel interface for controlling the screen brightness** using **acpi**.
+
+
+
+
+## how to increase the brightness?
+
+ideal solution: using the Fn+F9 and Fn+F10 keys
+
+ok, first check if these keys are mapped via acpi:
+
+as root, i type:
+
+    acpi_listen
+    fn+f9    video/brightnessdown BRTDN 00000087 00000000
+    fn+f10   video/brightnessup BRTUP 00000086 00000000
+    fn+f11   --nothing--
+
+so fn+f11 seems to be connected directly (i don't know how that exactly works) but the other two keys work fine with acpi_listen. so we can use these!
+
+**NOTE:** i had the 'ambient light sensor' disabled using the BIOS but this didn't help either. fn+f11 will switch to using the 'ambient light sensor' but somehow i usually think it's still to dim most of the time. it is far better on the 'mac book pro'.
+
+maybe nvidia-settings? **NO**! it does not control that.
+
+even restarting X didn't fix it. and restarting the computer not either!?
+
+## what next? -> the acpi interface
+
+the acpi interface was incomplete as **there was no /proc/acpi/video/**
+
+after endless googling i realized that **hp-wmi** and **wmi** (CONFIG_HP_WMI=m) support was already included in my kernel as modules and even loaded but:
+
+    CONFIG_ACPI_VIDEO=m
+
+was missing!
+
+so i added it, reinstalled a new kernel with the proper modules and after a reboot the video interface was there:
+
+    /proc/acpi/video/DGFX/
+
+so experimenting with it:
+
+    cat /proc/acpi/video/DGFX/LCD/brightness
+    levels:  0 5 10 15 20 25 30 33 36 40 43 46 50 55 60 65 70 75 80 83 86 90 93 96 100
+    current: 30
+
+now, let's increase that value to the maximum:
+
+    echo "100" > /proc/acpi/video/DGFX/LCD/brightness
+
+and i'm finally there! i can actually see what i'm writing! ;-)
+
+## how to integrate this into the system?
+
+we will combinecpi script that takes an entry for all actions
+
+    #!/bin/sh
+    # /etc/acpi/default.sh
+    # Default acpi script that takes an entry for all actions
+    set $*
+    group=${1%%/*}
+    action=${1#*/}
+    device=$2
+    id=$3
+    value=$4
+    log_unhandled() {
+    logger “ACPI event unhandled: $*”
+    }
+    case “$group” in
+    video)
+    case “$action” in
+    brightnessup)
+    /etc/acpi/brightness.sh up
+    ;;
+    brightnessdown)
+    /etc/acpi/brightness.sh down
+    ;;
+    esac
+    ;;
+    button)
+    case “$action” in
+    power)
+    /sbin/init 0
+    ;;
+    # if your laptop doesnt turn on/off the display via hardware
+    # switch and instead just generates an acpi event, you can force
+    # X to turn off the display via dpms.  note you will have to run
+    # ‘xhost +local:0′ so root can access the X DISPLAY.
+    #lid)
+    #       xset dpms force off
+    #       ;;
+    sleep)
+    /usr/sbin/pm-suspend
+    ;;
+    *)      log_unhandled $* ;;
+    esac
+    ;;
+    ac_adapter)
+    case “$value” in
+    # Add code here to handle when the system is unplugged
+    # (maybe change cpu scaling to powersave mode).  For
+    # multicore systems, make sure you set powersave mode
+    # for each core!
+    #*0)
+    #       cpufreq-set -g powersave
+    #       ;;
+    # Add code here to handle when the system is plugged in
+    # (maybe change cpu scaling to performance mode).  For
+    # multicore systems, make sure you set performance mode
+    # for each core!
+    #*1)
+    #       cpufreq-set -g performance
+    #       ;;
+    *)      log_unhandled $* ;;
+    esac
+    ;;
+    *)      log_unhandled $* ;;
+    esac 
+
+the acpi with the /proc interface to set a proper brightness level. a nice reference for  doing so can be found at [1].
+
+i've written a **script** in **/etc/acpi/events/default** first **but it didn't work!**
+
+**NOTE:** i did not restart acpid, this was probably the problem
+
+anyway: i integrated the events into **/etc/acpi/default.sh** instead. this is better as one can check that for syntax errors and one can experiment with it, example:
+
+first do a:
+
+    acpi_listen
+
+and then create an acpi event, as for instance pressing fn+f9 (on my elitebook) to find how the event is called (which gets generated)
+
+for instance: **pressing fn+f3** here generates a "**button/sleep SBTN 00000080 00000000**"
+
+note this down, or copy it with the mouse. then invoke the default.sh script using it as parameter, leave the cryptic numbers aside. example:
+
+    ./default.sh button/sleep
+
+if this manual invocation works (no syntax errors in default.sh reported) you can also start using the acpi event by pressing fn+f3 (instead of manually invoking the script).
+
+### the /etc/acpi/brightness.sh script
+
+
+    if [ "$1"x == "up"x ]; then
+    X=$( cat /proc/acpi/video/DGFX/LCD/brightness | grep current | awk '{print $2}')
+    Y=$(echo  "$X+20" | bc)
+    for i in `seq $X $Y`; do
+    echo $i > /proc/acpi/video/DGFX/LCD/brightness
+    done
+    fi
+    if [ "$1"x == "down"x ]; then
+    X=$( cat /proc/acpi/video/DGFX/LCD/brightness | grep current | awk '{print $2}')
+    Y=$(echo  "$X-20" | bc)
+    for i in `seq $X -1 $Y`; do
+    echo $i > /proc/acpi/video/DGFX/LCD/brightness
+    done
+    fi
+
+## the /etc/acpi/default.sh script
+
+# links
+
+
+* [1] <http://www.gentoo.de/doc/de/power-management-guide.xml>
+
+# errata
+	
+  * fixed: script path="/etc/acpi/events/brightness"  is now "/etc/acpi/brightness.sh" as it is wrong to put scripts into /etc/acpi/events/*
+
+

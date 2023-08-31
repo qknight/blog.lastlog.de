@@ -1,0 +1,110 @@
+[[!summary chatGPT: Nixcloud is a hosting platform for webservices that offers various services including a cooperative editor, an app-store for third-party webservices, additional SaaS such as monitoring and DNS, and on-site deployments.]]
+[[!draft]]
+[[!specialpage]]
+
+[[!img media/nixcloud.png width=100x class="noFancy" style="float: right" ]]
+
+# what
+
+**nixcloud is a hosting platform for webservices**.
+
+# history
+
+* nixcloud was founded by:  joachim schiele (me) and paul seitz in 2017
+* with euipo trademark for europe
+* nixcloud.io / nixcloud.eu domains
+
+## private prototypes
+
+* cooperative editor
+* nixcloud.monitoring
+* nixcloud.auth
+
+# nixcloud company concept
+
+the business side of nixcloud:
+
+* **ego-centric view of services** `subscription` and `free`
+
+  looks similar to github.com/qknight/ and we'll also have organizations
+
+  * <https://nixcloud.io/qknight/myservice>
+  * <https://nixcloud.io/qknight/mynamespace/mediawiki1>
+
+* **a cooperative editor** `free`
+
+  used by multiple users writing nix, adapting upstream projects
+
+* **app-store + hosting** `subscription`
+
+   we promote third party webservices:
+
+   * **nixcloud-webservices** `free`
+
+       * [nixcloud-webservices](https://github.com/nixcloud/nixcloud-webservices)
+
+         * [nixcloud.email](https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.email.md)
+         * [nixcloud.TLS](https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.TLS.md)
+         * [nixcloud-container](https://github.com/nixcloud/nixcloud-container)
+
+  used with:
+
+  * **programming nix files directly**
+
+     for technical users
+
+  * **a convenience abstraction html form field abstracting the nixos option system**
+
+     for non-technical users
+
+* **additional SaaS** `subscription`
+
+   * **nixcloud.monitoring**
+
+       this is from the working prototype code:
+
+     ~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+     nixcloud.monitoring = {
+       enable = true;
+       apiKey = "4d3c5jdl-3kv6-6c92-43c2-bddcd6949e41";
+         targets = {
+           active = {
+             check_ssl_cert = [
+               {
+                  host = "example.org";
+               }
+             ];
+             check_http = [
+               {
+                 host = "nixcloud.io";
+                 url = "/main/en";
+                 contains = "individual";
+               }
+             ];
+           };
+         };
+       };
+     };
+     ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   * **nixcloud.dns**
+
+     a complete nix abstraction of dns which automates the dns setup for the service
+
+   * **nixcloud.auth**
+
+      oauth2 service which can be used by all webapps we feature. one can pick to use:
+
+      * auth.nixcloud.io
+      * self-hosted instance
+
+* **on site deployments** `subscription`
+
+   subscription service for on-site hosting with automatic updates
+
+   * self hosted (aws, gcp, azure, ...)
+   * on-premise (nixos host or VM)
+
+# summary
+
+thanks for your time! ❤

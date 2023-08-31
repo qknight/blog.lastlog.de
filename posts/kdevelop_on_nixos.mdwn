@@ -1,0 +1,45 @@
+[[!meta date="2011-10-17 22:18"]]
+[[!tag linux packagemanager usability visualization]]
+
+[[!summary chatGPT: This post discusses two issues faced when using NixOS, including problems with importing a Makefile-based project in KDevelop and issues with auto-completion due to the absence of /usr/include in NixOS. The post provides some updates and links to potential solutions for these problems]]
+
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+
+# issue 1
+
+
+i've adapted to a nixos only desktop and i'm facing new problems every day, lately i wanted to use kdevelop but it wasn't able to import a normal 'Makefile'based project. next i installed lots of packages somehow mentioned at [1]. still that alone didn't help so i ran:
+
+
+    kbuildsycoca4
+
+
+kbuildsycoca4 is a utility which generates a cache of .desktop files and such to be used by programs. PovAddict#kde-devel@irc.freenode.net recommended to set KDEDIRS correctly because when doing so running kbuildsycoca4 manually wouldn't be neccessary.
+
+not sure how to solve this problem correctly yet but in case i find out i will add it to this post.
+
+**update: 30.06.2012**
+
+in /etc/nixos/configuration.nix write:
+
+    environment.systemPackages = with pkgs; [
+      kde4.kdevelop
+    ];
+
+**after nixos-rebuild kdevelop will have makefile and cmake support.** however, at least for proper cmake support, needed when kdevelop should build the project, you will need to **prepare a decent environment where all the needed programs and dependencies are listed**, see [2]
+
+
+# issue 2
+
+
+another point which bugs me is that auto-completion doesn't work correctly as there is no such thing as /usr/include on nixos as one might expect when coming from a different linux distribution. didn't find a solution here yet either...
+
+**update: 30.06.2012 - found a nice solution to this problem, just have a look at [2] as well**
+
+
+# links
+
+
+* [1] <http://techbase.kde.org/Projects/KDevelop4/HowToCompile>
+* [2] <http://invalidmagic.wordpress.com/2012/03/23/developing-software-using-nixos/>

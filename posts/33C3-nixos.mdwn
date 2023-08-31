@@ -1,0 +1,18 @@
+[[!meta date="2016-12-27 11:35"]]
+[[!tag nixos 33C3 kongress]]
+
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!summary nixos assembly on 33C3 kongress]]
+
+# nixos assembly
+
+[[!img media/nixos-33C3.jpg class="noFancy"]]
+
+if you want to join our nixos sprint, you can find our assembly here:
+
+[[!img media/nixos-33C3-map.png class="noFancy"]]
+
+hope to see you!
+
+qknight
+

@@ -1,0 +1,192 @@
+[[!summary creating chatGPT summaries for pankat articles using the api and go]]
+[[!meta date="2023-08-15 09:47"]]
+[[!tag go chatGPT pankat]]
+
+# motivation
+
+for **$0.19 i've used chatGPT API to create the summary for ~94 articles and automatically insert them.**
+
+the program to do so, which is below, was written in golang with copilot.
+
+# the script
+
+this scans all articles and picks those without a summary. it then uses the chatGPT API to create a summary and inserts it into the article.
+
+~~~~~~~~~~~~~~~~~~~~~~~~ {.go}
+package main
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"github.com/sashabaranov/go-openai"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func main() {
+	var articles []string
+	FindArticles(&articles, "C:\\Users\\qknight\\Desktop\\Projects\\pankat\\documents\\blog.lastlog.de\\posts\\")
+	for _, article := range articles {
+		fmt.Println("-> " + article)
+	}
+	//var articles1 []string
+	//articles1 = append(articles1, "C:\\Users\\qknight\\Desktop\\Projects\\pankat\\documents\\blog.lastlog.de\\posts\\tcp.mdwn")
+	ProcessArticles(&articles)
+}
+
+func FindArticles(articles *[]string, d string) {
+	// Read the current directory
+	dir, err := os.ReadDir(d)
+	if err != nil {
+		fmt.Println("Error reading directory:", err)
+		return
+	}
+
+	// Loop through the files in the directory
+	for _, file := range dir {
+		// recursive
+		if file.IsDir() {
+			full := filepath.Join(d, file.Name())
+			FindArticles(articles, full)
+		}
+
+		// Check if the file is a markdown file
+		if strings.HasSuffix(file.Name(), ".mdwn") {
+			// print absolute file path
+			full := filepath.Join(d, file.Name())
+			//fmt.Println(full)
+			// check if it contains the string "[[!summary"
+			ff, err := os.Open(full)
+			defer ff.Close()
+			if err != nil {
+				continue
+			}
+			scanner := bufio.NewScanner(ff)
+			found := false
+			for scanner.Scan() {
+				if strings.Contains(scanner.Text(), "[[!summary") {
+					fmt.Println("Found summary in " + full)
+					fmt.Println(scanner.Text())
+					found = true
+					continue
+				}
+			}
+			// Add the file to the list of articles
+			if found == false {
+				*articles = append(*articles, full)
+			}
+		}
+	}
+}
+
+func ProcessArticles(articles *[]string) {
+	for _, article := range *articles {
+		// Read the content of the file
+		content, err := readFileContents(article)
+		if err != nil {
+			fmt.Println("Error reading file contents:", err)
+			continue
+		}
+
+		// Make an API request to OpenAI
+		summary, err := createSummary(apiKey(), content)
+		if err != nil {
+			fmt.Println("Error making API request:", err)
+			continue
+		}
+
+		// Print the summary from the API response
+		fmt.Println("Summary:", summary)
+
+		// Write the summary to the file
+		err = writeSummaryToFile(article, summary)
+		if err != nil {
+			fmt.Println("Error writing summary to file:", err)
+			continue
+		}
+	}
+}
+
+func writeSummaryToFile(filename, summary string) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+
+	// read complete file into a string
+	var content string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		content += scanner.Text() + "\n"
+	}
+	file.Close()
+	newArticle := summary + "\n" + content
+
+	file1, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer file1.Close()
+	// write to file
+	_, err = file1.WriteString(newArticle)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func readFileContents(filename string) (string, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	var content string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		content += scanner.Text() + "\n"
+	}
+
+	return strings.TrimSpace(content), nil
+}
+
+func createSummary(apiKey, content string) (string, error) {
+	client := openai.NewClient(apiKey)
+	p := fmt.Sprintf("Create a one line summary, without linebreaks, of the content below using the format [\[!summary xxx]] where xxx is the summary text:\n%s", content)
+
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    openai.ChatMessageRoleUser,
+					Content: p,
+				},
+			},
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("ChatCompletion error: %v\n", err)
+		return "", err
+	}
+
+	return resp.Choices[0].Message.Content, nil
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+this is really quick'n'dirty code since it only needs to execute once.
+
+# summary
+
+the result can be found at <https://lastlog.de/blog/timeline.html> and the summaries are starting with *chatGPT*.
+
+interestingly for three articles it did not add the closing ]] so the summary was broken. but that comes with using ML i guess, it never archives 100% accuracy.
+
+thanks for the great library at <https://github.com/sashabaranov/go-openai>!

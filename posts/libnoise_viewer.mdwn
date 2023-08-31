@@ -1,0 +1,56 @@
+[[!summary chatGPT: The author discusses their experience with using multi-threading and the QThread class in the libnoise-viewer software, as well as how they applied a color-gradient to visualize a heightmap. They also mention their positive experience with migrating to cmake and using the KDevelop IDE.]]
+[[!meta date="2010-01-12 17:19"]]
+[[!tag cmake linux qt technology usability visualization]]
+
+# motivation
+
+i've just fixed most bugs in **libnoise-viewer** [1] and the software is really usable now. it features a **QGraphicsScene** and a **QGraphicsView** and to make it faster i've used some it::blackmagic called threads. Actually i used **QThread** and this was my first real use of multi-threading and it works pretty well. When i scroll the planar area small tiles are generated, two at a time are dispatched so that a dual core system is 'saturated' cpu load wise.
+
+[[!img media/ridgedmulti1.png alt="" size=600x]]
+
+This viewer uses the '**noise::module::RidgedMulti**' module to generate the surface in a black/white fashion. All i did was to apply a color-band according to the relative height. As you might have seen already, there is a black/white vs color toggle. Using this you can visualize the heightmap.
+
+
+    if (job.colorstate) {
+    renderer.ClearGradient ();
+    
+    renderer.AddGradientPoint ( 1.000000, utils::Color (0, 90, 0, 255));
+    renderer.AddGradientPoint ( 0.740000, utils::Color (0, 129, 0, 255));
+    renderer.AddGradientPoint ( 0.700000, utils::Color (0, 190, 0, 255));
+    renderer.AddGradientPoint ( 0.650000, utils::Color (0, 250, 0, 255));
+    renderer.AddGradientPoint ( 0.600000, utils::Color (120, 250, 250, 255));
+    renderer.AddGradientPoint ( 0.390000, utils::Color (20, 120, 200, 255));
+    renderer.AddGradientPoint ( 0.340000, utils::Color (20, 50, 250, 255));
+    renderer.AddGradientPoint ( 0.200000, utils::Color (0, 0, 120, 255));
+    
+    renderer.EnableLight();
+    renderer.SetLightContrast (3.0); // Triple the contrast
+    renderer.SetLightBrightness (2.0); // Double the brightness
+    }
+
+
+The rendering speed is very good. But see yourself (the upload of the ogv video to wordpress media didn't work, so i host it somewhere else).
+
+<video controls>
+  <source src="http://blog.lastlog.de/posts/media/libnoise-viewer.ogv">
+  Your browser does not support the video tag.
+</video>
+
+If you want to visualize other '**libnoise graphs**' you can edit the sourcode (see **renderThread.cpp**) , all you need is to add 3 or 5 lines of code:
+
+    module::RidgedMulti myModule;
+    myModule.SetOctaveCount (job.octave);
+    myModule.SetFrequency (job.frequency);
+
+Again: if you ever have to use threads, use QThreads since **signals/slots are threadsafe** (coming with qt ~4.2 if i recall correctly) communication between the threads is very easily done using the signals/slot mechanism, which means using the event loop.
+
+I need to say, this is the 3rd project i've **migrated to cmake** and to do that i needed about **30-50 minutes** since i also cleaned up the sourcode and did some other things as renaming of files and re factoring of class names.
+
+I've also updated to **=dev-util/kdevelop-3.9.97 **this release fixed all the crashes the previous release had and i absolute love this ide. Currently i can't think of ever using something else! The cmake integration is very good and makes a lot of fun using it. Renaming of classes or member functions as well as object's names works like a charm! ****
+
+**Unlike other KDE components kdevelop 3.9.97 works reliably stable for me!**
+
+# links
+
+* [1] <http://github.com/qknight/libnoise-viewer>
+* [2] <http://github.com/qknight/libnoise>

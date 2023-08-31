@@ -1,0 +1,79 @@
+[[!summary chatGPT: The author describes their setup for experimenting with deployment by installing virtual Linux distributions using Virtualbox, solving networking issues and enabling internet access for all hosts using masquerading and configuring a DHCP server.]]
+[[!meta date="2010-12-21 03:16"]]
+[[!tag gentoo packagemanager]]
+
+to **experiment with deployment** i've installed several linux distributions using **virtualbox** (based on iso images). i had some problems with the networking but today i got rid of the complicated setup, used previously.
+
+# what i want
+    
+    |-------------------------------------------|
+    |       fedora      debian       windows    |
+    |  10.0.0.100    10.0.0.101   10.0.0.102    |
+    |          |          |          |          |
+    |          --------|||||||-------|          |
+    |                     | switch              |
+    |---------------------|---------------------|
+                          |
+                          | vboxnet0 10.0.0.1/24
+
+
+virtualbox adds the **vboxnet0** (**host only network adapter**) using the preferences dialog in the main gui. additionally i added masquerading, using a external script, in order to have all hosts inside the 'host only networking' accessing the internet. the switch is created by virtualbox automatically when selecting 'host only networking' using **vboxnet0** per **appliance**.
+
+i was using '=app-emulation/virtualbox-ose-3.2.10'.
+
+
+# how to do it
+
+
+the setup is quite easy, i just wanted to write it down anyway in case it is of help for others.
+
+
+# masquerading
+
+
+in order to get each **virtualbox appliance connected with the internet**, masquerading is used. this is basically a one way internet connection but in my scenario there are no services provided to the outside world.
+
+
+    iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# dhcp server
+
+**as the virtualbox-built-in dhcp server did not work at all**, i decided to use =**net-misc/dhcp-3.1.2-p1** instead. so here is the configuration:
+
+    
+    dhcp.conf
+    # option definitions common to all supported networks...
+    option domain-name "example.org";
+    option domain-name-servers 10.0.0.1;
+    
+    default-lease-time 600;
+    max-lease-time 7200;
+    ddns-update-style ad-hoc;
+    
+    log-facility local7;
+    
+    subnet 10.0.0.0 netmask 255.255.255.0 {
+      option domain-name-servers 8.8.8.8;
+      range 10.0.0.10 10.0.0.200;
+      option routers 10.0.0.1;
+    }
+    
+    subnet 192.168.56.0 netmask 255.255.255.0 {
+      option domain-name-servers 8.8.8.8;
+      range 192.168.56.101 192.168.56.202;
+      option routers 192.168.56.1;
+    }
+
+
+i run this server from a script which is also started at boot time:
+
+    dhcp eth0 vboxnet0
+
+this is helpful as i can configure static IPs for known mac addresses. but also automatic assignment should be quite stable as all parameters can be tuned as used to.
+
+# the clients
+
+as mentioned already, each **client** has to be **assinged** to the '**host only network' adapter**: **vboxnet0**. most linux distributions will try to get the host address via dhcp automatically. also each host can communicated with each other, so it is easy to do maintainance stuff.
+
+**update: 2010-12-21** modified article as it's not clear why some things are done the way they are

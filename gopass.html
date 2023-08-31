@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="gopass.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>gopass</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/gopass/gopass.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="ruckig_motion_planning.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="docker_compose_vs_nixcloud.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">gopass</h1>
+    <div id="date"><p><span id="lastupdated">3 aug 2023</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gopass" class="tagbtn btn btn-primary">gopass</a></p></div>
+    <p><a href="posts/gopass/gopass.png"><img src=posts/gopass/gopass.png width="100px" alt="" style="float: right" class="noFancy"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>i need a password store with these properties:</p>
+<ul>
+<li>support for multiple OSes (android/linux/windows)</li>
+<li>versioned (git)</li>
+<li>secure (gpg)</li>
+<li>self-hosted (simple git repo with ssh access)</li>
+<li>usable in teams (using several mounts, i.e. private/company store
+for sets of passwords)</li>
+</ul>
+<p>and with <a href="https://www.gopass.pw/">gopass</a> i have all of
+these!</p>
+<p>in a nutshell, gopass uses git as backend, encrypts the passwords
+using gpg and accesses the git repo via ssh keys or passwords. the only
+downside, gopass leaks the directory structure/file names, as those are
+not encrypted.</p>
+<h2 data-number="2" id="how-i-use-it">how i use it</h2>
+<p>the documentation is all over the place and some issues are really
+hard to come by.</p>
+<p>a good start for everyday use:</p>
+<p><a href="https://woile.github.io/gopass-cheat-sheet/"
+class="uri">https://woile.github.io/gopass-cheat-sheet/</a></p>
+<h3 data-number="2.1" id="backend">backend</h3>
+<p>i’m using <a href="https://github.com"
+class="uri">https://github.com</a> repository:</p>
+<ul>
+<li>create github.com/yourname/yourrepo and make it private so not
+everybody can clone the repo</li>
+<li>add <a
+href="https://github.com/yourname/yourrepo/settings/keys">Deploy
+keys</a>, generated in the android app</li>
+</ul>
+<h3 data-number="2.2" id="windows">windows</h3>
+<p>i used <em>chocolatey</em> as described in the installation manual
+at:</p>
+<p><a
+href="https://github.com/gopasspw/gopass/blob/master/docs/setup.md#windows"
+class="uri">https://github.com/gopasspw/gopass/blob/master/docs/setup.md#windows</a></p>
+<pre><code>choco install gopass</code></pre>
+<h3 data-number="2.3" id="android">android</h3>
+<p><a
+href="https://github.com/android-password-store/Android-Password-Store"
+class="uri">https://github.com/android-password-store/Android-Password-Store</a></p>
+<p><a href="posts/gopass/android-password-store.png"><img src=posts/gopass/android-password-store.png width="200px" alt="" style="float: none" class="noFancy"></a></p>
+<p>the settings:</p>
+<pre><code>repository URL: git@github.com/yourname/yourrepo.git
+authentication mode: ssh key</code></pre>
+<p>the password store app syncs on each change, which is nice.</p>
+<h3 data-number="2.4" id="linux">linux</h3>
+<p>simply install gopass, git and gpg</p>
+<h2 data-number="3" id="yet-unsolved-issues">yet unsolved issues</h2>
+<ul>
+<li>otp integration (still use andotp, need to check <a
+href="https://github.com/gopasspw/gopass/blob/master/docs/features.md#adding-otp-secrets">gopass
+otp</a>)</li>
+<li>ssh cert management (is there a gopass-agent?)</li>
+<li>is there iphone support?</li>
+</ul>
+<h2 data-number="4" id="conclusion">conclusion</h2>
+<p>i wish i had moved to gopass / password store years ago.</p>
+<p><strong>especially sharing passwords with a team, this is an ideal
+solution</strong>. major benefit is that one does not have to use ntfs
+file mounts, to store keepassx databases and can basically update the
+local copy of the db with <code>gopass sync</code> and then be offline
+for a while and still able to use it daily.</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/gopass/gopass.mdwn" title="posts\gopass\gopass.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

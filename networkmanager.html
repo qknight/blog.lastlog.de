@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="networkmanager.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>networkmanager</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/networkmanager.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="process_control_on_logout.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="ATI_M22_mobility_radeon_x300_and_external_monitors.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">networkmanager</h1>
+    <div id="date"><p><span id="lastupdated">25 oct 2009</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p>network management on linux differs from distro to distro. trying
+various of these i liked what SuSE did over the year. they included a
+<strong>network manager like applet ‘knetwork’</strong> with kde 3 which
+even included isdn (ppp) links.</p>
+<p>gentoo has it’s own network configuration which is quite static using
+/etc/conf.d/net. i use this for static setups but i’ve written my own
+scripts for my laptop (aka desktop) machine. just one example:</p>
+<h2 data-number="2"
+id="wpa_supplicant_generic_dhcp_ath0">wpa_supplicant_generic_dhcp_ath0</h2>
+<pre><code>#!/bin/bash -v
+echo &quot;sh /root/config/wpa_supplicant_generic_dhcp_ath0&quot; &gt; /root/last-lan.sh
+if [ -f /var/run/dhcpcd-ath0.pid ]; then
+rm /var/run/dhcpcd-ath0.pid
+fi
+killall dhcpcd
+killall wpa_supplicant
+killall vpnc
+ifconfig br0 down
+ifconfig ath0 down
+ifconfig eth0 down
+brctl delif br0 ath0
+brctl delif br0 eth0
+brctl delbr br0
+
+rmmod ath5k
+modprobe ath5k
+#iw reg set EU #does not work
+sleep 1
+ifconfig ath0 up
+wpa_supplicant -B -dd -D wext -i ath0 -c /etc/wpa_supplicant.conf
+route del default
+#dhcpcd ath0
+iptables -t nat -A POSTROUTING -o ath0 -j MASQUERADE
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+ethtool -s eth0 speed 100
+dhcpcd ath0
+#dhclient ath0
+
+cp /etc/resolv.conf /etc/resolv.conf.dnsmasq
+echo &quot;nameserver 127.0.0.1&quot; &gt; /etc/resolv.conf
+ifconfig eth0 10.0.0.1/24 up
+dhcpd eth0</code></pre>
+<p>although my scripts work very well (even when i restart my computer
+the last script is automatically run from /etc/init.d/local) this setup
+has it drawbacks in usability.</p>
+<p><strong>benefits</strong>:</p>
+<ul>
+<li>starts a dhcpd instance, so my laptop acts as a dhcp server (not
+included)</li>
+<li>my local dnsmasq installation can be accessed from the eth0
+subnet</li>
+<li>setup for eth0 is automatically made &amp; routing is enabled by
+default</li>
+<li>i can adapt to new networks quite fast with yet another config file
+instantiation</li>
+<li>once bridging is working for eth0|ath0 i can increase usability
+since i can transparently use either wireless lan or ethernet, say for
+backups the later might be much faster without having to kill all
+connections. (not included)</li>
+</ul>
+<p><strong>drawbacks</strong>:</p>
+<ul>
+<li>although networks using none|wpa1|wpa2 it tends to have problems
+with vpn (i wrote another script)</li>
+<li>it lacks usability, no monitoring what happens (in case of an issue
+i run it on a shell)</li>
+<li>on bad connections with wifi the <strong>dhcp step fails quite some
+times</strong>, running the script again will result in (loss of
+time)</li>
+<li>it reloads the wireless lan driver (helpful when i was using kismet
+for finding new networks), still this might not be necessary all the
+time (loss of time)</li>
+<li>bad in regards to hot plugging (and therefore automation) after
+inserting a wireless lan usb stick (or similar)</li>
+<li>my scripts require a <strong>static interface naming
+scheme</strong>, gentoo provides this by default:
+<strong>/etc/udev/rules.d/70-persistent-net.rules</strong></li>
+</ul>
+<p>i considered NetworkManager (NM). i like most of it’s technology as
+for instance the <strong>DBUS</strong> interface it uses is probably the
+best way one could implement something like NM. i also like the
+integration into gentoo but this came pretty late (ubuntu was the first
+distro which had quite acceptable NM support).</p>
+<p>but NM does a very bad job if things don’t work. there is no
+debugging possible. example:</p>
+<ul>
+<li>NM using WPA2 needs to create a wpa_supplicant.conf on the fly
+before executing wpa_supplicant. i did not find any way to see this file
+anywhere</li>
+<li>NM won’t help me to see wpa_supplicant errors</li>
+<li>NM will show the signal power if i’m connected to a certain network.
+this is limited to one interface in general. what about several wifi
+cards? what about bluetooth links?</li>
+<li>NM lacks a graphical interface (or any interface at all) for
+debugging what is going on</li>
+</ul>
+<p>this made me think about network and interface usage in general. i’m
+using many tools for years now as:</p>
+<ul>
+<li><strong>ip</strong> - for ipv4/ipv6 interface configuration &amp;
+routing</li>
+<li><strong>dhcpcd/dhclient </strong>(managing dhcp address
+automation)</li>
+<li><strong>wpa_supplicant</strong> (wpa|wpa2|EAP)</li>
+<li><strong>vpnc</strong> (instead of cisco vpn)</li>
+<li><strong>dns</strong> (resolv.conf / dnsmasq) (openresolv is on the
+agenda, didn’t have time yet)</li>
+</ul>
+<p>but these tools although relying on each other are monolithic and
+static software monsters. if one wants to understand what networks are
+all about it is one thing: <strong>dynamics in every aspect</strong></p>
+<p>the next graph shows a ‘network grammar’ which describes the possible
+dependencies or how one can stack various programs:</p>
+<p><a href="media/blog-lastlog-de-networkmanager.png"><img src=media/blog-lastlog-de-networkmanager.png alt="" caption="network grammer" size=800x></a></p>
+<p>but on ‘<strong>run time</strong>’ you will end up in a
+‘<strong>state graph</strong>’ with every application somehow connected
+to others in various ways. states are also triggered on timeouts (for
+example when the ‘<strong>dhcp server</strong>’ <strong>wasn’t
+accessible</strong> by the local dhclient one is forced to take action).
+now let’s look how the grammar applies on ‘run time’:</p>
+<p><a href="media/blog-lastlog-de-networkmanager2.png"><img src=media/blog-lastlog-de-networkmanager2.png alt="" caption="network state graph" size=800x></a></p>
+<p>the two previous graphics also demonstrate the stacking capabilities.
+looking at the grammar makes this obvious. (the <strong>grammar</strong>
+and the <strong>flow graph</strong> are far from complete but illustrate
+the basic concept).</p>
+<ul>
+<li><p>if someone types ‘<strong>ip l set eth0 down</strong>’ all
+connections regarding eth0 as source or target are removed as well es
+default or specialized routes over (through) that interfaces are dropped
+without being restored on ‘ip l set eth0 up’. example</p>
+<pre><code># ip l set eth0 up
+# tcpdump -i eth0 &amp;
+[1] 5866
+listening on eth0, link-type EN10MB (Ethernet), capture size 96 bytes
+
+# ip l set eth0 down
+tcpdump: pcap_loop: recvfrom: Network is down
+0 packets captured
+0 packets received by filter
+0 packets dropped by kernel
+[1]  + exit 1     tcpdump -i eth0</code></pre>
+<p><strong>HINT:</strong> dhclient for instance keeps running if the
+interface goes down</p>
+<p><strong>HINT:</strong> ssh only detaches the eth0 interface from
+being used and on up reattaches it</p>
+<p><strong>SOURCE:</strong> equery b ip -&gt; sys-apps/iproute2-2.6.28
+(/sbin/ip)</p>
+<pre><code>iproute2-2.6.28::iplink.c shows:
+} else if (strcmp(*argv, &quot;down&quot;) == 0) {
+req-&gt;i.ifi_change |= IFF_UP;
+req-&gt;i.ifi_flags &amp;= ~IFF_UP;</code></pre></li>
+</ul>
+<p>this triggers the kernel in some way which then signals the change to
+every process using this interface.</p>
+<ul>
+<li>in a state graph every object can perform an action considered best
+suited by the affected object. this helps to delegate some jobs to
+daemons (for example dhcpd) but every object affects the ‘<strong>state
+machine</strong>’</li>
+<li>the protocol for interaction is <strong>DBUS</strong> (there is a
+wpa_supplicant dbus interface, as well as one for dhcpclient usage)</li>
+</ul>
+<p>maybe this idea inspires someone to rewrite NM with usability (in the
+sense of <strong>automation</strong> and <strong>debugging
+feedback</strong>) in mind. i think NM is on the right track
+already.</p>
+<p>NM should:</p>
+<ul>
+<li><p>show the connection state: either layer1 connection/layer2
+connection/layer 3 connection</p></li>
+<li><p>link quality per interface (wlan/bluetooth)</p>
+<p><a href="media/blog-lastlog-de-network-meter.png"><img src=media/blog-lastlog-de-network-meter.png alt="" caption="network meter"></a></p></li>
+<li><p>have a debug console which can be triggered</p></li>
+<li><p>should have a ‘in detail’ network information dialog</p>
+<p><a href="media/blog-lastlog-de-network-information.png"><img src=media/blog-lastlog-de-network-information.png alt="" caption="network information"></a></p></li>
+<li><p>should generate a wpa_supplicant.conf which can be viewed (so
+that one can see what the on-the-fly config file generator has
+created)</p></li>
+<li><p>should pipe the output of all involved processes to a debug line,
+so that one can sort output per process with a global time line</p></li>
+<li><p>regarding the ‘grammar’ above one can think of a ‘<strong>pyramid
+of services</strong>’. if one of the services in the middle fails all
+above have to be restarted (or at least signaled on change). say vpnc
+fails, we need to reconnect it with all the things one has to do -&gt;
+removing the current route, reset a new one (probably the same) and
+prior to that we have to reconnect as soon as the service is known to
+fail. vpnc for example fails quite some times since. this ‘pyramid of
+services’ should be visible to the user and a user ‘must have’ the
+possibility to see the status of every ‘floor’ in this pyramid. if layer
+3 connection is working, l3 must light up. if a user wants to restart
+all services above layer 3 there must be a ‘restart all services above’
+button. currently in NM one has to do all the steps from bottom
+up.</p></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/networkmanager.mdwn" title="posts\networkmanager.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

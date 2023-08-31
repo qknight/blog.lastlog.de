@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="qgraphicsscene_used_as_a_qabstractitemview_ii.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>qgraphicsscene used as a qabstractitemview ii</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/qgraphicsscene/qgraphicsscene_used_as_a_qabstractitemview_ii.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="the_future_of_the_internet.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="ogre_3d.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::qgraphicsscene" title="article series qgraphicsscene" class="seriesbtn btn btn-primary">qgraphicsscene</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="qgraphicsscene_used_as_a_qabstractitemview.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="qgraphicsscene_used_as_a_qabstractitemview_iii.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">qgraphicsscene used as a qabstractitemview ii</h1>
+    <div id="date"><p><span id="lastupdated">2 feb 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::qt" class="tagbtn btn btn-primary">qt</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p>Again some thoughts about this complex topic, but this time with
+content not as last time when i accidentally published an unfinished
+article - i’m very sorry for that.</p>
+<h2 data-number="2"
+id="updated-diagram-illustrating-the-qgraphicsscene-used-as-a-qabstractitemmodel">updated
+diagram illustrating the QGraphicsScene used as a
+QAbstractItemModel</h2>
+<p>the primary difference to the last one i published is that there is
+the other view i’ve integrated into the automate project - the
+‘TreeView’</p>
+<p><a href="media/graphicssceneasabstractitemview.png"><img src=media/graphicssceneasabstractitemview.png size=800x></a></p>
+<h2 data-number="3"
+id="extending-qgraphicsitem-to-be-used-with-a-qabstractitemmodel">extending
+QGraphicsItem to be used with a QAbstractItemModel</h2>
+<p><strong>Q:</strong> what is this section about (in a few words)?</p>
+<p><strong>A:</strong> now as <strong>QGraphicsItem</strong> is used to
+represent <strong>QModelIndex</strong>’es they need a way to query data
+from the Model, this is how it can be done</p>
+<p>in qt4 there are a few <strong>different classes using QGraphicsItem
+as a base class</strong>. originally i wanted to extend the items with
+<strong>virtual inheritance</strong> [1] but then the ‘<strong>dreaded
+diamond</strong>’ problem showed me that it can’t be done since i could
+NOT change the way a <strong>QGraphicsTextItem</strong> would inherit
+from <strong>QGraphicsItem</strong> (read: i couldn’t add the keyword
+virtual between</p>
+<pre><code>&#39;public **_here_ **QGraphicsItem&#39;</code></pre>
+<p>and if that can’t be done the virtual inheritance can’t be used). of
+course one could now change the <em>qt core library</em> but that would
+be wrong ‘in concept’ since my application should be able to be used
+with any version (for example qt 4.4) not just one single version i’ve
+changed.</p>
+<p>so after hours of figuring i came up with the <strong>class
+GraphicsItemModelExtension</strong> [2], it makes use of pure virtual
+functions and since <strong>QGraphicsItem</strong>(s) do have a
+<strong>data</strong>() and <strong>setData</strong>() function which is
+exactly the same function name used with the Model i had to rethink the
+function calls. now data() and setData() for the Model used from a
+QModelIndex via GraphicsItemModelExtension are named
+<strong>modelData</strong>()/<strong>setModelData</strong>()
+instead.</p>
+<p><strong>but what makes you want to use the GraphicsitemModelExtension
+class?</strong> in contrast to my previous attempt it stores the
+QPersistentModelIndex and you don’t have to rely on an existing scene()
+which is then <strong>casted from a QGraphicsScene into a
+GraphicsScene</strong> which then would provide a
+<strong>Model</strong>* which finally would be used to query data.</p>
+<p>the basic concept after adding an item to the QGraphicsScene is that
+one needs to query data right in the constructor, for instance you need
+various properties as ‘label’ or ‘color’. since the normal item now has
+index() it can instantly (even when not added into a scene() yet) query
+the Model for data. <strong>NOTE:</strong> right after an item is added
+to a QGraphicsScene it does NOT have a scene() yet, if you try to query
+scene() from a <strong>constructor</strong> of a QGraphicsItem you
+<strong>WILL get NULL</strong> which was a big flaw in my previous
+implmenetaions. but now that problem is gone and because of the nature
+of pure virtual functions (yes QGraphicsItemModelExtenstion is actually
+an abstract base class) it helps to design new custom GraphicItems.</p>
+<h2 data-number="4"
+id="again-why-i-used-properties-instead-of-another-hierarchy-layer">again
+‘why i used properties instead of another hierarchy layer’</h2>
+<p>in the automate [3] project i had a TreeView which does have several
+columns and one can display one property per column, this is done by the
+data(..) implementation and is quite easy, just see my code. however in
+the spring random map generator project [4] i need the properties not in
+one row per column but instead all properties should be top down
+with:</p>
+<pre><code>module name
+propertyName propertyValue (displayed by a delegate)
+propertyName propertyValue (displayed by a delegate)
+propertyName propertyValue (displayed by a delegate)
+...</code></pre>
+<p><a href="media/treeview.png"><img src=media/treeview.png size=400x></a></p>
+<p>so i can’t use the data(..) function as i did last time. now i need
+one QModelIndex per row but my model currently does not have properties
+as QModelIndex’es at all. so what should i do? i’m still not sure about
+this… but as soon as i found a nice solution i will write about it.</p>
+<h2 data-number="5" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="http://www.parashift.com/c++-faq-lite/multiple-inheritance.html"
+class="uri">http://www.parashift.com/c++-faq-lite/multiple-inheritance.html</a></li>
+<li>[2] <a
+href="http://github.com/qknight/springrts.com-random-map-generator/blob/master/src/frontend/GraphicsItemModelExtension.cpp"
+class="uri">http://github.com/qknight/springrts.com-random-map-generator/blob/master/src/frontend/GraphicsItemModelExtension.cpp</a></li>
+<li>[3] <a href="http://github.com/qknight/automate"
+class="uri">http://github.com/qknight/automate</a></li>
+<li>[4] <a
+href="http://github.com/qknight/springrts.com-random-map-generator"
+class="uri">http://github.com/qknight/springrts.com-random-map-generator</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/qgraphicsscene/qgraphicsscene_used_as_a_qabstractitemview_ii.mdwn" title="posts\qgraphicsscene\qgraphicsscene_used_as_a_qabstractitemview_ii.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

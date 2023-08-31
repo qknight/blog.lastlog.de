@@ -1,0 +1,271 @@
+[[!meta date="2016-11-05 14:33"]]
+[[!tag nixos APU linux usability odroid]]
+
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!summary about running NixOS on a simple yet powerfull server: the APU]]
+
+# motivation
+
+a few months back i've replaced the [odroid XU4](http://www.hardkernel.com/main/products/prdt_info.php?g_code=G143452239825) with this [APU 2c4 board](http://www.apu-board.de/produkte/apu2c4.html).
+
+[[!img media/APU2C4.jpg title="data mining setup" class="noFancy"]]
+
+## installing nixos
+
+first have a look into the [apu2 manual](http://www.apu-board.de/apu2.pdf).
+
+since there is no VGA/DVI output but only a RS232 serial interface we need to use that:
+
+1. serial cable
+
+    out of simplicity i soldered one myself, the pins are:
+
+        pin 2 to pin 3
+        pin 3 to pin 2
+        pin 5 to pin 5 (GND)
+
+    i've been using this with a USB 2 RS232 converter
+
+        # lsusb
+        Bus 003 Device 003: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+
+2. connecting via serial console:
+
+        picocom /dev/ttyUSB0 -b 115200
+
+3. nixos boot cd
+
+    download the **nixos-minimal-16.03.714.69420c5-x86_64-linux.iso** and use **unetbootin** to deploy it to an USB stick. afterwards mount the first partition of the USB-stick and append this to the syslinux.cfg file's kernel command line:
+        
+        console=ttyS0,115200n8
+
+    <div class="alert alert-info" role="alert">
+    <strong>info: </strong>
+    using the serial console you can see the GRUB output, see the kernel's output after boot and finally get a shell.
+    </div>
+
+4. booting from the USB stick
+
+     the **apu 2c4** features corebios and the process is straight forward, just hit **F10** and select the USB stick
+
+5. nixos installation
+
+    basically follow the [nixos manual](https://nixos.org/nixos/manual/index.html#sec-installation)
+
+    <div class="alert alert-info" role="alert">
+    <strong>info: </strong>
+    but don't forget to include this line in `configuration.nix`:
+
+        boot.kernelParams = [ "console=ttyS0,115200n8" ];
+
+    </div>
+
+# /etc/nixos/configuration.nix                                                     
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix }
+# Edit this configuration file to define what should be installed on
+# your system.  Help is available in the configuration.nix(5) man page
+# and in the NixOS manual (accessible by running ‘nixos-help’).
+
+{ config, pkgs, ... }:
+
+let
+  pw = import ./passwords.nix;
+in
+# setfacl -R -m u:joachim:rwx /backup
+
+{
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+    ];
+
+  # Use the GRUB 2 boot loader.
+  boot.loader.grub.enable = true;
+  boot.loader.grub.version = 2;
+  # Define on which hard drive you want to install Grub.
+  boot.loader.grub.device = "/dev/sda";
+
+  boot.kernelParams = [ "console=ttyS0,115200n8" ];
+
+  networking = {
+    hostName = "apu-nixi"; # Define your hostname.
+    bridges.br0.interfaces = [ "enp1s0" "wlp4s0" ];
+    firewall = {
+      enable = true;
+      allowPing = true;
+      allowedTCPPorts = [ 22 ];
+      #allowedUDPPorts = [ 5353 ];
+    };
+
+  };
+
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  #Select internationalisation properties.
+  i18n = {
+    consoleFont = "Lat2-Terminus16";
+    consoleKeyMap = "us";
+    defaultLocale = "en_US.UTF-8";
+  };
+
+  security.sudo.enable = true;
+
+  programs.zsh.enable = true;
+  users.defaultUserShell = "/run/current-system/sw/bin/zsh";
+
+  services = {
+    nscd.enable = true;
+    ntp.enable = true;
+    klogd.enable = true;
+    nixosManual.enable = false; # slows down nixos-rebuilds, also requires nixpkgs.config.allowUnfree here..?
+    xserver.enable = false;
+
+    cron = {
+      enable = true;
+      mailto = "js@lastlog.de";
+      systemCronJobs = [
+        "0 0,8,16 * * * joachim cd /backup/; ./run_backup.sh"
+        #*     *     *   *    *            command to be executed
+        #-     -     -   -    -
+        #|     |     |   |    |
+        #|     |     |   |    +----- day of week (0 - 6) (Sunday=0)
+        #|     |     |   +------- month (1 - 12)
+        #|     |     +--------- day of month (1 - 31) 
+        #|     +----------- hour (0 - 23)
+        #+------------- min (0 - 59)
+      ]; 
+    };  
+  };  
+
+  # Set your time zone.
+  # time.timeZone = "Europe/Amsterdam";
+
+  # List packages installed in system profile. To search by name, run:
+  environment.systemPackages = with pkgs; [
+    borgbackup
+    bridge-utils
+    pciutils
+    openssl
+    ethtool
+    #borg
+    iotop
+    cryptsetup
+    parted
+    pv
+    tmux
+    htop
+    git
+    dfc
+    vim
+    wget
+    linuxPackages.cpupower
+    powertop
+    usbutils
+    ethtool
+    smartmontools
+    nix-repl
+    manpages
+    ntfs3g
+    lsof
+    iptraf
+    mc
+    hdparm
+    sdparm
+    file
+    dcfldd
+    dhex
+    inotifyTools
+    nmap
+    tcpdump
+    silver-searcher
+    #emacs
+  ];
+
+  time.timeZone = "Europe/Berlin";
+
+  # Enable the OpenSSH daemon.
+  services.openssh = {
+    enable = true;
+    permitRootLogin = "without-password";
+  };
+
+  systemd.services.hostapd.after = [ "sys-subsystem-net-devices-wlp4s0.device" ];
+
+  services.hostapd = {
+    enable = true;
+    wpaPassphrase = pw.wpaPassphrase;
+    interface = "wlp4s0";
+    ssid="flux";
+  };
+
+
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.extraUsers.joachim = {
+    isNormalUser = true;
+    uid = 1000;
+  };
+
+  # The NixOS release to be compatible with for stateful data such as databases.
+  system.stateVersion = "16.09";
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+## WD passport USB 3.0 bug
+
+with a WD passport USB 3.0 disk i can't boot the system since i hit [this bug](https://www.coreboot.org/pipermail/seabios/2015-December/010176.html).
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+SeaBIOS (version ?-20160311_005214-0c3a223c2ee6)
+XHCI init on dev 00:10.0: regs @ 0xfea22000, 4 ports, 32 slots, 32 byte contexts
+XHCI    extcap 0x1 @ fea22500
+XHCI    protocol USB  3.00, 2 ports (offset 1), def 0
+XHCI    protocol USB  2.00, 2 ports (offset 3), def 10
+XHCI    extcap 0xa @ fea22540
+Found 2 serial ports
+ATA controller 1 at 4010/4020/0 (irq 0 dev 88)
+EHCI init on dev 00:13.0 (regs=0xfea25420)
+ATA controller 2 at 4018/4024/0 (irq 0 dev 88)
+Searching bootorder for: /pci@i0cf8/*@14,7
+Searching bootorder for: /rom@img/memtest
+Searching bootorder for: /rom@img/setup
+ata0-0: KINGSTON SMS200S360G ATA-8 Hard-Disk (57241 MiBytes)
+Searching bootorder for: /pci@i0cf8/*@11/drive@0/disk@0
+XHCI port #3: 0x002202a0, powered, pls 5, speed 0 [ - ]
+XHCI port #1: 0x00021203, powered, enabled, pls 0, speed 4 [Super]
+Searching bootorder for: /pci@i0cf8/usb@10/storage@1/*@0/*@0,0
+Searching bootorder for: /pci@i0cf8/usb@10/usb-*@1
+USB MSC vendor='WD' product='My Passport 0827' rev='1012' type=0 removable=0
+call16 with invalid stack
+PCEngines apu2
+coreboot build 20160311
+4080 MB ECC DRAM
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+## documentation
+
+* [apu2-documentation](https://github.com/pcengines/apu2-documentation)
+* [coreboot](https://github.com/pcengines/coreboot/)
+* [latest BIOS versions](http://pcengines.ch/howto.htm#bios)    
+* [APU BIOS recovery chip](http://pcengines.ch/spi1a.htm)
+
+how to recover a bricked BIOS (after flashing)? on APU1 it was SPI, and there's a header, so like wires + a ch341a should do it.
+
+# wireless
+the APU i'm using also has a Mini-PCIe wireless card built and you can choose from these two cards:
+
+* [Compex WLE200NX](http://www.apu-board.de/produkte/compexwle200nx.html)
+* [Compex WLE600VX](http://www.apu-board.de/produkte/compexwle600vx.html)
+
+the access point works nicely with my android devices as well as my linux laptops.
+
+# buy the APU
+if you want to buy an APU, buy the [APU bundle](http://www.apu-board.de/produkte/apu2c4-bundle.html). 
+
+# summary
+
+the APU is runnig NixOS and is very stable and fast while using little energy. would use/buy again!

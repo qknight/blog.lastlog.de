@@ -1,0 +1,34 @@
+[[!summary chatGPT: The content discusses the upcoming wireless LAN standard 802.11s and the concept of mesh networking, highlighting the need for a centralized infrastructure before decentralization can occur in various examples, and mentioning the advantages and security issues of the 802.11s standard.]]
+[[!meta date="2009-06-06 13:54"]]
+[[!tag society technology]]
+[[!img media/decentralized_vs_centralized.gif alt="" style="float: right"]]
+
+today i thought about wireless lan an the upcoming wlan standard 802.11s [1] with the newcomer technology called ‘mesh networking’ [2], [3]. i just then realized that before you can deploy a decentralized infrastructure you have to first specify the solution using a centralized infrastructure. i give you some examples:
+
+* p2p networking uses the client/server model still but since there is no central server anymore the redundancy is given. p2p networks emerged years after the client/server paradigm was known/used the first time.
+* the internet used static routes to work (still in the ARPANET state) nowadays nobody uses that anymore since BGP/OSPF/ISIS are widly deployed among different ISPs.
+* a real world example: a company is found by a single person which does all the work. when the company is growing this person needs to outsource or delegate parts of the work to other persons. to be able to do that that person has to find a set of rules to make these steps invariant.
+* a city is found and there is one street going through it. when the city is growing the center of the city is covered by a redundant network of streets.
+
+what might be new for most users out there is the 802.11s draft for wireless lan since it is the transformation of a centralized network into a decentralized one.
+
+let's recover: in an **infrastructure network** two client nodes relay on a **access point (ap)** and all the communication is going trough that ap. client a pings client b then means: a sends the ping to client b to the ap. the ap sends the ping to client b. b then creates a ping reply to client a and sends it to the ap. the ap then relays the reply to client a. this mode has its advantages as well since it is easier to implement than what has been done in 802.11s called ad-hoc.
+
+in **ad-hoc mode** two clients can now **communicate directly**. but again they can also use the access point which is running in ad-hoc mode as well (not in infrastructure mode), to relay their data. the decision what route to take is done by a routing algorithm. as far as i know a lot of effort to get that standard working was made by the olpc developers.
+
+i'm very happy to see this standard emerging. this topology is an urgent requirement. why?
+	
+  * the network does **not** have a **single point of failure**
+  * two ad-hoc participants can exchange data with **lower sending power levels **when being near to each without interfering with others
+  * **routs are established automatically** through out the network
+
+still i see security issues since there is no pki (public key interface) for 802.11s yet. still one could use a **radius server** but this voids the idea of a decentralized network.
+
+summary: before a problem can be decentralized there must be one instance or solution of the problem in a centralized fashion.
+
+**if you find any pattern which breaks this, please let me know!**
+
+#links
+ * [1] <http://de.wikipedia.org/wiki/IEEE_802.11s>
+ * [2] <http://wiki.laptop.org/go/Mesh_Network_Details>
+ * [3] <http://de.wikipedia.org/wiki/Ad-hoc-Netz>

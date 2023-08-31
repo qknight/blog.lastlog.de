@@ -1,0 +1,304 @@
+[[!summary chatGPT: This post discusses using Nix for source deployment and binary deployment on Windows, and explores how to build a MinGW-based Nix toolchain for Windows.]]
+[[!tag nixos]]
+[[!meta date="2011-02-14 11:30"]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+# motivation
+
+searching for a '**cross platform**', '**cross distribution**' package manager, one question that arises in regards to nix is:
+
+    can nix be used for '**source deployment' and 'binary deployment**' on windows?
+
+
+in the last post i discussed how to install nix 0.16 [1] on windows but back then i could not find any working gui tool. i was not  able to compile such a tool either with the tools found in nixpkgs [2]. the problem is that the used toolchain is optimized for  posix environments (linux and others) with dependencies to X11.
+
+**how to use nix to build software for windows then? **the solution to this problem is easy: we have to extend the current toolchain (used in nixpkgs) by a new one.**
+**
+
+first, let's see what others do: other distributions already support 'cross compilers' to compile program in linux (but for windows). the drawback of such a solution is that it binds the developer to a certain distribution. so what concepts do exist, in order to build software, for windows:
+
+
+
+	
+  * **windows+cygwin (running nix inside cygwin)** using the posix toolchain (nixpkgs)
+this is already working and supported
+
+	
+  * **windows+cygwin (running nix inside cygwin)** using a different toolchain: MinGW
+this is what this blog posting is about
+
+	
+  * **using nix on any posix conform distrubtion** with a **cross compiler setup** using the MinGW toolchain
+there are some references to MinGW found in the nixpkgs already, according to developers on irc.freenode.org#nixos [10] this is used for cross compiler setups. still i could not find any mingw expression to experiment with such a cross compiler setup in nix.
+
+
+so why would i want to have **windows+cygwin+nix** with a ** native windows mingw toolchain**?
+
+
+
+	
+  * **nix can be used as a package manager for windows**
+
+	
+  * **nix does support 'source deployment' and 'binary deployment' **
+so it is a important target for developers on all platforms/distributions
+
+	
+  * **nix is not bound to any distribution in particular **
+which also makes it an excellent tool for 'cross distribution' packaging (when using nix in a prefix installation in contrast to using NIX OS)
+
+	
+  * **nix can be used to create abstract targets of all kind**
+examples: creating NSIS installers, automated software builds/tests
+
+	
+  * **nix can be used to build  'cross compiler chains'
+**this would actually be interesting for me as well (but not covered here)**
+**
+
+
+
+
+# creating a new mingw based nix toolchain
+
+
+this is not that easy, but we somehow have to** replace/extend the linux based toolchain with a MinGW toolchain** optimized for windows.
+
+
+## first: what should be supported?
+
+
+on windows, that is:
+
+
+
+	
+  * **direct hardware access** (using windows api and device drivers) / directX
+
+	
+  * using  Qt natively (**without X11**)
+
+	
+  * things like 'start menu'  shortcuts
+
+
+we will use qt 4.7 as an example how to do that.
+
+
+## how to build software for windows natively?
+
+
+first let's build software for windows, how it would be done using windows:
+
+
+
+	
+  * download the **Automated MinGW installer** (should contain gcc 4.x) at [ ](http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/)[3]
+
+	
+  * download the **qt 4.7.1 library** (i used the zip distribution for this experiment) [4]
+
+
+to build the libraries (&later the software)
+
+
+### making mingw work (native installation)
+
+
+
+
+
+	
+  1. as already mentioned, download the 'Automated MinGW installer'
+
+	
+  2. install MinGW
+
+
+NOTE: do not add anything to the global PATH, as we are going to setup multiple toolchains, this would be a source of horrible side-effects.
+
+so instead of a global PATH, we could alter the PATH used in cmd.exe on the fly (every time we start a new cmd.exe) with:
+
+
+    PATH = %PATH%;c:\mingw\bin;
+
+
+NOTE: windows does not have something like RPATH [5] (rpath  is not cmake specific but that linked page should give you an basic idea what rpath is about), that means a windows program is lost if the library (something like mingw.dll) is not found in the same directory as the binary is in. as a quick fix to the problem one could expand the PATH variable to include also the place, where the respective library is in.
+
+as we'll with the new nix-toolchain, this simple fact is very problematic.
+
+[7] provides an interesting (maybe outdated) table about how such things are handled in other distributions.
+
+
+### making qt work (using mingw, still native installation)
+
+
+so as the compiler setup is done, we need to add the qt library. download a file called qt-everywhere-opensource-src-4.7.1.zip at [5].
+
+
+
+	
+  1. **using the cmd.exe** from above (with the PATH adaption)
+
+	
+  2. **unzip** qt-everywhere-opensource-src-4.7.1.zip
+
+	
+  3. **cd qt-everywhere-opensource-src-4.7.1**
+
+	
+  4. **configure.exe**
+
+	
+  5. **make install** (will install into the same directory, but we don't care right now)
+
+
+afterwards we can execute qt programs from the cmd.exe shell. to make the examples executable from everywhere either:
+
+	
+  * (DON'T DO THAT!): **add the MinGW path and the Qt-library path to the global PATH** variable
+
+	
+  * (DON'T DO THAT!): **copy the needed dll files into EACH qt example directory** to make the examples work from everywhere (either from  cmd.exe shell or when starting from explorer.exe)
+
+	
+  * add another PATH, namely: c:\qt-everywhere-opensource-src-4.7.1\bin in the cmd.exe shell
+
+
+as a final step we test if the qt examples work (this is kind of a module test), **run any qt example from cmd.exe with the extended PATH settings applied**. as we now know how to get this toolchain working in a native environment, we can try to automate this process using nix expressions.
+
+
+## adapting this buildchain into nix expressions
+
+
+to get a working toolchain inside nix i packaged the installation of MinGW from c:\MinGW and created something like mingw.tar.bz2 for redistribution. see the nix expressions in [6] and consult the README in order to get  the nix expression to work in your cygwin environment (this time not cmd.exe anymore, instead use the cygwin shell).
+
+
+
+	
+  * winmingw.nix downloads my re-release of mingw and installs it
+
+	
+  * it also makes the tools like mingw32-make available for use inside your cygwin shell
+
+
+NOTE: make sure your cygwin (not cmd.exe) has ~/.nix-profile/bin in your PATH environment variable (example: export PATH=~/.nix-profile/bin:$PATH).
+
+
+### how to install cygwin/nix and my nix expressions on windows:
+
+
+
+
+
+	
+  1. **install a full cygwin environment** (several gb of files, use the setup.exe installer)
+or see my last post about this
+
+	
+  2. **make nix 0.16 work **
+again: see my last post about this
+
+	
+  3. use **git clone with my local repo** in [6]
+cd ~; mkdir .nixpkgs; cd .nixpkgs; git clone ...
+
+	
+  4. install winmingw: **nix-env.exe -i winmingw**
+
+	
+  5. check that the mingw tools are there, type: **mingw32-make.exe** or **mingw32-make**
+
+
+NOTE: after installing winmingw  notice that there are a lot of new tools symlinked from '~/.nix-profile/bin'. **interestingly this also includes symlinks to libraries (read dll files) files**. so why symlink dll files?
+
+
+## installing qt using the new mingw toolchain
+
+
+there is another **anomaly** using cygwin in comparison to all other posix systems. in windows all executables do have the **.exe suffix** while on linux they don't. as the cygwin shell must be compatible to both worlds, the designer of cygwin made this decision:
+
+
+
+	
+  * programs can be **executed by typing: 'curl.exe' but also by typing 'curl'**, both times it is the same program which gets executed
+
+	
+  * there is an **exception to the rule above**, if a **script called 'curl'** also exists (which is executable), it is **executed instead** of curl.exe
+
+	
+  * if the script 'curl' and the binary 'curl.exe' are in the same directory, then the **'curl' script has precedence**, when typing 'curl' in a shell
+
+
+at least [8] states it that way. i also experimented with these commands:
+
+	
+  1. touch AA; touch AA.exe (both files get created)
+
+	
+  2. touch AA.exe; touch AA (only AA.exe is created and later the timestamp is updated)
+
+
+i guess (1) is true on all posix systems (at least for those i've been working with so far). but **(2) is cygwin specific and implies some issues on would not think of**.
+
+to track down an issue which is caused by the fromer rule  it cost me at least 1-2 hours. the problem was that my winqt.nix expression was fine but always exited with 'error 1' after the unzip operation (without any error message, except the exit 1 code). i always thought that i did something wrong with the nix language. but then i decided to run the command (which would normally be executed by nix) in a shell and found out that the **cygwin shell bahaves differently than the cmd.exe shell for the exact same command**.
+
+to my surprise i got prompted by unzip (in the cygwin shell) with the question if i want to [o]verwrite or [r]ename 'configure.exe' (cause by a file configure). i wondered quite some time what problem could cause this?! so i extracted it again, but this time in cmd.exe with no prompt.
+
+
+# important conclusions
+
+
+Edit: further discussion should be redirected to the nix wiki [11].
+
+
+## problem 1: symlinks and dll files
+
+
+
+
+
+	
+  * **all programs in nix are installed into a unique prefix** but are available as a symlink from ~/.nix-profile/bin
+
+	
+  * **symlinking the same program twice does therefore not work** but happens  rarely anyway
+
+	
+  * however: **symlinking two different dll files sharing the same name is  not possible**, this is the biggest issue right now
+
+
+a solution would be static linking. therefore:
+
+	
+  * two programs having the same binary name ('firefox' for example)
+
+	
+  * two programs sharing the same library name ('mingw32.dll' for example)
+
+
+the former point is easy to accomplish but the later is not. 'viric' (a developer from irc.freenode.org#nixos) pointed out that in order to fix this issue we could use 'side-by-side sharing' [9].
+
+NOTE: **it would be very interesting to see, if such a thing would actually work.**
+
+
+## problem 2: directory and file handling
+
+
+the other important problem is how file handling is implemented in cygwin. the **current behaviour seems to be convenient for users but is a no-go for packaging **as it might cause a lot of unforeseen consequences (and we all have played halfile and know where this could be going).
+
+
+# links
+
+
+* [1] <http://nixos.org/nix/>
+* [2] <http://nixos.org/nixpkgs/>
+* [3] <http://mingw.org>
+* [4] <http://qt.nokia.com/products/>
+* [5] <http://www.cmake.org/Wiki/CMake_RPATH_handling>
+* [6] <https://github.com/qknight/mingw-nix-on-windows>
+* [7] <http://www.fortran-2000.com/ArnaudRecipes/sharedlib.html>
+* [8] <http://hem.bredband.net/richardc/Cygwin.html>
+* [9] <http://msdn.microsoft.com/en-us/library/ms995843.aspx>
+* [10] <http://webchat.freenode.net/?channels=nixos>
+* [11] <http://wiki.nixos.org/wiki/Nix_on_Windows>

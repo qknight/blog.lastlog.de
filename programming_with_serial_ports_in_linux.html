@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="programming_with_serial_ports_in_linux.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>programming with serial ports in linux</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/programming_with_serial_ports_in_linux.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="documentaries_revisited.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="booting_nixos_from_lvm_on_top_of_mdadm.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">programming with serial ports in linux</h1>
+    <div id="date"><p><span id="lastupdated">5 apr 2012</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/nut-logo.png"><img src=media/nut-logo.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="what-is-this">what is this?</h2>
+<p>i bought an UPS with two ports: serial and usb. and because i did not
+know much about the UPS (<strong>AEG - PROTECT HOME VA 600</strong>) i
+started to look at the communication protocol. turns out there are
+<strong>lots of good tools for serial line interception</strong> but
+nearly none for the usb stuff. sadly the driver i wrote isn’t needed at
+all as an email to the nut-ML revealed that this UPS uses the Q1
+protocol which is already supported pretty well using the
+<strong>blazer_usb and blazer_ser module</strong>.</p>
+<p>anyway it was pretty interesting to hack on NUT using
+<strong>debian</strong> and <strong>later nixos</strong>. so
+<strong>here is a guide how to log/analyze serial traffic and how to
+write a simulator for either side.</strong></p>
+<p>and not to forget:** thanks to Arnaud Quette for his ups/nut support.
+<strong>there is also a </strong>brief nut setup introduction**, see
+[1].</p>
+<h2 data-number="2" id="sniff-serial-port-data-between-ups-and-pc">sniff
+serial port data between UPS and PC</h2>
+<ol type="1">
+<li><p>set serial settings to:</p>
+<p>enable serial port port number: com 1 irq 4 io port 0x3f8 port mode:
+host device port/file path: /tmp/interceptty</p></li>
+<li><p><strong>maybe correct the permissions to
+/tmp/interceptty</strong></p></li>
+<li><p><strong>interceptty -s ‘ispeed 2400 ospeed 2400’ -l /dev/ttyS0 |
+tee mylog | interceptty-nicedump</strong></p></li>
+<li><p>on the linux host:</p>
+<p>tail -F mylog | grep “&lt;”**</p></li>
+<li><p><strong>start </strong>virtualbox vm with a windows xp**
+installed</p></li>
+</ol>
+<p>note: <strong>ignore this virtualbox warning: “Ioctl failed for
+serial device ‘/tmp/interceptty’ (VERR_INVALID_PARAMETER). The device
+will not work properly.”. it works anyway, at least on my system (using
+ubuntu 10.10 with standard virtualbox).</strong></p>
+<h2 data-number="3" id="using-the-virtual-python-ups">using the virtual
+python UPS</h2>
+<ol type="1">
+<li><p>on the server side open /dev/remserialVM</p>
+<p>remserial -d -p 23000 -s “2400 raw” -l /dev/remserialVM
+/dev/ptmx</p></li>
+<li><p>on the client side (same host), do:</p>
+<p>remserial -d -r 127.0.0.1 -p 23000 -s “2400 raw” -l /dev/remserialPY
+/dev/ptmx</p></li>
+<li><p><strong>chmod 0777 /dev/remser</strong>*</p></li>
+<li><p>change the virtualbox serial settings:</p>
+<p>port mode: host device port/file path: /dev/remserialVM</p></li>
+<li><p>then format a ‘message’ with a hexeditor also called
+“hexeditor”</p></li>
+<li><p>start the vm</p></li>
+<li><p>then send the formated message: cat message &gt;
+/dev/remserialPY</p></li>
+<li><p>if the message was received by the windows ups monitoring
+software (it will think that the message it received originated from the
+UPS and not that it was crafted manually)</p></li>
+</ol>
+<p><strong>note:</strong> instead of manually sending messages, i also
+used the script: ./simulate-ups.py which does that automatically.</p>
+<p><strong>note:</strong> simulate-ups-monitor.py can be used in an
+analog way but simply using the ups with a real serial port. i should
+mention btw, that i was using both a <strong>usb2serial adapter</strong>
+and an old computer which still contains one of those <strong>ancient
+serial ports</strong>.</p>
+<h2 data-number="4" id="simulate-ups.py">simulate-ups.py</h2>
+<pre><code>#!/usr/bin/python
+import serial
+ser = serial.Serial(&#39;/dev/remserialPY&#39;, 2400)
+ 
+line = &#39;&#39;
+count=0
+ 
+def process_command(cmd):
+        print &quot; &lt; incomming: &quot; + cmd
+        if cmd == &quot;Q1&quot;:
+                print &quot;REQUEST FOR DATA FROM USV&quot;
+                n = (&quot;20&quot;).decode(&quot;hex&quot;)
+                d = (&quot;0d&quot;).decode(&quot;hex&quot;)
+                a = (&quot;28&quot;).decode(&quot;hex&quot;) + \
+                    &quot;000.0&quot; + n + \
+                    &quot;000.0&quot; + n + \
+                    &quot;000.5&quot; + n + \
+                    &quot;005&quot; + n + \
+                    &quot;00.0&quot; + n + \
+                    &quot;00.6&quot; + n + \
+                    &quot;25.0&quot; + n + \
+                    &quot;00000001&quot; + d
+                ser.write(a)
+
+while True:
+        ch = ser.read(1)
+        if ch == &quot;\x0d&quot;:
+                process_command(line)
+                line = &#39;&#39;
+        else:
+                line = line + ch</code></pre>
+<h2 data-number="5"
+id="simulate-ups-monitor.py">simulate-ups-monitor.py</h2>
+<pre><code>#!/usr/bin/python
+import serial
+import re
+import time
+import sys
+
+ser = serial.Serial(&#39;/dev/ttyS0&#39;, 2400)
+#, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, 0)
+
+line = &#39;&#39;
+count=0
+status=&quot;unknown&quot;
+
+def write(cmd):
+        #print &quot;sending &quot; + cmd;
+        ser.write(cmd)
+
+def print_status(status):
+                print &quot;status is: Unknown|LostCom|Normal|ScheduledShutdown|60SecsShutdown|ActiveShutdown|CriticalPowerFail: &quot; + status
+
+def process_command(cmd):
+        valid = re.compile(r&quot;\([0-9][0-9][0-9].[0-9] [0-9][0-9][0-9].[0-9] [0-9][0-9][0-9].[0-9] [0-9][0-9][0-9] [0-9][0-9].[0-9] [0-9][0-9].[0-9] [0-9][0-9].[0-9] [01][01][01][01][01][01][01][01]&quot;)
+        if valid.match(cmd):
+                #print status + &quot; : VALID REPLY FROM USV   -&gt;    &quot; + cmd
+                #(239.5 239.5 235.6 000 49.9 13.6 25.0 00001001
+                netz_eingang=cmd.split(&#39; &#39;)[0].lstrip(&#39;(&#39;)
+                netz_unknown=cmd.split(&#39; &#39;)[1]
+                netz_ausgang=cmd.split(&#39; &#39;)[2]
+                percent=cmd.split(&#39; &#39;)[3]
+                hz=cmd.split(&#39; &#39;)[4]
+                bat_voltage=cmd.split(&#39; &#39;)[5]
+                temperature=cmd.split(&#39; &#39;)[6]
+                bits=cmd.split(&#39; &#39;)[7]
+                bit1=bits[0]
+                bit2=bits[1]
+                bit3=bits[2]
+                bit4=bits[3]
+                bit5=bits[4]
+                bit6=bits[5]
+                bit7=bits[6]
+                bit8=bits[7]
+                print status + &quot; &quot; + cmd
+        else:
+                print &quot;invalid reply detected: &quot; + cmd
+                sys.exit(1)
+
+write( (&quot;51310d&quot;).decode(&quot;hex&quot;))
+
+while True:
+        ch = ser.read(1)
+        if ch == &quot;\x0d&quot;:
+                process_command(line)
+                time.sleep(1)
+                write( (&quot;51310d&quot;).decode(&quot;hex&quot;))
+                line = &#39;&#39;
+        else:
+                line = line + ch</code></pre>
+<h2 data-number="6" id="simulate-the-ups-monitor">simulate the UPS
+monitor</h2>
+<pre><code># ./simulate-ups-monitor.py
+VALID REPLY FROM USV -&gt; (241.5 241.4 237.5 000 49.9 13.5 25.0 00001001
+VALID REPLY FROM USV -&gt; (241.5 241.4 237.5 000 49.9 13.5 25.0 00001001
+VALID REPLY FROM USV -&gt; (241.4 241.4 237.5 000 49.9 13.5 25.0 00001001</code></pre>
+<h2 data-number="7" id="summary">summary</h2>
+<p>so <strong>would i buy a AEG Protect Home VA 600 again</strong>?
+currently there is no ‘time left’ estimation and therefore i shutdown
+the system either after 25 seconds or on LB (low battery) but after
+reloading the batteries the shutdown usually is triggered by the 25
+seconds rule after a state change to OB (on battery). i think this is a
+decent setup and therefore <strong>i would probably buy that UPS
+again</strong>. <strong>but i don’t really have a clue about UPS devices
+so there might be much better ones in the same price range</strong>,
+maybe someone on the NUT/UPS ML can make a better recommendation.</p>
+<p>what i really dislike is that this product ships with linux support
+BUT not with NUT support. i later realized that they created their own
+linux software. what a waste of time, i would rather love to get the
+specification and then use NUT instead - probably this is the case for
+nearly all the users seeing that this devices has linux support. but my
+request to get the specification was simply ignored, so i think there
+are <strong>better vendors out there</strong>.</p>
+<p>another interesting aspect of nut is how complex the integration in
+the system is.</p>
+<h2 data-number="8" id="links">links</h2>
+<ul>
+<li>[1] <a href="https://nixos.org/wiki/How_to_setup_UPS/NUT"
+class="uri">https://nixos.org/wiki/How_to_setup_UPS/NUT</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/programming_with_serial_ports_in_linux.mdwn" title="posts\programming_with_serial_ports_in_linux.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+[[!meta date="2016-11-15 12:10"]]
+[[!img media/nixos-lores.png alt="" class="noFancy" style="float: right"]]
+[[!tag sprint nixos linux technology usability]]
+[[!summary a report about a nixos hacking sprint in the augsburger 'openlab' hackerspace.]]
+
+# nixos-sprint
+
+paul and me visisted the [augsburger openlab](https://openlab-augsburg.de/) again!
+
+# projects
+
+## profpatsch
+
+ * package draw.io  
+    * ✔ build with ant
+ * ✔ Initialize package tests
+
+## uwap
+
+ * Quassel + qt4 doesn't support postgresql as database backend   
+    * ✔ Add an option to the quassel service to allow the qt5 version 
+ * "nixify" postfix configuration  
+    * ✔ main.cf <https://github.com/NixOS/nixpkgs/pull/20218>
+
+## christine
+
+ * ✔ add maildev: <https://github.com/NixOS/nixpkgs/pull/20162>
+ * ✔ removed django 1.5: <https://github.com/NixOS/nixpkgs/pull/20195>
+ * ✔ nodejs cleanup: <https://github.com/NixOS/nixpkgs-channels>
+ * ✔ hadoop: removed hardcoded path: <https://issues.apache.org/jira/browse/HADOOP-13797>
+
+## paul, michael & qknight 
+ * ✔ started nextcloud packaging 
+ * ✔ leaps: packaged with tests: <https://github.com/NixOS/nixpkgs/commit/47d81ed3473f33cfb48f2be079f50cdfac60f1e7>
+ * ✔ made <https://github.com/QuiteRSS/quiterss> work on nixos, <https://github.com/NixOS/nixpkgs/pull/20245>
+ * fixed nixcloud.io email system so that qknight can use thunderbird with STARTTLS and submission
+
+        submissionOptions = {
+          "smtpd_tls_security_level" = "encrypt";
+          "smtpd_sasl_auth_enable" = "yes";
+          "smtpd_client_restrictions" = "permit_sasl_authenticated,reject";
+          "smtpd_sasl_type" = "dovecot";
+          "smtpd_sasl_path" = "private/auth";
+        };
+
+ * LXC: Unprivileged container with NixOS as guest and as host:
+    * ✔ LXC container ist started as root that spawnes the LXC as user 100000 which is unprivileged on the host
+    * ✔ shared read only store  with the host
+    * ✔ container can be build and updated on the host with nix-env
+
+# summary
+
+this sprint was awesome. we got so many things to work! 
+

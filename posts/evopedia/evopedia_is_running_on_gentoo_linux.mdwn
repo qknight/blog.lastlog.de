@@ -1,0 +1,50 @@
+[[!summary chatGPT: Evopedia, an offline Wikipedia reader, has been ported to Gentoo Linux and the ebuild can be found at the given link. Thanks were given to the developers who reviewed the ebuild and hope it will be included in the official distribution soon.]]
+[[!meta date="2010-12-21 02:39"]]
+[[!tag gentoo linux p2p packagemanager qt society]]
+[[!series evopedia]]
+
+[[!img media/200px-gentoo_linux_logo_matte-svg.png width=120x style="float: right"]]
+
+# motivation
+evopedia [1], the offline wikipedia reader, has been ported to gentoo linux. the ebuild can be found at [2].
+
+i would like to say **thanks** to all **devs @ irc.freenode.net#gentoo-sunrise**! especially to those who reviewd my ebuild.
+
+hope this ebuild will be moved into the official distribution anytime soon.
+
+# source
+
+/usr/local/portage/sci-misc/evopedia/evopedia-0.4.2.ebuild
+    
+    # Copyright 1999-2010 Gentoo Foundation
+    # Distributed under the terms of the GNU General Public License v2
+    
+    EAPI=3
+    
+    inherit qt4-r2
+    
+    DESCRIPTION="Offline Wikipedia Viewer"
+    HOMEPAGE="http://evopedia.info/"
+    SRC_URI="http://evopedia.info/src/${P}.tar.gz"
+    
+    LICENSE="GPL-3"
+    SLOT="0"
+    KEYWORDS="~amd64"
+    IUSE=""
+    
+    RDEPEND="
+            >=x11-libs/qt-gui-4.4:4
+            >=app-arch/bzip2-1.0.6
+    "
+    DEPEND="${RDEPEND}"
+    
+    src_configure() {
+            eqmake4 evopedia.pro PREFIX="${EPREFIX}"/usr
+    }
+
+# links
+
+* [1] <http://evopedia.info>
+* [2] <http://bugs.gentoo.org/show_bug.cgi?id=349210>
+
+**update: 2010-12-24:** added the source (contents of evopedia-0.4.2.ebuild)

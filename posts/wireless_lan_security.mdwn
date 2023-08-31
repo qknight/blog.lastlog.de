@@ -1,0 +1,23 @@
+[[!summary chatGPT: The text discusses the security issues with using a bridge in securing a wireless LAN, including the potential for interception, alteration, and insertion of malware. It also debunks the effectiveness of MAC filters in wireless security.]]
+[[!meta date="2009-06-14 23:25"]]
+[[!tag linux society technology]]
+
+one issue with securing a wireless lan most ppl forget is that the access point is running as a bridge. using a bridge is a good thing in general but it has it's drawbacks concerning security
+
+    client1 < ~ ~wlan link~ ~~> ap bridge <------wire-----> client2
+
+this is the common setup on the average home wlan you can find. assume the hacker got a valid wpa2 key from somewhere or your wep key was broken (which can be done in less than 10minutes - common knowledge).
+
+since most access points are used as internet routers as well you can now redirect connections from client2 over clien1 with some arp-spoofing (also common knowledge, just search in google). this would of course not work if the router wasn't configured as bridge! for example one could create one subnet 172.16.0.0/24 for wired lan and 172.16.111.0/24 for the wireless lan. this would cure this critical security issue.
+
+but having the stream redirected what could an attacker do with it? you can first of all intercept all traffic. you can alter the traffic and upload trojans/viruses using a http proxy and then you could insert it into a download.
+
+another security issue which is common with autoupdaters is weather they check the updates for **authenticity**. I did not check any but i would assume there could be some interesting way getting things done.
+
+just remember that next time you have to secure a network. consider using no bridge.
+
+i would like to **debunk a security myth** about wireless security guides. many tell you to turn on **mac filters**. mac filters don't do any good since anyone can spoof your mac address (if you use that ap with a wireless client from time to time) and one can use two clients with equal mac addresses but different ip addresses (this might be dependent on the vendor) but i tested this for an access point using a madwifi card and it worked well. the only thing which is not working is communicating between the two clients sharing the same mac.
+
+this works since wireless lan is a broadcast medium and both clients see the data incoming (and both decode them). but since they use a different mac address the data won't be handled on the wrong destination. some protocols might break tough
+
+enabling mac filters on the other hand degrades usability greatly. so if in doubt don't use it.

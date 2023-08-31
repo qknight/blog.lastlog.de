@@ -1,0 +1,40 @@
+[[!summary chatGPT: The author encountered a limitation in the Radeon X300 graphics card where only one crtc interface could be used at a time, leading to a workaround using the xrandr command to disable and enable outputs, and suggested improvements for error messages.]]
+[[!meta date="2009-10-26 11:29"]]
+[[!img media/t43-radeon.png alt="" style="float: right"]]
+
+
+
+# motivation
+The Radeon X300 seems to have **'two crtc**' interfaces only. And one is always used when the LVDS (laptop builtin display) is enabled (in use). So one is left. Since i use DVI-0 on one workplace and VGA-0 on the other i usually was forced to reset X to make things work, since i wasn't aware of the resource limitation. The error which came up was:
+
+
+    % xrandr --auto --output VGA-0 --mode 1024x768
+    xrandr: cannot find crtc for output VGA-0
+
+
+The **solution** is easy. Just disable (in this case) DVI-0 output. Next enable VGA-0 output again.
+
+
+    % xrandr --output DVI-0 --off
+    % xrandr --auto --output VGA-0 --mode 1280x1024 --right-of LVDS
+
+
+Usability wise this problem is a result of a missing resource counter (maybe it exists) but still the interface 'xrandr' was not very helpful in diagnosing the issue. **I would have expected** an error message as:
+
+
+    xrandr: no free crct for output VGA-0 left. you can only enable two devices at a time, maybe disable one to enable the other.
+
+
+lspci shows:
+	
+    # lspci
+    00:00.0 Host bridge: Intel Corporation Mobile **915GM**/PM/GMS/910GML Express Processor to DRAM Controller (rev 03)
+    01:00.0 VGA compatible controller: ATI Technologies Inc **M22** [Mobility Radeon **X300**]
+    00:01.0 PCI bridge: Intel Corporation Mobile **915GM/PM** Express PCI Express Root Port (rev 03)
+
+
+Thanks to [1]
+
+# links
+
+* [1] <http://lists.freedesktop.org/archives/xorg/2007-August/027490.html>

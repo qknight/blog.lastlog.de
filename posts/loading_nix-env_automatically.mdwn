@@ -1,0 +1,74 @@
+[[!meta date="2013-08-01 14:54"]]
+[[!tag nixos usability packagemanager]]
+[[!summary how to load a custom environment automatically when entering a directory]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+# motivation 
+
+using my-env you create a custom environment, see [1] where you will find a ~/.nixpkgs/config.nix example script. a couple of times i was discussing with others that it would be cool to have that environment loaded automatically when entering that directory. some say that the ruby devs did astonishing things in that regard. reading [2] finally inspired me to write this example how this could be done. 
+
+so assuming you have installed 'nix-env -i env-sdl', this posting describes what to do in order to get it loaded automatically.
+
+# the shell extension(s)
+
+## default shell (cd overloading)
+
+i put this into my **~/.zshrc**:
+
+    function cd {
+        # loads environments automatically when .load-env file exists with the project name <name> in it
+        # load-env-<name> must of course exist, example: load-env-sdl where .load-env would contain sdl
+        builtin cd "$@"
+        if [ -f ".load-env" ] ; then
+            echo "Note: found '.load-env' file, automatically loading the 'load-env-${a}' environment."
+            # display its contents
+            a=$(cat .load-env) 
+            load-env-${a}
+            echo "Note: You left the 'load-env-${a}' environment. Type: load-env-${a} to reload it"
+        fi
+    }
+
+afterwards type:
+
+    zsh
+
+## load-env-sdl shell
+
+to make changes to the spawned shell, edit $NIXREPOS/nixpkgs/pkgs/misc/my-env/default.nix
+
+# usage
+
+## to load the environment manually:
+
+    % load-env-sdl
+    env-sdl loaded
+     
+    sdl:[joachim@lenovo-t530:~/projects/myproject]$ 
+
+
+## to add a environemnt loader when entering the directory:
+
+    % cd ~/projects/myproject
+    % echo "sdl" > .load-env
+
+this creates a .load-env file containing 'sdl' in it. 
+
+## afterwards the environment should be loaded automatically when entering ~/projects/myproject
+
+    % cd ~/projects/myproject
+    env-sdl loaded
+     
+    sdl:[joachim@lenovo-t530:~/projects/myproject]$ 
+
+# summary
+
+there is currently no support for environment nesting but i doubt this is needed anyway. whenever you **want to leave the environment** simply type '**exit**' or hit '**ctrl+d**'.
+
+# update 10.7.2014
+see also [3]
+
+# links
+
+* [1] <https://nixos.org/wiki/Howto_develop_software_on_nixos>
+* [2] <http://superuser.com/questions/283352/how-do-you-run-a-shell-command-script-automatically-when-entering-cd-ing-a-direc>
+* [3] <https://news.ycombinator.com/item?id=7958388>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="spamassassin_procmail_with_vpopmail_accounts.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>spamassassin procmail with vpopmail accounts</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/spamassassin_procmail_with_vpopmail_accounts.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="updating_to_kde_4.4.2_from_kde_4.3.3.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="no_more_crashes_after_resuming_from_pm_suspend.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">spamassassin procmail with vpopmail accounts</h1>
+    <div id="date"><p><span id="lastupdated">28 jun 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::mail" class="tagbtn btn btn-primary">mail</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/spamassassin-logo-320x136.png"><img src=media/spamassassin-logo-320x136.png alt="copied from http://spamassassin.apache.org/logo" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>i’ve had lots of trouble with mail the last two years with lots of
+spam still passing spamassassin. but that wasn’t so bad since we already
+had ﻿greylisting [1] running. that however still meant <strong>8 spam
+mails per day</strong> with subjects as:</p>
+<ul>
+<li>Hot news for js! 70% off all June!</li>
+<li>Totaler Ausverkauf von Top Zeitmesser</li>
+<li>Yes, js, today -80% to all prices. Office accessible free</li>
+<li>This crysis never ends</li>
+<li>VIAGRA ® Official Site -95%</li>
+</ul>
+<p>however, that changed after i started to collect the spam to train
+the bayesian filter [2] used by spamassassin. this posting is about how
+i’ve done it!</p>
+<p><strong>in contrast: after using bayes i receive one spam mail every
+4th day</strong>.</p>
+<p>i still have to monitor the spam, which is filed in a folder called
+‘spam’ in one of my ‘imap’ folders but since it can be identified as
+spam by 100% most of the time it’s simply a copy’n’past operation of all
+files in ‘spam’ to ‘spam_train’. the ‘spam-train’ folder is used in
+order to train spamassassin. of course there are false-positives and
+false-negatives as well. but handling those is very easy.</p>
+<h2 data-number="2" id="is-my-setup-special-in-any-way">is my setup
+special in any way?</h2>
+<p>no i don’t think so at all. <strong>however: most sites do encourage
+admins not to use bayes filters per vpopmail account.</strong> and
+because of that and other factors there is not much documentation of how
+to do so. since i had some issues with how to call spamassassin from
+procmail it did not work for a very long time. recently i bought my
+nokia n900 mobile phone and using mail on this device is very nice.
+receiving a spam mail per hour means a notification on the n900 which IS
+annoying if the notification mostly contains spam slogans.</p>
+<h2 data-number="3" id="my-.procmailrc">my .procmailrc</h2>
+<pre><code># qmail Lazydog procmailrc file
+SHELL=&quot;/bin/bash&quot;
+VHOME=&quot;/var/vpopmail/domains/lastlog.de/js&quot;
+VERBOSE=&quot;no&quot;
+LOGFILE=&quot;/var/vpopmail/domains/lastlog.de/js/procmail.log&quot;
+:0fw
+**| spamassassin --siteconfigpath=/var/vpopmail/domains/lastlog.de/js/.spamassassin/ -p /var/vpopmail/domains/lastlog.de/js/.spamassassin/local.cf**
+:0:
+* ^X-Spam-Flag: YES
+/var/vpopmail/domains/lastlog.de/js/.maildir/.spam/new
+:0:
+* ^(From|Cc|To).*news@aktuell.conrad.de
+/dev/null
+# (other rules below)</code></pre>
+<h2 data-number="4"
+id="my-local.cf-file-the-only-config-file-i-changed">my local.cf file,
+the only config file i changed:</h2>
+<pre><code># cat local.cf
+required_score          3.2
+rewrite_header subject _SCORE(0)_ |
+use_bayes 1
+use_dcc 1
+use_pyzor 1
+use_razor2 1
+bayes_auto_learn 1
+bayes_path /var/vpopmail/domains/lastlog.de/js/.spamassassin/db/bayes
+bayes_file_mode 0777
+report_safe 1
+#add_header all Flag _YESNOCAPS_
+ok_languages            en de
+ok_locales              en de
+# Google SafeBrowsing Plugin
+loadplugin Mail::SpamAssassin::Plugin::GoogleSafeBrowsing
+#body GOOGLE_SAFEBROWSING eval:check_google_safebrowsing_blocklists()
+google_safebrowsing_apikey ABQIAA#VJ#J#VAQFbnTQ4uqKBRgArBR3gWufhSOf_c-vzV4UEN0steDDKD
+google_safebrowsing_dir /var/cache/spamassassin
+# scores for each url hit in message body
+google_safebrowsing_blocklist goog-black-hash 0.3
+google_safebrowsing_blocklist goog-malware-hash 0.5</code></pre>
+<h2 data-number="5" id="how-to-experiment-with-spam">how to experiment
+with spam</h2>
+<p>no blog or documentation talks about this but i think it’s very
+important. say you have a spam mail and you want to test your
+spamassassin configuration do this:</p>
+<pre><code>ls -la /var/vpopmail/domains/lastlog.de/js/.maildir/cur
+-rw-rwx---+ 1 vpopmail vpopmail     2630 26. Dez 2009  msg.zQJ68:2,RS*
+-rw-rwx---+ 1 vpopmail vpopmail    21905 16. Dez 2009  msg._zr78:2,S*
+-rw-rwx---+ 1 vpopmail vpopmail     7433  9. Mär 2009  msg.zssm8:2,S*
+-rw-rwx---+ 1 vpopmail vpopmail     2332  6. Mai 17:27 msg.ZuFm8:2,S*
+-rw-rwx---+ 1 vpopmail vpopmail     3418 21. Nov 2008  msg.ZvFh8:2,S*
+-rw-rwx---+ 1 vpopmail vpopmail     3237 23. Feb 13:07 msg.zZcg9:2,S*</code></pre>
+<p>let’s pick one of these messages:
+‘<strong>msg.zf8y8:2,S</strong>’</p>
+<p>now, let’s see what spamassassin thinks about this message with:</p>
+<pre><code>cat msg.zf8y8:2,S | spamassassin -t -D -p /var/vpopmail/domains/lastlog.de/js/.spamassassin/local.cf &gt;mail 2&gt;debug</code></pre>
+<p><strong>-t -D</strong> are only important for debugging</p>
+<p>also have a look at:</p>
+<pre><code>tail -n 200 /var/vpopmail/domains/lastlog.de/js/procmail.log</code></pre>
+<h2 data-number="6"
+id="creating-the-configuration-for-vpopmail-usage-of-spamassassin">creating
+the configuration for vpopmail usage of spamassassin</h2>
+<p>the message is processed by spamassassin and written to a file called
+‘mail’ and the debug output going to stderr is written to a file called
+‘debug’. this helped me a lot to verify that spamassassin was reading
+the right config files.</p>
+<pre><code>cat msg.zf8y8:2,S | spamassassin -t -D --siteconfigpath=/var/vpopmail/domains/lastlog.de/js/.spamassassin/ -p /var/vpopmail/domains/lastlog.de/js/.spamassassin/local.cf &gt;mail 2&gt;debug</code></pre>
+<p>watch for things like this:</p>
+<pre><code>[7582] dbg: conf: finish parsing
+[7582] dbg: plugin: Mail::SpamAssassin::Plugin::GoogleSafeBrowsing=HASH(0x14e3a10) implements &#39;finish_parsing_end&#39;, priority 0
+[7582] dbg: bayes: tie-ing to DB file R/O /var/vpopmail/domains/lastlog.de/js/.spamassassin/db/bayes_toks
+[7582] dbg: bayes: tie-ing to DB file R/O /var/vpopmail/domains/lastlog.de/js/.spamassassin/db/bayes_seen
+[7582] dbg: bayes: found bayes db version 3
+[7582] dbg: bayes: DB journal sync: last sync: 0
+[7582] dbg: config: score set 3 chosen.
+[7582] dbg: message: main message type: multipart/mixed</code></pre>
+<p><strong>check: no loaded plugin implements ‘check_main’: cannot scan!
+at /usr/lib64/perl5/vendor_perl/5.8.8/Mail/SpamAssassin/PerMsgStatus.pm
+line 164.</strong></p>
+<p>it seems that if i use –siteconfigpath spamassassin expects all
+config files to be in
+‘/var/vpopmail/domains/lastlog.de/js/.spamassassin/’ but usually they
+are in ‘/etc/spamassassin/’. so when using –siteconfigpath make sure you
+copy all files from ’/etc/spamassassin/*’ to your own configuration
+directory ‘/var/vpopmail/domains/lastlog.de/js/.spamassassin/’.</p>
+<p><strong>WARNING: do not overwrite your customized files as there
+might be a local.cf in both paths!</strong></p>
+<p>to check if the right bayes path is used, look at the debug file we
+created:</p>
+<pre><code>cat debug | grep bayes
+[20792] dbg: bayes: tie-ing to DB file R/O /var/vpopmail/domains/lastlog.de/js/.spamassassin/db/bayes_toks
+[20792] dbg: bayes: tie-ing to DB file R/O /var/vpopmail/domains/lastlog.de/js/.spamassassin/db/bayes_seen
+[20792] dbg: bayes: found bayes db version 3
+[20792] dbg: bayes: DB journal sync: last sync: 0</code></pre>
+<p>in this case everything is right.</p>
+<p>also look if the mail is quallified as spam, just have a look at the
+‘mail’ file:</p>
+<pre><code>Subject: 16.6 | VIAGRA ® Official Site -95%
+X-Spam-Flag: YES
+X-Spam-Checker-Version: SpamAssassin 3.2.1 (2007-05-02) on
+bonker.serverkommune.de
+X-Spam-Level: ****************
+X-Spam-Status: Yes, score=16.6 required=5.0 tests=AWL,BAYES_99,
+HTML_IMAGE_ONLY_08,HTML_MESSAGE,HTML_SHORT_LINK_IMG_1,MISSING_DATE,
+MISSING_MID,MISSING_SUBJECT,NO_RELAYS,URIBL_AB_SURBL,URIBL_BLACK,
+URIBL_JP_SURBL,URIBL_OB_SURBL,URIBL_WS_SURBL shortcircuit=no
+autolearn=unavailable version=3.2.1
+MIME-Version: 1.0</code></pre>
+<h2 data-number="7" id="initial-bayes-sa-learn">initial bayes,
+sa-learn</h2>
+<p>since i’ve been learning the db wrong for some time i decided to
+relearn everything with:</p>
+<pre><code>cd /var/vpopmail/domains/lastlog.de/js/.spamassassin/db/
+
+ls -la
+-rw-rw----+ 1 joachim users    7824 21. Jun 15:17 bayes_journal
+-rw-rwx---+ 1 joachim users  643072 21. Jun 15:09 bayes_seen*
+-rw-rwx---+ 1 joachim users 5177344 21. Jun 15:09 bayes_toks*</code></pre>
+<p>just remove all 3 files (or create backups if in doubt) and then use
+sa-learn:</p>
+<pre><code>cat spamcommand
+
+echo &quot;=== &lt;SPAM Train&gt; ====&quot;
+
+echo &quot;/var/vpopmail/domains/lastlog.de/js/.maildir/.spam_train/cur&quot;
+
+nice sa-learn -D 5 -u vpopmail --dbpath /var/vpopmail/domains/lastlog.de/js/.spamassassin/db --siteconfigpath /var/vpopmail/domains/lastlog.de/js/.spamassassin/ -p /var/vpopmail/domains/lastlog.de/js/.spamassassin/user_prefs -C /var/vpopmail/domains/lastlog.de/js/.spamassassin --spam --dir /var/vpopmail/domains/lastlog.de/js/.maildir/.spam_train/cur
+
+echo &quot;=== &lt;/SPAM Train&gt; ===&quot;
+
+echo &quot;&quot;
+
+echo &quot;=== &lt;HAM Train&gt; ===&quot;
+
+for i in cur .js@dune2.de/cur .notice/cur; do
+
+echo &quot;learning from: /var/vpopmail/domains/lastlog.de/js/.maildir/${i}&quot;
+
+nice sa-learn -D 5 -u vpopmail --dbpath /var/vpopmail/domains/lastlog.de/js/.spamassassin/db --siteconfigpath /var/vpopmail/domains/lastlog.de/js/.spamassassin/ -p /var/vpopmail/domains/lastlog.de/js/.spamassassin/user_prefs -C /var/vpopmail/domains/lastlog.de/js/.spamassassin --ham --dir &quot;/var/vpopmail/domains/lastlog.de/js/.maildir/${i}&quot;
+
+echo &quot;=== &lt;/HAM Train&gt; ===&quot;</code></pre>
+<p>i execute this script every night using a cronjob, and so far it is
+working great! handling false positives and false negatives is easy as
+well since you only have to copy the wrong mails into the right folder
+and the next cronjob probably learns it right. i’m not sure on this but
+so far it is working.</p>
+<pre><code>./spamcommand
+
+==== &lt;SPAM Train&gt; ===
+
+/var/vpopmail/domains/lastlog.de/js/.maildir/.spam_train/cur
+
+[7913] info: archive-iterator: skipping large message
+
+...
+
+Learned tokens from 2515 message(s) (2531 message(s) examined)
+
+=== &lt;/SPAM Train&gt; ===
+
+=== &lt;HAM Train&gt; ===
+
+[22465] info: archive-iterator: skipping large message
+
+...
+
+Learned tokens from 1100 message(s) (1171 message(s) examined)
+
+[19782] info: archive-iterator: skipping large message
+
+....
+
+Learned tokens from 191 message(s) (199 message(s) examined)
+
+=== &lt;/HAM Train&gt; ===
+
+./spamcommand  291,01s user 12,00s system 12% cpu 40:05,37 total</code></pre>
+<p>the first time this script run about <strong>40 minutes</strong></p>
+<h2 data-number="8" id="rights-management">rights management</h2>
+<p>since there might be multiple users accessing the bayes dbs you have
+to check permissions. most likely these users are: vpopmail and your
+login name.</p>
+<h2 data-number="9" id="final-words">final words</h2>
+<p>remove <strong>-t</strong> and <strong>-D</strong> if you have
+finished debugging as it will flood your logs. also have a look at [3],
+[4] and [5].</p>
+<h2 data-number="10" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://de.wikipedia.org/wiki/Greylisting"
+class="uri">http://de.wikipedia.org/wiki/Greylisting</a></li>
+<li>[2] <a href="http://wiki.apache.org/spamassassin/BayesFaq"
+class="uri">http://wiki.apache.org/spamassassin/BayesFaq</a></li>
+<li>[3] <a
+href="http://wiki.apache.org/spamassassin/BayesInSpamAssassin"
+class="uri">http://wiki.apache.org/spamassassin/BayesInSpamAssassin</a></li>
+<li>[4] <a
+href="http://standbytux.blogspot.com/2005/07/using-spamassassin-and-procmail-to.html"
+class="uri">http://standbytux.blogspot.com/2005/07/using-spamassassin-and-procmail-to.html</a></li>
+<li>[5] <a href="http://faisal.com/docs/salearn"
+class="uri">http://faisal.com/docs/salearn</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/spamassassin_procmail_with_vpopmail_accounts.mdwn" title="posts\spamassassin_procmail_with_vpopmail_accounts.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

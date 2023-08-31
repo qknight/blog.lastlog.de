@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="running_the_nix_package_manager_on_windows.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>running the nix package manager on windows</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/running_the_nix_package_manager_on_windows.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="gentoo_server_maintainance_issues.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="running_the_nix_package_manager_in_a_prefix_as_the_home_directory.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">running the nix package manager on windows</h1>
+    <div id="date"><p><span id="lastupdated">19 jan 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::qt" class="tagbtn btn btn-primary">qt</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::windows" class="tagbtn btn btn-primary">windows</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>nix (see [2]) is a package manager like apt (used in debian/ubuntu)
+or portage (used in gentoo). windows does have a package manager which
+is typical among linux distributions. so here some recent findings and
+how to use nix (and nixpkgs) on windows.</p>
+<h2 data-number="2" id="reproduction-of-my-nix-system">reproduction of
+my nix system</h2>
+<p>setup of my system:</p>
+<ul>
+<li>core 2 duo processor</li>
+<li><strong>windows xp sp3</strong></li>
+<li><strong>cygwin</strong> (setup.exe version 2.738) with a full
+installation [1] (some 2-7 GB, 1h download) using setup.exe, do use
+‘default parameters’ everywhere, expect for the software selection: use
+all (do not install the source, binaries are enough)</li>
+<li><strong>nix 0.16</strong> release from [2]</li>
+<li><strong>install</strong> (as mentioned in the docs) <strong>to a
+ntfs partition</strong></li>
+</ul>
+<p>components i used (get installed using cygwin::setup.exe:</p>
+<ul>
+<li><strong>gcc</strong> version <strong>4.3.4</strong> 20090804
+(release1) (gcc), target i686-pc-cygwin</li>
+<li><strong>libtoolize</strong> (GNU libtool) <strong>2.4</strong></li>
+<li><strong>aclocal</strong> (GNU automake) <strong>1.11.1</strong></li>
+<li><strong>autoheader</strong> (GNU Autoconf)
+<strong>2.68</strong></li>
+<li><strong>automake</strong> (GNU automake)
+<strong>1.11.1</strong></li>
+<li><strong>autoconf</strong> (GNU Autoconf) <strong>2.68</strong></li>
+</ul>
+<h2 data-number="3" id="how-to-build">how to build</h2>
+<p>as there is no windows installer (for example using NSIS) you have to
+bootstrap nix from source.</p>
+<ol type="1">
+<li><strong>extract</strong> nix-0.16 to c:</li>
+<li><strong>start the cygwin shell</strong> (desktop icon)</li>
+<li>in the shell, type: ‘<strong>cd
+/cygdrive/c/nix/nix-0.16</strong>’</li>
+<li>type: ‘<strong>./bootstrap.sh</strong>’ (this is very important)
+that is why several of my attempts to get nix running failed ;P</li>
+<li>type: ‘<strong>./configure</strong>’</li>
+<li>type: ‘<strong>make install</strong>’</li>
+<li>afterwards you can use it with: ’**nix-env -qa ’*’**’ for
+example</li>
+</ol>
+<h2 data-number="4" id="how-to-use-nix">how to use nix</h2>
+<p>this is quite easy but it does not work as mentioned in the
+documentation (which worked only for unix systems so far). the full
+cygwin installation installes many tools.</p>
+<ol type="1">
+<li><strong>check your environmen</strong> for nix, type ‘nix-env.exe’
+and test if that program works (should be in the path)</li>
+<li>if ‘nix-env.exe’ does not work, check
+<strong>/usr/local/bin</strong> for a propper nix installation</li>
+<li>check if there is a unrar tool already (not included in full-cygwin
+installation with: ‘<strong>unrar.exe</strong>’</li>
+<li>you have to** subscribe to a nix channel**, see the nix
+documentation: chapter 2. quick start [4]</li>
+<li>if ‘nix-env.exe’ works, <strong>install ‘unrar’</strong> using:
+‘<strong>nix-env.exe -i unrar</strong>’ you should see compiler stuff
+and it installs a million *.drv files…</li>
+<li>now type: ‘<strong>unrar.exe</strong>’, should say: “bash:
+unrar.exe: command not found”</li>
+<li>now type: “<strong>export
+PATH=~./nix-profile/bin:$PATH</strong>”</li>
+<li>and try the command from step 5 again, now you should get a working
+‘unrar.exe’ installation</li>
+</ol>
+<h2 data-number="5" id="what-worked-using-nix-on-cygwin-windows">what
+worked using nix on cygwin-windows</h2>
+<p>most of the software related to X did not work, as windows and mesa
+don’t go along nicely. i’ve tried a few programs:</p>
+<ul>
+<li><strong>wget.exe worked</strong> (checked with ‘which wget’) and a
+download</li>
+<li><strong>hello.exe worked </strong>(GNU hello)</li>
+<li><strong>unrar.exe worked </strong>(compiled, installed, probably to
+work, didn’t extract anything)</li>
+<li>qt (nix throws a nix exception): unsupported platform for Mesa</li>
+<li>irssi (nix tries to compile the needed software but fails at
+glib-2.24.1)</li>
+<li>firefox (nix throws a nix exception): flashplayer is not supported
+on this platform</li>
+</ul>
+<h2 data-number="6" id="summary">summary</h2>
+<p>great to have nix on windows. no it’s time to use it, here are a
+bunch of scenarios:</p>
+<ul>
+<li>use it to create windows software</li>
+<li>use it to create installers (using NSIS)</li>
+</ul>
+<p>but both points would be independent of nix, so this results in a
+very nice build system. maybe combined with hyrdra this is a great way
+to build software.</p>
+<h2 data-number="7" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://www.cygwin.com/cygwin-ug-net/setup-net.html"
+class="uri">http://www.cygwin.com/cygwin-ug-net/setup-net.html</a></li>
+<li>[2] <a href="http://nixos.org/nix/"
+class="uri">http://nixos.org/nix/</a></li>
+<li>[3] <a href="http://hydra.nixos.org/build/858291/download/1/manual/"
+class="uri">http://hydra.nixos.org/build/858291/download/1/manual/</a></li>
+<li>[4] <a
+href="http://hydra.nixos.org/build/858291/download/1/manual/#chap-quick-start"
+class="uri">http://hydra.nixos.org/build/858291/download/1/manual/#chap-quick-start</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/running_the_nix_package_manager_on_windows.mdwn" title="posts\running_the_nix_package_manager_on_windows.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

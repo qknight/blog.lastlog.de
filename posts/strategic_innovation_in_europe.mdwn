@@ -1,0 +1,62 @@
+[[!meta date="2023-05-22 22:58"]]
+[[!tag technology europe]]
+[[!summary technocratic white paper on how to make europe a strong strategic player]]
+
+[[!img media/innovation-creativity-icon.svg width="100px" class="noFancy" alt="https://uxwing.com/innovation-creativity-icon" style="float: right"]]
+
+# motivation
+
+ideas of mine to make 'europe' a 'strong strategic player'
+
+# software
+
+to get rid of the current software monoculture we need to introduce a open source based culture. the closed source culture keeps us dependent on the US.
+
+there are already so many open source projects out there, we need to use them instead.
+
+# internet
+
+## security
+
+* make software reproducibility a first order principle (i.e. reproducible builds via Nix)
+* forbid microsoft AD usage in companies and public institutions and encourage open standards
+
+## provider
+
+* make ipv6 mandatory for dsl/fiber/mobile
+  * with static prefix
+  * ipv6
+  * general SLA uptime guarantees for wired connections, no special contracts for businesses
+* maximum 3 months contracts
+* free choice of router
+* symmetric upload/download bandwidth
+* discourage the term 'flat rate', instead just have reasonable prices
+* encourage [https://letsencrypt.org/](let's encrypt) usage
+
+## roaming
+
+* we must get rid of EU roaming fees for mobiles (also includes swiss), also make mobile voip mandatory in terms of QoS
+
+## payment, accounting
+
+invoice automation:
+
+* sellers (online and offline) must be obliged to append a machine readable (json, xml) invoice for accounting during the payment process
+
+europe needs a independent clone of:
+
+* [paypal.com](paypal.com)
+* digital payment (aka google pay)
+
+## hosting
+
+in europe we must have an alternative to amazon aws, google cloud, microsoft azure, digitalocean, linode
+
+## packages and services
+
+* germany: shift away from home-delivery default to https://de.wikipedia.org/wiki/Paketbox and https://de.wikipedia.org/wiki/Packstation
+* create a 'europe' based alternative to amazon.com in form of a market place (i.e. google shopping)
+
+# conclusion
+
+this white paper only outlines a few low-hanging fruits. in regards to many topics discussed above, the netherlands is currently in the lead. they even got cool things as the [https://nlnet.nl/](nlnet.nl) initiative.

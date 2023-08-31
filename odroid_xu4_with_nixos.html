@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="odroid_xu4_with_nixos.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>odroid xu4 with nixos</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/odroid_xu4_with_nixos.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="wordpress.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="nixos_pxe_booting.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">odroid xu4 with nixos</h1>
+    <div id="date"><p><span id="lastupdated">11 feb 2016</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::odroid" class="tagbtn btn btn-primary">odroid</a><a href="timeline.html?filter=tag::xu4" class="tagbtn btn btn-primary">xu4</a><a href="timeline.html?filter=tag::u-boot" class="tagbtn btn btn-primary">u-boot</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="NixOS project logo" style="float: right" class="noFancy"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p><strong>nixos support for ‘armv7l’ is getting much better in
+general</strong>. in this postings i want to show a few insights on how
+to get nixos running on any ARM board with general linux support. much
+of the multi-platoform stuff was probably created by
+<strong>viric</strong> and later extended by
+<strong>dezgeg</strong>.</p>
+<p><a href="media/odroid-xu4.jpg"><img src=media/odroid-xu4.jpg width="300px" alt="Odroid XU4 board" caption="Odroid XU4, picture form Hardkernel" style="float: none" class="noFancy" label="(c) hardkernel"></a></p>
+<ul>
+<li><strong>Samsung Exynos5422 Cortex™-A15 2Ghz and Cortex™-A7 Octa core
+CPUs</strong></li>
+<li>Mali-T628 MP6(OpenGL ES 3.0/2.0/1.1 and OpenCL 1.1 Full
+profile)</li>
+<li>2Gbyte LPDDR3 RAM PoP stacked</li>
+<li>eMMC5.0 HS400 Flash Storage</li>
+<li>2 x USB 3.0 Host, 1 x USB 2.0 Host</li>
+<li>Gigabit Ethernet port</li>
+<li>HDMI 1.4a for display</li>
+<li>Size : 82 x 58 x 22 mm approx.(including cooling fan)</li>
+</ul>
+<div class="alert alert-info" role="alert">
+<p><strong>2 gb ram and 8 x 1.5GHz core(s) make the XU4 an excellent ARM
+board for source deployment</strong>.</p>
+</div>
+<h3 data-number="1.1" id="nixpkgs">nixpkgs</h3>
+<p>a short look into: <a
+href="https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/stdenv/linux/default.nix">https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/stdenv/linux/default.nix</a>
+shows:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">bootstrapFiles</span> =</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">customBootstrapFiles</span> != null then customBootstrapFiles</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="ex">system</span> == <span class="st">&quot;i686-linux&quot;</span> then import ./bootstrap/i686.nix</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="ex">system</span> == <span class="st">&quot;x86_64-linux&quot;</span> then import ./bootstrap/x86_64.nix</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="ex">system</span> == <span class="st">&quot;armv5tel-linux&quot;</span> then import ./bootstrap/armv5tel.nix</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="ex">system</span> == <span class="st">&quot;armv6l-linux&quot;</span> then import ./bootstrap/armv6l.nix</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="ex">system</span> == <span class="st">&quot;armv7l-linux&quot;</span> then import ./bootstrap/armv7l.nix</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="ex">system</span> == <span class="st">&quot;mips64el-linux&quot;</span> then import ./bootstrap/loongson2f.nix</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="ex">abort</span> <span class="st">&quot;unsupported platform for the pure Linux stdenv&quot;</span><span class="kw">;</span></span></code></pre></div>
+<p>plenty ARM variants are already used along with nixos!</p>
+<p>the essential parts to run NixOS on ARM:</p>
+<ul>
+<li><a
+href="https://github.com/NixOS/nixpkgs/pull/11633/files">https://github.com/NixOS/nixpkgs/pull/11633/files</a></li>
+<li><a
+href="https://nixos.org/wiki/NixOS_on_ARM">https://nixos.org/wiki/NixOS_on_ARM</a></li>
+<li><a
+href="https://nixos.org/wiki/Bootstrapping_NixOS_on_ARM">https://nixos.org/wiki/Bootstrapping_NixOS_on_ARM</a></li>
+</ul>
+<h2 data-number="2" id="kernel">kernel</h2>
+<p>since i’m not using the GPU i’ve decided to try the 4.2.0 kernel:</p>
+<p><a
+href="http://odroid.com/dokuwiki/doku.php?id=en:xu4_building_kernel">http://odroid.com/dokuwiki/doku.php?id=en:xu4_building_kernel</a></p>
+<div class="alert alert-info" role="alert">
+<p>so far this is working except for some usb 2.0 harddrives** (usb 2
+sata bridge) which will cause a kernel OOPS after about 30-90 min. using
+usb 3.0 disks on the usb 3.0 ports seem to work on the other hand.</p>
+</div>
+<h4 data-number="2.0.1" id="installing-drm-crap">installing DRM
+crap</h4>
+<p>ODROID-XU4 must have the secure boot enabled boot loader. There are
+four components of boot loader:</p>
+<ul>
+<li>bl1.bin.HardKernel</li>
+<li>bl2.bin.HardKernel</li>
+<li>tzsw.bin.HardKernel</li>
+<li>u-boot-dtb.bin (compiled by us, not supplied by hardkernel)</li>
+</ul>
+<div class="alert alert-info" role="alert">
+<p>i tried bl2.bin.hardkernel but it didn’t work! but using
+bl2.bin.hardkernel.1mb_uboot made it work.</p>
+</div>
+<h5 data-number="2.0.1.1"
+id="install-the-binary-blobs-using-this-steps">install the binary blobs
+using this steps:</h5>
+<ol type="1">
+<li><p>download the needed files form here:</p>
+<p><a
+href="http://download.tizen.org/snapshots/tizen/tv/latest/images/arm-wayland/tv-boot-armv7l-odroidxu3/">http://download.tizen.org/snapshots/tizen/tv/latest/images/arm-wayland/tv-boot-armv7l-odroidxu3/</a></p></li>
+<li><p>then deploy them to the empty <strong>sd-card</strong> (eMMC
+offsets differ by one sector, see below):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># zero the first 4000 secotors</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=/dev/zero bs=512 count=4000 of=/dev/sdd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install the 4 binary blobs</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=bl1.bin.hardkernel bs=512 seek=1 of=/dev/sdd</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=bl2.bin.hardkernel.1mb_uboot  bs=512 seek=31 of=/dev/sdd</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=../u-boot-dtb.bin bs=512 seek=63 of=/dev/sdd</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dd</span> if=tzsw.bin.hardkernel  bs=512 seek=2111 of=/dev/sdd</span></code></pre></div>
+<div class="alert alert-info" role="alert">
+you should now be able to get a u-boot shell when using the new sd-card
+in a odroid xu4.
+</div></li>
+</ol>
+<h5 data-number="2.0.1.2" id="xu4-flash-specification">XU4 flash
+specification</h5>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>sd_fuse<span class="op">:</span> sd_fusing<span class="op">:</span> Add Embedded MMC <span class="op">(</span>eMMC<span class="op">)</span> support</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Odroid boards can boot from either a SD<span class="op">/</span>MMC or an eMMC<span class="op">.</span> The iROM</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>load the bootloader binaries <span class="op">(</span>first and second stage bootloader<span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>trustzone<span class="op">,</span> DRM<span class="op">,</span> etc<span class="op">)</span> from the first sectors of the boot device<span class="op">.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>An SD exposes all its physical address space as just one device</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">(</span>e<span class="op">.</span>g<span class="op">:</span> <span class="op">/</span>dev<span class="op">/</span>mmcblk0<span class="op">)</span> so its first sectors are just located on that</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>device but the eMMC split its physical address space in different</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>virtual devices <span class="op">(</span>e<span class="op">.</span>g<span class="op">:</span> mmcblk0boot0<span class="op">,</span> mmcblk0boot1<span class="op">,</span> mmcblk0rpmb and</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>mmcblk0<span class="op">).</span> So the eMMC first sectors are not located on the device</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>but on the virtual $<span class="op">{</span>device<span class="op">}</span>boot0<span class="op">.</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>Also<span class="op">,</span> the addresses are at a different offset <span class="cf">for</span> SD<span class="op">/</span>MMC and eMMC</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>so special care has to be taken when flashing images to an eMMC</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>since just dd<span class="ch">&#39;i</span><span class="er">ng an image to the block device won</span><span class="ch">&#39;</span>t work<span class="op">.</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>The binaries written and their offset on both a SD<span class="op">/</span>MMC and eMMC are<span class="op">:</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                               eMMC                               <span class="op">|</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> Binary                          <span class="op">|</span> Start sector <span class="op">|</span> Length <span class="op">(</span>sector<span class="op">)</span> <span class="op">|</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> bl1<span class="op">.</span>HardKernel <span class="op">(</span>BL1<span class="op">/</span>DRM<span class="op">)</span>        <span class="op">|</span>    <span class="dv">0</span>         <span class="op">|</span>   <span class="dv">30</span>            <span class="op">|</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> bl2<span class="op">.</span>HardKernel <span class="op">(</span>BL2<span class="op">/</span>SPL<span class="op">)</span>        <span class="op">|</span>   <span class="dv">30</span>         <span class="op">|</span>   <span class="dv">32</span>            <span class="op">|</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> u<span class="op">-</span>boot<span class="op">.</span>bin <span class="op">(</span>U<span class="op">-</span>Boot<span class="op">)</span>             <span class="op">|</span>   <span class="dv">62</span>         <span class="op">|</span> <span class="dv">1024</span>            <span class="op">|</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> tzsw<span class="op">.</span>HardKernel <span class="op">(</span>TrustZone S<span class="op">/</span>W<span class="op">)</span> <span class="op">|</span> <span class="dv">2110</span>         <span class="op">|</span>  <span class="dv">312</span>            <span class="op">|</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                              SD<span class="op">/</span>MMC                              <span class="op">|</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> Binary                          <span class="op">|</span> Start sector <span class="op">|</span> Length <span class="op">(</span>sector<span class="op">)</span> <span class="op">|</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> bl1<span class="op">.</span>HardKernel <span class="op">(</span>BL1<span class="op">/</span>DRM<span class="op">)</span>        <span class="op">|</span>    <span class="dv">1</span>         <span class="op">|</span>   <span class="dv">30</span>            <span class="op">|</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> bl2<span class="op">.</span>HardKernel <span class="op">(</span>BL2<span class="op">/</span>SPL<span class="op">)</span>        <span class="op">|</span>   <span class="dv">31</span>         <span class="op">|</span>   <span class="dv">32</span>            <span class="op">|</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> u<span class="op">-</span>boot<span class="op">.</span>bin <span class="op">(</span>U<span class="op">-</span>Boot<span class="op">)</span>             <span class="op">|</span>   <span class="dv">63</span>         <span class="op">|</span> <span class="dv">1024</span>            <span class="op">|</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>                                 <span class="op">|</span>              <span class="op">|</span>                 <span class="op">|</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> tzsw<span class="op">.</span>HardKernel <span class="op">(</span>TrustZone S<span class="op">/</span>W<span class="op">)</span> <span class="op">|</span> <span class="dv">2111</span>         <span class="op">|</span>  <span class="dv">312</span>            <span class="op">|</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="op">+---------------------------------+--------------+-----------------+</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>Signed<span class="op">-</span>off<span class="op">-</span>by<span class="op">:</span> Javier Martinez Canillas <span class="op">&lt;</span>javier<span class="op">.</span>martinez@collabora<span class="op">.</span>co<span class="op">.</span>uk<span class="op">&gt;</span></span></code></pre></div>
+<div class="alert alert-info" role="alert">
+<p>you don’t need to copy the u-boot.bin (or anything similar named) to
+the /boot as the XU4 won’t look for it there. the XU4 wants it to be
+written to the sd-card at a special place, preferably outside any
+partition.</p>
+</div>
+<h2 data-number="3" id="uboot">uboot</h2>
+<p>uboot is a boot loader and if you manage to install the latest
+version, which right now is <strong>2016.01-rc1</strong>, you will get
+support for extlinux.</p>
+<p>extlinux features a grub like boot-menu:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>Retrieving file<span class="op">:</span> <span class="op">/</span>extlinux<span class="op">/</span>extlinux<span class="op">.</span>conf</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">3543</span> bytes read in <span class="dv">14</span> ms <span class="op">(</span><span class="fl">247.1</span> KiB<span class="op">/</span>s<span class="op">)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">------------------------------------------------------------</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="op">:</span>      NixOS <span class="op">-</span> Default</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="op">:</span>      NixOS <span class="op">-</span> Configuration <span class="dv">7</span> <span class="op">(</span><span class="dv">2015</span><span class="op">-</span><span class="dv">12</span><span class="op">-</span><span class="bn">02</span> <span class="bn">05</span><span class="op">:</span><span class="dv">32</span> <span class="op">-</span> <span class="fl">15.09</span><span class="er">.git.ba8f33fM</span><span class="op">)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span><span class="op">:</span>      NixOS <span class="op">-</span> Configuration <span class="dv">6</span> <span class="op">(</span><span class="dv">2015</span><span class="op">-</span><span class="dv">12</span><span class="op">-</span><span class="bn">02</span> <span class="bn">05</span><span class="op">:</span><span class="dv">0</span><span class="er">9</span> <span class="op">-</span> <span class="fl">15.09</span><span class="er">.git.ba8f33fM</span><span class="op">)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span><span class="op">:</span>      NixOS <span class="op">-</span> Configuration <span class="dv">5</span> <span class="op">(</span><span class="dv">2015</span><span class="op">-</span><span class="dv">12</span><span class="op">-</span><span class="bn">02</span> <span class="bn">04</span><span class="op">:</span><span class="bn">01</span> <span class="op">-</span> <span class="fl">15.09</span><span class="er">.git.ba8f33fM</span><span class="op">)</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span><span class="op">:</span>      NixOS <span class="op">-</span> Configuration <span class="dv">4</span> <span class="op">(</span><span class="dv">2015</span><span class="op">-</span><span class="dv">11</span><span class="op">-</span><span class="dv">29</span> <span class="bn">02</span><span class="op">:</span><span class="dv">32</span> <span class="op">-</span> <span class="fl">15.09</span><span class="er">.git.ba8f33fM</span><span class="op">)</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span><span class="op">:</span>      NixOS <span class="op">-</span> Configuration <span class="dv">3</span> <span class="op">(</span><span class="dv">2015</span><span class="op">-</span><span class="dv">11</span><span class="op">-</span><span class="dv">28</span> <span class="dv">17</span><span class="op">:</span><span class="dv">33</span> <span class="op">-</span> <span class="fl">15.09</span><span class="er">.git.ba8f33f</span><span class="op">)</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>Enter choice<span class="op">:</span> <span class="dv">1</span><span class="op">:</span>        NixOS <span class="op">-</span> Default</span></code></pre></div>
+<div class="alert alert-info" role="alert">
+<p>this <strong>helps you to boot previous versions of your nixos
+system</strong> but you need a <strong>odroid USB-UART</strong> and use
+<strong>picocom</strong> to do the selection. the 4.2.x kernel i’m using
+does not have graphical support.</p>
+</div>
+<h3 data-number="3.1" id="u-boot-patch">u-boot patch</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode diff"><code class="sourceCode diff"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">diff --git a/common/cmd_pxe.c b/common/cmd_pxe.c</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>index 080b376..67dd647 100644</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">--- a/common/cmd_pxe.c</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dt">+++ b/common/cmd_pxe.c</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">@@ -19,7 +19,7 @@</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a> #include &quot;menu.h&quot;</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  #include &quot;cli.h&quot;</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>   -#define MAX_TFTP_PATH_LEN 127</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>   +#define MAX_TFTP_PATH_LEN 512</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>     const char *pxe_default_paths[] = {</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      #ifdef CONFIG_SYS_SOC</span></code></pre></div>
+<div class="alert alert-warning" role="alert">
+<p>without this patch you won’t be able to find the dtb files as the
+path names get too long for u-boot to process.</p>
+</div>
+<h3 data-number="3.2" id="uboot-source">uboot source</h3>
+<p>odroid xu4 uboot can be found here:</p>
+<p><a
+href="http://odroid.com/dokuwiki/doku.php?id=en:xu3_building_u-boot#installation">http://odroid.com/dokuwiki/doku.php?id=en:xu3_building_u-boot#installation</a>.</p>
+<p>odroidxu3-v2012.07 is quite old so i tried ‘master’:</p>
+<p><a
+href="http://git.denx.de/?p=u-boot.git;a=blob;f=doc/README.distro;hb=refs/heads/master">http://git.denx.de/?p=u-boot.git;a=blob;f=doc/README.distro;hb=refs/heads/master</a></p>
+<div class="alert alert-warning" role="alert">
+<p>one major difference was that i <strong>had to use the
+u-boot-dtb.bin</strong> instead of the <strong>u-boot.bin</strong>.</p>
+</div>
+<h3 data-number="3.3" id="compilation">compilation</h3>
+how to build the custom u-boot-dtb.bin for the XU4? simply use
+‘nix-env’:
+<pre>
+nix-env -qaP | grep odroid
+ubootOdroidXU4           uboot-odroid_xu4-fa8883a1e39a20e72aaa5093af0c80062cb95757
+</pre>
+<p>install it:</p>
+<pre><code>nix-env -iA ubootOdroidXU4</code></pre>
+<p>then look at the paths and copy the u-boot-dtb.bin from there.
+alternatively download it from here:</p>
+<p><a
+href="https://nixcloud.io/downloads/armv7l/u-boot-dtb.bin">https://nixcloud.io/downloads/armv7l/u-boot-dtb.bin</a></p>
+<pre><code>5f32e455af6ef3d316b2a9d7ddc25a6c84959f955d96039e57c05244fad2b898 u-boot-dtb.bin</code></pre>
+<h4 data-number="3.3.1" id="installing-u-boot-on-the-emmc">installing
+u-boot on the eMMC</h4>
+<p>using u-boot itself to flush u-boot onto a eMMC, described in the
+steps below, you will require a working sd-card image with the wanted
+new u-boot-dtb.bin on it:</p>
+<ol type="1">
+<li><p>first upgrade the u-boot on the sd-card. then</p></li>
+<li><p>then use this sd-card’s u-boot to boot the xu4 and finally copy
+that u-boot from the sd-card to the eMMC using the u-boot
+shell.</p></li>
+</ol>
+<p>to place the new u-boot on the eMMC copy the first 30MB of the image
+to a sd-card. then boot from it and attach the USB-UART and right after
+booting, press ‘return’ to get to a prompt with this label:
+<strong>ODROID-XU3 #</strong>, then type these commands:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ODROID<span class="op">-</span>XU3 # mmc dev <span class="dv">0</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ODROID<span class="op">-</span>XU3 # mmc read <span class="bn">0x50000000</span> <span class="bn">0x1</span> <span class="bn">0xa3e</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ODROID<span class="op">-</span>XU3 # mmc dev <span class="dv">1</span> <span class="dv">1</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>ODROID<span class="op">-</span>XU3 # mmc write <span class="bn">0x50000000</span> <span class="bn">0x0</span> <span class="bn">0xa3e</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>ODROID<span class="op">-</span>XU3 # mmc dev <span class="dv">1</span> <span class="dv">0</span></span></code></pre></div>
+<p>this will copy the u-boot from the sd-card into the eMMC. afterwards
+poweroff and remove the sd-card. you can now use the new u-boot from the
+eMMC. next copy the image to the eMMC and you are ready to go!</p>
+<h4 data-number="3.3.2" id="xu4-boot-messages">xu4 boot messages</h4>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">U-Boot</span> 2016.01-rc1 <span class="er">(</span><span class="ex">Dec</span> 02 2015 <span class="at">-</span> 04:40:51 +0000<span class="kw">)</span> <span class="cf">for</span> ODROID<span class="ex">-XU3</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">CPU:</span>   Exynos5422 @ 800 MHz</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">Model:</span> Odroid XU3 based on EXYNOS5422</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Board:</span> Odroid XU3 based on EXYNOS5422</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Type:</span>  xu4</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">DRAM:</span>  2 GiB</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="ex">__of_translate_address:</span> Bad cell count for gpx0</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="ex">MMC:</span>   EXYNOS DWMMC: 0, EXYNOS DWMMC: 1</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ex">***</span> Warning <span class="at">-</span> bad CRC, using default environment</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="ex">In:</span>    serial</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="ex">Out:</span>   serial</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="ex">Err:</span>   serial</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Net:</span>   No ethernet found.</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Hit</span> any key to stop autoboot:  0 </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="ex">switch</span> to partitions <span class="co">#0, OK</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="ex">mmc0</span> is current device</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="ex">Scanning</span> mmc 0:1...</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="ex">Found</span> /extlinux/extlinux.conf</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="ex">Retrieving</span> file: /extlinux/extlinux.conf</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="ex">3543</span> bytes read in 14 ms <span class="er">(</span><span class="ex">247.1</span> KiB/s<span class="kw">)</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="ex">------------------------------------------------------------</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="ex">1:</span>      NixOS <span class="at">-</span> Default</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="ex">2:</span>      NixOS <span class="at">-</span> Configuration 7 <span class="er">(</span><span class="ex">2015-12-02</span> 05:32 <span class="at">-</span> 15.09.git.ba8f33fM<span class="kw">)</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="ex">3:</span>      NixOS <span class="at">-</span> Configuration 6 <span class="er">(</span><span class="ex">2015-12-02</span> 05:09 <span class="at">-</span> 15.09.git.ba8f33fM<span class="kw">)</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="ex">4:</span>      NixOS <span class="at">-</span> Configuration 5 <span class="er">(</span><span class="ex">2015-12-02</span> 04:01 <span class="at">-</span> 15.09.git.ba8f33fM<span class="kw">)</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="ex">5:</span>      NixOS <span class="at">-</span> Configuration 4 <span class="er">(</span><span class="ex">2015-11-29</span> 02:32 <span class="at">-</span> 15.09.git.ba8f33fM<span class="kw">)</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="ex">6:</span>      NixOS <span class="at">-</span> Configuration 3 <span class="er">(</span><span class="ex">2015-11-28</span> 17:33 <span class="at">-</span> 15.09.git.ba8f33f<span class="kw">)</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> choice: 1:        NixOS <span class="at">-</span> Default</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="ex">Retrieving</span> file: /extlinux/../nixos/fy2rhpvfwn27w6qr2w8z9s60zbbxdxf5-initrd-initrd</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="ex">3495632</span> bytes read in 322 ms <span class="er">(</span><span class="ex">10.4</span> MiB/s<span class="kw">)</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="ex">Retrieving</span> file: /extlinux/../nixos/kw3x6kdwhd834j6adpi5bk2m4akj5kzx-linux-4.2.0-5eb40d45b291ee129cbfac2073f1ca7aa32ff4c5-zImage</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="ex">5767144</span> bytes read in 515 ms <span class="er">(</span><span class="ex">10.7</span> MiB/s<span class="kw">)</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="ex">append:</span> systemConfig=/nix/store/v7anhi1v9rvkcdy5pylspqjcdzslm5gi-nixos-15.09.git.ba8f33fM init=/nix/store/v7anhi1v9rvkcdy5pylspqjcdzslm5gi-nixos-15.09.git.ba8f33fM/init loglevel=4</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="ex">Retrieving</span> file: /extlinux/../nixos/kw3x6kdwhd834j6adpi5bk2m4akj5kzx-linux-4.2.0-5eb40d45b291ee129cbfac2073f1ca7aa32ff4c5-dtbs/exynos5422-odroidxu4.dtb</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="ex">45419</span> bytes read in 70 ms <span class="er">(</span><span class="ex">632.8</span> KiB/s<span class="kw">)</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="ex">Kernel</span> image @ 0x42000000 [ 0x000000 <span class="at">-</span> 0x57ffe8 ]</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">### Loading init Ramdisk from Legacy Image at 43300000 ...</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Image</span> Name:   </span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Image</span> Type:   ARM Linux RAMDisk Image <span class="er">(</span><span class="fu">gzip</span> compressed<span class="kw">)</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Data</span> Size:    3495568 Bytes = 3.3 MiB</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Load</span> Address: 00000000</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Entry</span> Point:  00000000</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Verifying</span> Checksum ... OK</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">## Flattened Device Tree blob at 43000000</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Booting</span> using the fdt blob at 0x43000000</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Loading</span> Ramdisk to 4fcaa000, end 4ffff690 ... OK</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>   <span class="ex">Loading</span> Device Tree to 4fc9b000, end 4fca916a ... OK</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="ex">Starting</span> kernel ...</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>    0.000000] L2C: failed <span class="er">to</span> <span class="ex">init:</span> <span class="at">-19</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>    1.856637] s3c-rtc 101e0000.rtc:: <span class="er">failed</span> <span class="ex">to</span> find rtc source clock</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;&lt;&lt;</span> NixOS <span class="ex">Stage</span> 1 <span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="ex">loading</span> module dm_mod...</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="ex">running</span> udev...</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="ex">starting</span> version 217</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="ex">starting</span> device mapper and LVM...</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="ex">checking</span> /dev/mmcblk0p2...</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="ex">fsck</span> <span class="er">(</span><span class="ex">busybox</span> 1.23.2, <span class="kw">)</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="ex">[fsck.ext4</span> <span class="er">(</span><span class="ex">1</span><span class="kw">)</span> <span class="ex">--</span> /mnt-root/] fsck.ext4 <span class="at">-a</span> /dev/mmcblk0p2</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="ex">/dev/mmcblk0p2:</span> clean, 69438/209664 files, 454448/843520 blocks</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="ex">mounting</span> /dev/mmcblk0p2 on /...</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;&lt;&lt;</span> NixOS <span class="ex">Stage</span> 2 <span class="op">&gt;&gt;&gt;</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="ex">running</span> activation script...</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="ex">setting</span> up /etc...</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="ex">starting</span> systemd...</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="ex">Welcome</span> to NixOS 15.09.git.ba8f33fM <span class="er">(</span><span class="ex">Dingo</span><span class="kw">)</span><span class="ex">!</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Swap.</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Expecting</span> device dev-mmcblk0p1.device...</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Expecting</span> device dev-ttySAC2.device...</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Remote File Systems <span class="er">(</span><span class="ex">Pre</span><span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Remote File Systems.</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Paths.</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Created</span> slice Root Slice.</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Created</span> slice User and Session Slice.</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on /dev/initctl Compatibility Named Pipe.</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on Delayed Shutdown Socket.</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on Journal Socket <span class="er">(</span><span class="ex">/dev/log</span><span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on udev Kernel Socket.</span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on udev Control Socket.</span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on Journal Socket.</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Created</span> slice System Slice.</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Remount Root and Kernel File Systems...</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Created</span> slice system-getty.slice.</span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Created</span> slice system-serial<span class="dt">\x</span>2dgetty.slice.</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Setup Virtual Console...</span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Load Kernel Modules...</span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Mounting</span> POSIX Message Queue File System...</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Create list of required st... nodes for the current kernel...</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Mounting</span> Debug File System...</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> udev Coldplug all Devices...</span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Journal Service...</span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Slices.</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Mounted</span> Debug File System.</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Mounted</span> POSIX Message Queue File System.</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Remount Root and Kernel File Systems.</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Load Kernel Modules.</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Create list of required sta...ce nodes for the current kernel.</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Create Static Device Nodes in /dev...</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Mounting</span> Configuration File System...</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Apply Kernel Variables...</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Load/Save Random Seed...</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Update UTMP about System Boot/Shutdown...</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Mounted</span> Configuration File System.</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> udev Coldplug all Devices.</span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> udev Wait for Complete Device Initialization...</span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Load/Save Random Seed.</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Apply Kernel Variables.</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Update UTMP about System Boot/Shutdown.</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Create Static Device Nodes in /dev.</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> udev Kernel Device Manager...</span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Local File Systems <span class="er">(</span><span class="ex">Pre</span><span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Setup Virtual Console.</span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Journal Service.</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Trigger Flushing of Journal to Persistent Storage...</span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Trigger Flushing of Journal to Persistent Storage.</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> udev Kernel Device Manager.</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Found</span> device /dev/ttySAC2.</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Found</span> device /dev/mmcblk0p1.</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Mounting</span> /boot...</span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Mounted</span> /boot.</span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> udev Wait for Complete Device Initialization.</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Local File Systems.</span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Create Volatile Files and Directories...</span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target System Initialization.</span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on D-Bus System Message Bus Socket.</span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Listening</span> on Nix Daemon Socket.</span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Sockets.</span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Timers.</span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Basic System.</span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> SSH Daemon...</span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> NTP Daemon...</span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Cron Daemon...</span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> CPU Frequency Governor Setup...</span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Firewall...</span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> SCSI Link Power Management Policy...</span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Kernel Log Daemon...</span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Kernel Log Daemon.</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Store Sound Card State...</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Name Service Cache Daemon...</span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Permit User Sessions...</span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Hardware RNG Entropy Gatherer Daemon...</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Hardware RNG Entropy Gatherer Daemon.</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Create Volatile Files and Directories.</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Cron Daemon.</span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> CPU Frequency Governor Setup.</span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> SCSI Link Power Management Policy.</span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Store Sound Card State.</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Permit User Sessions.</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> NTP Daemon.</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Getty on tty1...</span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Getty on tty1.</span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Serial Getty on ttySAC2...</span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Serial Getty on ttySAC2.</span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Login Prompts.</span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> SSH Daemon.</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Name Service Cache Daemon.</span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Host and Network Name Lookups.</span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target User and Group Name Lookups.</span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Login Service...</span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a><span class="ex">[FAILED]</span> Failed to start Firewall.</span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a><span class="ex">See</span> <span class="st">&quot;systemctl status firewall.service&quot;</span> for details.</span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> D-Bus System Message Bus...</span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> D-Bus System Message Bus.</span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Network <span class="er">(</span><span class="ex">Pre</span><span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target All Network Interfaces.</span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> DHCP Client...</span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Networking Setup...</span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Login Service.</span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Stopping</span> Name Service Cache Daemon...</span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Stopped</span> Name Service Cache Daemon.</span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Networking Setup.</span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Extra networking commands....</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>         <span class="ex">Starting</span> Name Service Cache Daemon...</span>
+<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Extra networking commands..</span>
+<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> Name Service Cache Daemon.</span>
+<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Started</span> DHCP Client.</span>
+<span id="cb9-186"><a href="#cb9-186" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Network.</span>
+<span id="cb9-187"><a href="#cb9-187" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span>  OK  <span class="bu">]</span> <span class="ex">Reached</span> target Multi-User System.</span>
+<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;&lt;&lt;</span> Welcome <span class="ex">to</span> NixOS 15.09.git.ba8f33fM <span class="er">(</span><span class="ex">armv7l</span><span class="kw">)</span> <span class="ex">-</span> ttySAC2 <span class="op">&gt;&gt;&gt;</span></span></code></pre></div>
+<h3 data-number="3.4" id="sd-card-images">sd-card images</h3>
+<p>you can download the odroid xu4 nixos image here:</p>
+<ol type="1">
+<li><p><a
+href="https://nixcloud.io/downloads/armv7l/odroid_xu4-nixos-15.09.git.ba8f33fM-kernel-4.2.0-sd-card_image-2015-12-02-3gb-disk.dd.xz">https://nixcloud.io/downloads/armv7l/odroid_xu4-nixos-15.09.git.ba8f33fM-kernel-4.2.0-sd-card_image-2015-12-02-3gb-disk.dd.xz</a></p>
+<pre><code> sha256sum 06d909038a6369c52d162aaa655aabe40b52b129faf7d3579a35171b564b0515  </code></pre></li>
+<li><p>install it on a <strong>sd-card</strong> using xz and dd</p>
+<pre><code> xz --decompress --keep --stdout sha256 odroid_xu4-nixos-15.09.git.ba8f33fM-kernel-4.2.0-sd-card_image-2015-12-02-3gb-disk.dd.xz | dd bs=4M of=/dev/sdN</code></pre></li>
+<li><p>afterwards resize the second partition to the maximum size of
+your partition. i would recommend to use at least 8gb but better 16gb
+sd-cards</p>
+<pre><code> gparted /dev/sdN</code></pre></li>
+</ol>
+<p>finally plug the sd-card into your odroid xu4 and boot from it.
+should work out of the box.</p>
+<div class="alert alert-info" role="alert">
+<p>if you deploy to the eMMC, look at the guide above on how to install
+the new u-boot using a sd-card!</p>
+</div>
+<h2 data-number="4" id="tooling">tooling</h2>
+<h3 data-number="4.1" id="picocom">picocom</h3>
+<p>i’m usually using picocom instead of ‘screen’ or ‘minicom’ for
+accessing the serial console like this:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> picocom /dev/ttyUSB0 <span class="at">-b</span> 115200</span></code></pre></div>
+<p>however, i don’t want to use the root-user so i added a few lines to
+my udev rules using <strong>services.udev.extraRules</strong>:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">services.udev.extraRules</span> = <span class="st">&#39;&#39;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Bus 001 Device 005: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ATTRS{idVendor}==</span><span class="st">&quot;067b&quot;</span><span class="ex">,</span> ATTRS{idProduct}==<span class="st">&quot;2303&quot;</span>, MODE=<span class="st">&quot;666&quot;</span>, SYMLINK+=<span class="st">&quot;ttyUSB-odroid-u3-1&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Bus 003 Device 055: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x UART Bridge / myAVR mySmartUSB light</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ATTRS{idVendor}==</span><span class="st">&quot;10c4&quot;</span><span class="ex">,</span> ATTRS{idProduct}==<span class="st">&quot;ea60&quot;</span>, MODE=<span class="st">&quot;666&quot;</span>, SYMLINK+=<span class="st">&quot;ttyUSB-odroid-u3-2&quot;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="kw">;</span></span></code></pre></div>
+<p>afterwards you can use ‘picocom /dev/ttyUSB-odroid-u3-2 -b 115200’ as
+a none-root user. i wish we had that also for device nodes like /dev/sda
+and similar which is ‘simple’ to use.</p>
+<h3 data-number="4.2" id="resizing-partitions">resizing partitions</h3>
+<p>resizing paritions &amp; resizing filesystems is easy if you are
+using gparted! but how to resize a partition which is inside a image
+which was created using ‘dd’? well, use the <strong>loop</strong>
+luke!</p>
+<p>mount the image using ‘losetup’:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">losetup</span> <span class="at">-f</span> <span class="at">--show</span> <span class="at">-P</span> odroid_xu4_kernel-4.2.0-sd-card-2015-12-02-16gb.dd    </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">loop0</span>                 7:0    0   3,4G  0 loop  </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├─loop0p1</span>           259:2    0   114M  0 loop  </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="ex">└─loop0p2</span>           259:3    0   3,2G  0 loop  </span></code></pre></div>
+<p>then you can use gparted on /dev/loop0 or modify the partitions using
+/dev/loop0p1 and so on.</p>
+<p>after you finished your edits, unmount it:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">losetup</span> <span class="at">-d</span> /dev/loop0</span></code></pre></div>
+<h2 data-number="5" id="conclusion">conclusion</h2>
+<p>getting nixos to work with the U3/XU4 was quite an adventure and not
+possible without dezgeg and virics help via IRC. also their efforts in
+creating all the nixos-ARM specific packages is great.</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/odroid_xu4_with_nixos.mdwn" title="posts\odroid_xu4_with_nixos.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

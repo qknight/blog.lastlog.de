@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="the_cloud.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>the cloud</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/the_cloud.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="bonding_eth0_wlan0_together_to_get_an_active_backup_link.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="NAT_traversal_library.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">the cloud</h1>
+    <div id="date"><p><span id="lastupdated">11 jul 2012</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::security" class="tagbtn btn btn-primary">security</a><a href="timeline.html?filter=tag::society" class="tagbtn btn btn-primary">society</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::virtualization" class="tagbtn btn btn-primary">virtualization</a></p></div>
+    <p><a href="media/konqueror.png"><img src=media/konqueror.png alt="" caption="what does 'cloud' stand for?" style="float: right" size=200x></a></p>
+<h2 data-number="1" id="what-does-cloud-stand-for">what does ‘cloud’
+stand for?</h2>
+<p>simply speaking, a cloud consists similar computers (homogeneous
+hardware). usually every single cloud computer runs the same OS (host
+system), each controlling various guests. the main technical motivations
+are:</p>
+<ul>
+<li>load balancing of <strong>cpu load </strong>(move the VM to a
+machine with more CPU power)</li>
+<li>load balancing of <strong>input/ouput load</strong> (RAM increase;
+faster storage raid; in memory databases)</li>
+<li>load balancing of <strong>bandwidth usage </strong>(move the VM to
+the most demanding users)</li>
+<li><strong>increase redundancy </strong>(reduce hardware failures;
+reduce power loss issues)</li>
+</ul>
+<p>the main non-technical motivations seem to be:</p>
+<ul>
+<li><strong>marketing</strong> - ‘cloud’ sounds cool, although a ‘cloud’
+is basically just a subset of the internet</li>
+<li><strong>vendor lock-in</strong> - probably no surprise to
+anyone</li>
+<li><strong>centralization</strong> - cheaper to manage; grants more
+control over the platform</li>
+</ul>
+<p><strong>if you are a customer to a service which is hosted in the
+cloud </strong>you usually don’t see the cloud at all, hence the term
+‘cloud’:</p>
+<ul>
+<li><strong>amazon</strong>: when buying books or other things</li>
+<li><strong>google</strong>: using google search; reading email; google
+maps</li>
+<li><strong>microsoft azure</strong>: whatever that platform is good
+for, is actually anybody using this?</li>
+</ul>
+<p><strong>if you are using one or more machines from a cloud,</strong>
+there are basically two interesting patterns:</p>
+<ul>
+<li><strong>actively maintain each computer:</strong> implement
+distributed file systems and distributed services</li>
+<li><strong>using an abstraction: </strong>someone implemented the
+handling of nodes and services you are going to develop thus it is
+running on top of an abstraction</li>
+</ul>
+<p>to sum up, if you <strong>want to use cloud computers, you have to
+decide between:</strong></p>
+<ul>
+<li><strong>SaaS</strong> - Software as a Service (something like google
+mail)</li>
+<li><strong>PaaS</strong> - Platform as a Service (something like ms
+azure / amazon e2)</li>
+</ul>
+<p>as the trend in hardware design is going towards multicore along with
+NUMA it seems the cloud is undergoing similar changes. as a rule of
+thumb i’d say that ‘<strong>cloud computing can be seen as an approach
+to build a distributed operating system</strong>’.</p>
+<h2 data-number="2" id="cloud-problems">cloud problems</h2>
+<p>not too long ago you would have maintained your own infrastructure
+with access to the hardware and software used. but times have changed
+and the americanization of things, that is by building ‘super services’,
+is about to change the internet yet again.</p>
+<p>i see this issues (no special order):</p>
+<h3 data-number="2.1" id="loss-of-control">loss of control</h3>
+<p>this is probably the strongest argument against using third party
+proprietary services as you can’t fix it when it is broken. but cloud
+computing usually means a loss of privacy as well. the article [2]
+mentioning various points from richard stallman and larry ellison
+probably makes this point clear. it is interesting to see this SaaS
+wikipedia article [3] which reads like a campaign for SaaS - probably
+written by someone with a marketing background. there is the dangers to
+loose your data to foreign countries, as mentioned in [7].</p>
+<h3 data-number="2.2" id="loss-of-own-infrastructure">loss of own
+infrastructure</h3>
+<p>you don’t have your own infrastructure anymore, thus you don’t have
+physical control over your devices. additionally you then depend on
+working internet connections. it is likely that the infrastructure you
+rely on runs in one or several different countries.</p>
+<h3 data-number="2.3"
+id="loss-of-software-not-designed-for-the-cloud">loss of software not
+designed for the cloud</h3>
+<p>the various versions of the <strong>GPL had a great influence on how
+software could be used and distributed</strong> but with the advent of
+the cloud this changes drastically. the way programs, especially
+webservices, are designed makes the GPL concept useless as it does not
+affect you at all. however, there is a new license, the ‘Affero General
+Public License’ [4] which fills that gap.</p>
+<p>why is wordpress is not licensed AGPL i wonder? my first guess is
+laziness as every author of every single patch would have to be asked
+for license change persmission. but the wordpress hosters could be using
+the GPL to greenwash their software as they would not have to hand out
+proprietary extension which might not be released. but who knows?!</p>
+<h3 data-number="2.4"
+id="loss-of-knowledge-how-to-setup-services-similar-to-todays-cloud-servcies">loss
+of knowledge how to setup services similar to today’s cloud
+servcies</h3>
+<p>think about email - who operates his own mailserver nowadays? most
+friends of mine use google mail and this implies: once you are familiar
+with a service and its workflow you usually do not want to change.
+especially if the service seems to be free as in google mail for example
+(but most of my friends seem not to care that google replaced ‘currency’
+by ‘privacy’ which is used as payment instead).</p>
+<p>as a consequence the knowledge about how to run your own mail server
+gets lost. if you understand german, listen to alternativlos 18 - ‘Peak
+Oil, den Weltuntergang, und wie man sich vorbereiten kann’ [5]** minute
+74 ff** - they discuss this issue.</p>
+<h3 data-number="2.5" id="my-personal-experience">my personal
+experience</h3>
+<p>i have a strong tendency to use devices which are capable of bringing
+me certain services offline. this is why i put a lot of effort into the
+evopedia application for instance. the nokia n900 is probably another
+good example where i try to maintain an offline infrastructure - i
+didn’t even have mobile internet on the n900 for a complete year and yet
+i was able to do most things using sip/mappero/evopedia and others.</p>
+<p>here are some thoughts about online services i use:</p>
+<h4 data-number="2.5.1" id="wordpress">wordpress</h4>
+<p>i use <strong>wordpress.com</strong> right now and i really hate it
+for these points:</p>
+<ul>
+<li>you <strong>can’t write offline</strong></li>
+<li>initial <strong>uploading images</strong> or updating them** is a
+frustrating process**</li>
+<li>i sometimes <strong>loose parts of articles while
+writing</strong></li>
+<li>there is <strong>no good backup process </strong>for offline
+backups</li>
+<li>i <strong>hate the WYSIWYG editor</strong> as it does not work very
+well</li>
+<li><strong>wordpress is inconsitent in producing a good web 2.0
+workflow</strong>, it feels like reloading the page all the time instead
+of doing so for single dom-tree elements only, as it would be done with
+web 2.0; if you don’t trust me, have a look at [6] - how the upcoming
+wikipedia editor works</li>
+</ul>
+<p>of course i could host wordpress on my own webserver and i wanted to
+do that for a long time. the problem is that wordpress is optimized to
+be run on wordpress.com thus i think it might be too much work for me to
+support it with proper security updates and plugin management.** instead
+i search for a blog system which uses markdown in combination to git but
+i didn’t find yet what i am searching for.**</p>
+<p>don’t get me wrong, i really like wordpress but i don’t like this
+dependency and lack of flexibility using their software.</p>
+<h4 data-number="2.5.2" id="google-maildocs">google mail/docs</h4>
+<p>i really love ‘google docs’ as it is a wonderful collaborative
+platform but i can’t use it as i have to disclose all documents to
+google i’d be working on.</p>
+<h4 data-number="2.5.3" id="google-android">google android</h4>
+<p>like google mail and google docs, android has a very good cloud
+integration. but if you want to use services other than google’s, it is
+a horrible platform. for instance i keep installing xabber [12] although
+google uses jabber but intentionally made you require to install third
+party software in order to use non google jabber. same goes for most
+other services. if i had to use an android phone i would buy one with
+proper CyanogenMod [13] support.</p>
+<h4 data-number="2.5.4" id="github.com">github.com</h4>
+<p>great service for source code hosting using git. still the platform
+itself is not available like for <a
+href="http://gitorious.org/">http://gitorious.org/</a> or <a
+href="http://gitlabhq.com/">http://gitlabhq.com/</a>. github.com uses a
+wiki which is bound to the platform and not contained in the git
+repo.</p>
+<p>note: although i never used <a
+href="http://www.fossil-scm.org/">http://www.fossil-scm.org</a> i like
+the idea that it contains a wiki in the repository as well</p>
+<p>i use github.com only for free and open source projects.</p>
+<h2 data-number="3" id="better-without-clouds">better without
+clouds</h2>
+<p>the conventional use of the term ‘cloud’ simply indicates a buzzword
+or business term for vendor lock-in and centralized infrastructure you
+don’t have control of. that is good to know as it helps to recognize and
+avoid such services. what one should use instead is decentralized
+infrastructure located near the user, connected to the internet where
+needed, giving the user the control over the platform.</p>
+<p>arguably this concept is implemented as a new trend called
+‘<strong>personal cloud</strong>’ or ‘<strong>private cloud
+server</strong>’. but these terms are limiting the trend to personal or
+private matters, yet i would like to see it in businesses as well.</p>
+<h3 data-number="3.1" id="hardware">hardware</h3>
+<p>following the concept of decentralization <strong>users can host
+their own files and other things</strong> as address books / calenders
+<strong>on their own home devices</strong>.</p>
+<p>a list of interesting devices to give you an idea:</p>
+<ul>
+<li><strong>sheevaplug</strong> [9] - there is even a nixos version for
+this device (by viric)!</li>
+<li><strong>pogoplug</strong> [10]</li>
+<li><strong>tonidoplug</strong> [11]</li>
+<li><strong>fritz!box</strong> (with myfritz and fritznas) [14]</li>
+</ul>
+<h3 data-number="3.2" id="software">software</h3>
+<h4 data-number="3.2.1" id="software-implementing-services">software
+implementing services</h4>
+<p>a list of software i find interesting:</p>
+<ul>
+<li><strong>despora</strong> [15] - decentralized facebook</li>
+<li><strong>owncloud</strong> [16] - dropbox like service</li>
+<li><strong>sparkleshare</strong> [21] - is a collaboration and sharing
+tool that is designed to keep things simple and to stay out of your
+way.</li>
+<li><strong>tomahawk</strong> [19] - a nice music streaming service</li>
+<li>various p2p / torrent like services:
+<ul>
+<li><strong>mldonkey</strong> [17]</li>
+</ul></li>
+</ul>
+<p>still most ‘personal or private clouds’ scale differently compared to
+the big 3 mentioned in the beginning of this article. for instance, most
+of these services are configured in the client/server way and they
+usually do not implement concepts as failover, backups or load
+balancing. for that to happen it requires a new set of tools and
+decentralized frameworks based on p2p technologies - which has just not
+happened yet.</p>
+<p>there is also a political issue: most internet users do not have a
+decent upload channel, which basically means that their internet
+connection is not very good.</p>
+<h5 data-number="3.2.1.1" id="software-for-managing-services">software
+for managing services</h5>
+<ul>
+<li><strong>openshift</strong> [20] - is a cloud computing platform as a
+service product from red hat</li>
+<li><strong>openstack</strong> [21] - is a global collaboration of
+developers and cloud computing technologists producing the ubiquitous
+open source cloud computing platform for public and private clouds.</li>
+<li><strong>disnix</strong> [8] - is a distributed deployment extension
+for Nix, a purely functional package manager.</li>
+</ul>
+<p>i’ve used neither but i like to point out that there is ongoing open
+source involvement and interestingly non of these technologies are used
+in private clouds. <strong>private clouds seem to implement the
+classical client/server paradigm at the moment. </strong>there is a
+<strong>remarkable exception</strong>, that is <strong>filesharing using
+p2p/kademlia</strong> which implements a basically read only storage
+which scales pretty well already.</p>
+<h3 data-number="3.3" id="a-matter-of-design">a matter of design</h3>
+<p>to make the private cloud or a decentralized cloud a success we
+need:</p>
+<ul>
+<li>a <strong>standardized package manager</strong> with proper software
+life-cycle management</li>
+<li><strong>symmetrical internet connections</strong> with decent
+upload/download speeds</li>
+<li><strong>transparent support for
+scalability/reliability/redundancy</strong> (the points mentioned in the
+beginning of the article)</li>
+<li><strong>powerful hardware </strong>with low power usage but capable
+of high loads</li>
+<li><strong>encryption and certificates </strong>or** a chain of
+trust**</li>
+<li><strong>ipv6 </strong>- we need good endpoint communication
+capabilities</li>
+<li>****a clear understanding of where we want to put our personal data
+and how we can protect it****</li>
+</ul>
+<p>i think each requirement on its own is already implemented somewhere
+but not in combination to each. there is not yet a library providing the
+software/protocol requirements and the hardware is either not powerful
+enough or is not intended to be used in that way required.</p>
+<h2 data-number="4" id="conclusion">conclusion</h2>
+<p>still it is a long way for the private clouds to have the same level
+of features/quality as the big clouds already have. <strong>for the time
+being it seems to be complicated for the average internet user to use
+the internet without loosing too much of his individuality</strong>,
+thus the <strong>freedom of expression</strong>.</p>
+<h2 data-number="5" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="http://www.google.de/search?sourceid=chrome&amp;ie=UTF-8&amp;q=richard+stallman+cloud"
+class="uri">http://www.google.de/search?sourceid=chrome&amp;ie=UTF-8&amp;q=richard+stallman+cloud</a></li>
+<li>[2] <a
+href="http://www.guardian.co.uk/technology/2008/sep/29/cloud.computing.richard.stallman"
+class="uri">http://www.guardian.co.uk/technology/2008/sep/29/cloud.computing.richard.stallman</a></li>
+<li>[3] <a href="http://de.wikipedia.org/wiki/Software_as_a_Service"
+class="uri">http://de.wikipedia.org/wiki/Software_as_a_Service</a></li>
+<li>[4] <a
+href="http://en.wikipedia.org/wiki/Affero_General_Public_License"
+class="uri">http://en.wikipedia.org/wiki/Affero_General_Public_License</a></li>
+<li>[5] <a href="http://alternativlos.org/18/"
+class="uri">http://alternativlos.org/18/</a></li>
+<li>[6] <a
+href="https://www.mediawiki.org/wiki/VisualEditor:InezSandbox"
+class="uri">https://www.mediawiki.org/wiki/VisualEditor:InezSandbox</a></li>
+<li>[7] <a
+href="http://www.engadget.com/2011/06/30/microsoft-european-cloud-data-may-not-be-immune-to-the-patriot/"
+class="uri">http://www.engadget.com/2011/06/30/microsoft-european-cloud-data-may-not-be-immune-to-the-patriot/</a></li>
+<li>[8] <a href="http://nixos.org/disnix/"
+class="uri">http://nixos.org/disnix/</a></li>
+<li>[9] <a href="http://de.wikipedia.org/wiki/SheevaPlug"
+class="uri">http://de.wikipedia.org/wiki/SheevaPlug</a></li>
+<li>[10] <a href="http://pogoplug.com/"
+class="uri">http://pogoplug.com/</a></li>
+<li>[11] <a href="http://en.wikipedia.org/wiki/Tonido"
+class="uri">http://en.wikipedia.org/wiki/Tonido</a></li>
+<li>[12] <a href="http://www.xabber.com/"
+class="uri">http://www.xabber.com/</a></li>
+<li>[13] <a href="http://www.cyanogenmod.com/"
+class="uri">http://www.cyanogenmod.com/</a></li>
+<li>[14] <a href="https://www.myfritz.net/was_ist_myfritz.xhtml"
+class="uri">https://www.myfritz.net/was_ist_myfritz.xhtml</a></li>
+<li>[15] <a href="http://de.wikipedia.org/wiki/Diaspora_(Software)"
+class="uri">http://de.wikipedia.org/wiki/Diaspora_(Software)</a></li>
+<li>[16] <a href="http://de.wikipedia.org/wiki/Owncloud"
+class="uri">http://de.wikipedia.org/wiki/Owncloud</a></li>
+<li>[17] <a href="http://de.wikipedia.org/wiki/Mldonkey"
+class="uri">http://de.wikipedia.org/wiki/Mldonkey</a></li>
+<li>[18] <a href="http://trac.edgewall.org/"
+class="uri">http://trac.edgewall.org/</a></li>
+<li>[19] <a href="http://www.tomahawk-player.org/"
+class="uri">http://www.tomahawk-player.org/</a></li>
+<li>[20] <a href="http://en.wikipedia.org/wiki/OpenShift"
+class="uri">http://en.wikipedia.org/wiki/OpenShift</a></li>
+<li>[21] <a href="http://openstack.org/"
+class="uri">http://openstack.org/</a></li>
+<li>[22] <a href="http://sparkleshare.org/"
+class="uri">http://sparkleshare.org/</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/the_cloud.mdwn" title="posts\the_cloud.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

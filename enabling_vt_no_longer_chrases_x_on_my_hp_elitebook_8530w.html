@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="enabling_vt_no_longer_chrases_x_on_my_hp_elitebook_8530w.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>enabling vt no longer chrases x on my hp elitebook 8530w</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/enabling_vt_no_longer_chrases_x_on_my_hp_elitebook_8530w.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="fixing_volume_change_in_linux.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="creating_c++_classes_using_python_scripts.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">enabling vt no longer chrases x on my hp elitebook 8530w</h1>
+    <div id="date"><p><span id="lastupdated">21 jul 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/.jpg"><img src=media/.jpg alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>i always wanted to use VirtualBox with 64bit guests. but this did not
+work for a very long time. i guess this has something to do with that
+Quadro FX 770M card.</p>
+<pre><code>lspci
+01:00.0 VGA compatible controller: nVidia Corporation G96M [Quadro FX 770M] (rev a1)</code></pre>
+<p>so on which architecture is my host OS?</p>
+<pre><code>arch
+x86_64</code></pre>
+<h2 data-number="2" id="what-were-the-previous-problems">what were the
+previous problems?</h2>
+<p>i’ve always experimented with the bios setting, on my hp bios this is
+called: “Virtualization Technology” and it can either be enabled or
+disabled. but for various versions of x11-drivers/nvidia it:</p>
+<ul>
+<li>did not start X with an error message in /var/log/Xorg.0.log</li>
+<li>crash the computer with a black screen (and more than average but
+constant fan noise)</li>
+</ul>
+<p>however it was always able to use the xorg driver called ‘nv’ to use
+the system. only the proprietary nvidia module did not work as
+expected.</p>
+<p>here is a list of driver versions i’ve experimented with
+(<strong>which did NOT work</strong>):</p>
+<ul>
+<li>x11-drivers/nvidia-drivers-180.27</li>
+<li>x11-drivers/nvidia-drivers-180.29</li>
+<li>x11-drivers/nvidia-drivers-180.44</li>
+<li>x11-drivers/nvidia-drivers-180.51</li>
+<li>x11-drivers/nvidia-drivers-180.60</li>
+<li>x11-drivers/nvidia-drivers-185.18.36</li>
+<li>x11-drivers/nvidia-drivers-185.18.36-r1</li>
+<li>x11-drivers/nvidia-drivers-190.42-r3</li>
+<li>x11-drivers/nvidia-drivers-190.53</li>
+<li>x11-drivers/nvidia-drivers-190.53-r1</li>
+<li>x11-drivers/nvidia-drivers-195.36.24</li>
+</ul>
+<h2 data-number="3" id="what-did-fix-it">what did fix it?</h2>
+<p>installing <strong>x11-drivers/nvidia-drivers-256.35</strong> finally
+fixed it!</p>
+<h2 data-number="4" id="what-does-work">what does work?</h2>
+<ul>
+<li>3d game, so 3d acceleration support is there</li>
+<li>2d acceleration does seem to work as well</li>
+<li>pm-suspend (hibernate-ram) seems to work as well</li>
+<li>using VirtualBox with a 64 bit image (enabling
+System-&gt;Acceleration-&gt;Hardware Virtualization [x] Enable
+VT-X/AMD-V)</li>
+<li>mode switch to consoles (alt+f1 to alt+f12) does work and i can see
+it actually (no black screen)</li>
+</ul>
+<p>i hope this driver is somehow stable. currently it’s hardmasked in
+gentoo.</p>
+<h2 data-number="5" id="update-fr-23-jul">update: fr 23 jul</h2>
+<p>using <strong>x11-drivers/nvidia-drivers-256.35</strong> did break
+suspend’s resume with several crashes. i’ve disabled VT in the bios and
+now i’m using the latest stable release.</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/enabling_vt_no_longer_chrases_x_on_my_hp_elitebook_8530w.mdwn" title="posts\enabling_vt_no_longer_chrases_x_on_my_hp_elitebook_8530w.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

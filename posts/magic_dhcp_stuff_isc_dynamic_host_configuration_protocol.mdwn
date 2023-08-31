@@ -1,0 +1,114 @@
+[[!summary chatGPT: A blog post explaining how to execute custom scripts when a DHCP lease is passed to a client, with instructions and examples for setup in Gentoo Linux.]]
+[[!meta date="2010-03-27 13:24"]]
+[[!tag gentoo linux]]
+
+[[!img media/internet_systems_consortium.jpg size=400x style="float: right"]]
+
+# motivation
+
+a friend of mine, **Andreas Korsten**, showed me how to execute custom scripts when a dhcp-lease is passed to a client. this is interesting stuff and since it seems **not to be documented**anywhere yet, i decided to blog it. it is probably of use for other admins out there - thanks to Andreas Korsten!
+
+# concept
+
+
+**idea: run a custom script when a lease is passed to the client.**in the example below every client in the netboot group will trigger 'custom logging' and additionally execute a script.
+
+
+# ISC Dynamic Host Configuration Protocol
+
+
+It is about: net-misc/dhcp-3.1.2_p1 (gentoo, portage), see [1] **No special useflags** were used: **+kernel_linux**-doc -minimal -selinux -static
+
+
+# setup /etc/dhcp/dhcp.conf
+
+
+    # vim: set noet ts=4 sw=4:
+        
+    allow booting;
+    allow bootp;
+    
+    server-name "myServer";
+    default-lease-time 3000;
+    max-lease-time 6000;
+    ddns-update-style none;
+    
+    subnet 10.0.0.0 netmask 255.255.255.0 {
+     range 10.0.0.10 10.0.0.20;
+     option subnet-mask 255.255.255.0;
+     option domain-name-servers 10.0.0.1;
+     option domain-name "myPool";
+    
+    group netboot {
+     next-server 10.0.0.1;
+     #server-identifier 10.0.0.1;
+     #filename "pxelinux.0";
+    
+    #on commit { execute ("/tmp/dhcpcommit.sh", hardware , "fnord", host-decl-name, "foo", leased-address, "bar" ); }
+     #on commit { execute ("/tmp/dhcpcommit.sh", host-decl-name ); }
+     #on commit { execute ("/tmp/dhcpcommit.sh", leased-address ); }
+    
+    # helpful: https://lists.isc.org/pipermail/dhcp-users/2008-September/007167.html
+     on commit { 28 set ClientIP = binary-to-ascii(10, 8, ".", leased-address); 29 set ClientMac = binary-to-ascii(16, 8, ":", substring(hardware, 1, 6)); 30 log(concat("Commit: IP: ", ClientIP, " Mac: ", ClientMac)); 31 execute("/tmp/dhcpcommit.sh", "commit", ClientIP, ClientMac); 32
+     #if(execute("/root/scripts/dhcp-event", "commit", ClientIP, ClientMac) = 0) {
+     #if(execute("/tmp/dhcpcommit.sh", "commit", ClientIP, ClientMac) = 0)
+     #{
+     # log(concat("Sent DHCP Commit Event For Client ", ClientIP));
+     #}
+     #} else {
+     # log(concat("Error Sending DHCP Commit Event For Client ", ClientIP));
+     #}
+     }
+    
+    host router5 { hardware ethernet 00:40:ff:aa:b0:44; fixed-address 10.0.0.5; option host-name "router5"; }
+     #include "/etc/dhcp/dhcpd.otherhosts.conf";
+     }
+    }
+
+
+
+# the script
+
+
+
+**you could send an email or jabber message or just do some advanced logging. consider: if you have a server-farm it might be interesting to see if a reboot actually worked**. the arguments to the bash script can be processed within the script. the order of the arguments is given by the dhcpd.conf file, see above.
+
+
+
+# possible errors
+
+
+
+always review the logs, in my case /var/log/syslog and since the dhcpd service on gentoo is running as user 'dhcp' and the script was not accessable for the user 'dhcp' this error could be found:
+
+
+    
+    debug: Mar 27 13:45:17 dhcpd: Commit: IP: 10.0.0.5 Mac: 0:40:ff:aa:b0:44
+    debug: Mar 27 13:45:17 dhcpd: execute_statement argv[0] = /tmp/dhcpcommit.sh
+    debug: Mar 27 13:45:17 dhcpd: execute_statement argv[1] = commit
+    debug: Mar 27 13:45:17 dhcpd: execute_statement argv[2] = 10.0.0.5
+    debug: Mar 27 13:45:17 dhcpd: execute_statement argv[3] = 0:40:ff:aa:b0:44
+    err: Mar 27 13:45:17 dhcpd: Unable to execute /tmp/dhcpcommit.sh: Permission denied
+    err: Mar 27 13:45:17 dhcpd: execute: /tmp/dhcpcommit.sh exit status 32512
+    info: Mar 27 13:45:17 dhcpd: DHCPREQUEST for 10.0.0.5 (10.0.0.1) from 0:40:ff:aa:b0:44 via ath0
+    info: Mar 27 13:45:17 dhcpd: DHCPACK on 10.0.0.5 to 0:40:ff:aa:b0:44 via ath0
+
+
+right after i corrected the permission issue:
+
+    
+    debug: Mar 27 13:52:32 dhcpd: Commit: IP: 10.0.0.5 Mac: 0:40:ff:aa:b0:44
+    debug: Mar 27 13:52:32 dhcpd: execute_statement argv[0] = /tmp/dhcpcommit.sh
+    debug: Mar 27 13:52:32 dhcpd: execute_statement argv[1] = commit
+    debug: Mar 27 13:52:32 dhcpd: execute_statement argv[2] = 10.0.0.5
+    debug: Mar 27 13:52:32 dhcpd: execute_statement argv[3] = 0:40:ff:aa:b0:44
+    info: Mar 27 13:52:32 dhcpd: DHCPREQUEST for 10.0.0.5 from 0:40:ff:aa:b0:44 via ath0
+    info: Mar 27 13:52:32 dhcpd: DHCPACK on 10.0.0.5 to 00:40:ff:aa:b0:44 via ath0
+
+
+
+
+# links
+
+
+* [1] <http://www.isc.org/products/DHCP>

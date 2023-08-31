@@ -1,0 +1,35 @@
+[[!summary chatGPT: A guide on how to download and compile Mumble and its dependencies in Linux.]]
+
+[[!meta date="2009-10-10 17:14"]]
+[[!tag linux technology]]
+[[!img media/mumble.png alt="" style="float: right"]]
+
+**so how is that done?**
+
+  1. download mumble-1.1.8.tar.gz
+
+  2. extract it
+
+  3. download libcap-2.16.tar and extract it as welll -> ./configure && make but not make install
+
+  4. now go into the mumble source directory and edit 
+
+    **src/murmur/murmur.pro
+    LIBS+= -L /home/joachim/mumble-1.1.8/libcap-2.16/libcap -lcap**
+    ** INCLUDEPATH += /home/joachim/mumble-1.1.8/libcap-2.16/libcap/include/**
+    i just added this two lines, check the path in your installation
+
+  5. now we have to invoke qmake to generate the 'Makefile' with
+  **qmake main.pro CONFIG+=no-client CONFIG+=no-ice CONFIG+=no-dbus**
+
+  6. finally we do
+  ** make**
+
+    * if something fails in the make step, either play with the Makefile (which will be lost after doing '**make distclean**' of course
+    * in case you want to play with the murmur.pro you should use '**make distclean**' and then step 5 again, else you will not get a new **Makefile** and it won't work
+
+  7. we need to give the dynamic linker the library at runtime, this is done with one little command:
+
+  ** export LD_LIBRARY_PATH=/home/joachim/mumble-1.1.8/libcap-2.16/libcap:$LD_LIBRARY_PATH**
+
+That's it. Once the concpets are obvious doing things like that gets fairly easy.

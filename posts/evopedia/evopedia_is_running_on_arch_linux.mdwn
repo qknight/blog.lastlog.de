@@ -1,0 +1,67 @@
+[[!summary chatGPT: evopedia is now available for easy installation on Arch Linux through AUR, and users can also install it directly using the provided PKGBUILD source code.]]
+[[!meta date="2010-12-23 12:04"]]
+[[!tag evopedia arch packagemanager qt]]
+[[!series evopedia]]
+
+[[!img media/arch-linux-logo.png size=100x style="float: right"]]
+
+# motivation
+
+evopedia [1] is now working on arch linux! i've uploaded the PKGBUILD to AUR [2], which means that it is now very easy for arch linux users to use evopedia.
+
+with some luck a developer will pick up that package and put it into the main distribution. in case you want to use the package directly (without waiting for official support,  read on)
+
+# how to install
+
+download the PKGBUILD source from [2]. then read [3] and in short:
+
+as root:
+
+    pacman -S base-devel
+
+as root:
+
+    makepkg PKGBUILD
+
+as normal user:
+
+    pacman -U evopedia-0.4.2-1-x86_64.pkg.tar.xz
+
+
+if you get any trouble, read the documentation ;-)
+
+
+# the source
+
+    # Maintainer: Joachim Schiele 
+    pkgname=evopedia
+    pkgver=0.4.2
+    pkgrel=1
+    pkgdesc='Offline Wikipedia Viewer'
+    arch=('i686' 'x86_64')
+    url='http://evopedia.info/'
+    license=('GPL3')
+    depends=('bzip2' 'qt')
+    makedepends=()
+    md5sums=('2f9672ebd550f01a4b71bf67a4140911')
+    #source="http://lastlog.de/misc/${pkgname}-${pkgver}.tar.gz"
+    source="http://evopedia.info/src/${pkgname}-${pkgver}.tar.gz"
+    
+    build() {
+      cd "$srcdir/$pkgname-$pkgver"
+      /usr/bin/qmake evopedia.pro PREFIX="$pkgdir"/usr
+      make
+    }
+    
+    package() {
+      cd "$srcdir/$pkgname-$pkgver"
+      make install
+    }
+    
+    # vim:set ts=2 sw=2 et:
+
+# links
+
+* [1] <http://evopedia.info>
+* [2] <http://aur.archlinux.org/packages.php?ID=44675>
+* [3] <https://wiki.archlinux.org/index.php/Creating_Packages>

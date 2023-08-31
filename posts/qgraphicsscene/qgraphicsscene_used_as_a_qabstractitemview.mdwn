@@ -1,0 +1,118 @@
+[[!summary chatGPT: This is a discussion about using QGraphicsScene as a QAbstractItemView and exploring different design approaches and concepts for a graph editor.]]
+[[!meta date="2009-12-10 23:26"]]
+[[!tag qt technology usability visualization]]
+[[!series qgraphicsscene]]
+
+# motivation
+
+I've once written a **qt4** program which does use the **QGraphicsScene** in a very unique way. Since i need the same concept for another project i started to read the code i've written quite some time ago. The code [1] is very complex so i got lost very soon but as a solution i came up with this **graph**, '**illustrating the concept and the class design**'. There was a feature i wanted to add and it might sound funny but i used this graph 'as a map' to navigate through the source.
+
+[[!img media/graphicssceneasabstractitemview.png size=800x caption="QGraphicsScene used as a QAbstractItemView"]]
+
+First a few words on the graph:
+
+If you want to do the same thing keep in mind that** every layer of abstraction duplicates the data once per instance** but **the data acquired through the model is the only data which is authoritative**. All other copies are for caching purpose and to keep structural integrity for instance a QGraphicsScene needs all items to be placed on the scene this way it is easier for the programmer.
+
+In the early design phase i thought it would be **efficient** to **render only the part of the scene which is actually visible**. QGraphicsScene can't be seen by definition. It is the QGraphicsView which attaches to the scene and which then visualizes the part of the scene (or the whole scene) if it's viewport is configured to do so. Taken efficiency into account rendering only 'what is seen'' is already given but we have to insert all the nodes and connections into the QGraphisScene. **It is important to know that a QGraphisScene is also a model based design** that's why a single QGraphisScene can have several different QGraphisView attached to it. One can be rotated, the other can be zoomed out - do with it whatever you desire. **All i did was wrapping the QGraphisScene's model into another layer**.
+
+We currently have 4 layers and we have to wrap something 3 times:
+
+  * first we wrap the data to be used by the model, this happens with QModelIndex()es
+  * second we wrap QModelIndex()es into QPersistentModelIndexes()
+  * third we wrap QPersistentModelIndexes() into QGraphicsItems()
+
+**So one might wonder why did i NOT use the QAbstractItemView in the first place?** This is probably the most important question!
+
+A **QAbstractItemView** gives you a paint() function and you have to draw the scene yourself. There is an excellent example called 'chart example', see [2]. It might be a very good solution for many problems which don't require complex 'user <-> item' interaction - think of 'move a node or you click a node'. (please play with the example, and look at the code).
+
+A **QGraphicsScene** has it's own model which handles all the items. Items can have various attributes as moveable/clickable/selectable. You can layer items so that they have individual or group rotation properties. You can use predefined items or you can create your own. A very important point is you have a collision detection and items can be clicked by the mouse and items can even receive keyboard input.  See example [3].
+
+It should be clear now that a 'graph editor' needs all the later mentioned capabilities.
+
+I want to discuss several things:
+
+  1. inserting/deleting items with the graphical editor
+  2. how to read and write data seen from a QGraphicsItem
+  3. why i used properties instead of another hierarchy layer
+  4. why GraphicsItems access the model NOT being just a delegate
+
+## 1. inserting/deleting items with the graphical editor
+
+the fundamental concept is: "data is only inserted/deleted through the model". The model is the most important component in MVC [4] abstraction. If you add a node with the gui you can either place the node by random (which is what i do mainly) or you can query the mouse position (if the mouse is hoovering above the QGraphicsView) and map it to the QGraphicsScene coordinates and finally you ask the model to add a node with addNode(coordinates) using the models public interface which can be accessed from the **G**raphics**V**iew (**NOT** QGraphicsView). The model will add a new item at the data layer and the data layer will delegate the 'added' item upwards in the hierarchy.
+
+That's why there are functions with **active** and **passive** names as:
+	
+  * insertNode()
+  * nodeInserted()
+
+
+The first is an interface to add nodes. The second will be called when the updated is delegated upwards. You never call a passive named function directly since it is ONLY called by the QAbstractItemModel/QAbstractItemView code.
+
+Removing items is basically the same but now you have an **identifier**. A item is removed based on it's **identifier** which **can be a QPersistentModelIndex for example**.
+
+## 2. how to read and write data seen from a QGraphicsItem
+
+
+A QGraphicsItem (and all derived types) live in the QGraphisScene and don't have access to the model. It is conceptually easy to generate such an object based on the information given by the model (read **simplex** communication here) - which can be done in the init() function when the view is initialized and filled with all nodes and node connections.
+
+However it can be  challenging creating a backward communication channel (read **duplex**, bidirectional). In an ideal world this would be done in a way that a AbstractGraphicsItem inherits from QGraphicsItem. This AbstractGraphicsItem then is specialized in NodeGraphicsItem and into a ConnectionGraphisItem.
+
+The AbstractGraphicsItem would add the communication layer (this is not done in my example). The specialization layer would do the custom drawing stuff as a node is drawn differently than a node_connection.
+
+In my example the QGraphicsScene does setData() and data() wrapping. This is a hack which works nice but i'd prefer the delegate design now since it is a clear interface design.
+
+Most properties are set/queried by: **model->data(), model->setData()**. One problem for example is when you move one item. Would it make sense to update the position through the model? Probably not since this would slow down the whole operation. Since the QGraphicsScene provides a signal which is emiteed when an moved item is released this signal could be used to update the position of the item through the model. This operation is **asynchronous**.
+
+For all other properties as 'node label' and 'node_connection color' and similar it only makes sense to use model->setData() and wait for the model to update the item (which just asked 'could you please update my color?'). This operation is absolutely **synchronous**.
+
+
+## 3. why i used properties instead of another hierarchy layer
+
+I'm not sure on this yet and i think i have to think about this more time. However i share some thoughts.
+
+my data currently has these 3 types:
+	
+  * ROOT_NODE
+  * NODE
+  * NODE_CONNECTION
+
+
+and properties for node as for example: nodelabel, startflag, final flag (yes NFA/DFA/... do you remember?) why not add another type called PROPERTY instead of using setProperty() and property() (which is provided by QObject).
+
+i call the type approach (using  PROPERTY) from now on: '**typeapproach**'  and the QObject::property() approach i call '**qobjectproperty**'.
+
+In either concept the model code would not be that different. Using QObject::properties one would (as i did) use data() and setData() and query the needed information - a QVariants is returned and automatically converted to a type usable by the view.
+
+The most significant difference when using the 'typeapproach' would be the updates for the items in the QGraphisScene. One would have a QPersistentModelIndex() per property (nodelabel/start flag/final flag) and one would instantly know what to change when updateData() want's the QGraphicsItem to change it's label. Currently i'm using the 'qobjectproperty' and i have to check all those properties every time updateData() is called.
+
+**I'm not sure what is the best strategy but i would guess the 'typeapproach'  could be very interesting.**
+
+
+## 4. why GraphicsItems access the model NOT being just a delegate
+
+
+as mentioned earlier this would be the best design. if an item of type NODE is required a respective QGraphicsItem, say a NodeGraphicsItem is synthesized. i probably will use this design for the next project.
+
+
+# some final words
+
+
+i've written this page for myself since i'm currently planning a similar project using a QAbstractItemModel with a QGraphicsScene. but as this subject is complex i'd like to share this with anyone out there.
+
+if you have some thoughts on this, please let me know by email:_ js adt lastlog dodt de_
+
+
+# links
+
+
+* [1] <http://lastlog.de/wiki/index.php/AutomateEditor>
+* [2] <http://doc.trolltech.com/4.1/itemviews-chart.html>
+* [3] <http://doc.trolltech.com/4.3/graphicsview-collidingmice.html>
+* [4] <http://de.wikipedia.org/wiki/Model_View_Controller>
+* [5] <http://doc.trolltech.com/4.2/itemviews-simpletreemodel.html>
+
+# updates
+
+(13.12.2009) the title of this document was of course wrong, it must be: QGraphicsScene used as a **QAbstractItemView **and not 'used as a QAbstractItemModel' ;P
+
+the example for the low level 'data' structure which is refered as simpletreeexample is actually called 'simple tree model' example, see [5]

@@ -1,0 +1,106 @@
+[[!meta date="2017-11-18 12:35"]]
+[[!tag nlnet nixos nixcloud email webservices]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!summary creating the ultimate webservice(s) tooling aka nixcloud.]]
+[[!series nixcloud]]
+
+# motivation
+
+on the quest to make nix the no. 1 deployment tool for webservices, we are happy to announce the release of:
+
+* `nixcloud.webservices` 
+* `nixcloud.reverse-proxy` 
+* `nixcloud.email`
+
+all can be found online at:
+
+    git clone https://github.com/nixcloud/nixcloud-webservices
+
+or visit: <https://github.com/nixcloud/nixcloud-webservices>    
+    
+# nixcloud
+
+what is the nixcloud? paul and me (joachim) see the nixcloud as an extension to nixpkgs focusing on the deployment of webservices. we abstract installation, monitoring, DNS management and most of all 'state management'.
+    
+# nixcloud.webservices
+
+`nixcloud.webservices` is a extension to nixpkgs for packaging webservices (apache, nginx) or language specific implementations as go, rust, perl and so on.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+nixcloud.webservices.leaps.myservice = {
+  enable = true;
+  proxyOptions = {
+    port   = 50000;
+    path   = "/foo";
+    domain = "example.com";
+  };
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+it comes with so many features and improvements that you are better off reading the documentation here:
+    
+<https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.webservices.md>
+
+# nixcloud.reverse-proxy
+
+this component makes it easy to mix several webservices, like multiple webservers as apache or nginx, into one or several domains. it also abstracts TLS using ACME.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+nixcloud.reverse-proxy = {
+  enable = true;
+  extendEtcHosts = true;
+  extraMappings = [
+    {
+      domain = "example.com";
+      path = "/";
+      http = {
+        mode = "on";
+        record = ''
+          rewrite ^(.*)$ https://example.org permanent;
+        '';
+      };
+      https = {
+        mode = "on";
+        basicAuth."joachim" = "foo";
+        record = ''
+          rewrite ^(.*)$ https://example.org permanent;
+        '';
+      };
+    }
+  ];
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.reverse-proxy.md>
+
+# nixcloud.email
+
+manual here: <https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.email.md>
+
+the idea is to make email deployment accessible to the masses by providing an easy abstraction, especially for webhosting.
+
+## configuration example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+nixcloud.email= {
+  enable = true;
+  domains = [ "example.com" "example.org"  ];
+  ipAddress = "1.2.3.4";
+  ip6Address = "afe2::2;
+  hostname = "example.com";
+  users = [
+    # kdkdkdkdkdkd -> feed that into -> doveadm pw -s sha256-crypt
+    { name = "js2"; domain = "example.org"; password = "{PLAIN}foobar1234"; aliases = [ "postmaster@r0sset.com" ]; }
+    { name = "paul"; domain = "example.com"; password = "{PLAIN}supersupergeheim"; }
+    { name = "catchall"; domain = "example.com"; password = "{PLAIN}foobar1234"; aliases = [ "@example.com" ]; }
+    #{ name = "js2"; domain = "nix.lt"; password = "{PLAIN}supersupergeheim"; }
+    #{ name = "quotatest"; domain = "nix.lt"; password = "{PLAIN}supersupergeheim"; quota = "11M"; aliases = [ "postmaster@mail.nix.lt" "postmaster@nix.lt" ]; }
+  ];
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# questions?
+
+* joachim schiele <js@lastlog.de>
+* paul seitz <paul.m.seitz@gmail.com>

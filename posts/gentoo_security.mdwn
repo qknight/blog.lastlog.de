@@ -1,0 +1,75 @@
+[[!summary chatGPT: A reminder on how to keep a Gentoo system safe and sound, including updating active components, removing unnecessary software, checking for GLSA and kernel updates, managing disk space, and disabling unused services.]]
+[[!meta date="2011-01-04 00:53"]]
+[[!tag gentoo linux security]]
+
+[[!img media/200px-gentoo_linux_logo_matte-svg.png alt="" style="float: right"]]
+
+# security & integrity
+
+just a quick reminder on how to keep your gentoo system safe and sound:
+
+  1. **eix-sync; emerge -uDN world
+**this will ensure that all active components (see  **/var/lib/portage/world** are updated)
+**www-plugins/adobe-flash** and **app-text/acroread** will not be updated if not listed there!
+
+	
+  2. check **/var/lib/portage/world **for software which you don't need anymore
+
+	
+  3. afterwards: **emerge --depclean
+**packages not listed in **/var/lib/portage/world** will be removed (check carefully)
+
+	
+  4. use **glsa-check -f affected **(requires a recent eix-sync, done in step (1))
+
+	
+  5. update the **gentoo-kernel** as often as possible (reboot afterwards)
+recent kernels are a good thing: sys-kernel/gentoo-sources-2.6.32-**r24
+**NOTICE: i'm refering to the -**r24** suffix and not the kernel version in general
+
+	
+  6. **reboot your system on security related software/kernel updates**
+(see glibc issue lately, which required a reboot)
+
+	
+  7. only start services you need, disable services which don't get used anymore
+
+
+this list is, of course, incomplete. but as i did this wrong until now, there might be other gentoo users out there, who still do. anyone?
+
+
+# saving disk space
+
+
+check and clean this places:
+
+
+
+	
+  1. **/tmp**
+
+	
+  2. **/var/tmp**
+
+	
+  3. **eclean -d distfiles
+**which will clean out obsolete files from /usr/portage/distfiles**
+**
+
+	
+  4. **/usr/src/**
+(often there are old kernel versions, here it is **6,2 gb for 3 kernels**)
+
+	
+  5. check **/var/db/pkg/<CATEGORY>/<PKG-VERSION>/
+**this often contained packages i've not been using anymore
+
+	
+  6. use **emerge --depclean**
+
+	
+  7. check **/lib/modules** for kernel module size
+i've been using genkernel and i had built all modules, resulting in **1,2gb per kernel **
+
+
+# updated: 2011-01-04 added eclean to 'saving disk space', thanks to Leifbk

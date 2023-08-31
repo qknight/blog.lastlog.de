@@ -1,0 +1,23 @@
+[[!meta date="2014-12-22 13:04"]]
+[[!tag linux usability]]
+[[!summary memtest86 fails because of broken usb stick it was on]]
+
+# motivateion
+
+a few months ago i had to fix a computer and was using memtest86 from a ubuntu usb boot stick. the program always returned this error:
+
+[[!img media/memtest86-fail.jpg caption="memtest86 fails because of broken usb stick it was on" size=800x style="float: none"]]
+
+# the problem & solution
+
+interestingly **the problem was not caused by a memory problem**. the most probable cause was a broken USB stick image that caused memtest86 to fail for some unknown reason. after i dd'ed the ubuntu 14.04 image to the stick again, it keept finding no issues onwards.
+
+hours of wasted time only because memtest86 was broken!
+
+# conclusion
+
+**note:** should've created a dd'ed image of the stick to check for differences to the ubuntu 14.04 image, to find out the cause of this memtest86 issue. i always assumed that memtest86 would check itself first, before doing checks on ram but this seems to be no the case [citation needed].
+
+now i'm confused about the usefulness of memtest86 ;P
+
+

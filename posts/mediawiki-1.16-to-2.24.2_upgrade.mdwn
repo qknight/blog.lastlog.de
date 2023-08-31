@@ -1,0 +1,111 @@
+[[!meta date="2015-05-16 03:58"]]
+[[!tag php usability]]
+[[!summary mediawiki, php using traditional nixos webservices]]
+[[!img media/php.jpg class="noFancy" style="float: right" width="150px"]]
+
+# mediawiki, php
+today my wiki at [1] went south because the 1.16 version didn't work with the very recent PCRE library used in php.
+
+the error was something like:
+
+    Warning: preg_replace(): Compilation failed: group name must start with a non-digit at offset 4 in /home/patjk/public_html/speedsolving/wiki/includes/MagicWord.php on line 851
+
+so as i'm on nixos, let's see what pcre version is used by php:
+
+    $ nix-store -qR `which php`
+    /nix/store/5hkwn27l77b7c37z7812acdf4p9ldr6m-linux-headers-3.12.32
+    /nix/store/c2zjp7bqmp5wvpkrpl7p7sfhxbdyfryy-glibc-2.21
+    /nix/store/qgkv4wcgsjiqq0049r6cz1fk9mw6265n-zlib-1.2.8
+    /nix/store/xlxjcjq3bnbwnzq82irlzwxhmx6fvc2w-bash-4.3-p33
+    /nix/store/0nvzg4y39y05mw8yq4s26fa2vz6phbk4-cracklib-2.9.4
+    /nix/store/16rip84fx80fzzffc9flzwys9g6slcan-attr-2.4.47
+    /nix/store/3h2yha8d8zqzkh9q5vaib43cjm71glll-acl-2.2.52
+    /nix/store/nmw1hi49cg5msnq1fkpjv8ypb7dmjz5r-coreutils-8.23
+    /nix/store/qr35kb3cd1vb21a6mqa43xwmjy7jrbcq-gcc-4.8.4
+    /nix/store/qp6sn6zqf36d43x0i4yvak1zk9ld43js-perl-5.20.2
+    /nix/store/li4sd27rshs882hzfh1kwp3mwy2xs5r5-openssl-1.0.1m
+    /nix/store/29nl25y0id28q7vaqwpy5a069klrny8k-libssh2-1.5.0
+    /nix/store/764v2ddxrcqf97mpclnpvdfajab5rjbs-linux-pam-1.2.0
+    /nix/store/hf24zxgxfqk3rr06ym34rvlhc5ckg1r6-db-5.3.28
+    /nix/store/3fmxn7xl05n2f7larcaq0inak4sj7cnl-cyrus-sasl-2.1.26-without-kerberos
+    /nix/store/cc91cpjwgg4mj697vnk59lgbddg8ik8y-gnum4-1.4.17
+    /nix/store/5q0y3af7jdzm7gqbcgm03191wq59zbzj-flex-2.5.39
+    /nix/store/7w1s7l8ph568h398hykdpydkhj87nqb0-sqlite-3.8.10.1
+    /nix/store/bak44r45w242m3f5z0lg2ihvnsw2dd4c-openldap-2.4.40
+    /nix/store/cm7lwas9g9aav29im8vbkar24c4lr5qp-ncurses-5.9
+    /nix/store/kd455dx7m9g0mwp8f320723vwr0d1b2f-readline-6.3p08
+    /nix/store/y3z259g0y2gn2cg40d9f90xy2490i6q0-libcap-ng-0.7.3
+    /nix/store/307b0pfwxj35zzzj56xh1rrcgsna6800-heimdal-1.5.3
+    /nix/store/fsxbvl2vrd1ms8v9jkx9pnyzfi55qxxm-binutils-2.23.1
+    /nix/store/aslzqiz055b7mcppiyiq548nihzvidy2-gcc-wrapper-4.8.4
+    /nix/store/fd99fvl3paah5cnf825izxpafm3c2xpr-gnutar-1.28
+    /nix/store/49f7jz35vllp48ws9n5cgpdnpw7g1lwi-postgresql-9.2.10
+    /nix/store/53lhklzfxamdi8gfa3yxa3p1ikw62pn4-hook
+    /nix/store/6dn9absqamkp266x9wqp259nb1zxchjd-expat-2.1.0
+    /nix/store/ig2lx3cg9zacvicbs13grrka02ixsvix-cyrus-sasl-2.1.26
+    /nix/store/6ikz437zkrpb8krdn2d192qpq4s6b3sg-openldap-2.4.40
+    /nix/store/9yjrzfq06lwi1ma8lkahd4jywkqlbvq4-libaio-0.3.110
+    /nix/store/bran7khggz40y6lxs487xb6mlpwh5gax-libjpeg-turbo-1.4.0
+    /nix/store/dbp3a4rzvb1cy29j9bd2wkjd8gdv8kar-libmcrypt-2.5.8
+    /nix/store/gi3rllkxx2a4wybj8kfd2qlis9qzhcz7-hook
+    /nix/store/mz664ihx3np43bbaw1iqf2grkmrqfw0j-c-ares-1.10.0
+    /nix/store/w9g0wsyg1yslq6pf28dayjps65qjqza9-libnghttp2-0.7.14
+    /nix/store/h2bw7z4806cpyyfhyb1jlw3m0ki1mhkd-curl-7.42.1
+    /nix/store/i7vlp4bfbk2dlcxdrijw5cldlxcaf2wy-freetds-0.91
+    /nix/store/k5n1b6zhgqz5hj2xzv13fvby8ndkj7pd-libpng-1.6.16
+    /nix/store/ppj6v8zs2k4jx71pi7qgg2ljgdh7sglz-bzip2-1.0.6
+    /nix/store/ibfw7m9nxk8cr6dlid0j4wq5a4cq3yrw-freetype-2.5.4
+    /nix/store/ks93yfi57vkjwx0yf3aw4fr9pvm8zs33-gnused-4.2.2
+    /nix/store/kv4jdn6p331i7l3pb69d8z7han3r031h-uw-imap-2007f
+    /nix/store/qcwvxm65axcf5ff2q2vwjpqsg8qqd260-xz-5.2.1
+    /nix/store/s3rdcgyz9n7czz4pfhc989fcr906nvhc-libxml2-2.9.2
+    /nix/store/syk0sfdkvy30l3cml9bhsi68fznnkvds-judy-1.0.5
+    /nix/store/cm7lwas9g9aav29im8vbkar24c4lr5qp-ncurses-5.9
+    /nix/store/kd455dx7m9g0mwp8f320723vwr0d1b2f-readline-6.3p08
+    /nix/store/y3z259g0y2gn2cg40d9f90xy2490i6q0-libcap-ng-0.7.3
+    /nix/store/307b0pfwxj35zzzj56xh1rrcgsna6800-heimdal-1.5.3
+    /nix/store/fsxbvl2vrd1ms8v9jkx9pnyzfi55qxxm-binutils-2.23.1
+    /nix/store/aslzqiz055b7mcppiyiq548nihzvidy2-gcc-wrapper-4.8.4
+    /nix/store/fd99fvl3paah5cnf825izxpafm3c2xpr-gnutar-1.28
+    /nix/store/49f7jz35vllp48ws9n5cgpdnpw7g1lwi-postgresql-9.2.10
+    /nix/store/53lhklzfxamdi8gfa3yxa3p1ikw62pn4-hook
+    /nix/store/6dn9absqamkp266x9wqp259nb1zxchjd-expat-2.1.0
+    /nix/store/ig2lx3cg9zacvicbs13grrka02ixsvix-cyrus-sasl-2.1.26
+    /nix/store/6ikz437zkrpb8krdn2d192qpq4s6b3sg-openldap-2.4.40
+    /nix/store/9yjrzfq06lwi1ma8lkahd4jywkqlbvq4-libaio-0.3.110
+    /nix/store/bran7khggz40y6lxs487xb6mlpwh5gax-libjpeg-turbo-1.4.0
+    /nix/store/dbp3a4rzvb1cy29j9bd2wkjd8gdv8kar-libmcrypt-2.5.8
+    /nix/store/gi3rllkxx2a4wybj8kfd2qlis9qzhcz7-hook
+    /nix/store/mz664ihx3np43bbaw1iqf2grkmrqfw0j-c-ares-1.10.0
+    /nix/store/w9g0wsyg1yslq6pf28dayjps65qjqza9-libnghttp2-0.7.14
+    /nix/store/h2bw7z4806cpyyfhyb1jlw3m0ki1mhkd-curl-7.42.1
+    /nix/store/i7vlp4bfbk2dlcxdrijw5cldlxcaf2wy-freetds-0.91
+    /nix/store/k5n1b6zhgqz5hj2xzv13fvby8ndkj7pd-libpng-1.6.16
+    /nix/store/ppj6v8zs2k4jx71pi7qgg2ljgdh7sglz-bzip2-1.0.6
+    /nix/store/ibfw7m9nxk8cr6dlid0j4wq5a4cq3yrw-freetype-2.5.4
+    /nix/store/ks93yfi57vkjwx0yf3aw4fr9pvm8zs33-gnused-4.2.2
+    /nix/store/kv4jdn6p331i7l3pb69d8z7han3r031h-uw-imap-2007f
+    /nix/store/qcwvxm65axcf5ff2q2vwjpqsg8qqd260-xz-5.2.1
+    /nix/store/s3rdcgyz9n7czz4pfhc989fcr906nvhc-libxml2-2.9.2
+    /nix/store/syk0sfdkvy30l3cml9bhsi68fznnkvds-judy-1.0.5
+    /nix/store/zx0hnalq0sqg98wc1w2g4wjc553sy2ba-pcre-8.37
+    /nix/store/mq5s17j8z7z0qzxz32wj1ibmm3bz16az-mariadb-10.0.18-lib
+    /nix/store/my5ngdzqg6y2h2639mb3lhlg7ccvaijr-gnugrep-2.21
+    /nix/store/vgy461a462vk69cyqr9i8l1cyi7gzfyq-apr-1.5.2
+    /nix/store/vy1mpv39gbcif5n6bqbpz0j4j0vkpsai-apr-util-1.5.4
+    /nix/store/n0hhzhb3h04qrrfh52dzdl6z9q873jq8-apache-httpd-2.4.12
+    /nix/store/vfpmhd4w0cx4iz814b3cy81n9hc9qzih-icu4c-55.1
+    /nix/store/wrwk289fryjq8c42nh5y1fi6lqrjsl16-gmp-5.1.3
+    /nix/store/qwihm4zfqhz2y70shpd7d6rbxsydinzi-php-5.6.6
+
+as it turns out it was 8.37 and the version is supposed to be starting from pcre 8.34 onwards.
+
+anyway, the update took 2 hours since i also had to fix my custom mediawiki theme called clean.
+
+thanks to #mediawiki folks on irc.freenode.net for their support!
+
+# links
+
+* [1] <https://lastlog.de>
+* [2] <http://stackoverflow.com/questions/20905654/all-my-mediawiki-pages-are-blank>
+* [3] <https://github.com/qknight/mediawiki-theme-clean>

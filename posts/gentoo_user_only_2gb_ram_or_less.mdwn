@@ -1,0 +1,34 @@
+[[!summary chatGPT: This article explains how to write swap back to RAM after it has been swapped out during software installation, with cautionary warnings included.]]
+[[!meta date="2010-09-19 23:32"]]
+[[!tag gentoo packagemanager usability]]
+
+[[!img media/200px-gentoo_linux_logo_matte-svg.png alt="gentoo linux logo (copied from commons.wikipedia.org" style="float: right" width=140]]
+
+# motivation 
+when compiling all the used software before installing it one might find himself in this situation i'm face often:
+
+the **comiler uses a lot of ram** and therefore all the **current running applications** (if not killed by the OOM killer already) **are swapped** to the swap partition or swap-file.
+
+# writing swap back to ram
+
+that means after the installation (when there is free ram, the swapped out stuff still is in the swap space, as it is not transfered automatically back). in this case i often type this command:
+
+**WARNING: if you do have full ram, don't enter the command below as the OOM killer WILL kill programs you might NOT want to be terminated, continue only if you understand what you are doing!**
+
+list of all swap partitions:
+
+    # cat /proc/swaps
+    
+    Filename                                Type            Size    Used    Priority
+    /dev/sda3                               partition       244139800       16      -1
+
+
+now let's put that stuff back into ram:
+
+    # swapoff /dev/sda3
+
+still i might need the swap space later on, so let's reenable it:
+
+    # swapon /dev/sda3
+
+now all the open programs run fast again!

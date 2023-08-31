@@ -1,0 +1,34 @@
+[[!summary chatGPT: The author questions why the wiki principle, including link stability and collaborative editing, is not widely implemented in webpages and documents and expresses the benefits of using wikis.]]
+[[!meta date="2012-05-04 19:32"]]
+[[!tag society technology usability visualization]]
+
+[[!img media/evopedia.png style="float: right"]]
+
+# motivation
+
+for quite some time **i use a wiki at lastlog.de**, a mediawiki to be precise, and i wonder why there is no wide **adaptation towards the wiki principle**. with that i don't mean collaborative editing but, somehow in contrast, the principle to be quotable.
+
+lately, out of curiosity, i scrolled through my diploma thesis and checked the overall link stability. some were broken. **however, all wikipedia links worked**. as stated in the document itself, i explicitly link to the wikipedia because of its link stability. if i would have liked i could have even linked to a certain revision. but i decided not to, as the reader always has the option to look at an older revision, based on date and time.
+
+the more interesting aspect, that is why i linked to wikipedia articles, is that i don't want to waste time describing something when there is a different place doing so already. if someone is smart enough to follow my ideas in my diploma thesis i assume the same when it comes to judging about the quality of wikipedia articles. and before linking a keyword (like 'package manager') to a certain wikipedia article, which should describe it, i always read the article. the idea is twofold: first i like to see if my conception or understanding matches with what is in the article. second, if that is the case, i would simply link it and forget about the whole thing. but if my understanding does not match with the article i can evaluate my or their version as being better and pick what fits best.
+
+for some online articles i had to link, i wasn't even able to provide a direct link and therefore added a google search link into the document.
+
+**wiki editing has so many benefits, like being able to rollback to a previous version. do collaborative work. why is there no wiki like support, say when editing libre office/word documents?** maybe because back in time that was considered a waste of bits&bytes but using compression that can't be an argument today.
+
+here is a use-case where that would be great: say you write a document and you pass it to someone else for review and corrections. often i would like the other person doing whatever change he wants to do and later be able to rollback this or that change. with a wiki like document structure this would be very easy.
+
+if you don't follow, just have a look at this link:
+
+<http://en.wikipedia.org/w/index.php?title=Linux&diff=490431450&oldid=489027763>
+
+and about **link stability**: **this link might even work when this blog is long gone. **
+
+i see so many benefits by using wikis and wiki like concepts but despite of the wiki-web principle and decentralized VCSs there seems to be no wide use of it.
+
+IMHO i think **a webpage**, even this wordpress blog, **which does not implement a wiki principle, is kind of stupid** as one can never be certain what is going on. **one could say such a page is schizophrenic to some degree**.
+
+hopefully this will change in the future.
+
+# update: 11.5.2012 
+it would be desirable if the mentioned link stability would be independent of a strict TLD (top level domain). for example: if i move this blog to a different location, say to invalidmagic.de then all the articles here stop working and the links from other pages into this article will fail.

@@ -1,0 +1,24 @@
+[[!summary chatGPT: The author is curious about running Linux and Windows simultaneously on one machine, but there are security and performance issues with virtualization, and they are seeking information on how it works and how to set it up.]]
+[[!meta date="2009-10-18 13:04"]]
+[[!tag linux technology]]
+
+long time ago (2005 or 2004) i was curious about this topic. my idea: installing linux and windows on one machine. both running at the same time. i also hoped to execute native windows applications on my X server using some kind of high-performance wrapper. (that already happened with the software [1] parallels on mac os x).
+
+but it seems that there is some security issue with virtualization. since depending on the technique used (motherboard/cpu) there are some memory and bus issues regarding memory access protection.
+
+and what happened to the idea of having two pci-x graphic cards in one pc having each os accessing one (when running linux and windows). can this be done with native speed? can i play games with full FPS?
+
+it would be nice if someone could put together some nice articles in the wikipedia since what is already there is not very detailed and lacks a lot of topics. [2] seems to provide an open source solution for what vmware and parallels are already doing (opengl only no directx).
+
+**but more important, how does this work?**
+
+  * how to **setup the virtual machines**?
+  * how to **assign hardware**?
+  * how about **memory protection** (MMU security/processor rings)?
+  * how about **interrupt handling**?
+  * how** do these systems work compared to each** (vmware-fusion/parallels/xen-gl)?
+  * how about **APIs** which make this all happen?
+
+#links
+* [1] <http://www.parallels.com/>
+* [2] <http://www.cs.toronto.edu/~andreslc/xen-gl/>

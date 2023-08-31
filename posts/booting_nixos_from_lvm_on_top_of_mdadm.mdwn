@@ -1,0 +1,70 @@
+[[!summary chatGPT: This guide provides instructions for setting up a system using fdisk, mdadm, and LVM, with commands for creating RAID and configuring partitions. It also discusses the advantages of this setup and provides links to related resources.]]
+[[!meta date="2012-04-09 22:50"]]
+[[!tag linux nixos]]
+
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+# what is this?
+
+since i might require such an setup more often i post it here, so i don't forget it (see [1]).
+
+**this guide works great for fdisk+mdadm+LVM** but it did not work for parted lately using ubuntu server. i don't know why, maybe because of the raid controller?
+
+in case someone removes the commands from the nixos wiki, here are the commands again:
+
+    mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1
+    
+    pvcreate /dev/md0
+    vgcreate myvolgrp /dev/md0
+    lvcreate -L 1G -n boot myvolgrp
+    lvcreate -L 5G -n system myvolgrp
+  
+    mkfs.ext4 -n boot /dev/myvolgrp/boot
+    mkfs.ext4 -n system /dev/myvolgrp/system
+  
+    mount -L system /mnt
+    nixos-option --install
+  
+    cat /etc/nixos/configuration.nix
+    ...
+      { mountPoint = "/";
+        label="system";
+      }
+      { mountPoint = "/boot";
+        label="boot";
+      }
+    nixos-install
+
+
+# advantages of this setup
+
+
+
+
+
+	
+  * **no special partition required** either something like /dev/sda1 or /dev/sdb1 **where /boot would be placed on**
+  * LVM can be used for anything
+  * still mdadm is below, which is a good thing
+
+
+
+
+reminds me though that i should check if /etc/nixos/configuration.nix is capable of installing grub in several partitions already. usually it is only installed in /dev/sda given by this example:
+
+
+    boot.loader.grub = {
+      # Use grub 2 as boot loader.
+      enable = true;
+      version = 2;
+      
+      # Define on which hard drive you want to install Grub.
+      device = "/dev/sda"; # here is only one partition given
+    };
+
+
+# links
+
+
+* [1] <https://nixos.org/wiki/Soft-RAID_mdadm_(/dev/md0),_LVM_(PVs,VGs,LVs)>
+* [2] <https://nixos.org/wiki/Encrypted_Root_on_NixOS>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="converting_a_virtualbox_image_to_a_libvirt.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>converting a virtualbox image to a libvirt</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/converting_a_virtualbox_image_to_a_libvirt.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="shinken_0.6_on_gentoo.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="mediawiki_clean_skin_relocated.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">converting a virtualbox image to a libvirt</h1>
+    <div id="date"><p><span id="lastupdated">20 may 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a></p></div>
+    <p><a href="media/libvirtlogo.png"><img src=media/libvirtlogo.png size=150x style="float: right"></a>
+# motivation</p>
+<p>i have a gentoo system inside a virtualbox but i wanted to make some
+‘long term tests’ so i decided to migrate it to a libvirt machine which
+is running ‘fedora core 15 beta’.</p>
+<h2 data-number="1" id="problems-converting-the-image">problems
+converting the image</h2>
+<p>first i tried to migrate the ‘Gentoo 64 (portage).vdi’ directly to a
+libvirt image, using [2]. but anything i tried: afterwards the image was
+never bootable so i decided to use ssh to copy all the files
+instead.</p>
+<ol type="1">
+<li><p>boot both virtual machines using the
+‘<strong>grml64-mediaum_2010.12.iso</strong>’.</p></li>
+<li><p>assign the ip addresses while i was using on the virtualbox side
+using: vboxnet0 in a host only networking schema i used a bridge on the
+other machine which involved lots of manual configuration as: disable
+networkmanager (on fedora core, remember?), removing the eth0
+configuration (which happens to be called em1); adding a new
+configuration for the bridge br0 (using eth0).</p></li>
+<li><p>finally i could ping from the virtualbox image to the libvirt
+guest system</p></li>
+<li><p>i used ‘<strong>rsync -av /mnt/gentoo -e ssh
+192.168.66.20:/mnt/gentoo</strong>’ Note: both local gentoo systems were
+mounted into /mnt/gentoo</p></li>
+<li><p>but libvirt used a ide host controller (which was very slow)
+therefore i manually removed the ide controller and replaced it by a
+<strong>VirtIO Disk using ‘qcow2’ as storage format and ‘Virtio’ as
+bus</strong>.</p></li>
+<li><p>after all the copying i installed grub (grub-1.99rc1) but the
+original system had a grub1 config! the conversion was not
+simple!</p></li>
+</ol>
+<h3 data-number="1.1" id="the-grub-pitfall">The grub pitfall</h3>
+<p>virtualbox image using grub1:</p>
+<h4 data-number="1.1.1" id="cat-bootgrubmenu.lst">cat
+/boot/grub/menu.lst</h4>
+<pre><code>default 0
+timeout 30
+#splashimage=(hd0,0)/boot/grub/splash.xpm.gz
+
+title Gentoo Linux 2.6.24-r7
+root (hd0,0)
+kernel /boot/kernel-genkernel-x86_64-2.6.36-gentoo-r5  root=/dev/ram0 real_root=/dev/sda1
+initrd /boot/initramfs-genkernel-x86_64-2.6.36-gentoo-r5</code></pre>
+<p>in comparison: ‘libvirt guest’ using grub2</p>
+<h4 data-number="1.1.2" id="cat-bootgrubgrub.cfg">cat
+/boot/grub/grub.cfg</h4>
+<pre><code>set default=0
+set timeout=30
+
+menuentry &quot;Gentoo Linux 2.6.36-gentoo-r5&quot; {
+        insmod part_msdos
+        insmod ext2
+        set root=(hd0,msdos1)
+        linux /boot/kernel-genkernel-x86_64-2.6.36-gentoo-r5  root=/dev/ram0 real_root=/dev/vda1
+        initrd /boot/initramfs-genkernel-x86_64-2.6.36-gentoo-r5
+}</code></pre>
+<p><strong>Note:</strong> i marked the differences.</p>
+<p><strong>Note:</strong> take care of the different filename as
+well!</p>
+<p>anyway: in the grml shell you can install grub into /dev/vda
+using:</p>
+<pre><code>grub-install --root-directory=/mnt/gentoo /dev/vda</code></pre>
+<h3 data-number="1.2" id="the-kernel-configuration-pitfall">the kernel
+configuration pitfall</h3>
+<p>a <strong>libvirt guest</strong> must be aware of <strong>/dev/vda
+(virtIO)</strong> but my genkernel was not. also i lacked ext4 support.
+so it is a good idea to included this into the kernel (i had it included
+as modules but it did not work well).</p>
+<p>cat /etc/kernels/kernel-config-x86_64-2.6.36-gentoo-r5 | grep -i virt
+| grep -v “^#”</p>
+<pre><code>CONFIG_VIRT_TO_BUS=y
+CONFIG_VIRTIO_BLK=y
+CONFIG_VIRTIO_NET=y
+CONFIG_VIRTIO_CONSOLE=y
+CONFIG_HW_RANDOM_VIRTIO=y
+CONFIG_VIRTUALIZATION=y
+CONFIG_VIRTIO=y
+CONFIG_VIRTIO_RING=y
+CONFIG_VIRTIO_PCI=y
+CONFIG_VIRTIO_BALLOON=y</code></pre>
+<p>just use ‘genkernel’ to build the new kernel (and don’t forget the
+ext4 support as i did).</p>
+<h2 data-number="2" id="fedora-core-network-problems">fedora core
+network problems</h2>
+<p>i basically used [3] to make it work. the benefit is now that
+<strong>em1 is not used</strong> directly but the system uses
+<strong>br0</strong> to access the internet.</p>
+<p><strong>PRO:</strong> the libvirt guests do get their own ‘mac
+address’, thus are separated from being able to see each others
+traffic.</p>
+<h2 data-number="3" id="fedora-core-yum-problems">fedora core yum
+problems</h2>
+<p>i also tried to install virtualbox and followed the instructions
+found on virtualbox.org but soon i had the problem that the virtualbox
+kernel modules won’t build and need ‘kernel-devel’ but after installing
+the kernel-devel package using ‘yum install kernel-devel’ <strong>there
+was a mismatch between ‘used kernel’ and ‘kernel-devel’
+headers.</strong></p>
+<h2 data-number="4" id="summary">summary</h2>
+<p>libvirt and the ‘virtual machine manager’ are very nice:</p>
+<ul>
+<li>i like that it is so easy to start a virtual machine when the host
+machine boots.</li>
+<li>i also like the ‘virtual machine manager’ as it <strong>shows
+cpu/disk io/network io nicely</strong> (but that is not limited to
+libvirt virtualizations).</li>
+<li><strong>fedora core 15 beta</strong> was running quite nicely
+(except that it crashed while i was writing this article) so i can at
+least say: <strong>it ran for straight 6hours without crash
+;P</strong></li>
+</ul>
+<h2 data-number="5" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://libvirt.org/"
+class="uri">http://libvirt.org/</a></li>
+<li>[2] <a
+href="http://blog.loxal.net/2009/04/how-to-convert-vdi-to-vmdk-converting.html"
+class="uri">http://blog.loxal.net/2009/04/how-to-convert-vdi-to-vmdk-converting.html</a></li>
+<li>[3] <a
+href="http://www.howtoforge.com/virtualization-with-kvm-on-a-fedora-11-server"
+class="uri">http://www.howtoforge.com/virtualization-with-kvm-on-a-fedora-11-server</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/converting_a_virtualbox_image_to_a_libvirt.mdwn" title="posts\converting_a_virtualbox_image_to_a_libvirt.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

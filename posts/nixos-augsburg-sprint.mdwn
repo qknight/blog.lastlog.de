@@ -1,0 +1,83 @@
+[[!meta date="2016-06-28 02:54"]]
+[[!img media/nixos-lores.png alt="" class="noFancy" style="float: right"]]
+[[!series emscripten]]
+[[!tag sprint nixos linux technology usability emscripten]]
+[[!summary a report about a nixos hacking sprint in the augsburger 'openlab' hackerspace.]]
+
+# nixos-sprint
+
+paul and me visisted the [augsburger openlab](https://openlab-augsburg.de/) last weekend, for a nice nixos sprint with profpatsch. the sprint lasted two days and we talked lots about nix/nixpkgs internals.
+
+## nix based emscripten toolchain
+
+we've been working on the [emscripten nix toolchain](https://github.com/NixOS/nixpkgs/pull/16208). current status is: prototype is working and we can already compile these targets:
+
+* libz
+* libxml2
+* json_c
+* [xmlmirror](https://gitlab.com/odfplugfest/xmlmirror)
+
+**note:** *YAY*, this is the first nix-based emscripten toolchain which should work on nixos but also on **mac os x** and on basically **every POSIX supporting unix**!
+
+## nixexpr grammar
+
+[we had the idea to make the nix expression language more forgiving](https://github.com/NixOS/nix/pull/948) by having it support `;` at the end of a normal function body.
+
+### random example: mkDerivation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+  json_c_ = emscriptenStdenv.mkDerivation rec {
+
+    name = "json_c_";
+    version = "json-c-0.12-20140410";
+
+    buildInputs = [ autoconf automake libtool pkgconfig gnumake ];
+
+    src = fetchgit {
+      url = "https://github.com/json-c/json-c";
+      rev = "refs/tags/${version}";
+      sha256 = "0s9h6147v2vkd4l4k3prg850n0k1mcbhwhbr09dzq97m6vi9lfdi";
+    };
+    postFixup = "echo postFixup";
+    preFixup = "echo preFixup";
+    fixupPhase = "echo fixupPhase";
+  };
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+you close the scope with `};` and you always need the `;` which is not optional.
+
+### function call
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+{ foo, bar } :
+
+{
+  # function body
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+you close the scope with `}` and you are not allowed to use `};`!
+
+**note:** [with this patch](https://github.com/NixOS/nix/pull/948) you are now allowed to write either `}` (default) or `};` which is new.
+
+## mkDerivation outputs
+i finally learned that we now have the [`outputs`-feature]( https://nixos.org/nix/manual/#ssec-derivation)
+
+this means nixos/nix now supports split packages: 
+
+* `foo.deb` vs. 
+* `foo-dev.deb` 
+
+as ubuntu and other distros does. 
+
+in `nixpkgs`, for instance in an `stdenv.mkDerivation` you can now use:
+
+    outputs = [ "lib" "headers" "doc" ];
+
+to install software into these directories! great!
+
+
+# summary
+
+nice ppl, nice room. 10/10, would hack there again! **huge thanks to Profpatsch and helpers.**
+
+

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="owncloud_ssl_client_certificates.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>owncloud ssl client certificates</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/owncloud_ssl_client_certificates.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="LS-7T.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="ODOO_evaluation.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">owncloud ssl client certificates</h1>
+    <div id="date"><p><span id="lastupdated">8 feb 2015</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::qt" class="tagbtn btn btn-primary">qt</a><a href="timeline.html?filter=tag::webservices" class="tagbtn btn btn-primary">webservices</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::owncloud" class="tagbtn btn btn-primary">owncloud</a></p></div>
+    <p><a href="media/595px-OwnCloud2-Logo.svg.png"><img src=media/595px-OwnCloud2-Logo.svg.png width="200px" alt="" style="float: right" caption=""></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>this posting is about owncloud [1] which can be used to manage file
+sharing/calendar sharing/address book hosting and more. that said, i’ve
+ported a patch to enable SSL client certificates from owncloud 1.6 to
+owncloud master (upcoming 1.8) and here is the documentation how to use
+it and how i’ve done it. the discussion about this patch can be found at
+[2].</p>
+<p><strong>note:</strong> this posting is about the owncloud client,
+written in qt5 but also covers how to change the apache configuration,
+that is the owncloud.conf file.</p>
+<h2 data-number="2" id="setup">setup</h2>
+<h3 data-number="2.1" id="ssl-client-certificates">SSL client
+certificates</h3>
+<p>first thing you will need is a certificate to sign the client
+certificates. the manual [3] describes this nicely for openssl/apache
+usage.</p>
+<p><strong>note:</strong> it is important to understand that you can
+use:</p>
+<ul>
+<li><p>something like a verisign certificate to authenticate the server
+to the clients, which is pretty much what everyone does for his
+webpages,</p></li>
+<li><p>and still have your own CA to issue client certificates, to
+authenticate clients to the server.</p>
+<p>so you don’t rely on verisign (or similar) to sign your client
+certificates, which is quite handy.</p></li>
+</ul>
+<h3 data-number="2.2" id="owncloud-vhost">owncloud vhost</h3>
+<p>you can use the owncloud.conf coming with examples from the net and
+then extend it. this basically means that you add these lines:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLCertificateFile</span> /etc/apache2/ssl/datenhalde-cert.pem</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLCertificateKeyFile</span> /etc/apache2/ssl/datenhalde-key.pem</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLCACertificateFile</span> /etc/apache2/ssl/cacert.pem</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLVerifyClient</span> require</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLCACertificateFile</span> /etc/apache2/ssl/cacert.pem</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLVerifyDepth</span> 1</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># might be a good idea to disable SSLv2 SSLv3</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">SSLProtocol</span> all <span class="at">-SSLv2</span> <span class="at">-SSLv3</span></span></code></pre></div>
+<p>this is the complete configuration:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>VirtualHost <span class="ex">192.168.56.101:443</span><span class="op">&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ServerAdmin</span> webmaster@localhost                                                                                                                               </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ServerName</span> owncloud.myhost</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">DocumentRoot</span> /var/www/owncloud</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Available loglevels: trace8, ..., trace1, debug, info, notice, warn,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># error, crit, alert, emerg.</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># It is also possible to configure the loglevel for particular</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># modules, e.g.</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">LogLevel</span> debug </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">#LogLevel info ssl:warn</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ErrorLog</span> <span class="va">${APACHE_LOG_DIR}</span>/error.log</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CustomLog</span> <span class="va">${APACHE_LOG_DIR}</span>/access.log combined</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>IfModule <span class="ex">mod_ssl.c</span><span class="op">&gt;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="ex">ErrorLog</span> /var/log/apache2/ssl_engine.log</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="ex">LogLevel</span> debug</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>/IfModule<span class="op">&gt;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># For most configuration files from conf-available/, which are</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># enabled or disabled at a global level, it is possible to</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># include a line for only one particular virtual host. For example the</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># following line enables the CGI configuration for this host only</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># after it has been globally disabled with &quot;a2disconf&quot;.</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Include conf-available/serve-cgi-bin.conf</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   SSL Engine Switch:</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Enable/Disable SSL for this virtual host.</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLEngine</span> on</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   A self-signed (snakeoil) certificate can be created by installing</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   the ssl-cert package. See</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   /usr/share/doc/apache2/README.Debian.gz for more info.</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   If both key and certificate are stored in the same file, only the</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   SSLCertificateFile directive is needed.</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLCertificateFile</span> /etc/apache2/ssl/datenhalde-cert.pem</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLCertificateKeyFile</span> /etc/apache2/ssl/datenhalde-key.pem</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Server Certificate Chain:</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Point SSLCertificateChainFile at a file containing the</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   concatenation of PEM encoded CA certificates which form the</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   certificate chain for the server certificate. Alternatively</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   the referenced file can be the same as SSLCertificateFile</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   when the CA certificates are directly appended to the server</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   certificate for convinience.</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># qknight: normally you would need this as well but since my root CA is self signed, we don&#39;t</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="co">#SSLCertificateChainFile /etc/apache2/ssl/bundle.crt</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Certificate Authority (CA):</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Set the CA certificate verification path where to find CA</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   certificates for client authentication or alternatively one</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   huge file containing all of them (file must be PEM encoded)</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Note: Inside SSLCACertificatePath you need hash symlinks</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                to point to the certificate files. Use the provided</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                Makefile to update the hash symlinks after changes.</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLCACertificateFile</span> /etc/apache2/ssl/cacert.pem</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Certificate Revocation Lists (CRL):</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Set the CA revocation path where to find CA CRLs for client</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   authentication or alternatively one huge file containing all</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   of them (file must be PEM encoded)</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Note: Inside SSLCARevocationPath you need hash symlinks</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                to point to the certificate files. Use the provided</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="co">#                Makefile to update the hash symlinks after changes.</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="co">#SSLCARevocationPath /etc/apache2/ssl.crl/</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="co">#SSLCARevocationFile /etc/apache2/ssl.crl/ca-bundle.crl</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Client Authentication (Type):</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Client certificate verification type and depth.  Types are</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   none, optional, require and optional_no_ca.  Depth is a</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   number which specifies how deeply to verify the certificate</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   issuer chain before deciding the certificate is not valid.</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>    <span class="co">#SSLVerifyClient require</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>    <span class="co">#SSLVerifyDepth  10</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>    <span class="co"># qknight: added client cert requirement</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLVerifyClient</span> require</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLCACertificateFile</span> /etc/apache2/ssl/cacert.pem</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLVerifyDepth</span> 1</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    <span class="ex">SSLProtocol</span> all <span class="at">-SSLv2</span> <span class="at">-SSLv3</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   SSL Engine Options:</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Set various options for the SSL engine.</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   o FakeBasicAuth:</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        Translate the client X.509 into a Basic Authorisation.  This means that</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        the standard Auth/DBMAuth methods can be used for access control.  The</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        user name is the `one line&#39; version of the client&#39;s X.509 certificate.</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        Note that no password is obtained from the user. Every entry in the user</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        file needs this password: `xxj31ZMTZzkVA&#39;.</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   o ExportCertData:</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        This exports two additional environment variables: SSL_CLIENT_CERT and</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        SSL_SERVER_CERT. These contain the PEM-encoded certificates of the</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        server (always existing) and the client (only existing when client</span></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        authentication is used). This can be used to import the certificates</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        into CGI scripts.</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   o StdEnvVars:</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        This exports the standard SSL/TLS related `SSL_*&#39; environment variables.</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        Per default this exportation is switched off for performance reasons,</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        because the extraction step is an expensive operation and is usually</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        useless for serving static content. So one usually enables the</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        exportation for CGI and SSI requests only.</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   o OptRenegotiate:</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        This enables optimized SSL connection renegotiation handling when SSL</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        directives are used in per-directory context.</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>    <span class="co">#SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>FilesMatch <span class="st">&quot;\.(cgi|shtml|phtml|php)$&quot;</span><span class="op">&gt;</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">SSLOptions</span> +StdEnvVars</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>/FilesMatch<span class="op">&gt;</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>Directory <span class="ex">/usr/lib/cgi-bin</span><span class="op">&gt;</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">SSLOptions</span> +StdEnvVars</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>/Directory<span class="op">&gt;</span></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   SSL Protocol Adjustments:</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   The safe and default but still SSL/TLS standard compliant shutdown</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   approach is that mod_ssl sends the close notify alert but doesn&#39;t wait for</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   the close notify alert from client. When you need a different shutdown</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   approach you can use one of the following variables:</span></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   o ssl-unclean-shutdown:</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        This forces an unclean shutdown when the connection is closed, i.e. no</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        SSL close notify alert is send or allowed to received.  This violates</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        the SSL/TLS standard but is needed for some brain-dead browsers. Use</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        this when you receive I/O errors because of the standard approach where</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        mod_ssl sends the close notify alert.</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   o ssl-accurate-shutdown:</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        This forces an accurate shutdown when the connection is closed, i.e. a</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        SSL close notify alert is send and mod_ssl waits for the close notify</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        alert of the client. This is 100% SSL/TLS standard compliant, but in</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        practice often causes hanging connections with brain-dead browsers. Use</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        this only for browsers where you know that their SSL implementation</span></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        works correctly.</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Notice: Most problems of broken clients are also related to the HTTP</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   keep-alive facility, so you usually additionally want to disable</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   keep-alive for those clients, too. Use variable &quot;nokeepalive&quot; for this.</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   Similarly, one has to force some clients to use HTTP/1.0 to workaround</span></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   their broken HTTP/1.1 implementation. Use variables &quot;downgrade-1.0&quot; and</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>    <span class="co">#   &quot;force-response-1.0&quot; for this.</span></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>    <span class="ex">BrowserMatch</span> <span class="st">&quot;MSIE [2-6]&quot;</span> <span class="dt">\</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>                    nokeepalive ssl-unclean-shutdown <span class="dt">\</span></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>                    downgrade-1.0 force-response-1.0</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>    <span class="co"># MSIE 7 and newer should be able to use keepalive</span></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>    <span class="ex">BrowserMatch</span> <span class="st">&quot;MSIE [17-9]&quot;</span> ssl-unclean-shutdown</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>Directory <span class="ex">/var/www/owncloud</span><span class="op">&gt;</span></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>            <span class="ex">Options</span> Indexes FollowSymLinks MultiViews</span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>            <span class="ex">AllowOverride</span> All</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>            <span class="ex">Order</span> allow,deny</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>            <span class="ex">Allow</span> from all</span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>            <span class="ex">Satisfy</span> Any</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>/Directory<span class="op">&gt;</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>/VirtualHost<span class="op">&gt;</span></span></code></pre></div>
+<h3 data-number="2.3" id="owncloud-client">owncloud client</h3>
+<p>clone this repo:</p>
+<pre><code>git clone https://github.com/owncloud/client.git</code></pre>
+<p>then use [4] and install the dependencies:</p>
+<pre><code>aptitude install qt5-default
+aptitude install qt5keychain-dev
+aptitude install libqt5webkit5-dev
+aptitude install libqt5xmlpatterns5-dev
+aptitude install qttools5-dev qttools5-dev-tools
+aptitude install libneon27-dev
+aptitude install sqlite3
+aptitude install libsqlite3-dev
+aptitude install openssl-dev
+aptitude install libgnutls-openssl-dev</code></pre>
+<p>configure &amp; build:</p>
+<pre><code>mkdir build; cd build
+cmake -DCMAKE_SKIP_BUILD_RPATH=false -DCMAKE_BUILD_TYPE=Debug -DCMAKE_BUILD_WITH_INSTALL_RPATH=false -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=true  -DCMAKE_INSTALL_PREFIX=`pwd` ..
+make</code></pre>
+<p>finally, run it:</p>
+<pre><code>bin/owncloud --logfile /tmp/log</code></pre>
+<p>in another shell run this:</p>
+<pre><code>tail -f /tmp/log</code></pre>
+<h3 data-number="2.4" id="what-ive-tested">what i’ve tested</h3>
+<p>basically only coping files:</p>
+<ul>
+<li>i copied many small files (40) and</li>
+<li>some very large files (3x ~600mb) to the remote server using TLS 1.2
+and using the owncloud webgui in firefox, with client certificate (.p12)
+file installed in the browser. to check that the files were ‘really’
+copied to the server i was using the webinterface.</li>
+</ul>
+<h2 data-number="3" id="development">development</h2>
+<h3 data-number="3.1" id="git-rebase-using-meld">git rebase using
+meld</h3>
+<p>this is about how to merge the patch from 1.6 to 1.8 using meld:</p>
+<ol type="1">
+<li><p>imported the branch named ‘ssl-client-certs’ on owncloud
+1.6</p></li>
+<li><p>managed to get version 1.6 running with making some values
+hard-coded</p></li>
+<li><p>created a new branch: ‘git checkout -b ssl-client-certs-reduced’
+in order to not lose track of who made which changes</p></li>
+<li><p>remove the hard-coded code paths and did ‘rebase -i HEAD~10’ to
+compress all changes into a single commit. this makes the later rebase
+easier i was told.</p></li>
+<li><p>adapted my ~/.gitconfig like discussed in [6], in details:</p>
+<p>excerpt out of ~/.gitconfig</p>
+<pre><code> [merge]
+         # http://stackoverflow.com/questions/11133290/git-merging-using-meld   
+         tool = mymeld
+         conflictstyle = diff3
+ [mergetool &quot;mymeld&quot;]
+         keepBackup=false
+         #trustExitCode=true
+         # When there&#39;s a collison during git merge, I open a mergetool called Meld. It opens three files LOCAL, BASE and REMOTE. 
+         #As I&#39;ve read 
+         # - LOCAL -&gt; what is up2date at master
+         # - BASE -&gt; stuff i put together from left and right
+         # - REMOTE -&gt; what i did
+         cmd = /home/joachim/.nix-profile/bin/meld --diff $BASE $LOCAL --diff $BASE $REMOTE --diff $LOCAL $BASE $REMOTE --output $MERGED
+         # this opens meld with 3 tabs, 1st and 2nd tab containing the simple diffs I&#39;m trying to merge, and the 3rd tab, open by default, shows the 3-way merge view.</code></pre>
+<p><strong>note:</strong> the meld path is nixos specific
+/home/joachim/.nix-profile/bin/meld</p></li>
+<li><p>finally i decided for ‘rebase’ rather than ‘merge’ as the code
+history looks much prettier then:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">git</span> rebase master</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">First,</span> rewinding head to replay your work on top of it...</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Applying:</span> adds <span class="st">&#39;SSL client certificate&#39;</span> support from n.octeau with qknight changes as:</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Using</span> index info to reconstruct a base tree...</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       csync/src/csync.h</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       csync/src/csync_owncloud_private.h</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/cmd/cmd.cpp</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/CMakeLists.txt</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/folder.cpp</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/wizard/owncloudhttpcredspage.cpp</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/wizard/owncloudsetuppage.cpp</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/wizard/owncloudsetuppage.h</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/wizard/owncloudwizard.cpp</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/gui/wizard/owncloudwizard.h</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/libsync/CMakeLists.txt</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/libsync/account.cpp</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/libsync/account.h</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/libsync/creds/httpcredentials.cpp</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/libsync/creds/httpcredentials.h</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="ex">M</span>       src/libsync/networkjobs.cpp</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>stdin<span class="op">&gt;</span>:35: <span class="ex">trailing</span> whitespace.</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="kw">;</span>  </span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>stdin<span class="op">&gt;</span>:36: <span class="ex">trailing</span> whitespace.</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>stdin<span class="op">&gt;</span>:104: <span class="ex">trailing</span> whitespace.</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>stdin<span class="op">&gt;</span>:178: <span class="ex">trailing</span> whitespace.</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>stdin<span class="op">&gt;</span>:224: <span class="ex">trailing</span> whitespace.</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">warning:</span> squelched 21 whitespace errors</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="ex">warning:</span> 26 lines add whitespace errors.</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Falling</span> back to patching base and 3-way merge...</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/libsync/networkjobs.cpp</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/libsync/creds/httpcredentials.h</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/libsync/creds/httpcredentials.h</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/libsync/creds/httpcredentials.cpp</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/libsync/creds/httpcredentials.cpp</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/libsync/account.h</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/libsync/account.h</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/libsync/account.cpp</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/libsync/account.cpp</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/libsync/CMakeLists.txt</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/wizard/owncloudwizard.h</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/wizard/owncloudwizard.cpp</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/wizard/owncloudsetuppage.h</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/wizard/owncloudsetuppage.cpp</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/gui/wizard/owncloudsetuppage.cpp</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/wizard/owncloudhttpcredspage.cpp</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/folder.cpp</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/gui/folder.cpp</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/gui/CMakeLists.txt</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="ex">CONFLICT</span> <span class="er">(</span><span class="ex">content</span><span class="kw">)</span><span class="bu">:</span> Merge conflict in src/gui/CMakeLists.txt</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> src/cmd/cmd.cpp</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> csync/src/csync_owncloud_private.h</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Auto-merging</span> csync/src/csync.h</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Failed</span> to merge in the changes.</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Patch</span> failed at 0001 adds <span class="st">&#39;SSL client certificate&#39;</span> support from n.octeau with qknight changes as:</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    <span class="ex">The</span> copy of the patch that failed is found in:</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>        <span class="ex">/home/joachim/Desktop/projects/owncloud/mirall/.git/rebase-apply/patch</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    <span class="ex">When</span> you have resolved this problem, run <span class="st">&quot;git rebase --continue&quot;</span>.</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    <span class="ex">If</span> you prefer to skip this patch, run <span class="st">&quot;git rebase --skip&quot;</span> instead.</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    <span class="ex">To</span> check out the original branch and stop rebasing, run <span class="st">&quot;git rebase --abort&quot;</span>.</span></code></pre></div>
+<p>afterwards i was using the ‘git mergetool’ to make the final
+merge:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">git</span> mergetool</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Merging:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/gui/CMakeLists.txt</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/gui/folder.cpp</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/gui/wizard/owncloudsetuppage.cpp</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/libsync/account.cpp</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/libsync/account.h</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/libsync/creds/httpcredentials.cpp</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src/libsync/creds/httpcredentials.h</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Normal</span> merge conflict for <span class="st">&#39;src/gui/CMakeLists.txt&#39;</span>:</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>      <span class="ex">{local}:</span> modified file</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>      <span class="ex">{remote}:</span> modified file</span></code></pre></div>
+<p><a href="media/owncloud_meld_merge.jpg"><img src=media/owncloud_meld_merge.jpg caption=""></a></p>
+<p>as you can see in the screenshot above i’m using the third tab right
+now and what you can see there is:</p>
+<ul>
+<li>LOCAL: stuff which happened on <strong>master</strong> (very recent
+code)</li>
+<li>MIDDLE: remixing arena, here you have to take in stuff from the left
+(LOCAL) and the right (REMOTE)</li>
+<li>REMOTE: stuff i had been doing in my
+<strong>‘ssl-client-certs-reduced-merge’ branch</strong></li>
+</ul>
+<p><strong>note:</strong> what you have to do now is quite simple: for
+every file which has a merge conflict a new meld instance will pop up.
+when you finished editing, just save and quit meld and changes will be
+written to the respective file.</p>
+<p>after all merge conflicts are solved, do this:</p>
+<pre><code> git status</code></pre>
+<p>for all files which have not been added to the index yet, add
+them:</p>
+<pre><code> git add src/gui/CMakeLists.txt src/gui/folder.cpp src/gui/wizard/owncloudsetuppage.cpp src/libsync/account.cpp src/libsync/account.h src/libsync/creds/httpcredentials.cpp src/libsync/creds/httpcredentials.h</code></pre>
+<p>afterwards:</p>
+<pre><code> git rebase --continue</code></pre>
+<p>i accidently did a ‘git commit’ instead, and then i had to undo that
+commit and go for the ‘git rebase –continue’ instead</p>
+<p>finally use <strong>‘git push qknight
+ssl-client-certs-reduced-merge’</strong> to your github account and
+create a <strong>pull request</strong> from the github webpage to the
+owncloud master and your done.</p></li>
+</ol>
+<h3 data-number="3.2"
+id="understanding-code-using-kcachegrind">understanding code using
+kcachegrind</h3>
+<p>sometimes you have to extend an application but in order to do that
+you have to understand how it works. the original patch i had to port
+from 1.6 to 1.8 didn’t work out of the box so i had to search for the
+errors and i wanted to know which code-paths are taken and also how
+often, without having to step through the source code manually using GDB
+i decided to use valgrind with the callgrind plugin.</p>
+<p>first of all, this is the code seen from kdevelop:</p>
+<p><a href="media/owncloud_kdevelop.jpg"><img src=media/owncloud_kdevelop.jpg caption="kdevelop showing a complicated code path"></a></p>
+<p>now run:</p>
+<pre><code>valgrind --tool=callgrind -v  bin/owncloud</code></pre>
+<p><strong>note:</strong> it is important to use the application in a
+way that it executes the wanted code paths, in my case, to add a new
+account and sync files from it.</p>
+<p>afterwards you will find one file per task which looks like this:</p>
+<pre><code>ls -la | grep callg
+-rw-------  1 joachim users 3757878 Feb  3 07:33 callgrind.out.28286
+-rw-------  1 joachim users 1719011 Feb  3 07:31 callgrind.out.28321</code></pre>
+<p>and finally pick the right one and run this:</p>
+<pre><code>kcachegrind callgrind.out.28286 </code></pre>
+<p>in kcachegrind use the search field and enter your function name, in
+my case that was “Folder::init()”</p>
+<p><a href="media/owncloud_kcachegrind.jpg"><img src=media/owncloud_kcachegrind.jpg caption="kcachegrind shows which code path was taken and how often"></a></p>
+<p><strong>note:</strong> interpretation of the graphs and data shown is
+not as straight forward as it seems, see [4] for more details.</p>
+<h2 data-number="4" id="conclusion">conclusion</h2>
+<p>i’ve learned a lot about git, especially ‘git rebase’, ‘git
+mergetool’ and ‘git bisect’ and i think that the valgrind/cachegrind
+useage to understand execution paths is quite helpful! if you have
+comments on this, please use the comment field below. i’d love to have
+feedback.</p>
+<p>my motivation to create this feature was to have more security as you
+can create a vhost now which might even serve a very old
+apache/php/owncloud version with security exploits but, except a client
+with a valid SSL client certificate, nobody will ever be able to even
+issue a basic GET request to the server as the https will return a ‘SSL
+handshake error’ first!</p>
+<p><strong>thanks a lot to the folks at
+irc.freenode.net#owncloud-client-dev especially to ogoffart, danimo and
+guruz for their help.</strong></p>
+<p>i found the nixos environments quite helpful as i was using gcc and
+llvm for testing and it is so easy to change between these compilers on
+nixos.</p>
+<h2 data-number="5" id="links">links</h2>
+<ul>
+<li>[1] <a href="https://owncloud.org/"
+class="uri">https://owncloud.org/</a></li>
+<li>[2] <a href="https://github.com/owncloud/client/issues/69"
+class="uri">https://github.com/owncloud/client/issues/69</a></li>
+<li>[3] <a
+href="http://www.flatmtn.com/article/setting-ssl-certificates-apache"
+class="uri">http://www.flatmtn.com/article/setting-ssl-certificates-apache</a></li>
+<li>[4] <a href="http://valgrind.org/docs/manual/cl-manual.html"
+class="uri">http://valgrind.org/docs/manual/cl-manual.html</a></li>
+<li>[5] <a
+href="http://www.golem.de/news/eigene-cloud-daten-nach-hause-holen-1406-107155-4.html"
+class="uri">http://www.golem.de/news/eigene-cloud-daten-nach-hause-holen-1406-107155-4.html</a></li>
+<li>[6] <a
+href="http://stackoverflow.com/questions/11133290/git-merging-using-meld"
+class="uri">http://stackoverflow.com/questions/11133290/git-merging-using-meld</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/owncloud_ssl_client_certificates.mdwn" title="posts\owncloud_ssl_client_certificates.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

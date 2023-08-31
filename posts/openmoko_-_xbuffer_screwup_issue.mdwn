@@ -1,0 +1,91 @@
+[[!summary chatGPT: The openmoko device is experiencing frequent errors and the user is seeking a solution.]]
+[[!meta date="2009-05-19 18:30"]]
+[[!tag linux openmoko]]
+
+[[!img media/om.jpg alt="today i had the already mentioned problem: **xbuffer screwup**" style="float: right"]]
+
+i played with the openmoko to get an idea what could cause this and i come up with this:
+	
+  * system widgets are not affected much but they are.
+  * tangogps draws the map on the screen afterwards it draws an overlay over the map:
+this overlay is used to draw the track with red color, you probably have used this already
+the funny thing is that on a move event of the map the second layer isn't drawn and does NOT contain screwed images. after i release the screen the overlay is drawn and the map is filled with black random pixels and some other colors as well.
+  * later i restarted tangogps and then all the pixmaps were screwed no matter if i used the map move or not
+
+**openmoko using shr # dmesg**
+
+    [   63.660000] Restarting tasks ... done.
+    [   86.405000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+    [  189.895000] JFFS2 notice: (445) check_node_data: wrong data CRC in data node at 0x0d93a5bc: read 0x41c01a60, calculated 0x8116099a.
+    [  266.440000] HDQ error: 1
+    [  266.455000] HDQ responds again
+    [ 1470.260000] g_ether gadget: full speed config #1: CDC Ethernet (ECM)
+    [ 1470.270000] ADDRCONF(NETDEV_CHANGE): usb0: link becomes ready
+    [ 1472.610000] pcf50633 0-0073: usb curlim to 500 mA
+    [ 1480.365000] usb0: no IPv6 routers present
+    [ 2267.715000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+    [ 2282.025000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+    [ 2293.020000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+    [ 2317.940000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 2317.940000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 2317.940000] mmcblk0: error -110 sending status comand<3>mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 2317.950000] mmcblk0: error -110 requesting status
+    [ 2317.950000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 2317.950000] end_request: I/O error, dev mmcblk0, sector 10486864
+    [ 2317.950000] Buffer I/O error on device mmcblk0p1, logical block 1310856
+    [ 2317.950000] lost page write due to I/O error on mmcblk0p1
+    [ 2330.500000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+    [ 2467.610000] rxerr: port=1 ch=0x2e, rxs=0x00000001
+    [ 3152.305000] rxerr: port=1 ch=0x12, rxs=0x00000001
+    [ 3335.135000] rxerr: port=1 ch=0x00, rxs=0x0000000c
+    [ 3336.000000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.000000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.000000] mmcblk0: error -110 sending status comand<3>mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+    [ 3336.010000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.010000] glamo-mci glamo-mci.0: Error after cmd: 0x8120
+    [ 3336.010000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.020000] mmcblk0: error -110 requesting status
+    [ 3336.020000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.020000] end_request: I/O error, dev mmcblk0, sector 10208
+    [ 3336.020000] end_request: I/O error, dev mmcblk0, sector 10216
+    [ 3336.020000] end_request: I/O error, dev mmcblk0, sector 10224
+    [ 3336.035000] Aborting journal on device mmcblk0p1.
+    [ 3336.055000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.055000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.055000] mmcblk0: error -110 sending status comand<3>mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3336.085000] mmcblk0: error -110 requesting status
+    [ 3336.085000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3336.085000] end_request: I/O error, dev mmcblk0, sector 4176
+    [ 3336.085000] Buffer I/O error on device mmcblk0p1, logical block 520
+    [ 3336.085000] lost page write due to I/O error on mmcblk0p1
+    [ 3363.365000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3363.365000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3363.365000] mmcblk0: error -110 sending status comand<3>mmcblk0: error -110 sending read/write command, response 0x0, card status 0x0
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0xc120
+    [ 3363.380000] mmcblk0: error -110 requesting status
+    [ 3363.380000] glamo-mci glamo-mci.0: Error after cmd: 0x4120
+    [ 3363.380000] end_request: I/O error, dev mmcblk0, sector 15204384
+    [ 3363.380000] Buffer I/O error on device mmcblk0p1, logical block 1900546
+    [ 3363.380000] lost page write due to I/O error on mmcblk0p1
+
+currently i would like to fix that issue since it seems to happen frequently

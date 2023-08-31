@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="developing_software_using_nixos.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>developing software using nixos</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/developing_software_using_nixos.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="podcasts_and_documentaries.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="documentaries_revisited.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">developing software using nixos</h1>
+    <div id="date"><p><span id="lastupdated">23 mar 2012</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::cmake" class="tagbtn btn btn-primary">cmake</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::qt" class="tagbtn btn btn-primary">qt</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>i’ve just finished a wiki page on how to <strong>develop arbitrary
+software on nixos</strong> [1] (thanks to viric!). as this is
+fundamentally different to all other linux and non linux operating
+systems i think this is worth a posting about this subject in my
+blog.</p>
+<p>the <strong>interesting aspect</strong> is that
+<strong>nix</strong>/nixos <strong>provides</strong> such <strong>a
+development environment per project</strong> so one is not forced to
+pollute the system environment with the ongoing changes which always
+lead to <strong>horrible side effects as regression</strong> (you know
+<strong>when old habits stop working</strong> as a tiny update of libX
+breaks tool Z).</p>
+<p>the way it is used is covered by [1] already.</p>
+<h2 data-number="2" id="a-slightly-more-complex-example">a slightly more
+complex example</h2>
+<h3 data-number="2.1" id="config.nix">config.nix</h3>
+<pre><code>     1  {
+     2    packageOverrides = pkgs : with pkgs; rec {
+     3      # example environment from viric
+     4      sdlEnv = pkgs.myEnvFun {
+     5        name = &quot;sdl&quot;;
+     6        buildInputs = [ stdenv doxygen SDL SDL_image SDL_ttf SDL_gfx cmake SDL_net pkgconfig ];
+     7      };
+     8
+     9      # a custom library NOT included in nixpkgs (maybe later it is but assume for this example it is not)
+    10      libnoise = callPackage ./libnoise.nix {};
+    11
+    12      # this is the needed environment for development of my spring random map generator
+    13      # type &#39;load-srmg-env&#39; to load it after installing it using &#39;nix-env -i env-srmg&#39;
+    14      srmgEnv = pkgs.myEnvFun {
+    15        name = &quot;srmg&quot;;
+    16        buildInputs = [ stdenv doxygen cmake libnoise qt4 ];
+    17      };
+    18    };
+    19  }</code></pre>
+<p>in the ~/.nixpkgs/config.nix expression i added a custom library
+which is then available with nix-env, this way it can be installed using
+(<strong>nix-env -i libnoise</strong>).</p>
+<p>the <strong>interesting point is that line 2</strong> contains the
+<strong>rec keyword</strong> indicating that <strong>all 3 attributes in
+the attribute set (line 2 to 18) may recursively reference each
+other</strong>. this is <strong>required</strong> as the the
+<strong>srmgEnv</strong> on line 14 where the
+<strong>buildInputs</strong> lists <strong>libnoise</strong>.</p>
+<p>the <strong>libnoise expression</strong> is outsourced (line 10) into
+the <strong>file libnoise.nix</strong> (listed below).</p>
+<h3 data-number="2.2" id="libnoise.nix">libnoise.nix</h3>
+<pre><code>     1  {stdenv, doxygen, fetchgit, cmake}:
+     2
+     3  stdenv.mkDerivation rec {
+     4    name = &quot;libnoise-1.0.0&quot;;
+     5
+     6    # i also change bits in the library and therefore i like to have it local
+     7    # in case i change anything this needs to be done to reflect the change
+     8    # 1. make the change 
+     9    # 2. use &#39;git add file_which_has_changed&#39;
+    10    # 3. use &#39;git commit&#39;
+    11    # 4. use &#39;git log&#39; to find the most recent rev
+    12    # 5. paste the copied rev in the rev field below
+    13    # 6. reinstall the libnoise 
+    14    src = fetchgit {
+    15      url = /home/joachim/Desktop/projects/libnoise;
+    16      rev = &quot;8b5b89b7241a112dfe0b387f7589ea9a2df00b02&quot;;
+    17      sha256 = &quot;&quot;;
+    18    };
+    19
+    20    buildInputs = [ cmake doxygen ];
+    21
+    22    meta = {
+    23      description = &quot;libnoise&quot;;
+    24      homepage = &quot;http://www.github.com/qknight/libnoise&quot;;
+    25      license = &quot;LGPL2&quot;;
+    26      maintainers = with stdenv.lib.maintainers; [qknight];
+    27    };
+    28  }
+    29</code></pre>
+<p>the <strong>libnoise.nix file is interesting</strong> as <strong>it
+references a local git repository</strong>. it also lists what to do in
+order to alter the package.</p>
+<p>once the srmg-env is installed (<strong>nix-env -i env-srmg</strong>)
+it can be used using: <strong>load-srmg-env. </strong>as mentioned in
+[1] this environment will then behave as if one had used ubuntu linux
+and then installed all the required libraryies.</p>
+<h2 data-number="3" id="future">future</h2>
+<p>as i noted in [1] nix will soon get a toggle (<strong>nix-build
+–run-env ‘<nixpkgs>’ -A xterm, see [2]</strong>) which will clone the
+environment of virtually any <strong>sourceScription</strong> on the
+system. this means one can hack on any software easily by injecting code
+into the build chain on an arbitrary position - still, this changes
+won’t be persistent, meaning:</p>
+<ul>
+<li>after <strong>reinstallation</strong> of the sourceScription the
+<strong>former version will be installed</strong></li>
+<li>the <strong>environment</strong> will <strong>not last a
+reboot</strong> of the system (not 100% sure about this)</li>
+</ul>
+<p>still it is one step towards the concept of the midstream platform
+(mentioned in my diploma thesis) and is a great way to test a quick
+hack.</p>
+<p>update: 23.5.2012</p>
+<del>
+<p><strong>another</strong> interesting <strong>potential
+property</strong> is that <strong>tools like kdevelop</strong> could be
+<strong>patched to automatically see all the include paths of a complete
+project</strong> and therefore are able to <strong>provide automatic
+code completion</strong> without having too much manual effort.</p>
+</del>
+<p><strong>kdevelop can do that already</strong>! when importing the
+project’s ‘CMakeLists.txt’, kdevelop reads the ‘found’ entries and
+therefore collects all the library paths!</p>
+<h2 data-number="4" id="links">links</h2>
+<ul>
+<li>[1] <a href="https://nixos.org/wiki/Howto_develop_software_on_nixos"
+class="uri">https://nixos.org/wiki/Howto_develop_software_on_nixos</a></li>
+<li>[2] <a
+href="https://github.com/NixOS/nix/commit/7f38087f35e6f74a73bfdb28da8acd8930565d51"
+class="uri">https://github.com/NixOS/nix/commit/7f38087f35e6f74a73bfdb28da8acd8930565d51</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/developing_software_using_nixos.mdwn" title="posts\developing_software_using_nixos.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

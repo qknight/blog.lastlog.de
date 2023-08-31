@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="npm2nix-explained.svg">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lend"
+       style="overflow:visible;">
+      <path
+         id="path3810"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-6"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3810-4"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-4"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3810-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-61"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3810-9"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-2"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3810-3"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-8"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3810-92"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend-22"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3810-48"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="308.52917"
+     inkscape:cy="480.48852"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1525"
+     inkscape:window-height="704"
+     inkscape:window-x="1750"
+     inkscape:window-y="81"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="opacity:0.95094341;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#4183c7;stroke-width:4.95959902;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4.95959905, 4.95959905;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4381-4"
+       width="672.33478"
+       height="378.38031"
+       x="29.507856"
+       y="365.67188"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:5.29879093px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="292.95377"
+       y="624.57074"
+       id="text4749"
+       sodipodi:linespacing="125%"
+       transform="scale(0.96691619,1.0342158)"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4751"
+         x="292.95377"
+         y="624.57074">let nodeDeps = with nodePackages; [ </tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="631.19421"
+         id="tspan4753">  # hack: &quot;socket.io&quot; &lt;- quotes are needed since socket.io would be interpreted otherwise</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="637.81769"
+         id="tspan4755">  nodePackages.&quot;socket.io&quot;</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="644.44122"
+         id="tspan4757">  async</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="651.0647"
+         id="tspan4759">  async-stacktrace</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="657.68817"
+         id="tspan4761">  channels</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="664.31165"
+         id="tspan4763">  clean-css</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="670.93518"
+         id="tspan4765">  connect</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="677.55865"
+         id="tspan4767">  ejs</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="684.18213"
+         id="tspan4769">  # how to depend on express-3.1.0 here?</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="690.8056"
+         id="tspan4771">  express</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="697.42914"
+         id="tspan4773">  formidable</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="704.05261"
+         id="tspan4819">...</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="710.67609"
+         id="tspan5098">];</tspan><tspan
+         sodipodi:role="line"
+         x="292.95377"
+         y="717.29956"
+         id="tspan4821" /></text>
+    <rect
+       style="opacity:0.95094341;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#555555;stroke-width:4.95954847;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4.95954832, 4.95954832;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4381"
+       width="263.10324"
+       height="170.34244"
+       x="38.598186"
+       y="374.82312"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <image
+       y="386.12723"
+       x="321.77484"
+       id="image3004"
+       xlink:href="data:image/png;base64,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
+RK5CYII=
+"
+       height="74"
+       width="317"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <image
+       y="382.14789"
+       x="70.428574"
+       id="image3026"
+       xlink:href="data:image/png;base64,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
+AAAASUVORK5CYII=
+"
+       height="77"
+       width="178"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <rect
+       style="opacity:0.95094341;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#555555;stroke-width:1.35625827;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4566"
+       width="236.01944"
+       height="85.506714"
+       x="43.614693"
+       y="454.52997"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="101.42857"
+       y="508.07648"
+       id="text3029"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan3031"
+         x="101.42857"
+         y="508.07648">package.json</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.12432015px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 246.34788,504.06448 117.87567,0"
+       id="path3033"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="373.52924"
+       y="510.35675"
+       id="text3029-3"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan3031-1"
+         x="373.52924"
+         y="510.35675">node-packages.json</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.12432015px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 499.127,523.59992 -0.12433,37.10801"
+       id="path3033-6-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="376.55777"
+       y="582.01672"
+       id="text3029-3-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan3031-1-3"
+         x="376.55777"
+         y="582.01672">node-packages-generated.nix</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="339.20242"
+       y="483.10297"
+       id="text3029-3-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan3031-1-8"
+         x="339.20242"
+         y="483.10297">pkgs/top-level/</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="512.14734"
+       y="550.23517"
+       id="text4377"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4379"
+         x="512.14734"
+         y="550.23517">npm2nix</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="55.558392"
+       y="479.60568"
+       id="text4438"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4440"
+         x="55.558392"
+         y="479.60568">etherpad lite source/</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#4183c4;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="529.19287"
+       y="528.17352"
+       id="text4442"
+       sodipodi:linespacing="125%"
+       transform="matrix(0.99102267,-0.13369393,0.13369393,0.99102267,0,0)"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         x="529.19287"
+         y="528.17352"
+         id="tspan4446"
+         style="text-align:center;text-anchor:middle;fill:#4183c4;fill-opacity:1">clone</tspan></text>
+    <rect
+       style="opacity:0.95094341;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#555555;stroke-width:1.85192323;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4566-5"
+       width="235.52377"
+       height="159.76234"
+       x="44.872673"
+       y="573.47083"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="64.381943"
+       y="603.3111"
+       id="text3029-8"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan3031-4"
+         x="64.381943"
+         y="603.3111">etherpad/default.nix</tspan></text>
+    <rect
+       style="opacity:1;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#555555;stroke-width:0.87539053000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4566-5-8"
+       width="218.31757"
+       height="38.510418"
+       x="394.8667"
+       y="650.76416"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.12432015px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 409.43542,669.35193 -155.67772,0"
+       id="path3033-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.12432015px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 498.0768,601.60502 -0.12433,37.10801"
+       id="path3033-6-9-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="511.15521"
+       y="617.45325"
+       id="text4377-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4379-7"
+         x="511.15521"
+         y="617.45325">generates </tspan><tspan
+         sodipodi:role="line"
+         x="511.15521"
+         y="642.45325"
+         id="tspan4551">1 expression/npm</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.12432015px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 94.13761,539.84358 -0.12433,37.10801"
+       id="path3033-6-9-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="104.18555"
+       y="563.91516"
+       id="text4377-9"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4379-1"
+         x="104.18555"
+         y="563.91516">use source</tspan></text>
+    <rect
+       style="opacity:0.95094341;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4654"
+       width="124.24876"
+       height="26.263966"
+       x="237.38585"
+       y="512.87982"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="262.65765"
+       y="531.52936"
+       id="text4377-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4379-8"
+         x="262.65765"
+         y="531.52936">append</tspan></text>
+    <rect
+       style="opacity:0.81886792;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect4654-0"
+       width="124.24876"
+       height="26.263966"
+       x="245.99245"
+       y="677.45343"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="256.11197"
+       y="697.09283"
+       id="text4377-4-2"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4379-8-1"
+         x="256.11197"
+         y="697.09283">use deps</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="425.65512"
+       y="674.02179"
+       id="text3029-3-7-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan3031-1-3-2"
+         x="425.65512"
+         y="674.02179">nodePackages</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.25510120000000036px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+       x="50.750191"
+       y="617.70007"
+       id="text4719"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/joachim/Desktop/projects/blog-lastlog-de.branchable.com/posts/media/npm2nix-explained.png"
+       inkscape:export-xdpi="329.82001"
+       inkscape:export-ydpi="329.82001"><tspan
+         sodipodi:role="line"
+         id="tspan4721"
+         x="50.750191"
+         y="617.70007"># copied from pkgs/development/web/nodejs/</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="626.76892"
+         id="tspan4747"># build-node-package.nix (thanks to Shea Levy)</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="635.83783"
+         id="tspan4745" /><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="644.90668"
+         id="tspan4743">mkdir -p .bin</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="653.97559"
+         id="tspan4723">    ${concatStrings (map (dep: ''</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="663.04443"
+         id="tspan4725">      test -d ${dep}/bin &amp;&amp; (for b in $(ls ${dep}/bin); do</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="672.11334"
+         id="tspan4727">        ln -sv -t .bin ${dep}/bin/$b</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="681.18219"
+         id="tspan4729">      done)</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="690.2511"
+         id="tspan4731">    '') nodeDeps)}</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="699.31995"
+         id="tspan4733">    ${concatStrings (concatMap (dep: map (name: ''</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="708.38885"
+         id="tspan4735">      ln -sv ${dep}/lib/node_modules/${name} .</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="717.4577"
+         id="tspan4737">    '') dep.names) nodeDeps)}</tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="726.52661"
+         id="tspan4739">  </tspan><tspan
+         sodipodi:role="line"
+         x="50.750191"
+         y="735.59546"
+         id="tspan4741" /></text>
+  </g>
+</svg>

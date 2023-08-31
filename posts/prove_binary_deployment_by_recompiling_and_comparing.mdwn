@@ -1,0 +1,100 @@
+[[!summary chatGPT: The article discusses the challenges of verifying the integrity of source code in binary deployment and suggests using a purely functional package manager like Nix to minimize interference and ensure consistent outcomes. It also explores possible solutions to the problem of timestamps causing differences in files.]]
+[[!meta date="2011-02-16 14:01"]]
+[[!tag gentoo linux packagemanager security usability]]
+[[!img media/debian_ubuntu_gentoo_package.png size=180x alt="" style="float: right"]]
+
+# motivation
+
+
+'**binary deployment**' seems to be a good and fast solution nowadays (i'm talking about open source here). but what **prove** do i have to check if the source code was modified before compiled and signed (say by downstream::debian)?
+
+**Note:** you can replace debian by any other distribution doing 'binary deployment' (it is just an example).
+
+# how is binary deployment actually done
+
+
+this is very much distribution dependent. in general this workflow is used:
+	
+  1. **download** upstream source
+  2. **arrange a build environment**
+  3. apply 'downstream' **patches**
+  4. **install into DESTDIR/PREFIX** and **create an image** from that
+  5. finally **distribute that image**
+
+
+(1) can be secured by signatures using cryptographic hashes and a sig file. (2) is complicated as a pure build environment CAN NOT be guaranteed by most distributions while a notable exception is nix as the build chain and all packages are pure (pure means that no mutual effects between two or more installed components do happen). (3) as downstream patches are usually very small they could be checked manually for security related issues.
+
+
+## security problems using binary deployment
+
+
+downstream could simply add another 'evil' patch in step (3) but when the package got created, the source patch could be removed to hide the modification. this has happended already, see [2]. if the user wants to prevent such a situations there is a limited set of options. he could:
+	
+  * choose to **only do  'source deployment'** (like in gentoo)
+  * **setup his own build environment** (debian) which would **transform the 'binary deployment' into 'source deployment'**
+  * **use tools like SELinux and AppArmor** (but these tools work best on programs you can't check as skype for instance or open source tools you assume 'poor programming practice' in regards to security)
+
+## .. another option
+
+i've been plying with nix lately and as **nix is a 'purely functional package manager'** this implies that step (2) effects are minimized as components don't interfere. as a result this means: **if you clone the original build chain, you could expect the same outcome using the same input.** so i experimented with two components:
+
+
+
+	
+  * vim
+  * apache-httpd
+
+
+the results are very promising as:
+
+	
+  * **both projects have a 1:1 file mapping after reinstallation** (that means reinstalling would result in the same files being created for each project)
+  * **only the binaries had differences**, that is: both tools contain a timestamp which is of course different
+  * **DSO** (dynamic shared objects) as **modules/mod_cgi.so** were not timestamped contrary to my expectation
+
+**Edit:** it turns out that there was some research on this topic already, see [3] page 30. I quote it and hightlight some passages:
+
+
+> To ascertain how well these measures work in preventing impurities in NixOS, **we** **performed two builds of the Nixpkgs collection6 on two different NixOS machines**. This consisted of building 485 non-fetchurl derivations. The output consisted of 165927 files and directories. Of these, there was only one file name that differed between the two builds, namely in mono-1.1.4: a directory gac/IBM.Data.DB2/1.0.3008.37160 7c307b91aa13-
+d208 versus 1.0.3008.40191 7c307b91aa13d208. The differing number is likely derived from the system time. We then compared the contents of each file. There were **differences in 5059 files, or 3.4% **of all regular files. We inspected the nature of the differences: almost all were caused by timestamps being encoded in files, such as in Unix object file archives or compiled Python code. 1048 compiled Emacs Lisp files differed because the hostname of the build machines were stored in the output. Filtering out these and other file types that are known to contain timestamps, we were **left with 644 files, or 0.4%**. However, most of these differences (mostly in executables and libraries) are likely to be due to timestamps as well (such as a build process inserting the build time in a C string). This hypothesis is strongly supported by the fact that of those, **only 42 (or 0.03%) had different file sizes**. None of these content differences have ever caused an observable difference in behaviour.
+
+## how did i do the checks
+
+i used a prefix installation of nix on gentoo. i set the store path to something like '~/mynix/store' so that every program needs to be recompiled (nix limitation/feature). afterwards i did:
+
+    nix-env -i apache-httpd
+    ls store| grep apache-httpd
+    cp -R store/gyp2arhqcglbq6iq1hndclljs7v9n30k-apache-httpd-2.2.17/ apache1
+    nix-env -e apache-http
+    nix-env --delete-generations old
+    nix-store --delete store/gyp2arhqcglbq6iq1hndclljs7v9n30k-apache-httpd-2.2.17/
+
+
+and then do it again but copy to apache2/ instead. next start the comparing.
+
+
+## possible solution to the timestamp problem
+
+
+as it seems that the timestamps are the only problems, here are some thoughts how to overcome this:
+	
+  * **write a compare utility which ignores timestamps** (of course one has to find such regions first)
+  * **always freeze the clock when compiling and setting it to a fixed time**: this could be done by altering the libc library using LD_LIBRARY_PATH to map a indirection layer to the syscalls used for time/date things. remapping syscalls is nothing new ('trickle is a portable lightweight userspace bandwidth shaper' uses it).
+**NOTE:** this might have unknown side effects and needs to be evaluated as a fixed time will interfere with:
+	
+    1. a build environment measuring build-time using the time command
+    2. resetting the clock might result in 'clock screw detected' messages  and stop building, therefore all files need to be 'touched' in order to  make that work
+
+  * **adding a PACKAGE_MANAGER_BUILD_TIME variable to the build environment**. this implies one would either have to alter the buildchain (gcc timestamps) or one would have to  patch upstream's source dependent where that timestamp is applied. but the effect would be that the same timestamp is used resulting in a 1:1 match
+
+# summary
+
+  * i would really love to experiment further on this topic but i don't have the time right now to do so. i hope that someone else might take over.
+  * **i also could imagine a 'chain of trust' using gpg signatures**. this way we could have a several automated build systems monitoring the sanity of the builds.
+  * i also don't think that the 'possible solutions' are of limited use for distributions like  debian (i think debian has some kind of build purity but i can't find the docs right now) and alike.
+
+# links
+
+* [1] <http://monkey.org/~marius/pages/?page=trickle>
+* [2] <https://www.redhat.com/archives/fedora-announce-list/2008-August/msg00012.html>
+* [3] <http://www.st.ewi.tudelft.nl/~dolstra/pubs/nixos-jfp-final.pdf>

@@ -1,0 +1,22 @@
+[[!summary chatGPT: A blog post written in German discussing a seminar assignment on the topic of TCP, including links to a PDF, LaTeX tex file, and BibTeX file.]]
+[[!meta date="2010-04-30 02:54"]]
+[[!tag linux p2p society tcp technology usability]]
+
+weil der artikel [1] in deutsch verfasst ist,  verfasse ich dieses blog posting auch mal in deutsch.
+
+ich habe wegen einem seminar eine hausarbeit schreiben muessen. das **thema** war freigestellt, d.h. habe ich mich fuer '**tcp**' entschieden. **ich hoffe ich kann damit das verhalten von tcp etwas klarer machen. **
+
+eigentlich sollte die arbeit nur 5-7 seiten umfassen, es ist aber etwas mehr geworden weil man hausarbeiten mit 12pt verfasst und nicht mit 10pt wie ich es urspruenglich geschrieben hatte.
+
+ich habe zum **pdf** [1] auch noch das **latex tex file** [2] und das **bibtex** [3] ins verzeichnis [4] gelegt.
+
+ich freue mich ueber feedback jeglicher art.
+
+
+# links
+
+
+* [1] <http://www.lastlog.de/misc/tcp/tcp.pdf>
+* [2] <http://www.lastlog.de/misc/tcp/tcp.tex>
+* [3] <http://www.lastlog.de/misc/tcp/tcp.bib>
+* [4] <http://www.lastlog.de/misc/tcp/>

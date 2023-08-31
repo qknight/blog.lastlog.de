@@ -1,0 +1,65 @@
+[[!summary chatGPT: This posting shows how to alter certain functions in a library to fix issues with the date function in GCC timestamps. A code snippet is provided to create a custom memcpy function to bypass a specific issue in Adobe Flash.]]
+[[!meta date="2011-05-10 09:45"]]
+[[!tag linux]]
+
+# motivation
+this posting shows how to alter certain functions in a library. it might be of interest to fix some issues i found in an earlier posting where i wanted to 'fix' the date function to force GCC timestamps to be always the same date. still i think the better way of doing so is to add a new function to GCC which gives the user the freedom to fix the date to a constant, maybe by something like this:
+
+    GCC_DATE="Tue May 10 11:37:44 CEST 2011" gcc -c main.c -o main.o
+
+anyway here is the code written by linus and other [kernel] developers, i quote the whole posting #55 from Magnus Glantz:
+
+# the memcpy(...) function:
+
+
+I'm sure thousands of people will find their way here, so, here's a quicky. To
+bypass this issue (which is an issue in Adobe Flash), you may run the below
+"fix" brought forth in comment #38
+
+
+## 1. Cut and paste this into a prompt:
+
+
+    ---Cut below---
+    cat > $HOME/Downloads/linusmemcpy.c <<EOF
+    #include <sys/types.h>
+    
+    void *memcpy(void *dst, const void *src, size_t size)
+    {
+    void *orig = dst;
+    asm volatile("rep ; movsq"
+    :"=D" (dst), "=S" (src)
+    :"0" (dst), "1" (src), "c" (size >> 3)
+    :"memory");
+    asm volatile("rep ; movsb"
+    :"=D" (dst), "=S" (src)
+    :"0" (dst), "1" (src), "c" (size & 7)
+    :"memory");
+    return orig;
+    }
+    EOF
+    cd $HOME/Downloads
+    gcc -O2 -c linusmemcpy.c
+    ld -G linusmemcpy.o -o linusmemcpy.so
+    ---Stop cutting here---
+
+
+## 2. Shutdown any running copies of your webbrowser.
+
+
+
+
+## 3. Until a Adobe has fixed their Flash player, start your webbrowser as below:
+
+
+For Firefox users:
+
+    LD_PRELOAD=$HOME/Downloads/linusmemcpy.so /usr/bin/firefox &
+
+For Google Chrome users:
+
+    LD_PRELOAD=$HOME/Downloads/linusmemcpy.so /opt/google/chrome/google-chrome &
+
+# links
+
+* [1] <https://bugzilla.redhat.com/show_bug.cgi?id=638477>

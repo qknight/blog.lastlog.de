@@ -1,0 +1,516 @@
+[[!meta date="2016-02-11 10:58"]]
+[[!tag nixos odroid xu4 u-boot]]
+
+[[!img media/nixos-lores.png alt="NixOS project logo" style="float: right" class="noFancy"]]
+[[!summary nixos support for 'armv7l' is getting much better. in this postings i want to show a few insights on how to get nixos running on any ARM board which is running linux already.]]
+
+# motivation
+
+**nixos support for 'armv7l' is getting much better in general**. in this postings i want to show a few insights on how to get nixos running on any ARM board with general linux support. much of the multi-platoform stuff was probably created by **viric** and later extended by **dezgeg**.
+
+
+[[!img media/odroid-xu4.jpg width="300px" alt="Odroid XU4 board" caption="Odroid XU4, picture form Hardkernel" style="float: none" class="noFancy" label="(c) hardkernel"]]
+
+* **Samsung Exynos5422 Cortex™-A15 2Ghz and Cortex™-A7 Octa core CPUs**
+* Mali-T628 MP6(OpenGL ES 3.0/2.0/1.1 and OpenCL 1.1 Full profile)
+* 2Gbyte LPDDR3 RAM PoP stacked
+* eMMC5.0 HS400 Flash Storage
+* 2 x USB 3.0 Host, 1 x USB 2.0 Host
+* Gigabit Ethernet port
+* HDMI 1.4a for display
+* Size : 82 x 58 x 22 mm approx.(including cooling fan)
+
+<div class="alert alert-info" role="alert">
+**2 gb ram and 8 x 1.5GHz core(s) make the XU4 an excellent ARM board for source deployment**.
+</div>
+
+## nixpkgs 
+
+a short look into: [https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/stdenv/linux/default.nix](https://raw.githubusercontent.com/NixOS/nixpkgs/master/pkgs/stdenv/linux/default.nix) shows:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+  bootstrapFiles =
+    if customBootstrapFiles != null then customBootstrapFiles
+    else if system == "i686-linux" then import ./bootstrap/i686.nix
+    else if system == "x86_64-linux" then import ./bootstrap/x86_64.nix
+    else if system == "armv5tel-linux" then import ./bootstrap/armv5tel.nix
+    else if system == "armv6l-linux" then import ./bootstrap/armv6l.nix
+    else if system == "armv7l-linux" then import ./bootstrap/armv7l.nix
+    else if system == "mips64el-linux" then import ./bootstrap/loongson2f.nix
+    else abort "unsupported platform for the pure Linux stdenv";
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+plenty ARM variants are already used along with nixos!
+
+the essential parts to run NixOS on ARM:
+
+* [https://github.com/NixOS/nixpkgs/pull/11633/files](https://github.com/NixOS/nixpkgs/pull/11633/files)
+* [https://nixos.org/wiki/NixOS_on_ARM](https://nixos.org/wiki/NixOS_on_ARM)
+* [https://nixos.org/wiki/Bootstrapping_NixOS_on_ARM](https://nixos.org/wiki/Bootstrapping_NixOS_on_ARM)
+
+# kernel
+
+since i'm not using the GPU i've decided to try the 4.2.0 kernel:
+
+  [http://odroid.com/dokuwiki/doku.php?id=en:xu4_building_kernel](http://odroid.com/dokuwiki/doku.php?id=en:xu4_building_kernel)
+
+<div class="alert alert-info" role="alert">
+so far this is working except for some usb 2.0 harddrives** (usb 2 sata bridge) which will cause a kernel OOPS after about 30-90 min. using usb 3.0 disks on the usb 3.0 ports seem to work on the other hand.
+</div>
+
+### installing DRM crap
+
+ODROID-XU4 must have the secure boot enabled boot loader. There are four components of boot loader: 
+
+* bl1.bin.HardKernel 
+* bl2.bin.HardKernel
+* tzsw.bin.HardKernel
+* u-boot-dtb.bin (compiled by us, not supplied by hardkernel)
+
+<div class="alert alert-info" role="alert">
+i tried bl2.bin.hardkernel but it didn't work! but using bl2.bin.hardkernel.1mb_uboot made it work.
+</div>
+
+#### install the binary blobs using this steps:
+
+1. download the needed files form here:
+
+    [http://download.tizen.org/snapshots/tizen/tv/latest/images/arm-wayland/tv-boot-armv7l-odroidxu3/](http://download.tizen.org/snapshots/tizen/tv/latest/images/arm-wayland/tv-boot-armv7l-odroidxu3/)
+
+
+2. then deploy them to the empty **sd-card** (eMMC offsets differ by one sector, see below):
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+    # zero the first 4000 secotors
+    dd if=/dev/zero bs=512 count=4000 of=/dev/sdd
+    # install the 4 binary blobs
+    dd if=bl1.bin.hardkernel bs=512 seek=1 of=/dev/sdd
+    dd if=bl2.bin.hardkernel.1mb_uboot  bs=512 seek=31 of=/dev/sdd
+    dd if=../u-boot-dtb.bin bs=512 seek=63 of=/dev/sdd
+    dd if=tzsw.bin.hardkernel  bs=512 seek=2111 of=/dev/sdd
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+    <div class="alert alert-info" role="alert">
+    you should now be able to get a u-boot shell when using the new sd-card in a odroid xu4.
+    </div>
+
+#### XU4 flash specification
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .c }
+sd_fuse: sd_fusing: Add Embedded MMC (eMMC) support
+Odroid boards can boot from either a SD/MMC or an eMMC. The iROM
+load the bootloader binaries (first and second stage bootloader,
+trustzone, DRM, etc) from the first sectors of the boot device.
+
+An SD exposes all its physical address space as just one device
+(e.g: /dev/mmcblk0) so its first sectors are just located on that
+device but the eMMC split its physical address space in different
+virtual devices (e.g: mmcblk0boot0, mmcblk0boot1, mmcblk0rpmb and
+mmcblk0). So the eMMC first sectors are not located on the device
+but on the virtual ${device}boot0.
+
+Also, the addresses are at a different offset for SD/MMC and eMMC
+so special care has to be taken when flashing images to an eMMC
+since just dd'ing an image to the block device won't work.
+
+The binaries written and their offset on both a SD/MMC and eMMC are:
+
++---------------------------------+--------------+-----------------+
+|                               eMMC                               |
++---------------------------------+--------------+-----------------+
+| Binary                          | Start sector | Length (sector) |
++---------------------------------+--------------+-----------------+
+|                                 |              |                 |
+| bl1.HardKernel (BL1/DRM)        |    0         |   30            |
+|                                 |              |                 |
+| bl2.HardKernel (BL2/SPL)        |   30         |   32            |
+|                                 |              |                 |
+| u-boot.bin (U-Boot)             |   62         | 1024            |
+|                                 |              |                 |
+| tzsw.HardKernel (TrustZone S/W) | 2110         |  312            |
++---------------------------------+--------------+-----------------+
+
++---------------------------------+--------------+-----------------+
+|                              SD/MMC                              |
++---------------------------------+--------------+-----------------+
+| Binary                          | Start sector | Length (sector) |
++---------------------------------+--------------+-----------------+
+|                                 |              |                 |
+| bl1.HardKernel (BL1/DRM)        |    1         |   30            |
+|                                 |              |                 |
+| bl2.HardKernel (BL2/SPL)        |   31         |   32            |
+|                                 |              |                 |
+| u-boot.bin (U-Boot)             |   63         | 1024            |
+|                                 |              |                 |
+| tzsw.HardKernel (TrustZone S/W) | 2111         |  312            |
++---------------------------------+--------------+-----------------+
+
+Signed-off-by: Javier Martinez Canillas <javier.martinez@collabora.co.uk>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<div class="alert alert-info" role="alert">
+you don't need to copy the u-boot.bin (or anything similar named) to the /boot as the XU4 won't look for it there. the XU4 wants it to be written to the sd-card at a special place, preferably outside any partition.
+</div>
+
+# uboot
+
+uboot is a boot loader and if you manage to install the latest version, which right now is **2016.01-rc1**, you will get support for extlinux. 
+
+extlinux features a grub like boot-menu:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .c }
+Retrieving file: /extlinux/extlinux.conf
+3543 bytes read in 14 ms (247.1 KiB/s)
+------------------------------------------------------------
+1:      NixOS - Default
+2:      NixOS - Configuration 7 (2015-12-02 05:32 - 15.09.git.ba8f33fM)
+3:      NixOS - Configuration 6 (2015-12-02 05:09 - 15.09.git.ba8f33fM)
+4:      NixOS - Configuration 5 (2015-12-02 04:01 - 15.09.git.ba8f33fM)
+5:      NixOS - Configuration 4 (2015-11-29 02:32 - 15.09.git.ba8f33fM)
+6:      NixOS - Configuration 3 (2015-11-28 17:33 - 15.09.git.ba8f33f)
+Enter choice: 1:        NixOS - Default
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<div class="alert alert-info" role="alert">
+this **helps you to boot previous versions of your nixos system** but you need a **odroid USB-UART** and use **picocom** to do the selection. the 4.2.x kernel i'm using does not have graphical support.
+</div>
+## u-boot patch
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .diff }
+diff --git a/common/cmd_pxe.c b/common/cmd_pxe.c
+index 080b376..67dd647 100644
+--- a/common/cmd_pxe.c
++++ b/common/cmd_pxe.c
+@@ -19,7 +19,7 @@
+ #include "menu.h"
+  #include "cli.h"
+   
+   -#define MAX_TFTP_PATH_LEN 127
+   +#define MAX_TFTP_PATH_LEN 512
+    
+     const char *pxe_default_paths[] = {
+      #ifdef CONFIG_SYS_SOC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<div class="alert alert-warning" role="alert">
+without this patch you won't be able to find the dtb files as the path names get too long for u-boot to process.
+</div>
+
+## uboot source
+odroid xu4 uboot can be found here: 
+
+[http://odroid.com/dokuwiki/doku.php?id=en:xu3_building_u-boot#installation](http://odroid.com/dokuwiki/doku.php?id=en:xu3_building_u-boot#installation). 
+
+odroidxu3-v2012.07 is quite old so i tried 'master':
+
+[http://git.denx.de/?p=u-boot.git;a=blob;f=doc/README.distro;hb=refs/heads/master](http://git.denx.de/?p=u-boot.git;a=blob;f=doc/README.distro;hb=refs/heads/master)
+
+<div class="alert alert-warning" role="alert">
+one major difference was that i **had to use the u-boot-dtb.bin** instead of the **u-boot.bin**.
+</div>
+
+## compilation
+
+how to build the custom u-boot-dtb.bin for the XU4? simply use 'nix-env':
+<pre>
+nix-env -qaP | grep odroid
+ubootOdroidXU4           uboot-odroid_xu4-fa8883a1e39a20e72aaa5093af0c80062cb95757
+</pre>
+
+install it:
+
+    nix-env -iA ubootOdroidXU4
+
+then look at the paths and copy the u-boot-dtb.bin from there. alternatively download it from here:
+
+  [https://nixcloud.io/downloads/armv7l/u-boot-dtb.bin](https://nixcloud.io/downloads/armv7l/u-boot-dtb.bin)
+
+    5f32e455af6ef3d316b2a9d7ddc25a6c84959f955d96039e57c05244fad2b898 u-boot-dtb.bin
+
+
+### installing u-boot on the eMMC 
+
+using u-boot itself to flush u-boot onto a eMMC, described in the steps below, you will require a working sd-card image with the wanted new u-boot-dtb.bin on it:
+
+  1. first upgrade the u-boot on the sd-card. then
+
+  2. then use this sd-card's u-boot to boot the xu4 and finally copy that u-boot from the sd-card to the eMMC using the u-boot shell.
+
+to place the new u-boot on the eMMC copy the first 30MB of the image to a sd-card. then boot from it and attach the USB-UART and right after booting, press 'return' to get to a prompt with this label: **ODROID-XU3 #**, then type these commands:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .c }
+ODROID-XU3 # mmc dev 0
+ODROID-XU3 # mmc read 0x50000000 0x1 0xa3e
+ODROID-XU3 # mmc dev 1 1
+ODROID-XU3 # mmc write 0x50000000 0x0 0xa3e
+ODROID-XU3 # mmc dev 1 0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+this will copy the u-boot from the sd-card into the eMMC. afterwards poweroff and remove the sd-card. you can now use the new u-boot from the eMMC. next copy the image to the eMMC and you are ready to go!
+
+
+### xu4 boot messages
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+U-Boot 2016.01-rc1 (Dec 02 2015 - 04:40:51 +0000) for ODROID-XU3
+
+CPU:   Exynos5422 @ 800 MHz
+Model: Odroid XU3 based on EXYNOS5422
+Board: Odroid XU3 based on EXYNOS5422
+Type:  xu4
+DRAM:  2 GiB
+__of_translate_address: Bad cell count for gpx0
+MMC:   EXYNOS DWMMC: 0, EXYNOS DWMMC: 1
+*** Warning - bad CRC, using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+Net:   No ethernet found.
+Hit any key to stop autoboot:  0 
+switch to partitions #0, OK
+mmc0 is current device
+Scanning mmc 0:1...
+Found /extlinux/extlinux.conf
+Retrieving file: /extlinux/extlinux.conf
+3543 bytes read in 14 ms (247.1 KiB/s)
+------------------------------------------------------------
+1:      NixOS - Default
+2:      NixOS - Configuration 7 (2015-12-02 05:32 - 15.09.git.ba8f33fM)
+3:      NixOS - Configuration 6 (2015-12-02 05:09 - 15.09.git.ba8f33fM)
+4:      NixOS - Configuration 5 (2015-12-02 04:01 - 15.09.git.ba8f33fM)
+5:      NixOS - Configuration 4 (2015-11-29 02:32 - 15.09.git.ba8f33fM)
+6:      NixOS - Configuration 3 (2015-11-28 17:33 - 15.09.git.ba8f33f)
+Enter choice: 1:        NixOS - Default
+Retrieving file: /extlinux/../nixos/fy2rhpvfwn27w6qr2w8z9s60zbbxdxf5-initrd-initrd
+3495632 bytes read in 322 ms (10.4 MiB/s)
+Retrieving file: /extlinux/../nixos/kw3x6kdwhd834j6adpi5bk2m4akj5kzx-linux-4.2.0-5eb40d45b291ee129cbfac2073f1ca7aa32ff4c5-zImage
+5767144 bytes read in 515 ms (10.7 MiB/s)
+append: systemConfig=/nix/store/v7anhi1v9rvkcdy5pylspqjcdzslm5gi-nixos-15.09.git.ba8f33fM init=/nix/store/v7anhi1v9rvkcdy5pylspqjcdzslm5gi-nixos-15.09.git.ba8f33fM/init loglevel=4
+Retrieving file: /extlinux/../nixos/kw3x6kdwhd834j6adpi5bk2m4akj5kzx-linux-4.2.0-5eb40d45b291ee129cbfac2073f1ca7aa32ff4c5-dtbs/exynos5422-odroidxu4.dtb
+45419 bytes read in 70 ms (632.8 KiB/s)
+Kernel image @ 0x42000000 [ 0x000000 - 0x57ffe8 ]
+### Loading init Ramdisk from Legacy Image at 43300000 ...
+   Image Name:   
+   Image Type:   ARM Linux RAMDisk Image (gzip compressed)
+   Data Size:    3495568 Bytes = 3.3 MiB
+   Load Address: 00000000
+   Entry Point:  00000000
+   Verifying Checksum ... OK
+## Flattened Device Tree blob at 43000000
+   Booting using the fdt blob at 0x43000000
+   Loading Ramdisk to 4fcaa000, end 4ffff690 ... OK
+   Loading Device Tree to 4fc9b000, end 4fca916a ... OK
+
+Starting kernel ...
+
+[    0.000000] L2C: failed to init: -19
+[    1.856637] s3c-rtc 101e0000.rtc:: failed to find rtc source clock
+
+<<< NixOS Stage 1 >>>
+
+loading module dm_mod...
+running udev...
+starting version 217
+starting device mapper and LVM...
+checking /dev/mmcblk0p2...
+fsck (busybox 1.23.2, )
+[fsck.ext4 (1) -- /mnt-root/] fsck.ext4 -a /dev/mmcblk0p2
+/dev/mmcblk0p2: clean, 69438/209664 files, 454448/843520 blocks
+mounting /dev/mmcblk0p2 on /...
+
+<<< NixOS Stage 2 >>>
+
+running activation script...
+setting up /etc...
+starting systemd...
+
+Welcome to NixOS 15.09.git.ba8f33fM (Dingo)!
+
+[  OK  ] Reached target Swap.
+         Expecting device dev-mmcblk0p1.device...
+         Expecting device dev-ttySAC2.device...
+[  OK  ] Reached target Remote File Systems (Pre).
+[  OK  ] Reached target Remote File Systems.
+[  OK  ] Reached target Paths.
+[  OK  ] Created slice Root Slice.
+[  OK  ] Created slice User and Session Slice.
+[  OK  ] Listening on /dev/initctl Compatibility Named Pipe.
+[  OK  ] Listening on Delayed Shutdown Socket.
+[  OK  ] Listening on Journal Socket (/dev/log).
+[  OK  ] Listening on udev Kernel Socket.
+[  OK  ] Listening on udev Control Socket.
+[  OK  ] Listening on Journal Socket.
+[  OK  ] Created slice System Slice.
+         Starting Remount Root and Kernel File Systems...
+[  OK  ] Created slice system-getty.slice.
+[  OK  ] Created slice system-serial\x2dgetty.slice.
+         Starting Setup Virtual Console...
+         Starting Load Kernel Modules...
+         Mounting POSIX Message Queue File System...
+         Starting Create list of required st... nodes for the current kernel...
+         Mounting Debug File System...
+         Starting udev Coldplug all Devices...
+         Starting Journal Service...
+[  OK  ] Reached target Slices.
+[  OK  ] Mounted Debug File System.
+[  OK  ] Mounted POSIX Message Queue File System.
+[  OK  ] Started Remount Root and Kernel File Systems.
+[  OK  ] Started Load Kernel Modules.
+[  OK  ] Started Create list of required sta...ce nodes for the current kernel.
+         Starting Create Static Device Nodes in /dev...
+         Mounting Configuration File System...
+         Starting Apply Kernel Variables...
+         Starting Load/Save Random Seed...
+         Starting Update UTMP about System Boot/Shutdown...
+[  OK  ] Mounted Configuration File System.
+[  OK  ] Started udev Coldplug all Devices.
+         Starting udev Wait for Complete Device Initialization...
+[  OK  ] Started Load/Save Random Seed.
+[  OK  ] Started Apply Kernel Variables.
+[  OK  ] Started Update UTMP about System Boot/Shutdown.
+[  OK  ] Started Create Static Device Nodes in /dev.
+         Starting udev Kernel Device Manager...
+[  OK  ] Reached target Local File Systems (Pre).
+[  OK  ] Started Setup Virtual Console.
+[  OK  ] Started Journal Service.
+         Starting Trigger Flushing of Journal to Persistent Storage...
+[  OK  ] Started Trigger Flushing of Journal to Persistent Storage.
+[  OK  ] Started udev Kernel Device Manager.
+[  OK  ] Found device /dev/ttySAC2.
+[  OK  ] Found device /dev/mmcblk0p1.
+         Mounting /boot...
+[  OK  ] Mounted /boot.
+[  OK  ] Started udev Wait for Complete Device Initialization.
+[  OK  ] Reached target Local File Systems.
+         Starting Create Volatile Files and Directories...
+[  OK  ] Reached target System Initialization.
+[  OK  ] Listening on D-Bus System Message Bus Socket.
+[  OK  ] Listening on Nix Daemon Socket.
+[  OK  ] Reached target Sockets.
+[  OK  ] Reached target Timers.
+[  OK  ] Reached target Basic System.
+         Starting SSH Daemon...
+         Starting NTP Daemon...
+         Starting Cron Daemon...
+         Starting CPU Frequency Governor Setup...
+         Starting Firewall...
+         Starting SCSI Link Power Management Policy...
+         Starting Kernel Log Daemon...
+[  OK  ] Started Kernel Log Daemon.
+         Starting Store Sound Card State...
+         Starting Name Service Cache Daemon...
+         Starting Permit User Sessions...
+         Starting Hardware RNG Entropy Gatherer Daemon...
+[  OK  ] Started Hardware RNG Entropy Gatherer Daemon.
+[  OK  ] Started Create Volatile Files and Directories.
+[  OK  ] Started Cron Daemon.
+[  OK  ] Started CPU Frequency Governor Setup.
+[  OK  ] Started SCSI Link Power Management Policy.
+[  OK  ] Started Store Sound Card State.
+[  OK  ] Started Permit User Sessions.
+[  OK  ] Started NTP Daemon.
+         Starting Getty on tty1...
+[  OK  ] Started Getty on tty1.
+         Starting Serial Getty on ttySAC2...
+[  OK  ] Started Serial Getty on ttySAC2.
+[  OK  ] Reached target Login Prompts.
+[  OK  ] Started SSH Daemon.
+[  OK  ] Started Name Service Cache Daemon.
+[  OK  ] Reached target Host and Network Name Lookups.
+[  OK  ] Reached target User and Group Name Lookups.
+         Starting Login Service...
+[FAILED] Failed to start Firewall.
+See "systemctl status firewall.service" for details.
+         Starting D-Bus System Message Bus...
+[  OK  ] Started D-Bus System Message Bus.
+[  OK  ] Reached target Network (Pre).
+[  OK  ] Reached target All Network Interfaces.
+         Starting DHCP Client...
+         Starting Networking Setup...
+[  OK  ] Started Login Service.
+         Stopping Name Service Cache Daemon...
+[  OK  ] Stopped Name Service Cache Daemon.
+[  OK  ] Started Networking Setup.
+         Starting Extra networking commands....
+         Starting Name Service Cache Daemon...
+[  OK  ] Started Extra networking commands..
+[  OK  ] Started Name Service Cache Daemon.
+[  OK  ] Started DHCP Client.
+[  OK  ] Reached target Network.
+[  OK  ] Reached target Multi-User System.
+
+
+<<< Welcome to NixOS 15.09.git.ba8f33fM (armv7l) - ttySAC2 >>>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## sd-card images
+
+you can download the odroid xu4 nixos image here:
+
+1. [https://nixcloud.io/downloads/armv7l/odroid_xu4-nixos-15.09.git.ba8f33fM-kernel-4.2.0-sd-card_image-2015-12-02-3gb-disk.dd.xz](https://nixcloud.io/downloads/armv7l/odroid_xu4-nixos-15.09.git.ba8f33fM-kernel-4.2.0-sd-card_image-2015-12-02-3gb-disk.dd.xz)
+
+        sha256sum 06d909038a6369c52d162aaa655aabe40b52b129faf7d3579a35171b564b0515  
+
+2. install it on a **sd-card** using xz and dd
+
+        xz --decompress --keep --stdout sha256 odroid_xu4-nixos-15.09.git.ba8f33fM-kernel-4.2.0-sd-card_image-2015-12-02-3gb-disk.dd.xz | dd bs=4M of=/dev/sdN
+
+3. afterwards resize the second partition to the maximum size of your partition. i would recommend to use at least 8gb but better 16gb sd-cards
+
+        gparted /dev/sdN
+
+finally plug the sd-card into your odroid xu4 and boot from it. should work out of the box.
+
+<div class="alert alert-info" role="alert">
+if you deploy to the eMMC, look at the guide above on how to install the new u-boot using a sd-card!
+</div>
+
+# tooling
+
+## picocom
+i'm usually using picocom instead of 'screen' or 'minicom' for accessing the serial console like this:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+$ picocom /dev/ttyUSB0 -b 115200
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+however, i don't want to use the root-user so i added a few lines to my udev rules using **services.udev.extraRules**:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+  services.udev.extraRules = ''
+    #Bus 001 Device 005: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+    ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", MODE="666", SYMLINK+="ttyUSB-odroid-u3-1"
+    #Bus 003 Device 055: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x UART Bridge / myAVR mySmartUSB light
+    ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE="666", SYMLINK+="ttyUSB-odroid-u3-2"
+  };
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+afterwards you can use 'picocom /dev/ttyUSB-odroid-u3-2 -b 115200' as a none-root user. i wish we had that also for device nodes like /dev/sda and similar which is 'simple' to use.
+
+## resizing partitions
+
+resizing paritions & resizing filesystems is easy if you are using gparted! but how to resize a partition which is inside a image which was created using 'dd'? well, use the **loop** luke!
+
+mount the image using 'losetup':
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+losetup -f --show -P odroid_xu4_kernel-4.2.0-sd-card-2015-12-02-16gb.dd    
+loop0                 7:0    0   3,4G  0 loop  
+├─loop0p1           259:2    0   114M  0 loop  
+└─loop0p2           259:3    0   3,2G  0 loop  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+then you can use gparted on /dev/loop0 or modify the partitions using /dev/loop0p1 and so on.
+
+after you finished your edits, unmount it:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+losetup -d /dev/loop0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+# conclusion
+
+getting nixos to work with the U3/XU4 was quite an adventure and not possible without dezgeg and virics help via IRC. also their efforts in creating all the nixos-ARM specific packages is great.
+

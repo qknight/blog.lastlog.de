@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="LS-7T.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>LS-7T</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/LS-7T.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="memtest86_fail.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="owncloud_ssl_client_certificates.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">LS-7T</h1>
+    <div id="date"><p><span id="lastupdated">18 jan 2015</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::hardware" class="tagbtn btn btn-primary">hardware</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/ls-7t.jpg"><img src=media/ls-7t.jpg size=400x alt="" style="float: right" caption="screenshot from pollin.de LS-7T article"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>a few weeks ago i bought the 7” (17,78 cm) display set with
+touchscreen (LS-7T) from pollin.de and here is my experience with that
+device. i don’t want to make the product look bad because of my
+maybe-exotic requirements, anyway here is what i think about it.</p>
+<h2 data-number="2" id="what-i-liked">what i liked</h2>
+<ul>
+<li><strong>display quality is quite good</strong></li>
+<li>the <strong>manual from pollin is really good</strong>, thanks a lot
+pollin guys!</li>
+<li>the <strong>screen controller board provides for
+VGA/DVI/HDMI</strong> input!</li>
+<li>if VGA and HDMI plug is attached <strong>i like that the screen
+stays on VGA input, even though there is no VGA input signal at times,
+for example if you reboot the computer attached to the VGA
+input.</strong> other vendors often will jump to the active display
+source which can be very annoying.</li>
+<li><strong>instant power off using the attached controls of the screen
+is very fast</strong> (but why is this not DPMS controllable?)</li>
+<li><strong>the touch overlay, the transparent matrix with the USB
+connector, worked out of the box on linux</strong></li>
+</ul>
+<h2 data-number="3" id="what-i-disliked">what i disliked</h2>
+<ul>
+<li>the <strong>screen controller board provides a broken/incomplete
+EDID information</strong></li>
+<li>the display resulution is pretty much random and might or might not
+work, depending on the used graphis driver i suppose. it worked with my
+laptop but didn’t work with the odroid u3</li>
+<li>the <strong>display lacks DPMS support</strong>, therefore the
+screen will always draw power, even if your screen powersaving setting
+tells it to go to sleep</li>
+</ul>
+<h3 data-number="3.1" id="edid-resolution-issue">EDID resolution
+issue</h3>
+<p>the <strong>LS 7T manual clearly states that the native display
+resolution is 1024x600</strong>. but it never showed up on any computer
+as a default resolution and therefore i was looking into the EDID
+information.</p>
+<h4 data-number="3.1.1" id="looking-into-edid">looking into EDID</h4>
+<p>this is the EDID string provided by the monitor (see
+/var/log/X.0.log):</p>
+<pre><code>00ffffffffffff003674300001000000
+0a140103807341780acf74a3574cb023
+09484c21080081804540614095000101
+010101010101011d007251d01e206e28
+5500c48e2100001e011d8018711c1620
+582c2500c48e2100009e000000fc004d
+537461722044656d6f0a2020000000fd
+00324b1e5012000a2020202020200138</code></pre>
+<p>you can paste it into <a
+href="http://www.edidreader.com/">edidreader.com</a> and then you will
+recover these modes:</p>
+<pre><code>Timing Bitmap
+720x400 @ 70 Hz
+720x400 @ 88 Hz
+640x480 @ 60 Hz
+640x480 @ 67 Hz
+640x480 @ 72 Hz
+640x480 @ 75 Hz
+800x600 @ 56 Hz
+800x600 @ 60 Hz
+800x600 @ 72 Hz
+800x600 @ 75 Hz
+832x624 @ 75 Hz
+1024x768i @ 87 Hz
+1024x768 @ 60 Hz
+1024x768 @ 72 Hz
+1024x768 @ 75 Hz
+1280x1024 @ 75 Hz
+1152x870 @ 75 Hz</code></pre>
+<p>however, <strong>xrandr</strong> on linux (odroid u3) shows
+these:</p>
+<pre><code>HDMI-1 connected 1024x768+0+0 708mm x 398mm
+  1280x720       60.0 +   50.0  
+  1920x1080      50.0     60.0     30.0     24.0  
+  1920x1080i     60.0     25.0     30.0  
+  1280x1024      60.0  
+  1440x576i      25.0  
+  1024x768       60.0* 
+  1440x480i      30.0  
+  720x576        50.0  
+  720x480        59.9  
+  640x480        60.0  </code></pre>
+<h4 data-number="3.1.2"
+id="testing-with-various-operating-systems">testing with various
+operating systems</h4>
+<p>i also tested the display with:</p>
+<ul>
+<li>u3 (HDMI),</li>
+<li>a linux computer (VGA),</li>
+<li>a windows computer (HDMI) and</li>
+<li>a mac os x (HDMI) and</li>
+</ul>
+<p>none of these could use the display with the native 1024x600 display
+resolution out of the box and it always looked broken.</p>
+<h4 data-number="3.1.3" id="making-it-work-anyway">making it work
+anyway</h4>
+<p>with a big effort i was able to make the display work from my laptop
+(VGA) using 1024x600 as well as from the odroid u3 (HDMI). by default
+the screen runs on 1024x600 but the odruid u3+ does only support this
+mode by default so we have to add it manually.</p>
+<p>the odroid u3 modes supported by default:</p>
+<pre><code># export DISPLAY=:0
+# xrandr
+Screen 0: minimum 320 x 200, current 640 x 480, maximum 4096 x 4096
+HDMI-1 connected 640x480+0+0 708mm x 398mm
+   1280x720       60.0 +   50.0
+   1920x1080      50.0     60.0     30.0     24.0
+   1920x1080i     60.0     25.0     30.0
+   1280x1024      60.0
+   1440x576i      25.0
+   1024x768       60.0
+   1440x480i      30.0
+   720x576        50.0
+   720x480        59.9
+   640x480        60.0*</code></pre>
+<p>in <a
+href="http://www.elchs-kramkiste.de/lapurd/node/170">elchs-kramkiste</a>
+you will find a manual how to adapt the raspberry pi to boot with the
+correct resolution. however, the u3 works differently and thus the
+raspberry pi fixes don’t apply directly. the u3 default output
+resolutions are <strong>only</strong> 720p or full hd. my first attempt
+was to fix the x-server and maybe, if that had worked reliably i would
+have looked into the .scr files which have the potential to make also
+the linux kernel boot work properly (that is before X starts).</p>
+<p>so here is what i did in order to get X working:</p>
+<pre><code>cvt 1024 600
+# 1024x600 59.85 Hz (CVT) hsync: 37.35 kHz; pclk: 49.00 MHz
+Modeline &quot;1024x600_60.00&quot;   49.00  1024 1072 1168 1312  600 603 613 624 -hsync +vsync</code></pre>
+<p>you can enable this in your configuration (to test it):</p>
+<pre><code>export DISPLAY=:0
+xrandr --newmode  &quot;1024x600_60.00&quot;   49.00  1024 1072 1168 1312  600 603 613 624 -hsync +vsync
+xrandr --addmode HDMI-1 &quot;1024x600_60.00&quot;
+xrandr --output HDMI-1 --mode 1024x600_60.00</code></pre>
+<p><strong>WARNING</strong>: using xrandr is not a persistent change and
+will vanish if you reboot. when i wanted to make this setup permanent on
+my odroid u3, by modifing the xorg.conf, i broke my complete
+configuration and in the end even these xrandr settings weren’t accepted
+anymore!?! i want to document them here anyway, maybe they work for
+you?!</p>
+<p><strong>WARNING</strong>: odroid u3 only: when using the default
+1280x720 resolution with the u3 the display was missing the top ~ 18
+pixels as well as the bottom ~ 18 pixels. so there seems to be some
+overscan issue as well with using the 1280x720 resolution. maybe using
+<a
+href="http://filthypants.blogspot.de/2013/03/xrandr-overscan-fix-for-intel-hd4000.html">xinput
+–transform</a> with the default 1280x720 resolution can help here but i
+gave up on that.</p>
+<h3 data-number="3.2" id="in-detail-dpms">in detail: DPMS</h3>
+<p>with most monitors, <a
+href="https://en.wikipedia.org/wiki/VESA_Display_Power_Management_Signaling">DPMS</a>
+can be activated instantly using this command:</p>
+<pre><code>xset dpms force off</code></pre>
+<p>normally this will power off parts of the display, that is it powers
+off LED background illumination among other power saving features. at
+least it usually means that the monitor cools down pretty fast
+indicating it does not drain much power. however, IIRC, the LS-7T will
+just show a ‘no input signal’ or ‘no signal’ banner and waste all the
+energy!</p>
+<p>DPMS is very handy if the display should not be powered like 24/7,
+which is probably a requirement most users will have. i could imagine
+that this would even be a nice feature for CAR installations as power
+drain is a problem there as well, especially if the motor is not
+running.</p>
+<h2 data-number="4" id="summary">summary</h2>
+<p>i sold the display to a friend who desperately wanted it. thus i’m
+glad i got rid of it! my conclusion goes like this: <strong>why does
+someone produce a display without proper EDID and DPMS?</strong></p>
+<p>if you have a usecase similar to mine i would recommend:</p>
+<div class="alert alert-danger" role="alert">
+<p>DO NOT BUY THIS DISPLAY since it was horrible to setup properly.</p>
+<p>i wasted 5 hours with the setup. IF YOU DON’T APPLY THE ‘xrandr’
+modeline hack on the odroid u3, then the default resolution of 1280x720
+will make you lose parts of the image (~ 18 pixels on the top and
+another 18 pixels on the bottom).</p>
+</div>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/LS-7T.mdwn" title="posts\LS-7T.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

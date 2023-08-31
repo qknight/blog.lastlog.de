@@ -1,0 +1,65 @@
+[[!meta date="2014-02-05 14:17"]]
+[[!summary how to read mailing lists with a news reader]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+[[!tag nixos technology usability]]
+
+# motivation
+normally one would use a email client to access mailing lists (like [1] for instance). doing so has many pitfalls like:
+
+* you mix your inbox with the mailinglist
+* you might fix this with maintaining sieve or .procmailrc filters
+* you can't access emails on the list which where written before you registered and have to rely to parallel use of email client and for instance the gmane webservice [4] to access all other email threads.
+* creating powerful filters is tricky and time consuming if you are on several lists
+
+however, using a **news reader client like thunderbird and the gmane news group you no longer have to do that**!
+
+why am i writing this? as it turns out nobody knows about this feature and i wanted to spread this knowlege further!
+
+# how to read mailinglists with a news reader
+i've been reading mailinglist like forever but at the last nixos hacker sprint someone mentioned a very unique and handy way to read most mailinglists on the web using gmane. 
+
+let's see how this works. to use the gmane [2] interface to access mailinglists using thunderbird [3] or virtually and news reader client follow the guide at [3]. 
+
+* the gmane news group address is: **news.gmane.org**
+* once you added a news group account into thunderbird you can sign up to several mailing lists using a context menu.
+
+[[!img media/mailinglist_to_newsgroup_wrapper.jpeg alt="" style="float: none"]]
+
+(picture above: shows the nix-dev@cs.uu.nl ml)
+
+[[!img media/mailinglist_to_newsgroup_wrapper2.jpeg alt="" style="float: none"]]
+
+(picture above: shows the import dialog when selecting mailing lists to subscribe to)
+
+[[!img media/mailinglist_to_newsgroup_wrapper3.jpeg alt="" style="float: none"]]
+
+(picture above: shows that there are too many mailinglists for one human being to be read in a lifetime ;-)
+
+[[!img media/mailinglist_to_newsgroup_wrapper4.jpeg alt="" style="float: none"]]
+
+(picture above: shows the webinterface which is parsed by google so that you can find mailing list entries in searches)
+
+
+# conclusion
+
+i absolutely love it!
+
+pros:
+
+* very easy to use
+* you can access all messages' subjects (when you downloaded all of them, default is 500 only). thus you can do fulltext searches on subjects using the 'quick filter' from thunderbird
+* you don't have to setup any mailinglist filters like ^List-ID stuff
+* all your mails to the list are stored in the 'local folder' of thunderbird. so if a mail to a mailinglist was denied you don't have to write it from scratch but change the one you had written already
+
+cons:
+
+* the first mail to a mailinglist will register you to the list first which means that you are only subscribed after writing the first mail to the list
+* thunderbird's layout isn't optimal for reading the messages, especially if the messages have a lot of meta-data like big subjects
+* all mailinglists need to be subscribed to gmane's bot
+
+# links
+* [1] <http://lists.science.uu.nl/mailman/listinfo/nix-dev>
+* [2] <http://www.gmane.org/>
+* [3] <https://support.mozillamessaging.com/en-US/kb/creating-newsgroup-account>
+* [4] <http://news.gmane.org/gmane.linux.distributions.nixos>

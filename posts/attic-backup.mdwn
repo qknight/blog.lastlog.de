@@ -1,0 +1,110 @@
+[[!meta date="2015-03-19 17:58"]]
+[[!tag backup python linux technology usability]]
+[[!summary attic backup tool on nixos]]
+[[!img media/attic-backup.jpg size=200x alt="" style="float: right" class="noFancy"]]
+
+# motivation
+i do mysql backups using mysqldump and then move this into rdiff-backup, rsnapshot or duplicity. 
+
+turns out attic [1] is a much better alternative!
+
+# using attic for mysql backups
+
+my script produces a mysqldump every night for all databases and stores it in a single tar.bz2 file each so:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+$ du -sh backups-extracted  # about 230 tar-archives (uncompressed)
+7.8G    backups-extracted
+
+$ du -sh backups # about 230 tar-archives (each bz2 compressed)
+702M    backups
+
+$ ls -lath backups-extracted.tar.bz2 # about 230 tar-archives (compressed into a single bz2)
+713M backups-extracted.tar.bz2
+
+$ du -sh attic # about 230 tar-archives (added into attic)
+105M    attic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**this is an outstanding result** and to check if attic didn't scramble any bits i restored the backup and used 'diff -r dir1 dir2' and diff didn't report any difference.
+
+note: the databases are very idle and there is no change most of the time.
+
+# dan's experiments
+
+some stats for normal backups can be found at [2] so i quote what Dan wrote:
+
+> Obnam and Attic are two de-duplicating backup programs that seem to have a very similar design, so I've been comparing them.  Here are my observations and benchmarks.  I would be happy to receive corrections and or additions to this information.  The Attic author has also written about this at
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .shell }
+Important question:
+
+How resilient are the repositories that Obnam and Attic use?  If a
+single sector fails on the hard-drive, how much will be lost?  Do the
+programs deal with read errors without crashing?
+
+Testing:
+
+Versions used:  Attic 0.10, Obnam 1.5-1ubuntu1, no encryption.
+
+De-duplication:
+
+For this test I used a single 33MB pdf file.  The initial repos were
+33MB for Obnam and 28MB for Attic.  Then I added a single byte to the
+start of the file.  The Obnam repo went to 65MB while the Attic repo
+stayed at 28MB.  Both took about 1s for the initial backup and 0.5s
+for the second backup.
+
+The remaining testing was done with a Maildir folder containing
+23000 files.  The total length of these files is 126MB, and they
+occupy 177MB on disk according to du -sh, because of partially
+filled blocks.  Here MB means 1024*1024 bytes.
+
+Archive size, as measured by du -sh:
+
+After one backup:
+
+Attic:                65MB
+Obnam:               190MB
+Obnam with deflate:  127MB
+
+After a second backup with no changes:  the same.
+
+Speed:
+
+From local SSD to itself.  Warm cache.  First number is initial
+backup, second is a repeat with no changes.  minutes:seconds
+
+cp -a:           0:01
+Attic:           0:08  0:01
+Obnam:           0:51  0:05
+Obnam deflate:   0:53  0:05
+
+From local SSD to remote HD, over a so-so wifi connection:
+
+rsync:           0:24  0:01
+Attic ssh:       0:28  0:05
+Attic sshfs:     0:51  0:08
+Obnam sftp:      8:45  0:21
+Obnam sshfs:    25:22  0:22
+
+Note that when using Attic with sshfs, no software has to be installed
+on the remote host.
+
+As another data point, I use unison to do bidirectional
+synchronization of my home directory with an offsite server.  5GB,
+56000 files.  When there are no changes, it runs in 1 second (!), 
+and when there are changes, it is also very efficient.  Can either
+of these programs get close to that speed in the future?
+
+Dan
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# summary
+after obnam failed in any aspect because of performance issues, attic seems to be what obname promised. i might soon bring attic in as a replacement for my current modules. one thing i don't like too much though is that it requires to run on the target machine and requires a ssh connection and i a) do not want to run a open ssh server at home nor b) keep an active reverse tunnel open:
+
+# links
+
+* [1] <https://attic-backup.org/>
+* [2] <http://librelist.com/browser/attic/2014/1/31/attic-vs-obnam/>

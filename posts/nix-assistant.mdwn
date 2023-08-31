@@ -1,0 +1,81 @@
+[[!meta date="2015-07-23 03:58"]]
+[[!tag nixos qt assistant usability]]
+
+[[!img media/nixos-lores.png alt="" class="noFancy" style="float: right"]]
+[[!summary nixos options search for offline usage]]
+
+
+# motivation
+yesterday i was watching the New Horizons Mission Update - July 13, 2015 [1] and learned many new things. among them how most nix related projects got their names ;-)
+
+**in this posting i want to share some of mine nix related documentation news** which is:
+
+* nixos options search [2] is now available for offline use
+* wiki.nixos.org [3] also! 
+
+# the story
+
+starting back at the zidanca sprint [4] i had the idea of making the wiki available offline and since i was very much into qt and thus using 'qt assistant' i wanted it to be as cool as the qt docs.
+
+so here are the first results:
+
+[[!img media/nix-assistant1.jpg caption="qt assistant with wiki.nixos.org data"]]
+
+[[!img media/nix-assistant2.jpg caption="qt assistant with options search (showing javascript is working inside assistant)"]]
+
+[[!img media/nix-assistant3.jpg caption="qt assistant with full text search"]]
+
+# downloads
+
+you can download these files:
+
+* <https://nixcloud.io/nix-assistant/options.qch>
+* <https://nixcloud.io/nix-assistant/wiki.qch>
+
+download it:
+
+    % wget https://nixcloud.io/nix-assistant/options.qch
+    % wget https://nixcloud.io/nix-assistant/wiki.qch
+
+then install:
+
+    % nix-env -i qt-full
+
+and import the documentation:
+
+    % assistant -register options.qch 
+    % assistant -register wiki.qch 
+
+finally, launch assistant:
+
+    % assistant
+
+# conclusion
+
+how i did it:
+
+since i don't have access to the mysql dumps i was forced to use phantomjs/casperjs to query the data. turns out that casperjs and in particular javascript is a very nice combination for scraping webpages!
+
+you can find the source code at github [5].
+
+issues:
+
+* **license for the wiki is currently unknown?! ;P**
+* **images and some article types are not included in the wiki yet**
+* <strike>**toolchain not published yet**</strike>, update: see [5]
+* **not completely automated yet**
+* make 'qt assistant' a standalone download or consider 'zealdocs' [6]
+
+i hope to get most of these things fixed soon!
+
+hf,<br>
+qknight
+
+# links
+
+* [1] <https://www.youtube.com/watch?v=aNSGTbS3xuQ>
+* [2] <http://nixos.org/nixos/options.html>
+* [3] <https://nixos.org/wiki/Main_Page>
+* [4] <https://nixos.org/wiki/NixOS_Zidanca_sprint_2013>
+* [5] <https://github.com/qknight/wiki.nixos.org-scraper>
+* [6] <http://zealdocs.org/>

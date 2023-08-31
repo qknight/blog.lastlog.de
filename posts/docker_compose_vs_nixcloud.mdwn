@@ -1,0 +1,339 @@
+[[!meta date="2023-08-06 21:01"]]
+[[!tag nixcloud docker kubernetes nixos webservices]]
+[[!summary comparing docker compose/swarm to nixos, nixcloud.webservices, LXC and kubernetes]]
+[[!series nixcloud]]
+
+# motivation
+
+**this is my summary of years working with nix/nixpkgs/nixcloud-webservices and docker.**
+
+i compare [docker compose](https://github.com/docker/compose/) to [nixcloud.webservices](https://github.com/nixcloud/nixcloud-webservices).
+we'll also look briefly at [kubernetes](https://kubernetes.io/) and [nixcloud.containers](https://github.com/nixcloud/nixcloud-container) which is [LXC](https://linuxcontainers.org/) based.
+
+in this context, **a complex service would be a LAMP stack, an email service, like nixcloud.email or any 'service' which
+would require several docker containers, started simultaneously, to work**.
+
+## docker / docker compose
+[[!img media/docker-compose.png class="noFancy" style="float: right" alt="image from docker.com"]]
+
+a list of pros/cons to `docker` and `docker compose`:
+
+pro:
+
+ * **cross platform development support** (linux, mac, windows)
+ * [docker desktop](https://www.docker.com/products/docker-desktop/) is so amazing during development
+   * clear overview over containers/volumes/images
+   * grouping view for `docker compose` deployments
+   * useful for maintenance
+     * very easy to get a prompt in a running container
+     * good tool to investigate logs
+ * `yaml` based, easy to learn
+ * [docker FS layers](https://docs.docker.com/storage/storagedriver/#images-and-layers) (fabulous workaround for [PM](https://en.wikipedia.org/wiki/Package_manager) shortcomings in reproducibility)
+ * best practice **assumes container to be stateless**: **state management in volumes**
+ * **huge community** with lots of well designed containers on <https://hub.docker.com>
+ * `traefik` reverse-proxy is easy to use (with let's encrypt ACME integration)
+ * **scaling** potential of hosting using _docker swarm_ or even in _kubernetes_ with little adaptions
+
+con:
+
+ * **security** running containers as root is bad, yet many do exactly that
+
+ * **no management node concept** (controller in kubernetes)
+
+   it would be helpful if the deployment were controlled from a docker container itself - a controller node.
+   the controller keeps the central configuration and offers this to the other nodes.
+
+   the .env file, the docker-compose.yaml and deployment specific files would reside on the controller and
+   managed by it:
+
+   instead the deployment is controlled from the host, making deployment management platform dependent:
+
+   1. `docker compose down`
+   2. `docker compose run --rm setup --domain=example.com --email=admin@example.com`
+   3. `docker compose up -d`
+
+ * **stateful management tool**
+
+   `docker compose up` alone is not enough, users have to pass explicit command line arguments:
+
+   * **docker/docker compose commands get ridiculously long**
+   * management scripts around *docker compose* **result in platform specific code**
+   * problematic global state variables with _.env_
+   * **hard to build deployment variants with consistency** (http/https+let's encrypt or a different set of components)
+   * inspecting running containers give no clue from where they were configured, i.e. the docker-compose.yml file on the filesystem
+
+ * **incomplete APIs**
+   * [docker go API](https://pkg.go.dev/github.com/docker/docker/client): lacks support for some very basic scenarios
+     * access logs after a non-persistent container stops, see [moby/discussions/44219](https://github.com/moby/moby/discussions/44219)
+     * no way to access state of a container
+   * `docker compose`:
+     * has no relevant go bindings
+   * `docker swarm`:
+     * didn't find any relevant go bindings either
+
+* for a `docker compose down` you need to be in the right folder or you won't be able to do this consistently
+
+    <https://github.com/compose-spec/compose-spec/issues/94>
+
+ * **debugging restarting containers is hard**
+
+     if container is in a restart loop, one cannot get a shell in it to access the logs what causes the issue
+
+ * **git platform specific document encoding: LF vs. LFCR**
+
+     when working on Windows vs. working on Linux expect containers to fail in strange ways:
+
+     * <https://github.com/qknight/docker-ts5client>
+
+       autostart would not work because the init script had ^M
+
+     * <https://github.com/matrix-org/synapse/issues/13691>
+
+           bash: /start.py: /usr/local/bin/python^M: bad interpreter: No such file or directory
+
+ * `Dockerfile`: rebuilding images burns lots of bandwidth and wastes download capacity
+
+    as `apk add vim` or `apt install vim` can't cache their downloads as done in nix/nixos
+
+ * **yaml syntax is very limited**
+
+   yaml is no programming language and has very limited support to override configuration values compared to
+   [nixos options](https://nixos.org/manual/nixos/stable/index.html#sec-option-definitions-setting-priorities)
+
+ * **shared volumes** `-v ${PWD}/documents:/documents`
+
+   * UID/GID mapping of host to guest has *platform specific differences*
+
+     windows/mac blend host rights into the container but on linux files created inside the container
+     often have root:root as owner and even worse, sometimes **u+rw g-rwx o-rwx** as permission.
+
+ * **entrypoint.sh not easily overridable**
+
+    the concept of entrypoint.sh is amazing but when deriving a container with a Dockerfile the process to
+    write a correct entrypoint.sh is hard and might easily degrade over time. it'd be great if one could have a mult-stage like environment for this.
+
+ * **no way to merge two different docker images**
+
+    a workaround is [multi-stage builds](https://docs.docker.com/build/building/multi-stage/): copy programs from one image to
+     another but this is only applicable for a few 'selected' binaries
+
+ * **docker desktop**
+
+    i've been using docker desktop for windows for 18 months years now and though it is a remarkable
+    help during development, my experience is that it is very early days with huge performance issues,
+    memory leaks and the UI can be very lagging.
+
+### docker summary
+
+`docker` and `docker compose` is really useful as it brings linux development tools onto windows.
+*docker* brings reproducibility compared to manual setup of the environment but not as complete as *nix*.
+
+on the other hand, for the reasons listed above, **docker deployment side lacks massively on all platforms supported.**
+
+<div class="alert alert-info" role="alert">
+my take for complex services:
+
+* if you use `docker` / `docker compose` for your own service, using docker is fine.
+manual maintenance will be required lots anyway
+* **BUT: if you design a service to be run by others, you need to automate deployment and maintenance**
+</div>
+
+that said, single containers or simple deployments already bring huge benefits, see:
+
+ * <https://www.linuxserver.io/>
+ * <https://hub.docker.com/>
+
+the `docker`, `docker compose`, `docker swarm` golang API bindings have been stagnant, as pointed out
+above in parts. in contrast: kubernetes comes with this popular library: <https://github.com/kubernetes/client-go>
+which features the concept of a [controller](https://kubernetes.io/docs/concepts/architecture/controller/) which
+can be used to automate the deployment.
+
+<div class="alert alert-info" role="alert">
+**my advice for complex services:**
+
+**using docker tooling you cannot automate docker deployment properly, as there are no APIs to do so,** therefore
+**i'd go for nix (not necessarily using containers).**
+</div>
+
+## nixcloud.webservices & nixcloud.container
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+
+nixos can be compared to `docker compose` and [nixops](https://github.com/NixOS/nixops) to `docker swarm`.
+
+let's start with a list of pros/cons to nix/nixos usage:
+
+pro:
+
+ * nix applications
+
+   <https://nixos.wiki/wiki/Applications>
+
+ * nix tooling
+
+   the [nix programming language](https://nixos.org/manual/nix/stable/language/index.html) is awesome!
+   you can start with my [tour of nix](https://nixcloud.io/tour/).
+
+ * [nix reproducibility and declarative configuration](https://nixos.org/)
+
+   see how easy it is to have your own email server abstraction: [nixcloud.email](https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.email.md)
+
+ * [nixos option system](https://search.nixos.org/options)
+
+   nixos options system is the administrators dream:
+
+   * it is easy to use
+   * has a concept of [hierarchical value overrides](https://nixos.org/manual/nixos/stable/index.html#sec-option-definitions-setting-priorities)
+   * has standard *types* and can be extended with *custom types*, see [submodules](https://nixos.org/manual/nixos/stable/index.html#section-option-types-submodule)
+   * has good support for deprecating options
+
+ * [nixos option search](https://search.nixos.org/options)
+
+   once the service is contributed into nixpkgs, you can use the option search system.
+
+ * [nixos testing](https://nixos.org/manual/nixos/stable/index.html#sec-nixos-tests)
+
+    the best testing systems i've ever seen, see [nixos tests](https://nixos.org/manual/nixos/stable/index.html#sec-nixos-tests).reproducibility
+    it uses KVM VMs with a python abstraction to control VM states.
+
+ * [nix derivations](https://nixos.org/manual/nix/stable/language/derivations.html)
+
+   a derivation can be software as vim (binary, icons, scripts, ...), or only a simple configuration file which is created on the fly from the nixos options system.
+   docker uses the *Dockerfile* and each line this file generates a FS snapshot which is hashed. in nixos the *Dockerfile* concept matches to the *configuration.nix*.
+
+   i find the derivation concept hugely more powerful than the Dockerfile concept.
+
+ * nixos container support
+
+   * **systemd-nspawn** (default nixos system), see [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html)
+   * at nixcloud we created **lxc support** for more security [nixcloud-container](https://github.com/nixcloud/nixcloud-container)
+   * create **docker containers** from nix expressions [docker on nix](https://nixos.wiki/wiki/Docker)
+   * general **docker containers** support
+
+ * [nixcloud-webservices](https://github.com/nixcloud/nixcloud-webservices/)
+
+   * [nixcloud.email](https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.email.md) - email server with 5 lines of code
+   * [nixcloud.TLS](https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.TLS.md) - this way TLS is handled outside of your application
+   * [nixcloud-container](https://github.com/nixcloud/nixcloud-container) - LXC support
+
+     if you want to decouple the system nixos from the container nixos, you can use nixcloud-container in imperative mode, see <https://github.com/nixcloud/nixcloud-container#declarative-vs-imperative-containers>.
+
+ * run your software in different environments
+
+   once your service can be built from nix you can put everywhere:
+
+   * native
+   * nixos-container (systemd-nspawn)
+   * nixos-container (lxc)
+   * docker container
+   * KVM VM
+   * nixops: remote system
+
+   since nix has support for all of these.
+
+ * **nix-shell**
+
+   nix-shell is a tool to create a shell environment from a nix expression. this is useful for development and testing.
+
+ * **nix-flake**
+
+   nix-flakes are used to extend nixpkgs with third-party software, see
+   <https://github.com/nix-community/NUR> as example.
+
+   flake documentation:
+
+   * <https://nixos.wiki/wiki/Flakes>
+   * <https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html>
+
+con:
+
+ * **nix expression programming**
+
+   * **won't work with windows**, see <https://discourse.nixos.org/t/nix-on-windows/1113/6>
+   * works with linux and mac
+
+ * **nixos tests**
+
+   * nixos tests are integration tests, see
+
+      * [all-tests.nix](https://github.com/NixOS/nixpkgs/blob/4a446a0ce24d7e09ec1a4b660aeeb903934ed2f3/nixos/tests/all-tests.nix#L499)
+      * [tests/mysql/mysql.nix](https://github.com/NixOS/nixpkgs/blob/4a446a0ce24d7e09ec1a4b660aeeb903934ed2f3/nixos/tests/mysql/mysql.nix#L86)
+
+   * **won't work with windows: nixos tests require KVM**
+
+ * **nix package manager**
+
+   * **won't work with windows**
+
+     works in WSL but the mix with native windows tools and WSL is complicated.
+
+ * **you are using nixos but the require software not in nixpkgs?**
+
+   you want clion or goland which is hypothetically not abstracted in nixpkgs?
+   in my experience this can range from an easy fix for nixpkgs or be a nightmare.
+
+ * **no IDE integration for language wrapper of nix**
+
+   if you use **clion for development**, you will have to compile the source manually and once
+   you change is final you will have to adapt the nix expression so also nix can build it.
+
+   if you use **goland** then dependency management for golang will have a different dependency
+   resolution than the nix expression wrapping it.
+
+   <https://discourse.nixos.org/t/nixos-bazel-and-clion-other-ide/1288/10>
+
+ * **you need to build software for windows native**
+
+   **won't work with windows** but you might be able to setup a cross-compiler for it.
+
+### nix summary
+
+<div class="alert alert-info" role="alert">
+**my advice for complex services:**
+
+* if you manage the software for the target audience and linus is your target platform,
+then the nix path is a good choice.
+* if you develop for linux / windows / mac, then nix would be a debatable choice
+* if your developer team consists of mostly conservative windows users, then nix is not a good choice
+
+or in a nutshell:
+
+**nix is great if you develop, deploy and manage the software yourself for a linux-like platform.**
+
+</div>
+
+## kubernetes
+
+kubernetes works on windows, mac and linux and one can use the controller concept to automate the deployment of services.
+
+say you build docker containers but you use kubernetes to deploy them, then you can use the controller concept to automate the deployment of your services.
+
+* <https://github.com/kubernetes/client-go>
+* [controller](https://kubernetes.io/docs/concepts/architecture/controller/) concept
+
+### kubernetes summary
+
+<div class="alert alert-info" role="alert">
+**my advice for complex services:**
+
+only go this path if you are really forced to as kubernetes has nice features but adds lots of burden. if you use 'a managed kubernetes cluster' this might result in huge costs.
+
+note: by no means i'm an kubernetes expert.
+
+</div>
+
+# conclusion
+
+my main question would be: "who or what is the controller your services".
+
+* for `docker` the admin is the controller (no automation)
+* `kubernetes` has a controller concept, so it can be automated in golang
+* on `nixos` the controller is likely implemented in the nix language, so it can be automated
+
+<div class="alert alert-info" role="alert">
+**my overall advice for complex services:**
+
+the nix strategy is an 'all in' solution and hugely powerful if the programming languages you use are
+supported by nixpkgs and if the colleagues rock.
+</div>
+
+hopefully this article sheds some light on the options and helps you to make a decision what stack to use.

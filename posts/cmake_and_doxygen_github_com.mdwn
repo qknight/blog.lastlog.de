@@ -1,0 +1,91 @@
+[[!summary chatGPT: A developer discusses using cmake with doxygen, provides a code example, and mentions helpful resources.]]
+[[!meta date="2009-11-30 06:14"]]
+[[!img media/libnoise.png alt="" style="float: right"]]
+[[!tag cmake gentoo linux society technology usability]]
+
+# motivation
+
+i've just rewrote a library called **libnoise** to use cmake (instead of static Makefiles/libtool). i have to admit that cmake is probably the best buildsystem i've ever used. cmake does so many things better than others - but you probably know that already so i will focus on different things.
+
+i had lot's of problems using doxygen with an 'out of source' build. but i finally fixed that. i consider my hack an excellent example of how to use doxygen with cmake. the first thing i tried was hacking on [2], a posting from "Philippe Poilbarbe" (i don't know this developer) which i couldn't get running at first. exhausted i tried something else (for those who are interested, it was [3] a mail about a library called **'libLASi' using doxygen together with cmake** (see [4] for libLASi). now happy to get doxygen working the 'libLASi  way' at least  i decided to branch back to my first attempt which was [2].  finally i got that working, too. so [2]  is the basis for this posting - keep that in mind.
+
+i don't like the way doxygen is integrated in cmake by the 'libLASi' developers. why?
+
+because they write to the source directory (called '**in source build**') and this is not how cmake developers (that is those who wrote cmake)  consider stuff to be done right.
+
+if you ever have to use doxygen with cmake you should look at my code [2]. it will compile on linux (probably unix in general) and all you need is a g++ compiler and doxygen installed.
+
+in general to adapt the cmake/doxygen from any other build system keep this in mind:
+
+
+
+	
+  * the "**Doxygen**" file most often **static** will be rewritten (then called "**Doxygen.in**") and some **placeholders** are inserted as: **
+PROJECT_NUMBER         = @LIBNOISE_VERSION@**
+
+	
+  * in general one could say "**Doxygen.in**" needs some adaption to receive cmake variables contents as i already wrote in the libnoise sourcecode (see quote below)
+
+	
+  * the cmake script called: **CMakeLists.txt** dealing with the docu (doxygen) will then **replace** **this** **placeholders** on the fly - that is when executing '**cmake .**'
+
+	
+  * nearly all variables (i can't think of any which would not work but i didn't check them either) can be modified this way
+
+	
+  * **one variable** is **replaced** by a **REGEXP** (see quote below as well)
+
+
+
+        # you could also set the version with this, see Doxygen.in
+        # there you will find a line like this:
+        #      PROJECT_NUMBER         = @LIBNOISE_VERSION@
+        # @LIBNOISE_VERSION@ is then replaced by our global LIBNOISE_VERSION
+        #
+        # for instance you could uncomment the next 3 lines and change the version for testing
+        # SET(LIBNOISE_VERSION
+        #     "1.2.3-foo500"
+        # )
+        
+        # doxygen can reference external images with IMAGE_PATH, this is how we set it dynamically
+        SET( CMAKE_DOXYGEN_IMAGE_PATH
+        "${CMAKE_CURRENT_SOURCE_DIR}/img"
+        )
+        
+        # doxygen searches for source code (defined in FILE_PATTERNS, for example: *.cpp *.h)
+        # with DOXYGEN_SOURCE_DIR we fill a list of directories and later we write it into
+        # the Doxyfile with a REGEX REPLACE (see below)
+        SET( DOXYGEN_SOURCE_DIR
+        ${CMAKE_SOURCE_DIR}
+        )
+        
+        SET(DOXYGEN_OUTPUT_DIR html)
+        STRING(REGEX REPLACE ";" " " CMAKE_DOXYGEN_INPUT_LIST "${DOXYGEN_SOURCE_DIR}")
+        CONFIGURE_FILE(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+        SET(HTML_TARGET "html" )
+        ADD_CUSTOM_TARGET(${HTML_TARGET} ALL
+        /usr/bin/doxygen ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+        INSTALL( DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/" DESTINATION "/usr/share/doc/libnoise-${LIBNOISE_VERSION}" )
+
+
+
+
+
+	
+  * it is very important to understand what ${CMAKE_CURRENT_SOURCE_DIR} and ${CMAKE_CURRENT_BINARY_DIR} are used for
+
+
+i hope you won't loose as much time as i did figuring this out.
+
+finally: **thanks very much** for help from **straszheim#cmake@irc.freenode.net** (general cmake questions, nothing doxygen related) and **thanks to the example** at [5] but it wasn't very helpful since i didn't understand it - nice try, maybe next time! ;-)
+
+#links
+
+* [1] <http://github.com/qknight/libnoise>
+* [2] <http://www.cmake.org/pipermail/cmake/2006-August/010794.html>
+* [3] <http://marc.info/?l=cmake&m=119868994732284&w=2>
+* [4] <http://lasi.svn.sourceforge.net/viewvc/lasi/trunk/>
+* [5] <http://tobias.rautenkranz.ch/cmake/doxygen/>
+
+**UPDATE(30Nov09):** replaced static path with ${CMAKE_SOURCE_DIR} in the quoted script above

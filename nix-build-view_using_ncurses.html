@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="nix-build-view_using_ncurses.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>nix-build-view using ncurses</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/nix-build-view_using_ncurses.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="converting_jessyink_svg_based_presentations_to_png_and_pdf.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="linux_without_flash.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">nix-build-view using ncurses</h1>
+    <div id="date"><p><span id="lastupdated">31 may 2014</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p><strong>nix-build-view is a graphical frontend for nix-build, to
+visualize parallel execution of downloads and builds, taking place when
+doing nixos-rebuild for example.</strong></p>
+<p>i’ve been working on nix-build-view a lot and this is the first
+preview of my work. if you like/dislike my work please let me know using
+email to js@lastlog.de. you can find my work at [1].</p>
+<p><a href="media/nix-build-view.jpeg"><img src=media/nix-build-view.jpeg size=700x alt="" style="float: none" caption="nix-build-view visualizing nix-build"></a></p>
+<h2 data-number="2" id="looking-back">looking back</h2>
+<p><strong>this project was born on FOSDEM14 when i was talking to
+niksnut and iElectric and was motivated by the quality of Gentoo tools
+in regards to usability.</strong></p>
+<p>originally i did not want to use ncurses because of its C-nature i
+despise. but after hacking several prototypes i concluded it can’t just
+be done NOT using ncurses since NIX is running on linux, mac os x and
+other posix systems and they might have different terminals.</p>
+<p><strong>anyway, an interesting finding was that a terminal is like
+viewing a richt text document with a given resolution to render to.
+however, it is very limited and one cannot navigate the cursor in the
+document like one would expect of a DOM-tree nowadays. it is more like a
+1980…</strong></p>
+<p>one thing that hurts is how string and color processing is done both
+in a normal terminal and using ncurses. both do NOT have a notion of
+colored text, this has to be composed by the application developers.
+this was the primary reason i created AdvancedString and
+AdvancedStringContainer [2]. i’ve also added a list of unit tests for
+AdvancedString, see [3].</p>
+<h2 data-number="3" id="current-state">current state</h2>
+<p>the current implementation of nix-build-view/ is a RFC (not in the
+classical sense though). if you think i’ve been missing something please
+let me know.</p>
+<pre><code>nix-shell -p cmake -p clang -p ncurses
+git clone https://github.com/qknight/nix-build-view/
+cd nix-build-view//nix-build-view
+mkdir build
+cd build
+cmake ..
+make
+./nix-build-view</code></pre>
+<p>currently i’m emulating nix-build but the next thing is to connect
+nix-build-view to nix-build either by integrating nix-build-view into
+nix-build or by using some form of message passing. i’m not sure yet how
+to go on.</p>
+<p>there are known issues and i’ve listed a lot of them in the code
+itself using the keyword ‘FIXME’.</p>
+<h2 data-number="4" id="todos">TODOs</h2>
+<p>the good news is that nix-build-view is nearly done and that i will
+integrate nix-build-view into nixos soon.</p>
+<p>some open points at this time are:</p>
+<ul>
+<li><strong>reduce the amount of update() calls</strong> from
+FetchWidgetManager/BuildWidgetManager</li>
+<li><strong>make rendering more effiction</strong> by adding
+caching</li>
+<li><strong>fixing all FIXMEs</strong> in the code</li>
+<li><strong>integrate nix-build-view</strong> into nix-build or attach
+it using message passing</li>
+</ul>
+<h2 data-number="5" id="summary">summary</h2>
+<p>my goal was to have a tool equal to <strong>htop</strong> in quality.
+i’m sure nix-build-view will be very helpful and many NixOS devs already
+had great interest in nix-build-view.</p>
+<p>i’ll keep you posted about usability updates in NixOS of which i
+think we need to address!</p>
+<h2 data-number="6" id="links">links</h2>
+<ul>
+<li>[1] <a href="https://github.com/qknight/nix-build-view/"
+class="uri">https://github.com/qknight/nix-build-view/</a></li>
+<li>[2] <a
+href="https://github.com/qknight/nix-build-view//blob/e22e781cc7e7a6d5226396bc0f64bd4a94dca1cc/nix-build-view/AdvancedString.hpp"
+class="uri">https://github.com/qknight/nix-build-view//blob/e22e781cc7e7a6d5226396bc0f64bd4a94dca1cc/nix-build-view/AdvancedString.hpp</a></li>
+<li>[3] <a
+href="https://github.com/qknight/nix-build-view//blob/e22e781cc7e7a6d5226396bc0f64bd4a94dca1cc/nix-build-view/TDD-AdvancedStringTest.cpp"
+class="uri">https://github.com/qknight/nix-build-view//blob/e22e781cc7e7a6d5226396bc0f64bd4a94dca1cc/nix-build-view/TDD-AdvancedStringTest.cpp</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/nix-build-view_using_ncurses.mdwn" title="posts\nix-build-view_using_ncurses.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[[!summary chatGPT: An example is given where a peer-to-peer (p2p) web service could alleviate costs related to bandwidth usage and server load by distributing the load to clients, and mentions the influence of technologies like Google Gears and web 2.0 Ajax.]]
+[[!meta date="2009-05-19 13:38"]]
+[[!tag society technology]]
+
+to pick-up the centralized server/client problems from the last post again (seen in [1] for instance). i have found a very convincing example where this p2p usage would make much sense. the wikipedia project has lots of costs related to bandwidth usage and server load. in a p2p like webservice this load -> therefore cost, would be distributed to the clients.
+
+this technology as in [2] is very young and we have to alter the way we use technology today in a very invasive way but it can be done. look at what google does with 'gears' for instance (altough this is not p2p related) it is a very different concept compared to already existing use cases. the same goes for web 2.0 ajax technology which is now widely deployed.
+
+# links
+
+* [1] <http://flashback.calit2.uci.edu/apache2-default/index.html>
+* [2] <http://en.wikipedia.org/wiki/Wikipedia:Fundraising>

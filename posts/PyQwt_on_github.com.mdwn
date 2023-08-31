@@ -1,0 +1,15 @@
+[[!meta date="2014-12-10 23:54"]]
+[[!tag linux technology python pyqwt GIT]]
+[[!summary PyQwt moved from sf.net to github.com]]
+[[!img media/Squasher.png alt="snake discovered here http://www.markus-gattol.name/" style="float: right"]]
+
+# motivation
+moving projects from sf.net to github.com is getting routine. this time: PyQwt!
+
+# PyQwt
+PyQwt [1] has a new home at github.com and moved from CVS to GIT.
+
+# links
+
+* [1] <https://github.com/PyQwt>
+

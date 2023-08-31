@@ -1,0 +1,124 @@
+[[!summary chatGPT: Evopedia, the offline Wikipedia reader, is now running on Windows XP and later versions, with a guide on how to build and modify it for Windows.]]
+[[!meta date="2010-10-20 23:41"]]
+[[!tag packagemanager qt windows]]
+[[!series evopedia]]
+
+# motivation
+
+**evopedia**, the offline wikipedia reader, is now **running on windows xp** and probably also on all later windows versions.
+
+[[!img media/evopedia-on-windows.png width=390x]] 
+
+# how i did it
+
+i've created a build which uses dll files from qt. i actually wanted a static qt build but that did not work. so here is how i built the evopedia
+
+
+# downloading the needed software
+
+visit [1] and download the Qt SDK for Windows (~322MB). i also downloaded git for windows at [2].
+
+using git i then downloaded evopedia:
+
+    git clone https://qknight@github.com/qknight/torrent.git
+
+finally i downloaded **bzip2-1.0.5-bin.zip** at [4]. we are going to use this as we need the:
+
+  * bzlib.h (for compiling)
+  * bzip2.lib (for linking)
+  * bzip2.dll (for runtime)
+
+
+i've just created:
+	
+  * c:\evopedia
+  * c:\evopedia\bzip2 (where i moved all files from the **bzip2-1.0.5-bin.zip)**
+
+# modifying evopedia for windows
+
+it's basically about making some changes to src.pri (which is used in evopedia.pro)
+
+  * INCLUDEPATH += bzip2/include
+  * LIBS += $$quote($$_PRO_FILE_PWD_)/bzip2/lib/bzip2.lib
+
+afterwards the evopedia project can be opened with qtcreator (or directly used with the qt shell and qmake). just build the software in 'release mode' and after the buildstep is done, copy the bzip2.dll into the same directory as the evopedia.exe is in. now the program is ready to be used.
+
+please note that a relative LIBS (see LIBS below) path did not work as qtcreator sometimes does out-of-source builds.
+
+i had this problem:
+
+  * evopedia/ (project dir)
+  * evopedia/debug (debug build dir)
+  * evopedia-build/release (release build dir)
+
+don't ask me why qtcreator decided to build there. using a relative LIBS path did not work, as:
+
+	
+  * LIBS += bzip2/lib/bzip2.lib
+
+resulted in this linker error:
+
+
+    g++ -enable-stdcall-fixup -Wl,-enable-auto-import -Wl,-enable-runtime-pseudo-reloc -Wl,-s -mthreads -Wl -Wl,-subsystem,windows -o release\evopedia.exe object_script.evopedia.Release  -L"c:\Qt\2010.05\qt\lib" -lmingw32 -lqtmain bzip2/lib/bzip2.lib -lQtGui4 -lQtNetwork4 -lQtCore4
+    mingw32-make[1]: Leaving directory `C:/evopedia-build-desktop'
+    **g++: bzip2/lib/bzip2.lib: No such file or directory**
+    mingw32-make[1]: *** [release\evopedia.exe] Error 1
+    mingw32-make: Leaving directory `C:/evopedia-build-desktop'
+    mingw32-make: *** [release] Error 2
+    The process "C:/Qt/2010.05/mingw/bin/mingw32-make.exe" exited with code %2.Error while building project evopedia (target: Desktop)When executing build step 'Make'
+
+
+
+
+# testing the software
+
+
+i've used wine ﻿1.1.34 for testing and downloading an torrent using the evopedia dumpSettings dialog worked. also adding the archive to the list of active archives worked (see step 7 below). but i could not open any webpage, does wine not have a standard browser already set?
+
+
+# upcomming
+
+  * pictures don't work with this release, so be patient
+  * i'm planning on using a cross compiler from linux to create the windows version of evopedia, maybe also an installer.
+
+if you want to check out my windows xp build, download [5].
+
+how to use the test build?
+
+	
+  1. download [5]
+
+	
+  2. use winzip or winrar to extract all files to a folder. example: c:\evopedia
+
+	
+  3. start evopedia.exe and in the menu there is an entry called: dumpSettings, click it
+
+	
+  4. the dumpSettings dialog opens. it has a menu as well, click "Refresh Archive List" to query online archives. ensure that you have a working internet connection.
+
+	
+  5. now the list in the dumpSettings dialog should contain a list of several lanauges as "de,el,en,fr,it,sl,small".
+
+	
+  6. use small to test the evopedia application, click 'small' and then 'download'
+
+	
+  7. if your download completet use: 'menu' - 'manually add archive' and select the directory in c:\tmp
+
+
+**c:\tmp is probably no good default location** but we did not change that yet. also note that crei removed the automatic usage of 'just downloaded' archives. this makes step 7 necessary.
+
+
+# links
+
+* [1] <http://qt.nokia.com/downloads>
+* [2] <http://msysgit.googlecode.com/files/Git-1.7.3.1-preview20101002.exe>
+* [3] <http://github.com/qknight/torrent>
+* [4] <http://gnuwin32.sourceforge.net/packages/bzip2.htm>
+* [5] <http://www.lastlog.de/misc/wordpress/evopedia-git-windows-build.zip>
+
+
+# update
+
+23.10.2010 pictures work in windows with this build, just select 'allow' in the network settings instead of 'auto'. this is done using the menu: menu - network - allow

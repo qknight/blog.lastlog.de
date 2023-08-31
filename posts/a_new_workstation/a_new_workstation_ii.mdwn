@@ -1,0 +1,27 @@
+[[!summary chatGPT: The author provides updates and discusses various issues with their laptop, including IO-wait problems, crashing during compilation, swapping, crashes on resume, low quality graphic card drivers, KDE PIM application problems, and sound support issues. They also mention using smartd and experiencing problems with Skype and flash.]]
+[[!meta date="2010-02-21 11:46"]]
+[[!tag audio gentoo linux technology usability]]
+
+[[!img media/hp-com-elitebook-8530w.jpg alt="source hp.com" style="float: right" size=300x]]
+
+# motivation
+
+some updates about my laptop. i removed lvm and my 'luks partition' which seems to work much better now as i don't have this massive io-wait issues anymore.
+
+	
+  * i've tried several schedulers: '**noop anticipatory deadline cfq**' but none did the trick. it seems the issue is somewhere else. i've made some benchmarks but i did not find the file where i stored them ;P
+  * compiling ogre 3d 1.7rc1 crashed my computer a few days ago, maybe 2gb ram are not enough and/or my linux installation is somehow broken or a driver isn't done right - i did not find out what causes that yet
+  * compiling big packages in general often results in massive swapping which will shut down firefox (with probably 20tabs) soon and sometimes it kills xdm as well - does not happen too often
+  * but i still use xfs and i did not have any further data loss although, coming to the next problem
+  * my laptop crashes on ever 4th resume cycle and i have to 'force power off' with 5seconds pressing the pwr button this is because of nvidia.ko, i'm currently using: **x11-drivers/nvidia-drivers-190.53-r1**
+  * the quality of the nvidia proprietary driver is currently very low and ..... yes you know the story
+  * i tried to enable 'vt' for experimenting with virtual machines when i suddenly realized that all the issues with the nvidia.ko proprietary driver NOT starting X was caused by enabling this option. after i disabled it (in the bios) X resumed to work. i did not know that this was the cause for X not to start up. also the error logs did not show anything interesting?! strange, isn't it?
+  * since i'm nearly done with the ogre3d stuff i was doing i'm looking forward removing 3d support and experimenting with kms and the open source nouveau driver comming with kernel 2.6.33+
+  * all other hardware-components seem to be working pretty well, i can't complain about anything expect the bad graphic card drivers - i think that is the only proprietary module i'm currently using
+  * and i'm not using any kde pim application anymore since they suffer from very low quality (did i mention this already?) for instance they crash, they duplicate my addressbooks, on updates .kde dir (which stores all configs) sometimes is renamed to .kde4 (might be gentoo specific), xfs crashed all my 'open' files in .kde about 2 times now. so i'm using **psi, thunderbird** **and firefox** which seems to be working.
+  * i'm currently on kde 4.3 but i will try 4.4 soon
+  * my windows xp migration stopped working, not sure why - probably because my installation of grub. i should probably try to install a more recent windows version since this xp installation requires to set my sata controller into ide compatibility mode (which might be bad?)
+  * i'm now using smartd on all my computers, really a nice tool!
+  * my sound support sometimes is broken and i can't use skype for telephoning, also the composition of mics in this laptop somehow does not work well with alsa as i can't really predict which alsamixer settings makes the mic work and which not. most often it is basically random clicking until something works - welcome to linux audio. also flash sometimes does not work with sound when i use different players to play audio
+
+

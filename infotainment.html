@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="infotainment.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>infotainment</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/infotainment.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="nix-git.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="loading_nix-env_automatically.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">infotainment</h1>
+    <div id="date"><p><span id="lastupdated">28 jul 2013</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::infotainment" class="tagbtn btn btn-primary">infotainment</a><a href="timeline.html?filter=tag::society" class="tagbtn btn btn-primary">society</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p>in this article i want to illustrate my vision of ‘how infotainment
+in cars will be in a few years’. infotainment in cars causes a problem
+right now, as [1] puts it:</p>
+<blockquote>
+<p>“Dailytech recently published an article titled ‘Detroit Automakers
+Vie For App Devs Amid Infotainment Arms Race.’ <strong>Unfortunately for
+auto manufacturers, they are in a poor position to complete with
+companies like Google, Apple, Microsoft, etc…</strong> and they should
+give up the arms race and take a different direction. Mobile operating
+systems and their associated hardware have a rapid release cycle that
+significantly outpaces vehicle infotainment systems. Additionally,
+mobile OSs are developed by specialized companies that can spend dump
+trucks filled with money on their platform. I’m sorry Dodge, Toyota,
+Honda and all your friends; you simply can’t compete.”</p>
+</blockquote>
+<p>i totally subscribe to this view. this posting is about how to fix
+this issue by:</p>
+<ul>
+<li><strong>increase usability</strong></li>
+<li>build on <strong>replaceable hardware platforms</strong></li>
+<li>use <strong>open source</strong> and <strong>include the
+community</strong></li>
+</ul>
+<h2 data-number="2" id="usability">usability</h2>
+<p>usability is the most thriving factor for innovation. i want to
+illustrate this by an example:</p>
+<p><strong>the desktop computer is currently in the process of being
+replaced by tablets</strong> (btw.: not by microsoft tablets - since
+selling old concepts to new markets just doesn’t work).</p>
+<p>i expect that (on a worldwide view) the ‘desktop computer market’
+(traditional PC standing under the desk) will completely vanish,
+replaced by a set of new devices:</p>
+<ul>
+<li><strong>tablets (2013)* will replace the slack</strong></li>
+<li><strong>classical laptops (2013) will get a bigger market share for
+developers/engineers</strong></li>
+<li><strong>smartphones</strong> (2013) will also shrink the ‘desktop
+computer market’</li>
+<li><strong>smartpohnes</strong> (2014+) - like the ‘ubuntu edge’ [15] -
+are about to put the final nail in the coffin</li>
+</ul>
+<p>* thinking of a device of the year 2013</p>
+<h3 data-number="2.1" id="the-sudden-advent-of-tablets">the sudden
+advent of tablets</h3>
+<p>the primary reason is that android/iOS tablets totally fit the
+average users requirements:</p>
+<ul>
+<li><strong>communication</strong> - chat/email</li>
+<li>surfing the web</li>
+<li><strong>watching videos</strong></li>
+<li>playing games</li>
+<li>handy new workflows:</li>
+<li><strong>responsive interfaces</strong></li>
+<li><strong>multitouch/voice input</strong></li>
+<li>instant suspend/resume of the device</li>
+<li>long lasting batteries</li>
+<li><strong>intuitive software/hardware design</strong></li>
+<li><strong>prize</strong> - SoC is cheap!</li>
+</ul>
+<p>usability is a thriving motor in innovation and this posting is about
+<strong>how to make computers in cars more appealing to
+users</strong>.</p>
+<h3 data-number="2.2" id="the-human-machine-interface-hmi">the human
+machine interface (HMI)</h3>
+<p><a href="media/iPad-Mount-Cars.jpg"><img src=media/iPad-Mount-Cars.jpg size=300x style="float: none" caption="Daimler research project, see [12]"></a></p>
+<p>in regards to display integration this design is my favourite (found
+at [12]), why?</p>
+<ul>
+<li>the tablet could be <strong>operated both by a dial control or by
+touchscreen</strong></li>
+<li>the <strong>tablet implements the ‘’view/controller’’ in the <a
+href="http://de.wikipedia.org/wiki/Model_View_Controller"
+title="Wikipedia article on MVC">MVC</a> patten</strong>, thus the
+infotainment system can be replaced after 2-3 years</li>
+<li><strong>developing costs for tablets are far cheaper compared to
+onboard computers</strong>. also patching is not as complicated</li>
+<li>the user could <strong>unmount the tablet and use it for other
+things or even to remotely control the car and later remount it into the
+car</strong></li>
+<li><strong>users see their smartphone and tablet as part of their
+being</strong>, thus having a good integration in their car enhances
+their experience</li>
+</ul>
+<h4 data-number="2.2.1" id="needed-hmi-fixes-for-drivers">needed HMI
+fixes for drivers</h4>
+<p>the concept i’m thinking of is this:</p>
+<ul>
+<li><strong>infotainment system is based on a tablet</strong></li>
+<li><strong>an incar computer assists the tablet</strong> in making
+everything interconnected</li>
+<li>the <strong>tablet has an internet connection using UMTS/LTE but
+also a connection WiFi to the car</strong></li>
+<li>the car has a <strong>communication module which is connected
+UMTS/LTE to the OEM ‘data center’</strong></li>
+</ul>
+<p>now the user can either <strong>use the tablet or a smartphone to
+query the stats of this car</strong> using the ‘data center’</p>
+<p><a href="media/infotainment.jpeg"><img src=media/infotainment.jpeg size=700x alt="created by joachim schiele" style="float: none" caption="'tablet as infotainment solution in a car' by joachim schiele"></a></p>
+<p>the ‘data center’ would make access to the following data
+available:</p>
+<ul>
+<li>steering wheel
+<ul>
+<li>pressed keys</li>
+<li>orientation (angle)</li>
+</ul></li>
+<li>pedals</li>
+<li>GPS position</li>
+<li>car speed</li>
+<li>MEMS-Gyroskop</li>
+<li>illumination sensor (inside car, outside car)</li>
+<li>temperature sensor (inside car, outside car, motor, cooling)</li>
+<li>speed of car (and speed of each tire)</li>
+<li>air preasure (inside car, outside car, each tire)</li>
+<li>oil/coolants/petroal/battey/wiping water levels</li>
+<li>heating / ventilation / climate control</li>
+<li>motor levels/settings</li>
+<li>gear level</li>
+<li>radar results (and whatever sensors are bult into the car you can
+think of)</li>
+<li>fual consumtion</li>
+<li>odometer values</li>
+<li>power consumption per component (like android does it)</li>
+<li>defect sensors</li>
+<li>cameras</li>
+</ul>
+<h2 data-number="3" id="replaceable-hardware-platform">replaceable
+hardware platform</h2>
+<p>ordinary <strong>consumer tablets</strong> probably won’t survive
+intense heat for long, which is mostly a screen and battery issue. still
+we could use <strong>industry grade tablets</strong> (which usually
+survive from -10 to 90 degrees celcius) in the car.</p>
+<p>supporting consumer tablets might still be possible:</p>
+<ul>
+<li>smartphones are probably a good target since nobody will leave them
+in the car</li>
+<li>for tablets one could add a fan to cool it and</li>
+<li>mount it in a way that there is less direct sun impact or</li>
+<li>add a mechanic which protects the tablet when car is inactive (no
+fans)</li>
+</ul>
+<p>right now i see problems with supporting consumer tablets. using
+dedicated screens and forwarding sounds good at first but there are no
+open standards and the protocols which are deployed more often are
+proprietary and therefore no good target to be used. also it would
+require a device to stream to like a display. displays suffer the same
+problems as integrated computers do, they are outdated too soon.</p>
+<p>so why not use industry grade tablets until consumer tablets get
+better?</p>
+<p>here are three <strong>industry grade tablets</strong> which i find
+interesting:</p>
+<ul>
+<li>motorola ET1 enterprise tablet</li>
+<li>panasonic toughpad FZ-G1</li>
+<li>panasonic toughpad FZ-A1</li>
+</ul>
+<h4 data-number="3.0.1" id="motorola-et1-enterprise-tablet">motorola ET1
+Enterprise Tablet</h4>
+<blockquote>
+<p>Looking for a true enterprise-class tablet that you can deploy
+anywhere? The ET1 offers everything you need — from security and
+durability to flexibility and manageability. With WLAN or WWAN
+connectivity, you can count on the ET1 to deliver all the information
+your workforce needs to get the job done — whether they are inside the
+four walls or out in the field.</p>
+</blockquote>
+<p><a href="media/ET1_TierOne_ProductImage.jpg"><img src=media/ET1_TierOne_ProductImage.jpg alt="" style="float: none" caption="ET1 enterprise tablet"></a></p>
+<p>motorola ET1 specification states [2]:</p>
+<pre><code>Operating Temp.
+ 32° to 122° F /0° to 50° C
+Storage Temp.
+ -4° to 158° F /-20° to 70° C
+Drop Specification
+ Multiple 4 ft./1.2 m drop per MIL STD 810G
+Sealing
+ IP54
+Vibration
+ 4Gs peak, 5hz to 2khz, 1 hour duration per axis
+Thermal Shock
+ -4° F to 158° F/-20° C to 70° C rapid
+transition
+ESD
+ 15kv Air, 8kv contact, 2kv charge body
+Humidity
+ 10% to 95% RH (Non-condensing)</code></pre>
+<h4 data-number="3.0.2" id="panasonic-toughpad-fz-a1fz-g1">panasonic
+toughpad FZ-A1/FZ-G1</h4>
+<blockquote>
+<p>The first fully-ruggedized tablet powered by Android™ combines
+high-encryption data and device security with the seamless connectivity
+and enterprise-grade technology businesses and government agencies
+require.</p>
+</blockquote>
+<p><a href="media/ToughPad_A1_2-250.jpg"><img src=media/ToughPad_A1_2-250.jpg alt="" caption="Toughpad FZ-A1 [3]"></a>
+<a href="media/fz-g1aabaxlm.jpg"><img src=media/fz-g1aabaxlm.jpg alt="" caption="Toughpad FZ-G1 [4]"></a></p>
+<p>btw: both devices [3] and [4] are <a
+href="http://en.wikipedia.org/wiki/MIL-STD-810">certified MIL-STD-810
+certified</a>.</p>
+<h3 data-number="3.1" id="input-via-dial">input via dial</h3>
+<p><strong>being froced to use singletouch or multitouch is a real
+problem - especially when driving!</strong> that is because most tablets
+were designed to be hold in your hands while being operated. however,
+consider an external control, like the ‘bmw x5 idrive conroller’, is
+added to the tablet (via bluetooth BT) and the tablet is used in a ‘car
+mode’ (for instance by using the app ‘Car Home Ultra’). such an
+integration would seriously make a difference.</p>
+<p><a href="media/320px-IDrive_controller_X5_2.JPG"><img src=media/320px-IDrive_controller_X5_2.JPG alt="from wikipedia - thanks to Andi2612" style="float: right" size=300x style="float: none" caption="bmw x5 idrive conroller"></a></p>
+<p>such dials could be modified to have a very sensitive surface which
+would allow to write letters, without having to glance at the screen,
+even while driving - probably everyone remembers when palm cam up with
+handwriting recognition. why not integrate that?</p>
+<h3 data-number="3.2" id="tablet-audio-output">tablet audio output</h3>
+<p><strong>audio output would be done using BT, like it is done with
+mobile phones in cars today.</strong> if the tablet is mountable via a
+tablet mount then audio would still work after being removed. for
+instance when entering/leaving the car. triggers to issue a modeswitch
+after mounting the device could be done using NFC.</p>
+<h2 data-number="4" id="open-source-software-and-the-community">open
+source software and the community</h2>
+<p>another major issues with OEMs, they ignore the community without
+realizing that the cummunity is the actual user. of course, most users
+having access to APIs and source code won’t be able to use it like a
+developer could. but maybe a little example helps to understand that it
+only takes few to make cool things available to a broad audience: the
+linux kernel is developed by a small group compared to the sheer ammount
+of users - often unknowingly - using it.</p>
+<p>being open helps as you give others the possibility to contribute.
+see [16] and [17] how mighty this principle is. this graph illustrates
+the adaption rate to the linux kernel:</p>
+<p><a href="media/osadl-linux-adaption-rate.png"><img src=media/osadl-linux-adaption-rate.png alt="" style="float: right" style="float: none" caption="from osadl.com (dr. carsten emde)"></a></p>
+<p>the graph shows a few interesting trends:</p>
+<ul>
+<li>the desktop market seems to be unreachable by linux</li>
+<li>the later in time a linux adaption started the faster it took a 100%
+market share</li>
+<li>linux dominates many different markets, still it uses the same code
+base</li>
+</ul>
+<p>interestingly dr. emde also mentioned:</p>
+<blockquote>
+<p>as it stands today one might ask what happens first: linux will also
+get a near 100% coverage of the desktop or the classical desktop will
+die out</p>
+</blockquote>
+<p>as i already mentioned, taken the tablet market and the desktop
+market together, then linux is also about to take the desktop
+market.</p>
+<p>anyway, when wanting to benefit of the community it is important to
+give them the tools they need to do cool things, and that is:</p>
+<ul>
+<li>the software (FLOSS licensed)</li>
+<li>the toolchain (FLOSS licensed)</li>
+<li>the API (for cloud services but also locally)</li>
+<li>documentation</li>
+</ul>
+<p>[16] [17] [19]</p>
+<h3 data-number="4.1" id="api">API</h3>
+<p>there is only one way to do proper tablet integration: you need a
+central computer in the car which is basically running each time you are
+going to make a request. this ‘headless’ computer interconnects all
+devices and sensors in the car. if wanted reports them even back into
+the data center for remote usage.</p>
+<p>a powerful API helps community developers to make maximum use of
+it.</p>
+<h2 data-number="5"
+id="a-few-interesting-community-projects-oems-could-benefit-from">a few
+interesting (community) projects OEMs could benefit from</h2>
+<h3 data-number="5.1" id="open-street-map">open street map</h3>
+<p>i always wondered why there is no adaption towards open street map
+[17] since the quality of the data is in many regards superios to other
+commercially available data sources.</p>
+<h3 data-number="5.2" id="osmand">osmand</h3>
+<p>osmand [13] is probably one of the best open streetmap related
+renderers. there are only two things i would like to have:</p>
+<ul>
+<li>better routing and better awareness model of where the car currently
+is or might be</li>
+<li>life traffic integration (like when using google maps or
+tomtom)</li>
+</ul>
+<p>there exists a nice introduction video to osmand [14], the only
+problem seems it is french ;-)</p>
+<h3 data-number="5.3"
+id="interesting-hardware-hacking-project">interesting hardware hacking
+project</h3>
+<p>yourfacetatooed on youtube.com has built a very interesting
+concealable tablet integration, see [11] (video position 1:20
+onwards)</p>
+<p><a href="media/yourfacetatooed-Motorized-galaxy-tablet-incar-install-open.jpeg"><img src=media/yourfacetatooed-Motorized-galaxy-tablet-incar-install-open.jpeg alt="" style="float: right" size=500x style="float: none" caption=""></a></p>
+<p><a href="media/yourfacetatooed-Motorized-galaxy-tablet-incar-install-closed.jpeg"><img src=media/yourfacetatooed-Motorized-galaxy-tablet-incar-install-closed.jpeg alt="" style="float: right" size=500x style="float: none" caption=""></a></p>
+<h3 data-number="5.4" id="bikelogger">bikelogger</h3>
+<p>[5]</p>
+<h3 data-number="5.5" id="garmin-heads-up-display">garmin heads up
+display</h3>
+<p>[6]</p>
+<h3 data-number="5.6" id="eberspächer-pre-heater">eberspächer
+pre-heater</h3>
+<p>[7]</p>
+<h3 data-number="5.7" id="nexus-7-built-into-the-car">nexus 7 built into
+the car</h3>
+<p>[8]</p>
+<h3 data-number="5.8"
+id="another-interesting-integration-of-tablets-in-the-car">another
+interesting integration of tablets in the car</h3>
+<p>[9]</p>
+<h3 data-number="5.9" id="galaxy-tab-in-the-car">galaxy tab in the
+car</h3>
+<p>[10]</p>
+<h3 data-number="5.10" id="apple-carplay">apple carplay</h3>
+<p>[24]</p>
+<h3 data-number="5.11" id="tomtom-bridge-tablet">tomtom bridge
+tablet</h3>
+<p>[25] … this is 50% of what this posting is about …</p>
+<h2 data-number="6" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="http://tech.slashdot.org/story/13/07/03/0131214/why-automakers-should-stop-the-infotainment-arms-race"
+class="uri">http://tech.slashdot.org/story/13/07/03/0131214/why-automakers-should-stop-the-infotainment-arms-race</a></li>
+<li>[2] <a
+href="http://www.motorolasolutions.com/XC-DE/Business+Product+and+Services/Tablets/ET1+Enterprise+Tablet"
+class="uri">http://www.motorolasolutions.com/XC-DE/Business+Product+and+Services/Tablets/ET1+Enterprise+Tablet</a></li>
+<li>[3] <a
+href="http://www.panasonic.com/business/toughbook/ultra-mobile-rugged-mca-toughpad_FZ-A1.asp"
+class="uri">http://www.panasonic.com/business/toughbook/ultra-mobile-rugged-mca-toughpad_FZ-A1.asp</a></li>
+<li>[4] <a
+href="http://www.golem.de/news/panasonic-fz-g1-im-test-massives-windows-8-tablet-im-aussendienst-1307-100064.html"
+class="uri">http://www.golem.de/news/panasonic-fz-g1-im-test-massives-windows-8-tablet-im-aussendienst-1307-100064.html</a></li>
+<li>[5] <a href="http://bikelogger.de/en"
+class="uri">http://bikelogger.de/en</a></li>
+<li>[6] <a
+href="http://wmpoweruser.com/garmin-releases-a-heads-up-display-for-in-car-navigation-compatible-with-windows-phone-8/"
+class="uri">http://wmpoweruser.com/garmin-releases-a-heads-up-display-for-in-car-navigation-compatible-with-windows-phone-8/</a></li>
+<li>[7] <a
+href="http://www.eberspaecher-standheizung.com/bedienelemente/easystart-call.html"
+class="uri">http://www.eberspaecher-standheizung.com/bedienelemente/easystart-call.html</a></li>
+<li>[8] <a href="http://www.androidnext.de/news/nexus-7-im-auto/"
+class="uri">http://www.androidnext.de/news/nexus-7-im-auto/</a></li>
+<li>[9] <a
+href="http://www.all-electronics.de/texte/anzeigen/46521/Integration-von-Tablet-PCs-im-Pkw"
+class="uri">http://www.all-electronics.de/texte/anzeigen/46521/Integration-von-Tablet-PCs-im-Pkw</a></li>
+<li>[10] <a
+href="http://www.android-hilfe.de/samsung-galaxy-tab-forum/109394-galaxy-tab-golf-5-fest-der-mittelkonsole-einbauen-anstelle-von-orginalradio.html"
+class="uri">http://www.android-hilfe.de/samsung-galaxy-tab-forum/109394-galaxy-tab-golf-5-fest-der-mittelkonsole-einbauen-anstelle-von-orginalradio.html</a></li>
+<li>[11] <a
+href="http://www.youtube.com/watch?v=rmaBP6mLEzQ&amp;feature=player_embedded"
+class="uri">http://www.youtube.com/watch?v=rmaBP6mLEzQ&amp;feature=player_embedded</a></li>
+<li>[12] <a href="http://www.geeksugar.com/iPad-Mount-Cars-15602422"
+class="uri">http://www.geeksugar.com/iPad-Mount-Cars-15602422</a></li>
+<li>[13] <a href="http://www.youtube.com/watch?v=DWNK5Pk4wog"
+class="uri">http://www.youtube.com/watch?v=DWNK5Pk4wog</a> -
+Présentation d’osmand gps opensource.</li>
+<li>[14] <a href="http://osmand.net/"
+class="uri">http://osmand.net/</a></li>
+<li>[15] <a href="http://www.indiegogo.com/projects/ubuntu-edge"
+class="uri">http://www.indiegogo.com/projects/ubuntu-edge</a></li>
+<li>[16] <a href="http://video.linux.com/videos/how-linux-is-built"
+class="uri">http://video.linux.com/videos/how-linux-is-built</a></li>
+<li>[17] <a
+href="http://www.linux.com/news/featured-blogs/185-jennifer-cloer/715856-jim-zemlin-at-tedx-what-weve-learned-from-linus-torvalds"
+class="uri">http://www.linux.com/news/featured-blogs/185-jennifer-cloer/715856-jim-zemlin-at-tedx-what-weve-learned-from-linus-torvalds</a></li>
+<li>[18] <a href="http://osm.org" class="uri">http://osm.org</a></li>
+<li>[19] <a
+href="http://www.linux.com/news/featured-blogs/200-libby-clark/719560-5-reasons-infotainment-is-the-first-target-for-open-source-software-in-cars"
+class="uri">http://www.linux.com/news/featured-blogs/200-libby-clark/719560-5-reasons-infotainment-is-the-first-target-for-open-source-software-in-cars</a></li>
+<li>[20] <a
+href="http://garmin.blogs.com/my_weblog/2013/06/garmin-provides-portable-infotainment-for-vw-up-compact-car-.html"
+class="uri">http://garmin.blogs.com/my_weblog/2013/06/garmin-provides-portable-infotainment-for-vw-up-compact-car-.html</a></li>
+<li>[21] <a
+href="http://www.golem.de/news/unu-tablet-smart-tv-und-spielekonsole-in-einem-1308-101059.html"
+class="uri">http://www.golem.de/news/unu-tablet-smart-tv-und-spielekonsole-in-einem-1308-101059.html</a></li>
+<li>[22] <a
+href="http://www.heise.de/newsticker/meldung/Autofahrern-ist-Smartphone-Anschluss-wichtiger-als-Pferdestaerken-1954996.html"
+class="uri">http://www.heise.de/newsticker/meldung/Autofahrern-ist-Smartphone-Anschluss-wichtiger-als-Pferdestaerken-1954996.html</a></li>
+<li>[23] <a href="http://www.appszoom.com/android_applications/car+dock"
+class="uri">http://www.appszoom.com/android_applications/car+dock</a></li>
+<li>[24] <a href="http://www.apple.com/ios/carplay/"
+class="uri">http://www.apple.com/ios/carplay/</a></li>
+<li>[25] <a
+href="http://telematicsnews.info/2014/02/26/tomtom-bridge-tablet-will-provide-navigation-traffic-and-fleet-apps_f5263/"
+class="uri">http://telematicsnews.info/2014/02/26/tomtom-bridge-tablet-will-provide-navigation-traffic-and-fleet-apps_f5263/</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/infotainment.mdwn" title="posts\infotainment.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

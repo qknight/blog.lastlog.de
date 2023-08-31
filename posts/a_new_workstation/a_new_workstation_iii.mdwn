@@ -1,0 +1,155 @@
+[[!summary chatGPT: The author discusses their experience with the proprietary NVIDIA driver causing crashes and file loss on their Linux laptop and describes how they used netconsole to track down the issue. They then switched to the nouveau driver which improved performance and power saving, although there were some remaining issues with 2D drawing. The author concludes that KMS+nouveau+gallium3d is the way to go for NVIDIA drivers on Linux.]]
+[[!meta date="2011-02-20 14:45"]]
+[[!tag gentoo linux usability]]
+
+[[!img media/hp-com-elitebook-8530w.jpg alt="source hp.com" style="float: right" size=300x]]
+
+# nvidia and the proprietary driver
+
+**well, how to say it politely: proprietary driver, go to hell**! lately i've been using =x11-drivers/nvidia-drivers-260.19.29 with:
+
+	
+  * NX **(N**o e**X**ecute bit)
+  * VT (**virtualization bit)
+**
+
+enabled/disabled in various combinations but the laptop was crashing all over the place, that includes:
+
+	
+  * rendering a webpage (sometimes)
+  * playing flash videos (youtube)
+  * rendering a pdf (using kile)
+  * resume cycle (after pm-suspend)
+
+i probably had **2-6 crashes per day at least**. but on the bright side i **did not have much file loss** because i migrated from **xfs to ext3!**
+
+**i've had issues with this since i bought the laptop!
+**
+
+# tracking down the problem:
+
+
+i've been experimenting with '**/usr/src/linux/Documentation/networking/netconsole.txt**' which is a very very **important tool when tracking down kernel related issues**. before KMS + nouveau + gallium3d a kernel crash would not 'bluescreen' on linux when using the old driver architecture. KMS makes this possible now.
+
+back then i was using the nvidia.ko driver, so i create a little setup to track down the problem:
+
+
+## on the remote machine
+
+
+setup here is pretty easy, **inside a screen console, issue this command**:
+
+    nc -l -u -p 6666
+
+or
+ 
+    nc -l -u -p 6666 | tee ~/netconsole.log
+
+using screen makes it easy to retrieve the error log later for saving it to a file.
+
+
+## on the laptop
+
+
+**start that script** every new boot as root:
+
+    ip a del 192.168.100.233/24 dev eth0
+    ip a add 192.168.100.233/24 brd 192.168.100.255 dev eth0
+    
+    rmmod netconsole
+    sleep 1
+    dmesg -n 8
+    
+    modprobe netconsole netconsole=4444@192.168.100.233/eth0,6666@192.168.100.10/00:64:18:34:13:63
+
+syntax:
+
+ netconsole=[src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
+
+    where
+      src-port      source for UDP packets (defaults to 6665)
+      src-ip        source IP to use (interface address)
+      dev           network interface (eth0)
+      tgt-port      port for logging agent (6666)
+      tgt-ip        IP address for logging agent
+      tgt-macaddr   ethernet MAC address for logging agent (broadcast)
+
+note: **dmesg -n 8** is very important!
+
+## the log
+
+
+right after you start the script on the laptop** this (or similar) should appear**:
+
+
+    netconsole: network logging started
+    netconsole: local port 4444
+    netconsole: local IP 192.168.100.233
+    netconsole: interface 'eth0'
+    netconsole: remote port 6666
+    netconsole: remote IP 192.168.100.10
+
+
+if not, then something is wrong! check that the connection works by using this command:
+
+    echo -n "hello world" | nc -u 192.168.100.10 6666
+
+but notice:
+
+the nc receiver will attach to one source port number. so if you run that echo, it will attach to that source port number and then it will ignore anything coming from netconsole (another source port number) 
+
+**therefore restart nc on the remote machine.**
+
+
+## the outcome
+
+
+the problem for me was that** i wasn't able to record any nvidia related bug as it was probably a hardlock**, i did not try to use the 'sys key' but it would have been a good idea. the logging works for some 'suspend/resume issues'.
+
+Note: **use the ethernet devices**, it does not work with the wireless lan devices!
+
+
+# the solution to the nvidia.ko problem
+
+
+since yesterday i'm using **=x11-drivers/xf86-video-nouveau-0.0.16_pre20101130 for 2d** (3d does not work yet). a friend with the same laptop reported that on his debian machine also 3d support is working. so far i only had one crash after 7x suspend/resume cycling. this is very good as it makes working with that computer now possible. 3d support as running **=x11-apps/mesa-progs-8.0.1 glxgears/glxinfo **only produces a black window which seems to do nothing. at least 3d does not 'segfault' the application using it as yesterday before i did: 'emerge -uDN world' properly.
+
+
+## the first 'blue screen' in linux
+
+
+'blue screens' on linux are actually 'black screens' and it is finally working which is a very good thing. still i did not understand why my laptop was crashing after the 7th resume cycle. i have to learn how to interpret such a trace ;-). at least i got a backtrace in comparison to the netconsole approch (using the nvidia.ko driver).
+
+
+## nouveau driver status
+
+
+last time i tried to install the nouveau driver on my gentoo based laptop i had many troubles. this time i only emerged a few packages as x11-drivers/xf86-video-nouveau  and it was working after i blacklisted the nvidia module and adapted my xorg.conf to use nouveau by deleting it.
+
+**2d performance is really good and power saving seems to be implemented now** as the fan gets very silent now. not quite as silent compared to the nvidia.ko driver but much much better compared to the last time i tried nouveau.
+
+there are **not 2d drawing artefacts anymore** and **scrolling in the browser is very performant** and feels good.
+
+i'm using a setup where **both  NX and VT are enabled and working**. all my virtual machines using virtualbox are running.
+
+**suspend/resume does not work 100% well as the screen brightness is setup to the minimum level after resume and it can not be changed so far**.
+
+
+# summary
+
+
+i think that x11-drivers/nvidia-drivers finally bites the dust for several reasons:
+
+  * **nvidia.ko seems to be unmaintained** for the 01:00.0 VGA compatible controller: nVidia Corporation G96M [Quadro FX 770M] (rev a1) card at least
+  * **proprietary driver quality was never very good** for the G96M Quadro FX 770M on the hp 8530w as i was blogging quite a lot about significant issues
+  * **even though it was never very good support seems to degrade lately**
+  * **KMS+nouveau+gallium3d is the way to go**, what works so far looks promising
+
+**thanks to all developers of nouveau** to make this possible! i owe you one!!
+
+**Edit**: some updates as:
+
+  * there are some 2d drawing issues where icons look like defective frames of an incomplete mpeg video download
+  * some 2d drawing issues where some regions are drawn wrong
+
+i guess both things are related to caching done wrongly

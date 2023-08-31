@@ -1,0 +1,68 @@
+[[!summary chatGPT: The problem was that the system was halted due to udev not supporting the kernel version, and the fix involved downgrading udev to version 141 after booting from a grml USB stick and making some changes in the system setup.]]
+[[!meta date="2010-03-18 15:39"]]
+[[!tag gentoo linux packagemanager technology]]
+
+[[!img media/udev-tux.png alt="" style="float: right"]]
+
+#the problem:
+
+
+**labsystem boot halts with this error:**
+
+    Current udev only supports Linux kernel **2.6.25** and newer.
+    Your kernel is too old to work with this version of udev.
+
+# fix
+
+either upgrade kernel or downgrad udev, i downgraded udev
+
+system setup before fix was applied:
+	
+  * installed kernel: **2.6.23-gentoo**
+  * installed   udev: **sys-fs/udev-149**
+
+usb boot stick: **grml version: 2008.11 - Release Codename Schluchtenscheisser 2008-11-30**
+
+    disk usage:
+    /dev/sda* not important
+    
+    /dev/sdb1 boot,ext2
+    /dev/sdb2 lvm
+    
+    /dev/sdc1 boot,ext2
+    /dev/sdc2 lvm
+    
+    md0: /dev/sdb1 /dev/sdc1
+    md1: /dev/sdb2 /dev/sdc2
+
+
+# now the fix
+
+
+i basically used [1] and [2] as reference. i don't like that portage didn't tell me that with a dependency issue.
+	
+  1. grml usb stick boot
+  2. 'Start mdadm-raid' found in the bootlog on Console F1
+  3. vgscan; vgchnage -ay (wait about 10-30secs)
+  4. mount /dev/vg/root /mnt/root (create /mnt/root first)
+  5. cd /mnt/root; chroot .
+  6. emerge =sys-fs/udev/-146-r1 (did not work)
+  7. emerge =sys-fs/udev/-141
+
+     **edit /etc/portage/package.mask**
+
+        # DON'T INSTALL udev > 141 without making a kernel update first (2010-03-18)
+        sys-fs/udev-141
+
+  8. exit; reboot
+
+
+system setup after fix was applied:
+
+  * installed kernel: 2.6.23-gentoo (not changed)
+  * installed udev: sys-fs/udev-141
+
+# links
+
+* [1] <http://bugs.gentoo.org/281312>
+* [2] <http://lastlog.de/wiki/index.php/Festplatte_verschluesseln>

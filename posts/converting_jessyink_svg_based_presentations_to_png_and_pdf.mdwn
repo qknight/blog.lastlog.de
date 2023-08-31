@@ -1,0 +1,39 @@
+[[!meta date="2014-05-05 12:30"]]
+[[!tag svg jessyink pdf usability]]
+[[!summary how to create a presentation using inkscape and jessyink and how to create a pdf from it]]
+[[!img media/jessyink.jpg alt="" style="float: right"]]
+
+# motivation
+i like to **design my slides using inkscape** and then **using the plugin called jessyink** to create interactive SVGs. these are later displayed using firefox or chromium (does NOT work in IE). 
+
+example, see [1]
+
+# how to build a presentation using inkscape & jessyink
+
+this is described at [2] (in german). if you are using my presentation as template, you will get a different navigation (left/right key for for backward/forward navigation) and i added a automatic page number to the SVG.
+
+# how to create PNGs and a PDF from such presentations
+
+create a working directory:
+
+    mkdir myslides; cd myslides
+    ... copy your inkscape/jessyink document there ...
+    wget https://raw.githubusercontent.com/ariya/phantomjs/master/examples/rasterize.js
+
+then download phantomjs:
+
+    apt-get install phantomjs (or)
+    nix-env -i phantomjs
+
+afterwards create images from each slide:
+
+    for i in 0 `seq 1 43`; do phantomjs rasterize.js file:///home/joachim/doc/vortrag/easterhegg2014-docker-nix-container.svg#1_$i slide$(printf %03d $i).png 1024px*768px; done
+
+now create the pdf:
+
+    convert slide* easterhegg2014-docker-nix-container.svg.pdf
+
+# links
+
+* [1] <http://lastlog.de/misc/easterhegg2014-docker-nix-container.svg>
+* [2] <https://www.youtube.com/watch?v=m0nfQk1c4qw>

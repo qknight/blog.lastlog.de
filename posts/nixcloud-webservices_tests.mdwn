@@ -1,0 +1,194 @@
+[[!meta date="2017-11-28 12:35"]]
+[[!tag nixos nixcloud tests]]
+
+[[!img media/nixcloud.png size=10x class="noFancy" style="float: right" ]]
+
+[[!summary how we do tests and CI at nixcloud.]]
+[[!series nixcloud]]
+
+# motivation
+
+many programming languages have testing frameworks and for sometimes they are even used. in nixpkgs i see them lots, most often in libraries written in `perl`, `python` and `go`.
+
+this posting is about how we adapted this concept into nix. AFAIK this hasn't been done before so it might be worth sharing.
+
+# how testing works in perl/python/go
+
+the tests are executed during the build of the software and most often implemented in libraries.
+
+sometimes there is `doCheck = false;` as the tests fail for some reason. often these tests are impure and the build environment can't perform the actions, as for instance, visiting some remote website during build time which is not possible in a nix-build phase. 
+
+testing systems i'm refering to:
+
+* [perl example](http://www.jmdeldin.com/bioinf/testing/index.html)
+* [python example](http://docs.python-guide.org/en/latest/writing/tests/)
+* [go example](https://golang.org/pkg/testing/)
+
+## python example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+av = buildPythonPackage rec {
+  name = "av-${version}";
+  version = "0.2.4";
+
+  src = pkgs.fetchurl {
+    url = "mirror://pypi/a/av/${name}.tar.gz";
+    sha256 = "bdc7e2e213cb9041d9c5c0497e6f8c47e84f89f1f2673a46d891cca0fb0d19a0";
+  };
+
+  buildInputs
+    =  (with self; [ nose pillow numpy ])
+    ++ (with pkgs; [ ffmpeg_2 git libav pkgconfig ]);
+
+  # Because of https://github.com/mikeboers/PyAV/issues/152
+  doCheck = false;
+
+  meta = {
+    description = "Pythonic bindings for FFmpeg/Libav";
+    homepage = https://github.com/mikeboers/PyAV/;
+    license = licenses.bsd2;
+  };
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+example taken from <https://github.com/NixOS/nixpkgs/blob/master/pkgs/top-level/python-packages.nix>.
+
+## perl example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+ack = buildPerlPackage rec {
+  name = "ack-2.16";
+  src = fetchurl {
+    url = "mirror://cpan/authors/id/P/PE/PETDANCE/${name}.tar.gz";
+    sha256 = "0ifbmbfvagfi76i7vjpggs2hrbqqisd14f5zizan6cbdn8dl5z2g";
+  };
+  outputs = ["out" "man"];
+  # use gnused so that the preCheck command passes
+  buildInputs = stdenv.lib.optional stdenv.isDarwin gnused;
+  propagatedBuildInputs = [ FileNext ];
+  meta = with stdenv.lib; {
+    description = "A grep-like tool tailored to working with large trees of source code";
+    homepage    = http://betterthangrep.com/;
+    license     = licenses.artistic2;
+    maintainers = with maintainers; [ lovek323 ];
+    platforms   = platforms.unix;
+  };
+  # tests fails on nixos and hydra because of different purity issues
+  doCheck = false;
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+example taken from <https://github.com/NixOS/nixpkgs/blob/master/pkgs/top-level/perl-packages.nix>  
+  
+## go example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+terraform_0_9 = generic {
+  version = "0.9.11";
+  sha256 = "045zcpd4g9c52ynhgh3213p422ahds63mzhmd2iwcmj88g8i1w6x";
+  # checks are failing again
+  doCheck = false;
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+example taken from <https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/cluster/terraform/default.nix>.   
+
+# nixos testing
+
+first, let's have a look at how testing in nixos is done traditionally. these tests use KVM, spawn one or serveral virtual machines which interact with each other over the network. they are called explicitly: `nix-build -A leaps release.nix`.
+
+the leaps test:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+import ./make-test.nix ({ pkgs,  ... }:
+
+{
+  name = "leaps";
+  meta = with pkgs.stdenv.lib.maintainers; {
+    maintainers = [ qknight ];
+  };
+
+  nodes = {
+    client = {};
+    server = {
+      services.leaps = {
+        enable = true;
+        port = 6666;
+        path = "/leaps/";
+      };
+      networking.firewall.enable = false;
+    };
+  };
+
+  testScript =
+    ''
+      startAll;
+      $server->waitForOpenPort(6666);
+      $client->waitForUnit("network.target");
+      $client->succeed("${pkgs.curl}/bin/curl http://server:6666/leaps/ | grep -i 'leaps'");
+    '';
+})
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+nixos tests are described in the manual <https://nixos.org/nixos/manual/index.html#sec-nixos-tests> nicely. the source of the tests are at <https://github.com/NixOS/nixpkgs/blob/master/nixos/release.nix#L217>.
+
+# nixcloud testing
+
+at nixcloud we also implement tests as we have them in nixos (described above). some tests can be found here: <https://github.com/nixcloud/nixcloud-webservices/tree/master/tests> but, and that is why this posting was written, we also have different kind of tests, which are similar to those in perl, python and go explained previously.
+
+## test usage
+
+we basically extended the nixos module system:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+{ config, pkgs, lib, ... } @ args:
+
+{
+  options = {
+    nixcloud.reverse-proxy = {
+      enable = mkEnableOption "reverse-proxy";
+      ...
+    }
+  };
+  config = {
+    ...
+    nixcloud.tests.wanted = [ ./test.nix ];
+  };
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[see complete usage implementation](https://github.com/nixcloud/nixcloud-webservices/blob/12e51b6bd073acdd78807d0dbb23458267538b48/modules/services/reverse-proxy/default.nix#L298)
+
+**note**: the nixcloud.reverse-proxy module is similar to nixos modules as `services.openssh`
+
+if the nixcloud.reverse-proxy module is used and one does a `nixos-rebuild switch`, it evaluates the `./test.nix` during build.
+
+## implementation
+
+and the implementation of the test is here <https://github.com/nixcloud/nixcloud-webservices/blob/12e51b6bd073acdd78807d0dbb23458267538b48/modules/core/testing.nix>
+
+## advances
+
+* tests are located near the implementation of the service and not in a completely different directory
+
+* a user can't forget to run the test since they are implicit
+
+* everytime a developer changes the implementation, nixcloud.webservices for instance, it is unit tested. this insures that users don't forget to run the unit test before they commit.
+
+* these test builds are cached locally and are executed only once. similar for packages out of nixpkgs: if a dependency or the source code is changed, the test is also rerun.
+
+* oh, and hydra can evaluate the tests as well
+
+## drawbacks
+
+* a major drawback is that if you don't have KVM support it still spawns the tests and emulating will be very slow.
+
+    this is true for:
+
+    * remote machines which were already virtualized (and don't support nested virtualization)
+    * if you execute nixos inside virtualbox
+    * if you are using nix from inside mac os x (darwin) or basically from any other linux other than nixos
+
+# summary
+
+i would love to see this feature coming to nixos/nixpkgs also! oh and thanks to aszlig!

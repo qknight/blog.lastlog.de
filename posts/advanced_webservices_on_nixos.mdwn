@@ -1,0 +1,153 @@
+[[!meta date="2014-01-31 23:17"]]
+[[!summary a declarative approach to describe webservices]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+[[!tag nixos linux technology usability]]
+[[!series nixcloud]]
+
+# motivation
+i've been using nixos on my webserver for two years now and i love the declarative approach [1] of describing services as well as webservices! describing a webservices in a declarative way is like using the object factory programming pattern and helps to make better abstractions. a good example is the mediawiki abstraction shown below. a user only has to fill the values into the declarative description and nixos-rebuild will automatically install apache-2.2.25, mysql-5.1.72, php-5.4.20 and of course the mediawiki sources (versions of course might differ).
+
+**although the declarative approach found in NixOS seems great, it is very unflexible as it forces a rigid dependency model on its users. for example one can only use exactly one php version which needs to be the same for all such services but here i present an idea how to solve this. instead of constraining all webapps to be run on the same webserver, why not have a 'generic reverse proxy (apache)' which acts as a frontend and each declaratively described webservice would then use its own, individual mix of webtools like webserver, CGI-based and static/dynamic webpages?**
+
+[[!img media/advanced-webservices-on-nixos.jpg style="float: none" width="700px"]]
+
+**i would love to have your opinion/feedback/critisism to make this idea come true, so please write thoughts about this to 'js@lastlog.de'.**
+
+# declarative description of webservices as we have them in jan 2014
+
+this section describes what we already have and how it works:
+
+## a declarative description of the mediawiki software
+a webservice declaration (from [1]) which will will start the httpd service but also the serviceType = "mediawiki" on top of it: 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash .numberLines}
+services.postgresql.enable = true;
+services.postgresql.package = pkgs.postgresql92;
+services.httpd.enable = true;
+services.httpd.adminAddr = "admin@example.org";
+services.httpd.extraSubservices =
+  [ { serviceType = "mediawiki";
+      siteName = "My Wiki";
+      logo = "http://www.example.org/wiki-logo.png"; # should be 135x135px
+      extraConfig =
+        ''
+          # See http://www.mediawiki.org/wiki/Manual:Configuration_settings
+          $wgEmailConfirmToEdit = true;
+        '';
+    }
+  ];
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+when evaluating this service by running 
+
+    nixos-rebuild switch
+
+it was using this store paths:
+
+* /nix/store/fd1mqjpccqpasl0q462iqzx7d6jpl3h4-apache-httpd-2.2.25
+* /nix/store/n9c6ba46kyn0yakv3valyrhmlw0qy9a0-mysql-5.1.72
+* /nix/store/hy0mmhy6wd3dj1svyi6kxnslgkbbcb6y-php-5.4.20
+
+and it would reload apache in case of a change.
+
+## using vhosts along with declarative descriptions
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash .numberLines}
+services.postgresql.enable = true;
+services.postgresql.package = pkgs.postgresql92;
+
+services.httpd = {
+  enable = true;
+  logPerVirtualHost = true;
+  adminAddr="example@example.com";
+  hostName = "example.com";
+
+  virtualHosts =
+  [ 
+    {
+      hostName = "www.example.com";
+      serverAliases = ["www.example.com"];
+      documentRoot = "/www";
+    }
+   { 
+      # Note: do not forget to add a DNS entry for wiki.example.com in the DNS settings
+      hostName = "wiki.example.com";
+      extraConfig = ''
+          RedirectMatch ^/$ /mywiki
+        '';
+      extraSubservices =
+      [
+        {
+          serviceType = "mediawiki";
+          id="wiki1";
+          dbName="mediawiki_wiki1";
+
+          siteName = "My Wiki";
+          articleUrlPrefix = "/mywiki";
+          #logo = "http://www.example.org/wiki-logo.png"; # should be 135x135px
+          extraConfig =
+            ''
+              # See http://www.mediawiki.org/wiki/Manual:Configuration_settings
+              $wgEmailConfirmToEdit = true;
+            '';
+        }
+      ];
+    }
+    { 
+      # Note: do not forget to add a DNS entry for wiki.example.com in the DNS settings
+      hostName = "wiki2.example.com";
+      extraConfig = ''
+          RedirectMatch ^/$ /mywiki2
+        '';
+      extraSubservices =
+      [
+        {
+          serviceType = "mediawiki";
+          id="wiki2";
+          dbName="mediawiki_wiki2";
+          siteName = "wiki 2";
+
+          siteName = "My Wiki";
+          articleUrlPrefix = "/mywiki";
+          #logo = "http://www.example.org/wiki-logo.png"; # should be 135x135px
+          extraConfig =
+            ''
+              # See http://www.mediawiki.org/wiki/Manual:Configuration_settings
+              $wgEmailConfirmToEdit = true;
+            '';
+        }
+      ];
+    }
+  ];
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# declarative description of webservices (next generation)
+
+advantages:
+
+* stable API for third party webservices
+     * each webservice can have its own mysql database server since connections between webserver, application and mysql could be done on the fly
+     * one can use different php versions on different webservers
+     * individual upgrade paths could be used to migrate an old webservice to a more recent one using database duplication/freezing
+     * webservices can be stopped and started independently (interesting when deploying new services)
+* will make nix-docker [3] even cooler
+* different security levels per webserver (sometimes you need to support webapps with old php versions which are NOT secure)
+* can be combined with LXC <http://linuxcontainers.org/>
+* optimization
+     * webservices like trac can be optimized for python usage while 
+     * webservices like mediawiki can be optimized for php usage
+
+disadvantages:
+
+* using individual ports for all each service (like the n'th mysql server) might complicate the design when not using LXC or similar
+* reverse proxies performance penalty
+* someone has to implement it...
+
+with help of you i would like to start implementing it.
+
+# links
+* [1] <https://nixos.org/wiki/Setting_up_MediaWiki_%26_vhosts>
+* [2] <http://www.infoq.com/articles/docker-containers>
+* [3] <http://zef.me/6049/nix-docker>
+* [4] <http://zef.me/6079/deploying-wordpress-using-nix-docker>

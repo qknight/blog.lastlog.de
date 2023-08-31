@@ -1,0 +1,75 @@
+[[!summary chatGPT: This is a list of things to implement in Pankat, including writing summaries for articles, fixing bugs, integrating the leaps editor, implementing a comment system, adding tests, fixing bugs with regexp, creating a reference plugin, fixing watcher crashes, and improving the table of contents.]]
+this is a list of things i'd love to implement in pankat
+
+[[!draft]]
+[[!SpecialPage]]
+
+
+# bug1 watcher: gets stuck
+
+the watcher library gets stuck on windows after a while and saves are not recognized so no regeneration.
+
+so far i couldn't reproduce this issue.
+
+# bug2 watcher: huge build
+
+sometimes one save triggers a really huge list of article builds. this can go on for minutes and websocket life update is not working during this build.
+once this has been triggered it might reoccur right after the next save.
+
+# leaps
+
+* integrate leaps editor
+
+# css timeline
+
+timeline.html has broken html and css, see the middle of the article, the summaries exceed the page width
+
+# comment system (i.e. discourse)
+
+* implement comment system
+  * discourse <https://meta.discourse.org/t/using-discourse-as-a-comment-system/107663>
+  * <https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/servers/web-apps/discourse/default.nix#L400>
+  * <https://meta.discourse.org/t/embed-discourse-comments-on-another-website-via-javascript/31963>
+
+# tests
+
+add new test which:
+
+* adds new article (new.mdwn) and checks if
+ * db gets updated
+ * article gets rendered
+* modifies existing article and checks if websocket update works
+ * db gets updated
+ * attached client gets update via javascript (websocket)
+* need unittest for the article render callback with article url in path vs. filepath conversion
+
+# bug fix
+
+* FIX `BUG` with regexp where grep_and_vim_idea.mdwn contains plugin calls which should not be rendered
+   func processPlugins(_article []byte, article *Article) []byte {
+  var _articlePostprocessed []byte
+
+  re := regexp.MustCompile("\\[\\[!(.*?)\\]\\]")
+
+# reference plugin
+
+* write a `[[!links example.com]]` plugin, should generate [1] and a reference to the # links section below
+* add escape sequence support for plugins
+
+
+# watcher BUG
+
+watcher crash on windows:
+
+* <https://github.com/radovskyb/watcher/issues/121>
+* <https://github.com/radovskyb/watcher/pull/123>
+
+# toc improvement
+
+the toc in pankat moves far too much away from the document page bounds. maybe docuwiki's css can inspire a better positioning:
+
+this feature needs a complete restructuring of the html/css and is more work than expected.
+
+<https://wiki.shackspace.de/#dokuwiki__top>
+
+https://afeld.github.io/bootstrap-toc/

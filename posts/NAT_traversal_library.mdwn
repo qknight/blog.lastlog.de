@@ -1,0 +1,15 @@
+[[!meta date="2013-02-06 15:25"]]
+[[!tag tcp usability society technology]]
+[[!summary NAT traversal library]]
+
+i've been thinking about a **library [1] doing NAT traversal [2]** for a long time and it seems **it has finally arrived**! this is a good thing since ipv6 seems to take forever ;P
+
+**nice is used with WebRTC** so have a look at the chromium blog posting at [3]!
+
+thanks to eliasp
+
+#links
+
+* [1] <http://nice.freedesktop.org/wiki>
+* [2] <http://de.wikipedia.org/wiki/Interactive_Connectivity_Establishment>
+* [3] <http://blog.chromium.org/2013/02/hello-firefox-this-is-chrome-calling.html>

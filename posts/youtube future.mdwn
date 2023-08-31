@@ -1,0 +1,27 @@
+[[!meta date="2023-08-05 10:58"]]
+[[!tag youtube]]
+[[!summary looking into the decline of youtube and apps]]
+
+[[!draft]]
+
+# youtube
+
+- downloads in porgress dont appear in status bar nor can they be paused/resumed
+- download encryption is slow af
+- yt app startup is slow woth huge downloads
+- ui resizes multipme times when internet is slow and ui is starting,hard to click the rigjt buttons
+- view reset to beginning after scrolling down playlists and xlixking an item
+- no indicator of media has been consumed already
+- items in a playkisy start from beginnkng making it hard for long playkng items to resume loosing tje last positiln (long mixes,podcasts)
+- items in a playlost dont show of they are downloads or not (corrupted files are not re downloaded bit streamed every yime)
+- making playmists from downloads,espexiallt witj tje view scroll reset , really annoylng
+- in order to assign a playmist the item has to be played
+- yt starts on the home pannel while i often want to jist play downlaods in the car
+- downloads cant be paused
+- playlists are designed around 'streaming' and not 'downloads'
+
+## downloads
+
+- downloads are no real downloads:
+ - they are just a cache
+ - they are encrypted and the implementation scatters one big file into many small files making io performance bad

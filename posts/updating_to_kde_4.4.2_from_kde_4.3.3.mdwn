@@ -1,0 +1,365 @@
+[[!meta date="2010-05-18 12:58"]]
+[[!tag linux gentoo packagemanager usability]]
+[[!summary chatGPT: The blog post outlines the process of updating Gentoo Linux from KDE 4.3.3 to KDE 4.4.2 (and later 4.4.3). It discusses concepts like package stability in Portage, the user's existing software, preparations for the update, addressing warnings, handling package blocks, removing old KDE components, updating system configuration files, and ultimately achieving a successful installation of KDE 4.4.3, including troubleshooting and resolving dependencies along the way.]]
+
+[[!img media/200px-gentoo_linux_logo_matte-svg.png alt="" caption="gentoo linux logo (copied from commons.wikipedia.org)" style="float: right"]]
+
+# motivation
+
+i'm not a big fan of updates but sometimes i have to do them. this time i would like to blog the steps so that other gentoo users can review my doings. this posting lists all commands i've issues in order to update from kde-4.3.3 to kde-4.4.2 (later kde-4.4.3)
+
+# gentoo concepts
+
+
+WARNING: it is very important to understand what stable in portage means. if a package called mypackage is marked stable in portage, it can be installed with 'emerge mypackage'. that means it is marked stable by portage. however this might not mean that the package itself is stable at all - but most likely it is.  this concept is different to the concept of releases made by **software vendors**, who have their **own idea about stable/testing and unstable**.  **in portage a package is marked stable when the integration into the gentoo linux system has proved to be working well. also new packages might be marked unstable as they are not tested enough, even though many users would think they should be marked stable. ** **if in doubt: do not install software which is marked unstable by portage. this posting is all about to install a 'kde release' which is, when writing this posting, marked unstable in portage. in contrast: the kde developers release the software, which i'm going to install, as stable.**
+
+see [6] for the official kde & gentoo guide.
+
+
+# what software do i use right now
+	
+  * portage ﻿﻿2.2 rc67
+  * kde 4.3.3 (various packages, i've not used kde-meta)
+
+
+i've had lots of problems with kde 4.x so i basically removed all my daily kde 4.x dependencies and replaced them with none-kde programs as:
+
+	
+  * kmail -> **thunderbird**
+  * kopete -> **psi**
+  * konqueror ->**chromium & **firefox****
+
+i probably will change back once kde 4.x if:
+	
+  * kde 4.x itself is stable enough for a day by day usage
+  * good integration of kde 4.x in portage is finally there
+
+# preparations
+
+first let's update portage with:
+
+    # eix-sync
+
+since gentoo installations of kde take very long i've decided to install xfce4, which is a very nice and tiny desktop environment:
+
+    # emerge xfce4-meta
+
+afterwards i've logged out and logged into xfce4. i'm using the gnome terminal for the update.
+
+# first: fixing the emerge WARNING
+
+using **emerge **this message shows up every time:
+
+    WARNING: One or more repositories have missing repo_name entries:
+    /usr/local/portage/profiles/repo_name
+    NOTE: Each repo_name entry should be a plain text file containing a
+    unique name for the repository on the first line.
+
+i've seen this warning all over the place here and i usually look the error up in google, fix the problem and forget about it. as it still seems to be there on some machines it is probably a good idea to **document the fix in this blog**. so here we go:
+
+    echo "invalidmagic's local repository" > /usr/local/portage/profiles/repo_name
+
+and finally the warning is gone  see also [1] where this issue is discussed.
+
+# kde update, oh wait...
+
+the first thing i try is to test if the update does work out of the box, i'm doing this with:
+
+    # autounmask =kde-base/kde-meta-4.4.2
+
+next i try if portage can perform an update with:
+
+    # emerge --color n =kde-base/kde-meta-4.4.2
+
+usually this looks like this (only relevant lines shown):
+
+
+    [blocks B     ] <**x11-libs/qt-xmlpatterns**-4.6.2 ("<x11-libs/qt-xmlpatterns-4.6.2" is blocking x11-libs/qt-webkit-4.6.2-r1, x11-libs/qt-sql-4.6.2, x11-libs/qt-qt3support-4.6.2, x11-libs/qt-core-4.6.2-r1, x11-libs/qt-svg-4.6.2, x11-libs/qt-test-4.6.2, x11-libs/qt-opengl-4.6.2, x11-libs/qt-script-4.6.2, x11-libs/qt-gui-4.6.2)
+    
+    [blocks B     ] <**x11-libs/qt-test**-4.6.2 ("<x11-libs/qt-test-4.6.2" is blocking x11-libs/qt-webkit-4.6.2-r1, x11-libs/qt-sql-4.6.2, x11-libs/qt-xmlpatterns-4.6.2, x11-libs/qt-core-4.6.2-r1, x11-libs/qt-svg-4.6.2, x11-libs/qt-gui-4.6.2, x11-libs/qt-opengl-4.6.2, x11-libs/qt-qt3support-4.6.2, x11-libs/qt-script-4.6.2)
+    
+    [blocks B     ] **kde-base/libknotificationitem**:4.3[-kdeprefix] ("kde-base/libknotificationitem:4.3[-kdeprefix]" is blocking kde-base/kdelibs-4.4.2)
+    
+    [blocks B     ] <**x11-libs/qt-script**-4.6.2 ("<x11-libs/qt-script-4.6.2" is blocking x11-libs/qt-webkit-4.6.2-r1, x11-libs/qt-sql-4.6.2, x11-libs/qt-xmlpatterns-4.6.2, x11-libs/qt-core-4.6.2-r1, x11-libs/qt-svg-4.6.2, x11-libs/qt-test-4.6.2, x11-libs/qt-opengl-4.6.2, x11-libs/qt-qt3support-4.6.2, x11-libs/qt-gui-4.6.2)
+
+(see full list at [2], i've used '**emerge --color n =kde-base/kde-meta-4.4.2  -a > portage_log 2>&1' to create a file with the output**)
+
+
+so what i do instead, is to **remove all kde components from the system**
+
+# remove old kde components
+
+using **qlist** (app-portage/portage-utils-0.2.1) we need to find all kde components. we need to use -I to find installed packages. we also disable the usage of color, with -C, to make the output usable for script processing.
+
+    qlist -IC kde
+
+there are some applications as k3b for instance which does use **kde-base/kdelibs** but which are **NOT** included in this list. most of the time this can be ignored since a later 'revdep-rebuild' will fix this for those programs. however if kdelibs is removed k3b can't be started anymore. **removing kdelibs after k3b has been started will probably not crash k3b and k3b might still work.** so let's remove all kde components (also erasing all SLOTS, aka different versions):
+
+    emerge -C $(qlist -IC kde)
+
+dependent on your installation and harddrive speed this might take a while (545.09 seconds).
+
+# unwanted unmasks
+
+right now i realized that there are old 'autounmasks' in /etc/portage, i'm going to clean that up first:
+
+    cd /etc/portage/
+    grep kde * -R
+    grep qt * -R
+    grep avahi * -R
+
+i removed most files which had something to do with kde, qt, amarok and some with avahi. so have a look at all categories (directories):
+
+ * package.use/
+ * package.mask/
+ * package.unmask/
+ * package.keywords/
+
+**especially look for unmasks for 9999 packages**, which refer to **svn/cvs/git** versions which were not released yet (but might be tagged still). this means: if those packages refer to a developer's version without a tag the package might change without warning. therefor the installation could break with different error messages on different checkouts. usually developers want this in order to test their software. users don't want that but it's a nice way to experiment with recent software but still having a package manager for safe removal.  is the system now clean? we'll see. we probably have to set the correct use flags again.  **WARNING: be aware that use flags can also be set globally in /etc/make.conf** some useflags can be shown with:
+
+    equery u kde-meta
+
+the** semantic-desktop** useflag might be of interest.  **i'm not sure**, but i think that using the **kdeprefix useflag resulted in having: ~/.kde3.5, ~/.kde4.2, ~/kde4.4** and others. so once you want to use kde 4.4 instead of kde 4.2 (you can select this on login using kdm for instance) this means that all your system settings as: kaddressbook, knotes, autostarters, desktop configuration and others will have to be migrated manually by copying the files from ~/.kde4.2 to ~/.kde4.4 **prior **to your login. However this is just a guess but it would explain the issues i had, during the time i used +kdeprefix. about ~  kde3.5 / kde 4.2.  so let's do the autounmask again:
+
+    # autounmask =kde-base/kde-meta-4.4.2
+
+this time it took really long (36 minutes) but as **htop** shows portage does only use one core while **iotop** showed that there was no disk access at the same time. probably a result of complex dependency-graph-calculations.  so autounmask came up with this blocks:
+
+
+    **[blocks B     ]** >**x11-libs/qt-opengl**-4.5.3-r9999 (">x11-libs/qt-opengl-4.5.3-r9999" is blocking x11-libs/qt-assistant-4.5.3, x11-libs/qt-test-4.5.3-r1  , x11-libs/qt-dbus-4.5.3-r1, x11-libs/qt-xmlpatterns-4.5.3-r1, x11-libs/qt-core-4.5.3-r2, x11-libs/qt-gui-4.5.3-r2, x11-libs/qt-qt3support-4.5.3, x11  -libs/qt-svg-4.5.3-r1, x11-libs/qt-script-4.5.3-r1, x11-libs/qt-demo-4.5.3, x11-libs/qt-webkit-4.5.3, x11-libs/qt-sql-4.5.3)
+    
+    **[blocks B     ]** <**x11-libs/qt-svg**-4.6.2 ("<x11-libs/qt-svg-4.6.2" is blocking x11-libs/qt-webkit-4.6.2-r1, x11-libs/qt-sql-4.6.2, x11-libs/qt-xmlpatte  rns-4.6.2, x11-libs/qt-core-4.6.2-r1, x11-libs/qt-test-4.6.2, x11-libs/qt-opengl-4.6.2, x11-libs/qt-qt3support-4.6.2, x11-libs/qt-script-4.6.2, x11-l  ibs/qt-dbus-4.6.2, x11-libs/qt-gui-4.6.2)  and many more....
+
+
+so it's time to check the qt-* packages.  interesting, there is x11-libs/qt installed (a qt-3.x version), the new qt-4.x have a split package naming scheme.
+
+    # equery d x11-libs/qt
+
+	
+ * app-crypt/qca-1.0-r3 (x11-libs/qt:3)
+ * dev-libs/dbus-qt3-old-0.70 (=x11-libs/qt-3*)
+ * media-sound/hydrogen-0.9.3-r4 (=x11-libs/qt-3*)
+
+i do not want to change anything related to the qt-3 package sets. let's have a look at the x11-libs/qt-* stuff. this wildcard indicates it has something to do with the qt4 library.
+
+
+    qlist -Iv x11-libs | grep "qt-.*"
+* x11-libs/qt-3.3.8b-r2    (WARNING: you can leave this installed as it is not a conflict candidate for a kde 4.x installation despite some avahi issues)
+* x11-libs/qt-assistant-4.5.3
+* x11-libs/qt-core-4.5.3-r2
+* x11-libs/qt-dbus-4.5.3-r1
+* x11-libs/qt-demo-4.5.3
+* x11-libs/qt-gui-4.5.3-r2
+* x11-libs/qt-opengl-4.5.3-r1
+* x11-libs/qt-qt3support-4.5.3
+* x11-libs/qt-script-4.5.3-r1
+* x11-libs/qt-sql-4.5.3
+* x11-libs/qt-svg-4.5.3-r1
+* x11-libs/qt-test-4.5.3-r1
+* x11-libs/qt-webkit-4.5.3
+* x11-libs/qt-xmlpatterns-4.5.3-r1
+
+so there are many x11-libs/qt-* packages around.
+
+
+
+
+**WARNING**: if i'd remove these packages some software components might stop working. so it would be wise to see which packages depend on them. my worst case minimal requirement is a console (no X or desktop) environment so i skip this test.
+
+
+
+
+**NOTE**: qt4 can be used for console only programs (no gui) as well. but i don't know any relevant low level system dependencies which might break my minimal system requirements.
+
+
+therefore i think it is safe to remove these packakges:
+
+    # qlist -IC x11-libs | grep "qt-.*"
+    # emerge -C $(qlist -IC x11-libs | grep "qt-.*")
+
+so now that all qt4 packages are removed, let's try autounmask again but before that we need to remove previous failed attempts with:
+
+    # cd /etc/portage
+    # grep kde *
+
+
+then **review the grep output**, in my case i needed to remove these 3 files
+
+    # rm package.unmask/autounmask-kde-meta
+    # rm package.use/autounmask-kde-meta
+    # rm package.keywords/autounmask-kde-meta
+
+so again:
+
+    # autounmask =kde-base/kde-meta-4.4.2  (see [3] for a complete list)
+
+*smile* only one final 'block' left!
+
+
+    [blocks B     ] <**app-emulation/emul-linux-x86-xlibs**-20100409 ("<app-emulation/emul-linux-x86-xlibs-20100409" is blocking app-emulation/emul-linux-x86-opengl-20100410_pre)
+    * Error: The above package list contains packages which cannot be installed at the same time on the same system.
+    ('installed', '/', 'app-emulation/**emul-linux-x86-xlibs-20091231**', 'nomerge') pulled in by
+    ~app-emulation/emul-linux-x86-xlibs-20091231 required by ('installed', '/', 'app-emulation/**emul-linux-x86-gtklibs-20091231**', 'nomerge')
+    ~app-emulation/emul-linux-x86-xlibs-20091231 required by ('installed', '/', 'app-emulation/**emul-linux-x86-medialibs-20091231**', 'nomerge')
+    app-emulation/emul-linux-x86-xlibs required by ('ebuild', '/', 'x11-drivers/**nvidia-drivers-195.36.24**', 'merge')
+    (and 2 more)
+    ('ebuild', '/', 'app-emulation/**emul-linux-x86-opengl-20100410_pre**', 'merge') pulled in by
+    app-emulation/emul-linux-x86-opengl required by ('ebuild', '/', '**app-emulation/emul-linux-x86-xlibs-20100409-r1**', 'merge')
+
+so how to deal with that?
+	
+  1. i guess i could remove nvidia-drivers and replace it by the new nouveau driver (yes i'm on gentoo-sources-2.6.33 now)
+  2. i could try to update various components in random order and try again
+
+so let's try point two (2):
+
+    # autounmask =app-emulation/emul-linux-x86-gtklibs-20100409-r1
+    # autounmask =app-emulation/emul-linux-x86-medialibs-20100409
+
+and finally let's try it again
+
+    # autounmask =kde-base/kde-meta-4.4.2
+
+oh we got a "!done". that is great news as it seems to work so far!
+
+
+i just found out that i missed two more kde packages (qlist -IC kde) :
+	
+  * kde-base/kdebase-pam
+  * kde-base/kde-env
+
+however, i don't plan to remove them. with some luck they might be updated automagically.
+
+# update the system, before installing kde 4.x
+
+    # emerge -uDN world --keep-going -a  see [4] for the complete output of the command above  ...  Use emerge @preserved-rebuild to rebuild packages using these libraries  emerge -uDN world --keep-going -a  16972.19s user 5351.49s system 97% cpu **6:21:36.73 total**
+
+i usually use "--keep-going", please see the documentation what is cool about doing so. in general it helps to shorten installation time as a failure in the middle of a 200 package installation won't stop for manual maintenance. with some luck nearly all packages were installed using this feature when still having several critical compile or linker errors.
+
+# check for broken programs
+
+since we removed x11-libs/qt-* basically every program which links against any of these libraries MUST be broken. with one exception: programs which are linked statically. however most programs on linux are linked dynamically so we have to check for broken programs with:
+
+
+    # revdep-rebuild  revdep-rebuild  802.74s user 271.12s system 95% cpu **18:49.88 total**
+	
+  * Tue May 18 11:15:12 2010 >>> x11-libs/libXxf86dga-1.1.1
+  * Tue May 18 11:15:52 2010 >>> kde-base/libkcddb-4.4.3
+  * Tue May 18 11:16:30 2010 >>> net-wireless/kbluetooth-0.4.2
+  * Tue May 18 11:17:17 2010 >>> app-arch/libarchive-2.7.1-r1
+  * Tue May 18 11:21:07 2010 >>> app-cdr/k3b-1.91.0_rc2
+  * Tue May 18 11:29:08 2010 >>> media-video/vlc-1.0.6
+  * Tue May 18 11:29:36 2010 >>> x11-apps/xf86dga-1.0.2
+
+check the list of programs and libraries and if there is a program you would like to get rid of first, do so! i removed mumble, amarok and amarok-utils.
+
+# updating configuration files in /etc/
+
+this is really important and there are other ways to do it, anyway:
+
+    # etc-update
+
+# looking at the use flags of kde 4.4.2
+
+now the final step! after one day we are finally there! yepeee.
+
+    # emerge kde-meta -a  (see [5] for a complete list of packages and use flags)
+
+so all i did was to add: **lzma** and **semantic-desktop** useflag
+
+# oh there is a kde 4.4.3 now, so i install this instead
+
+it seems that while i wrote this blog entry a new version of kde was released (might be my late eix-sync as well). so i'm going to install 'kde 4.4.3' instead of 'kde 4.4.2'.  so what i do is basically starting all over again:
+
+  * removing old autounmasks in /etc/portage
+  * autounmask =kde-base/kde-meta-4.4.3
+
+# finally emerge kde-meta -a
+
+surprise! we got new blocks:
+
+    # emerge kde-meta -a
+    ('ebuild', '/', '**kde-base/kdelibs**-4.4.3', 'merge') pulled in by
+    >=kde-base/kdelibs-4.3.5[-kdeprefix,-aqua] required by ('ebuild', '/', '**kde-base/solid**-4.3.5', 'merge')
+    >=kde-base/kdelibs-4.3.5[-kdeprefix,-aqua] required by ('ebuild', '/', '**kde-base/krosspython**-4.3.5', 'merge')
+    >=kde-base/kdelibs-4.3 required by ('ebuild', '/', '**net-p2p/ktorrent**-3.3.4', 'merge')
+    (and 6 more)
+    ('ebuild', '/', '**kde-base/libknotificationitem**-4.3.5', 'merge') pulled in by
+    >=kde-base/libknotificationitem-4.3.5[-kdeprefix,-aqua] required by ('ebuild', '/', '**kde-base/krosspython**-4.3.5', 'merge')
+    >=kde-base/libknotificationitem-4.3.5[-kdeprefix,-aqua] required by ('ebuild', '/', '**kde-base/solid**-4.3.5', 'merge')
+    >=kde-base/libknotificationitem-4.3.5[-kdeprefix,-aqua] required by ('ebuild', '/', '**kde-base/kdialog**-4.3.5', 'merge')
+    (and 1 more)
+
+
+so what can we do about this one? first thing is to look if there is a more recent version of ktorrent which would use kdelibs-4.4.3 instead of kdelibs-4.3 and there is none, so ktorrent can't be installed with 'kde 4.4.3'.
+
+but that autounmask also shows a lot of blocks, basically those from above. however there is an additional one now:
+
+
+    ('ebuild', '/', '**kde-base/libkworkspace**-4.3.5', 'merge') pulled in by
+    =kde-base/libkworkspace-4.3 required by ('ebuild', '/', '**net-wireless/kbluetooth**-0.4.2', 'merge')
+
+
+there is nothing we can do about it right now. we have to remove kbluetooth. this stupid apple magic mouse didn't work well anyway so who cares?
+
+    # emerge -C kbluetooth
+
+let's try to mask '<kde-base/kdelibs-4.4' versions, that means all versions which were released before 4.4
+
+    # echo "=kde-base/kdelibs-4.3.5" >> /etc/portage/package.mask/kde
+    # echo "=kde-base/kdelibs-4.3.3-r1" >> /etc/portage/package.mask/kde
+
+
+that worked partially. 'emerge -uDN world' still has blocks but 'emerge kde-meta' would work well.
+
+so let's care about that blocks first:
+
+    # emerge -C ktorrent kile
+
+and i'm done. those two applications don't seem to work with kdelibs-4.4.3 so i will check the reinstall these when i see a new version of these two programs in the 'eix-sync' log. currently i don't need either of them. probably installing kde with the 'kdeprefix' useflag could have worked as well but i did not want to do that.
+
+so now the final step
+
+# installing kde-meta-4.4.3
+
+it seems we got all dependencies resolved!
+
+    # emerge kde-meta --keep-going -a
+
+it seems some use flags which i did not set result in an dependency issue:
+
+
+    # emerge: there are no ebuilds built with USE flags to satisfy ">=x11-libs/qt-qt3support-4.6.0:4[kde]".
+
+    !!! One of the following packages is required to complete your request:
+    - x11-libs/qt-qt3support-4.6.2 (Change **USE: +kde**)
+    (dependency required by "kde-base/libkcompactdisc-4.4.3" [ebuild])
+    (dependency required by "kde-base/kdemultimedia-meta-4.4.3" [ebuild])
+    (dependency required by "kde-base/kde-meta-4.4.3" [ebuild])
+    (dependency required by "kde-meta" [argument])
+
+let's fix that with:
+
+    # echo "x11-libs/qt-qt3support kde" >> /etc/portage/package.use/qt-qt3support
+
+and then we should restart the emerge but this time we add -N for 'new use'
+
+    # emerge kde-meta -N --keep-going -a
+
+now all problems are resolved and the installation (compilation&linking) is running. **x11-libs/qt-qt3support-4.6.2 **is the first package which is installed as we used -N.
+
+it might be a good idea to check for broken programs once again, just to be sure. use 'revdep-rebuild' for that.
+
+# summary
+
+next time i update i can have a look at this posting. maybe it is of help for other gentoo users as well. i would be delighted.
+
+# links
+
+
+* [1] <http://bugs.gentoo.org/show_bug.cgi?id=248603>
+* [2] <http://lastlog.de/misc/wordpress/portage_kde_meta_blocks.txt>
+* [3] <http://lastlog.de/misc/wordpress/autounmask.txt>
+* [4] <http://lastlog.de/misc/wordpress/emerge_world.txt>
+* [5] <http://lastlog.de/misc/wordpress/emerge_kde.txt>
+* [6] <http://www.gentoo.org/proj/de/desktop/kde/kde-config.xml>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="running_the_nix_package_manager_in_a_prefix_as_the_home_directory.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>running the nix package manager in a prefix as the home directory</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/running_the_nix_package_manager_in_a_prefix_as_the_home_directory.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="running_the_nix_package_manager_on_windows.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="replacing_automake_by_cmake.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">running the nix package manager in a prefix as the home directory</h1>
+    <div id="date"><p><span id="lastupdated">21 jan 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p><strong>this posting is about how to setup a nix prefix installation
+on gentoo linux</strong>. if you do not have permission to install
+software on your server you can install a package manager in your home
+directory.</p>
+<p>prefix distros:</p>
+<ul>
+<li>[1] <strong>gentoo prefix</strong> (using portage)</li>
+<li>[2] <strong>nix prefix</strong> (using nixpkgs)</li>
+<li>source deployment (done manually)</li>
+</ul>
+<h2 data-number="2" id="gentoo-prefix">gentoo prefix</h2>
+<ul>
+<li><p>pros:</p>
+<ul>
+<li>contains <strong>many packages</strong></li>
+<li><strong>great documentation</strong></li>
+<li><strong>works in prefix</strong> on: linux|mac|cygwin/interix</li>
+<li><strong>security</strong> related <strong>tools</strong>
+available</li>
+<li><strong>Xorg stuff</strong> as qt programs <strong>will
+work</strong></li>
+</ul></li>
+<li><p>cons:</p>
+<ul>
+<li><strong>time consuming installation</strong></li>
+<li><strong>complicated</strong></li>
+<li>linux prefix setup uses the sun solaris guide, which is ….
+<em>strange</em> at first</li>
+</ul></li>
+</ul>
+<h2 data-number="3" id="nix-prefix">nix prefix</h2>
+<ul>
+<li><p>pros:</p>
+<ul>
+<li><strong>binary deployment</strong> (when <strong>not
+altering</strong>: –with-store-dir OR –localstatedir) this is only
+possible if root assists installation</li>
+<li><strong>assisted binary deployment</strong> (when using self-made
+channel &amp; a build robot as hydra) i have not tested this but it
+should be possible</li>
+<li>it is very <strong>easy to experiment</strong> with several
+<strong>different versions</strong> of a single program</li>
+<li><strong>Xorg stuff </strong>as qt programs <strong>will
+work</strong></li>
+</ul></li>
+<li><p>cons:</p>
+<ul>
+<li>because you need to change the /store path, it is mainly source
+deployment at first</li>
+<li>no security tools</li>
+<li>compared to other linux distros a very small subset of packages
+available (as in ebuilds)</li>
+</ul></li>
+</ul>
+<h2 data-number="4" id="nix-prefix---setup">nix prefix - setup</h2>
+<p>download the software from [2], then follow this guide:</p>
+<pre><code>tar xf nix-0.16.tar
+cd nix-0.16
+./bootstrap
+./configure --prefix=~/nix **--localstatedir**=~nix/state **--with-store-di**r=~/nix/store
+make
+make install</code></pre>
+<p><strong>NOTE:</strong> –localstatedir is not visible when doing
+./configure –help!</p>
+<h2 data-number="5" id="nix-prefix---how-to-use">nix prefix - how to
+use</h2>
+<p>next you have to add it to your PATH, do:</p>
+<pre><code>bash</code></pre>
+<p>export PATH=~/.nix-profile/bin:$PATH</p>
+<p><strong>NOTE</strong>: you have to do this every time you want to use
+your prefixed nix.</p>
+<p>this will alter your path to use program you install using ‘nix-env’
+as:</p>
+<pre><code>nix-env -i wget</code></pre>
+<p>this should download about 10-40 software components as gcc,
+binutils, libraries and finally wget. afterwards do:</p>
+<pre><code>which wget</code></pre>
+<p>which should report: ~/.nix-profile/bin/wget</p>
+<h2 data-number="6" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://www.gentoo.org/proj/en/gentoo-alt/prefix/"
+class="uri">http://www.gentoo.org/proj/en/gentoo-alt/prefix/</a></li>
+<li>[2] <a href="http://nixos.org/nix/"
+class="uri">http://nixos.org/nix/</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/running_the_nix_package_manager_in_a_prefix_as_the_home_directory.mdwn" title="posts\running_the_nix_package_manager_in_a_prefix_as_the_home_directory.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

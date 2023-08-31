@@ -1,0 +1,169 @@
+[[!meta date="2015-04-13 11:58"]]
+[[!tag gentoo nixos nix]]
+[[!summary discussion on nixos USE flags similarities to gentoo]]
+[[!img media/nixos-lores.png alt="" class="noFancy" style="float: right"]]
+
+# motivation
+gentoo linux has USE flags [1] and nixos has a very similar system. in this short posting i want to show how they are used on nixos. 
+
+# about USE flags
+for a very long time i was not even sure if nixos had USE flags at all, since nix and nixos is so much different from all other linux systems. but since i understand a lot more about nix/nixos now, i would like to share my insights:
+
+* **nix implements USE flags** 
+* they are **easy to use**, see [2] for example
+* you can do **even more with nix USE flags than you were able in gentoo**
+
+note: there is a nice discussion here: 
+
+<https://github.com/NixOS/nixpkgs/issues/7446>
+
+## subversion expression
+
+you can find the source for the subversion nix expression at [4]:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .haskell }
+{ bdbSupport ? false # build support for Berkeley DB repositories
+, httpServer ? false # build Apache DAV module
+, httpSupport ? false # client must support http
+, pythonBindings ? false
+, perlBindings ? false
+, javahlBindings ? false
+, saslSupport ? false
+, stdenv, fetchurl, apr, aprutil, zlib, sqlite
+, apacheHttpd ? null, expat, swig ? null, jdk ? null, python ? null, perl ? null
+, sasl ? null, serf ? null
+}:
+
+assert bdbSupport -> aprutil.bdbSupport;
+assert httpServer -> apacheHttpd != null;
+assert pythonBindings -> swig != null && python != null;
+assert javahlBindings -> jdk != null && perl != null;
+
+stdenv.mkDerivation (rec {
+
+  version = "1.8.13";
+
+  name = "subversion-${version}";
+
+  src = fetchurl {
+    url = "mirror://apache/subversion/${name}.tar.bz2";
+    sha1 = "aa0bd14ac6a8f0fb178cc9ff325387de01cd7452";
+  };
+
+  buildInputs = [ zlib apr aprutil sqlite ]
+    ++ stdenv.lib.optional httpSupport serf
+    ++ stdenv.lib.optional pythonBindings python
+    ++ stdenv.lib.optional perlBindings perl
+    ++ stdenv.lib.optional saslSupport sasl;
+
+  configureFlags = ''
+    ${if bdbSupport then "--with-berkeley-db" else "--without-berkeley-db"}
+    ${if httpServer then "--with-apxs=${apacheHttpd}/bin/apxs" else "--without-apxs"}
+    ${if pythonBindings || perlBindings then "--with-swig=${swig}" else "--without-swig"}
+    ${if javahlBindings then "--enable-javahl --with-jdk=${jdk}" else ""}
+    ${if stdenv.isDarwin then "--enable-keychain" else "--disable-keychain"}
+    ${if saslSupport then "--with-sasl=${sasl}" else "--without-sasl"}
+    ${if httpSupport then "--with-serf=${serf}" else "--without-serf"}
+    --with-zlib=${zlib}
+    --with-sqlite=${sqlite}
+  '';
+
+  preBuild = ''
+    makeFlagsArray=(APACHE_LIBEXECDIR=$out/modules)
+  '';
+
+  postInstall = ''
+    if test -n "$pythonBindings"; then
+        make swig-py swig_pydir=$(toPythonPath $out)/libsvn swig_pydir_extra=$(toPythonPath $out)/svn
+        make install-swig-py swig_pydir=$(toPythonPath $out)/libsvn swig_pydir_extra=$(toPythonPath $out)/svn
+    fi
+    if test -n "$perlBindings"; then
+        make swig-pl-lib
+        make install-swig-pl-lib
+        cd subversion/bindings/swig/perl/native
+        perl Makefile.PL PREFIX=$out
+        make install
+        cd -
+    fi
+    mkdir -p $out/share/bash-completion/completions
+    cp tools/client-side/bash_completion $out/share/bash-completion/completions/subversion
+  '';
+
+  inherit perlBindings pythonBindings;
+
+  enableParallelBuilding = true;
+
+  meta = {
+    description = "A version control system intended to be a compelling replacement for CVS in the open source community";
+    homepage = http://subversion.apache.org/;
+    maintainers = with stdenv.lib.maintainers; [ eelco lovek323 ];
+    hydraPlatforms = stdenv.lib.platforms.linux ++ stdenv.lib.platforms.darwin;
+  };
+} // stdenv.lib.optionalAttrs stdenv.isDarwin {
+  CXX = "clang++";
+  CC = "clang";
+  CPP = "clang -E";
+  CXXCPP = "clang++ -E";
+})
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+this subversion nix expression can be customized depending on the values provided on the function call. just see the two examples below.
+
+## example 1 (usage)
+**example usage of the subversion expression** [5] - pkgs/top-level/all-packages.nix:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .haskell }
+apacheHttpdPackagesFor = apacheHttpd: self: let callPackage = newScope self; in {
+  inherit apacheHttpd;
+  mod_dnssd = callPackage ../servers/http/apache-modules/mod_dnssd { };
+  mod_evasive = callPackage ../servers/http/apache-modules/mod_evasive { };
+  mod_fastcgi = callPackage ../servers/http/apache-modules/mod_fastcgi { };
+  mod_python = callPackage ../servers/http/apache-modules/mod_python { };
+  mod_wsgi = callPackage ../servers/http/apache-modules/mod_wsgi { };
+  php = pkgs.php.override { inherit apacheHttpd; };
+  subversion = pkgs.subversion.override { httpServer = true; inherit apacheHttpd; };
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+when the attribute **apacheHttpdPackagesFor** is evaluated it will be passed all the function arguments shown above as mod_dnssd, mod_evasive, ..., and subversion. the main difference is that it passes a specially crafted version of the subversion expression with **httpServer = true** set;
+
+## example 2 (usage)
+**example usage of the subversion expression [6]** - pkgs/top-level/all-packages.nix:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .haskell }
+subversion = callPackage ../applications/version-management/subversion/default.nix {
+  bdbSupport = true;
+  httpServer = false;
+  httpSupport = true;
+  pythonBindings = false;
+  perlBindings = false;
+  javahlBindings = false;
+  saslSupport = false;
+  sasl = cyrus_sasl;
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+if the attribute **subversion** is evaluated, say by using:
+
+    $ nix-env -i subversion
+
+then it won't enable httpServer as it is disabled by default. if both, example 1 and example 2 are used on the same system, this means that two different versions of subversion are installed. this is a major difference to gentoo, where you could have such a feature only by using SLOS.
+
+
+# conclusion
+with nixos USE flags and assertions you can do everything what gentoo linux provided and more. there are many good examples for their usage in nixpkgs [3] already.
+
+if you would use example 1 and example 2 on the same machine, then it would install subversion two times on the same host. however, if both function calls are equal it will use the same subversion binary twice which happens if two users install subversion in their profile using:
+
+    $ nix-env -i subversion
+
+for instance.
+
+# links
+
+* [1] <https://wiki.gentoo.org/wiki/Handbook:X86/Working/USE>
+* [2] <https://nixos.org/nix/manual/#ex-subversion-nix>
+* [3] <https://github.com/nixos/nixpkgs>
+* [4] <https://github.com/NixOS/nixpkgs/blob/e01c96d14c356ec035774d5b5b74c533d1ceaf3e/pkgs/applications/version-management/subversion/default.nix>
+* [5] <https://github.com/NixOS/nixpkgs/blob/e01c96d14c356ec035774d5b5b74c533d1ceaf3e/pkgs/top-level/all-packages.nix#L8200>
+* [6] <https://github.com/NixOS/nixpkgs/blob/e01c96d14c356ec035774d5b5b74c533d1ceaf3e/pkgs/top-level/all-packages.nix#L11907>

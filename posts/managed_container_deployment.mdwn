@@ -1,0 +1,66 @@
+[[!summary chatGPT: The author is seeking advice on automating container deployment and management using a cross-platform tool. They mention using Docker, Kubernetes, and NixOS, but have concerns about the limitations and complexities of each option. They also ask for thoughts and suggestions on the topic.]]
+[[!draft]]
+
+# motivation
+
+what is a good container strategy.
+
+# xxx
+
+https://stackoverflow.com/questions/76565556/how-to-automate-container-deployment
+
+vision
+
+I want to automate the deployment of one service:
+
+    consisting of multiple containers (say mediawiki+mysql or mumble+forum page)
+    manage their initial deployment and updates using an automated management tool
+    the management tool should be running inside a container as well so it can be executed on every platform supporting a container concept.
+    i want to be able to program this from windows/linux/mac (cross platform development)
+
+Ideally the installation is as follows (docker specific code but could be kubernets or something else):
+
+docker image pull mymanager
+docker run mymanager
+
+Once the mymanager is running it will install the other containers and manage updates. Maybe it even has a REST/web interface for also automating this aspect.
+docker
+
+Granting access to the docker socket to the management container implies huge operational risks when managing several instances of the mymanager.
+
+I liked this project https://betterprogramming.pub/automatically-update-docker-containers-f2ccc79f4313
+
+In general I've seen that the docker cli tools have so much more capabilities compared to the go based libraries they provide and at times I found it lacking so much that I just could not automate some things.
+docker compose
+
+Docker compose has no API for automation. I've checked https://github.com/compose-spec/compose-go but this is more an API for compose tool than using compose API from my code base.
+
+There is a REST interface for compose but archived: https://github.com/francescou/docker-compose-ui
+
+I did not find go bindings for docker stack/swarm either.
+kubernetes
+
+https://github.com/kubernetes/client-go looks amazing.
+
+I think that what I want is a controller similar to https://github.com/kubernetes/sample-controller/blob/master/docs/controller-client-go.md
+
+I fear kubernetes for its complexity and I'm not sure if that can even be executed on a raspberry pi.
+nix/nixos
+
+I'm tempted to use nixos with the nixpkgs options system but there are some limitations here:
+
+    management is not cross platform (Windows only has WSL support, no native)
+        especially true if one wants to use the awesome testing framework locally, think it requires vt-x/vt-d flag and a nixos base system on a linux hypervisor
+    while nixos in general has nice update support it let's you skip updates (which i consider bad)
+
+https://www.reddit.com/r/NixOS/comments/z11oeh/deploying_nixbuilt_containers_to_kubernetes/
+nixcloud-container
+
+I've developed https://github.com/nixcloud/nixcloud-container in the past but this forces the deployment to be nixos and the developers machine to be nixos.
+
+It supports stateful normal systemd unprivileged containers but no REST interface or API.
+questions
+
+I wonder if i'm missing something. currently I'm not aware of any straightforward concept.
+
+This is a very general question but what are your thoughts?

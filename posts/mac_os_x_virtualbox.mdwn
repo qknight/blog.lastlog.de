@@ -1,0 +1,120 @@
+[[!summary chatGPT: Running Mac OS X from VirtualBox on a Gentoo Linux host system, including tips on disk image size, installing software, downloading Xcode, creating snapshots, and image growth.]]
+[[!meta date="2010-12-29 20:04"]]
+[[!tag gentoo linux macosx p2p packagemanager qt technology usability]]
+
+# motivation
+
+
+running mac os x from virtualbox helps to experiment with software deployment for that platform. i'm using gentoo **linux as host system** with **2.6.34-gentoo-r6** kernel on a **64 bit core 2 duo** machine with **virtualbox 3.2.10 OSE**. there are various blog postings about how to get it running so i won't repeat this here.
+
+the most **important **thing is to **use the snow leopard retail dvd**. as the dvd coming with the mac (a mac book pro in my case) won't work. you can get the retail dvd on ebay or various other sources. note: the retail dvd is not labeled 'snow leopard retail dvd' but something like 'snow leopard update dvd' in most auctions (don't blame me if that is wrong).
+
+
+# how i use it
+
+
+having snow leopard not only native, but also in a virtualbox image, makes testing of software easier.
+
+
+# hints
+
+
+
+
+## disk image size
+
+
+i use about 40 gb here, and about 25 gb are actually in use with:
+
+
+
+	
+  1. latest patch (1 gb)
+  2. xcode (6-8 gb)
+  3. trolltechs qt sdk (2 gb)
+  4. mac os x (8 gb)
+
+
+i wasted a lot of disk space with a default installation. but i don't want to spend too much time on that right now so i will leave it that way. i removed the printer drivers later on, saved me 600mb.
+
+
+## when installing software, map the image (dmg) using samba (running on the host machine)
+
+
+import dmg images, which are used to install software from, using samba from the host. this way you do not have to copy the dmg onto the virtual machine using ssh or by mapping an external harddrive (note: the OSE version i am using, does not support USB host mapping anyway) into the virtual machine.
+
+this also reduces the host image size by a few gigabyte of disk space. initially i was doing it wrong: i copied the file, installed from it and finally removed it. however, removing it did not have much of an effect, as virtualbox does not know about hfs+ partition scheme, therefore the file is only deleted inside the virtualmachine, still the host image uses the diskspace.
+
+example:
+
+my current **disk image**: mac os x [snow leopard].vdi is at **25Gb**. but **inside the virtual machine** is is only **18gb**.
+
+
+### smb.conf
+
+
+
+    
+    [global]
+      workgroup = MYGROUP
+      server string = Samba Server
+      security = share
+      dns proxy = no
+    [rw-files]
+      comment = Temporary rw files
+      path = /home/user/smbshare/rw
+      read only = no
+      writable = yes
+      public = yes
+    [ro-files]
+      comment = Temporary ro files
+      path = /home/user/smbshare/ro
+      read only = no
+      writable = no
+      public = yes
+
+
+don't forget to:
+
+
+
+	
+  1. create the paths listed above
+  2. secure the network as a rw path might be accessible from your lan
+
+
+consider using a user/password for that.
+
+
+## downloading xcode
+
+
+use wget to download it. it is about 3,6gb and it failed several times here. also resuming did not work well. after several attempts downloading it (must be about 12gb i've already downloaded) i had a, yet again, broken download at 99%. i thought: "not again"! and as there was no resuming (using a webbrowser) i downloaded a torrent.
+
+next i used the torrent and started the download, which created a file with the same filename. i closed the torrent client (rtorrent) and moved the previously metioned 99% download file, to the place where the torrent expected it's download. then i restarted the torrent download.
+
+thanks i did not have an offset error (this can happen on wrong resumes, anyway i did not use resume).
+
+finally the torrent checked all chunks and finnaly there was only 1mb left to download. so i repaired my download, using bittorrent.  all i had to do is wait 5minutes.
+
+next thing was file integrity. it seems that apple does encode some individual information into the xcode download. if rumors are true, it is no wonder that users sue apple, see [1]. anyway, this means we can't create a md5sum. it would be interesting to know what is going on.
+
+what we do know already is that most of the file, apparently 99% of the download is generic. if not, then i would not be able to repair the xcode download with the torrent content of a different user. see discussion at [2] for more input on this.
+
+
+## create snapshots
+
+
+virtualbox supports snapshots, use them! **they are a great way to update various system components as xcode without having to uninstall any components**. this results in a cleaner system, saves time & resources as deleted files are only deleted virtually inside the vm.
+
+
+## image growth
+
+
+every virtually deleted file is not really deleted as virtualbox works on a block device layer. that means: if hfs+ decides to use deleted inode for a newly created file it will be good as vm disk and real disk are in sync. but i guess more often than not this is not the case and the real disk image will grow over time.
+
+
+# links
+
+* [1] <http://www.heise.de/newsticker/meldung/Apple-wegen-angeblicher-Weitergabe-von-Nutzerdaten-verklagt-Update-1159403.html>
+* [2] <http://discussions.apple.com/thread.jspa?messageID=12770938>

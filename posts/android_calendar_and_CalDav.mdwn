@@ -1,0 +1,78 @@
+[[!meta date="2016-06-21 11:54"]]
+[[!img media/Android_robot.svg.png style="float: right; width: 100px;"]]
+[[!tag linux technology usability android CalDAV CardDAV owncloud google]]
+[[!summary Using CalDAV/CardDAV with owncloud on android and thunderbird]]
+
+# motivation
+2016 and android still does not have a built-in open source CalDAV/CardDAV, [this article](https://code.google.com/p/android/issues/detail?id=2361) is a very interesting read on the history and reactions of people wanting that. there is a [nice article](http://sabre.io/dav/building-a-caldav-client/) on how to implement a CalDAV client.
+
+so in a nutshell: syncing different devices while supporting offline capabilities is complicated.
+
+long story short: **i do not want to copy my data into the google cloud**. in this this posting i want to share my results with using **owncloud 8.2 to sync my calendar and address book between my desktop computer and android (cyanogenmod) mobile**.
+
+
+# owncloud/PIM
+
+[[!img media/owncloud-8.2-setup.png caption="owncloud setup"]]
+
+used components:
+
+* laptop:
+    * eMail: [thunderbird 45.1.1](https://www.mozilla.org/en-US/thunderbird/45.1.1/releasenotes/) with IMAP
+    * CalDAV: [Inverse SoGo connector 31.0.3](https://sogo.nu/download.html#/frontends)
+    * CardDAV: [lightning 4.7.1.1](https://www.mozilla.org/en-US/projects/calendar/)
+    * fileSync: [owncloud client](https://owncloud.org/install/)
+
+* android:
+    * eMail [k9 mail](https://github.com/k9mail/k-9) with IMAP
+    * CardDAV: [CardDAV-Sync free 0.4.20](https://play.google.com/store/apps/details?id=org.dmfs.carddav.sync&hl=en)
+    * CalDAV: [aCalDAV 0.1.1](https://github.com/ennswi/AndroidCaldavSyncAdapater)
+    * fileSync: [owncloud client](https://owncloud.org/install/)
+    * Calendar: [Etar-Calendar](https://github.com/xsoh/Etar-Calendar)
+
+# results
+
+what i liked:
+
+* have my own infrastructure
+* many components are **open source**
+
+what i hate:
+
+* lots of manual deployemnt and configuration
+* android 
+    * battery drain on android: 4 programs periodically pull for updates
+    * if owncloud can't be reached `aCalDAV` will always set a notification with an error, see [issue 17](https://github.com/ennswi/AndroidCaldavSyncAdapater/issues/17)
+
+        [[!img media/aCalDAV-issue17.png style="width: 120px;"]]
+
+* laptop: `thunderbird`'s CalDAV implementation
+    * focus stealing warning popup-dialog is displayed once in a while -> very annoying, see [issue 1287332](https://bugzilla.mozilla.org/show_bug.cgi?id=1287332)
+
+  
+        to reproduce this:
+
+        1. shutdown your `owncloud` server
+        2. start `thunderbird`
+        3. add a new event in the calendar and see `thunderbird-> tools -> error console`
+
+                Timestamp: 21.06.2016 15:01:54
+                Error: An error occurred when writing to the calendar http://192.168.0.86/owncloud/remote.php/dav/calendars/joachim/default/! Error code: MODIFICATION_FAILED. Description: 
+                Source File: resource://calendar/modules/calUtils.jsm -> file:///home/joachim/.thunderbird/hy2x4cxy.default/extensions/%7Be2fda1a4-762b-4020-b5ad-a41df1933103%7D/calendar-js/calCalendarManager.js
+                Line: 959
+
+        4. see the dialog
+
+            [[!img media/thunderbird-CalDAV-problem.jpg style="width: 200px;"]]
+
+        5. restart `thunderbird`, see it once in a while
+        6. once `owncloud` is connected and synced, the 'added and cached' event is synced and the message will not appear anymore
+
+* laptop: `thunderbird`'s CardDAV implementation interacts stangely with the `SoGo connector`, that is:
+    * don't try mass-moving of your contacts from the offline-address books into your owncloud address book. with old versions you might hit [this bug](https://sogo.nu/bugs/view.php?id=3351)
+    * address book can only be editited when `SoGo connector` can communicate with `owncloud`, no offline functionality
+    * sometimes one deletes an entry in the address book, it vanishes, appears again and finally vanishes forver ...?
+
+# conclusion
+
+i love this setup even as is a bit fragile! `k9 mail` is a great client, has even a better thread view than thunderbird. `etar` is exactly the calendar app i wanted! owncloud 8.x/9.x is currently packaged in `nixpkgs` but is broken. next up: fix the owncloud package(s) on nixos/nixcloud and use that instead of ubuntu 16.03.

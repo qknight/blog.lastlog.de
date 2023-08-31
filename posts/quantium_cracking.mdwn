@@ -1,0 +1,21 @@
+[[!summary chatGPT: This article discusses the potential use of quantum computing for software exploitation and verification, as well as its impact on security and cryptography. It also highlights the promise of detailed quantum research.]]
+[[!meta date="2012-04-26 21:38"]]
+[[!img media/purple_podcasts.png caption="purple_podcasts from harenome razanajato" style="float: right" size=170x]]
+[[!tag podcast security society]]
+
+i just finished listening to "**Episode 176: Quantum Computing**" [1] and this is really a great podcast. like the whole SE-Radio btw!
+
+this podcast really inspired me and on the way back from work, i was thinking about the possibility to exploit software using quantum computing.
+
+**quantum cracking** that is. it would work like this: **assume you have a program or function which gets input. the ultimate goal is to find some input which will crash the program.** using a quantum computer this is probably not that hard to compute.
+i could imagine that **quantum computing could also be used for software verification,** which is actually quite the opposite of what quantum cracking would be.
+
+**so when quantum computers arrive we do not only lose AES/RSA but our computers will be open to everyone with such a system. hopefully such systems spread soon, which might compensate the negative effect, maybe with quantum cryptography.**
+
+but as martin laforest says: **at the end of the day** i still don't know when this technique will arrive. but when it arrives it will turn security upside down.
+
+the most promising aspect of quantum computing, which is mentioned in the podcast, is that **it will enable detailed quantum research** which i consider a very cool thing as it will help to understand what goes down there.
+
+## links
+
+ * [1] <http://www.se-radio.net/2011/06/episode-176-quantum-computing-with-martin-laforest/>

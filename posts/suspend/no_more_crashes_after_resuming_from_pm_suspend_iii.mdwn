@@ -1,0 +1,86 @@
+[[!summary chatGPT: The author describes issues with their laptop, including problems with graphics, sound, WLAN, and ACPI events. They provide details about the specific issues and mention contacting the relevant development teams for help.]]
+[[!meta date="2010-09-27 11:47"]]
+[[!tag audio gentoo linux]]
+
+[[!img media/hp-com-elitebook-8530w.jpg size=180x caption="hp elite book 8530w, source hp.com" style="float: right"]]
+
+
+# motivation
+i'm still having several issues with this laptop, will it ever end? at least it's not the nvidia proprietary driver again. so here are some details:
+
+used kernel: **2.6.34-gentoo-r6**
+
+# problem
+	
+  * **graphics** causes problems with 'sata - ahci' mode
+  * **sound** sometimes crashes the system (module load/unload)
+  * **wlan** sometimes crashes the system (module load/unload)
+  * **acpi**, not all keys report acpi events
+
+## graphics
+
+used driver: **nvidia-drivers-256.53** (nvidia proprietary)
+
+so far most things i need are working, which includes:
+	
+  * 2d acceleration (xvid extension using mplayer)
+  * 3d acceleration
+  * console (alt+ctrl+f1) still works after pm-suspend's resume cycle (not when no X was running prior pm-suspend)
+  * resume will resume X without issues
+
+untested:
+	
+  * external monitor setups as vga/hdmi
+  * compositing: i still have compositing disabled as the system is much more responsive without it. still it would work well.
+
+problems:
+	
+  * a new problem is the issue with the nvidia module and the sata ahci mode:
+ 
+
+ 
+ Sep 25 18:24:56 ebooK kernel: [ 2989.757123] ata1: exception Emask 0x10 SAct 0x0 SErr 0x10000 action 0xf
+ Sep 25 18:24:56 ebooK kernel: [ 2989.757134] ata1: SError: { PHYRdyChg }
+ Sep 25 18:24:56 ebooK kernel: [ 2989.757146] ata1: hard resetting link
+ Sep 25 18:24:57 ebooK kernel: [ 2990.480057] ata1: SATA link up 3.0 Gbps (SStatus 123 SControl 300)
+ Sep 25 18:24:57 ebooK kernel: [ 2990.482352] ata1.00: ACPI cmd ef/10:03:00:00:00:a0 (SET FEATURES) filtered out
+ Sep 25 18:24:57 ebooK kernel: [ 2990.485490] ata1.00: ACPI cmd ef/10:03:00:00:00:a0 (SET FEATURES) filtered out
+ Sep 25 18:24:57 ebooK kernel: [ 2990.485935] ata1.00: configured for UDMA/133
+ Sep 25 18:24:57 ebooK kernel: [ 2990.485945] ata1: EH complete
+ Sep 25 18:24:57 ebooK kernel: [ 2990.486235] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+
+[1] seems to confirm this problem. when i disable ahci (and use ide mode) in the bios this error message is gone. currently i don't know how DPO or FUA or this whole error influences my stability. **however**: when my system crashes i have a very high chance of file loss, this means: all kde settings are deleted, chromium restores to factory defaults and similar problems.
+
+## sound
+
+    00:1b.0 Audio device: Intel Corporation 82801I (ICH9 Family) HD Audio Controller (rev 03)
+
+the soundsystem crashes the system when snd_* modules are reloaded using 'rmmod' or 'modprobe -r'. a trace can be found at [2].
+
+  * this crash happens even if there was no pm-suspend cycle yet
+  * it does not matter if sound was played (mp3 or film), it crashes anyway
+
+-> using **/etc/init.d/alsasound restart** does NOT remove loaded modules and it does NOT shut down programs using the soundcard prior to removing the modules. but i'm using a script which does so.
+
+i've written a mail to **alsa-devel@alsa-project.org** and i'm still waiting for feedback. maybe someone can help me.
+
+## wlan
+ 
+    03:00.0 Network controller: Intel Corporation Ultimate N WiFi Link 5300
+
+the wireless lan system crashes if the iwlagn module is loaded and then unloaded several times ('rmmod iwlagn' and 'modprobe iwlagn' several times). a stack trace can be found at [4]. i've filed a bug report at [5].
+
+## acpi
+
+
+my old 2.6.34 configuration reported acpi evnts for volume down/ volume up, fn+f3, fn+f4 (maybe), fn+f8,  fn+f9 and fn+f10 as well as for pwr button. with the fc13 kernel configuration i've experienced that some if not all acpi events were not sent. still have to find out why this happens.
+
+if i find out why that happens, i'll post some news on that.
+
+# links
+
+* [1] <http://ubuntuforums.org/archive/index.php/t-1037819.html>
+* [2] <http://lastlog.de/misc/wordpress/snd_hda_intel_backtrace>
+* [3] <http://www.alsa-project.org/main/index.php/Help_To_Debug_Intel_HDA>
+* [4] <http://lastlog.de/misc/wordpress/iwlagn_backtrace>
+* [5] <http://bugzilla.intellinuxwireless.org>

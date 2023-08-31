@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="xmlmirror.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>xmlmirror</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/xmlmirror.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="nixos-augsburg-sprint.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="tuebix.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::emscripten" title="article series emscripten" class="seriesbtn btn btn-primary">emscripten</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="nixos-augsburg-sprint.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="ruckig_motion_planning.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">xmlmirror</h1>
+    <div id="date"><p><span id="lastupdated">21 jul 2016</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nlnet" class="tagbtn btn btn-primary">nlnet</a><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::xmlmirror" class="tagbtn btn btn-primary">xmlmirror</a><a href="timeline.html?filter=tag::emscripten" class="tagbtn btn btn-primary">emscripten</a><a href="timeline.html?filter=tag::javascript" class="tagbtn btn btn-primary">javascript</a><a href="timeline.html?filter=tag::odf" class="tagbtn btn btn-primary">odf</a></p></div>
+    <p><a href="media/nlnet-logo.gif"><img src=media/nlnet-logo.gif class="noFancy" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>we are happy to announce the initial release of a useful new tool
+called <a href="https://gitlab.com/odfplugfest/xmlmirror">xmlmirror</a>.
+as the name more or less spells out, <a
+href="https://gitlab.com/odfplugfest/xmlmirror">xmlmirror</a> is an XML
+webeditor with schema validation, based on <a
+href="https://en.wikipedia.org/wiki/Form_(HTML)">webforms</a> and
+implemented with <a href="https://codemirror.net/">codemirror</a>.
+xmlmirror further uses a library called <a
+href="https://gitlab.com/odfplugfest/xmlmirror">Fast-XML-Lint</a> which
+uses <a href="http://xmlsoft.org/">libxml2</a> for schema verification
+and which is compiled with <a
+href="https://github.com/kripken/emscripten">emscripten</a>. or in
+layman’s terms: a web application that really helps you to create
+complex XML documents from scratch, as well as fix existing documents
+that are broken.</p>
+<p><a href="media/xmlmirror.jpg"><img src=media/xmlmirror.jpg class="noFancy"></a></p>
+<p><a href="https://lastlog.de/misc/xmlmirror/DemoUltimate.xhtml">live
+demo</a> / <a
+href="https://gitlab.com/odfplugfest/xmlmirror/tree/master">source
+code</a></p>
+<h3 data-number="1.1" id="features">features</h3>
+<ul>
+<li>a webform based editor to create complex
+<code>xml documents</code></li>
+<li>supports <code>xml schema</code> validation based on schema files
+in:
+<ul>
+<li><code>xml file format</code> and</li>
+<li><code>relax ng</code> file format,</li>
+</ul>
+both through libxml2</li>
+<li>features <strong>autocomplete</strong>-functionality for
+<strong>tags</strong> and <strong>attributes</strong> using <a
+href="https://codemirror.net/demo/xmlcomplete.html">codemirrors
+xmlcomplete</a> which is <a
+href="https://codemirror.net/doc/manual.html#addon_xml-hint">documented
+here</a></li>
+<li>validation implemented using <a
+href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers">webworkers</a>
+which is basically multithreading in javascript</li>
+<li>schema/xml document sizes up to ~500k lines each</li>
+<li><a
+href="https://gitlab.com/odfplugfest/xmlmirror/blob/master/schemainfoCreator.js">converter
+from single file relax ng documents to codemirror’s schemaInfo</a></li>
+<li><a href="https://opensource.org/licenses/MIT">MIT Licensed</a></li>
+<li>hosted on <a href="https://gitlab.com">gitlab.com</a></li>
+</ul>
+<h2 data-number="2" id="more-details">more details</h2>
+<h3 data-number="2.1" id="selenium">selenium</h3>
+<p>unit testing was implemented using <a
+href="http://www.seleniumhq.org/">selenium 2.53</a>:</p>
+<p><code>nix-shell -p python35Packages.selenium firefox-bin --command "python3 selenium_test.py"</code></p>
+<p>it works like this:</p>
+<ol type="1">
+<li>opens a specially crafted html document:
+<code>schemainfoCreator-test.html</code> in a webbrowser</li>
+<li>executes it and looks for “OK” or a 10 seconds timeout</li>
+</ol>
+<p>selenium_test.py:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.common.keys <span class="im">import</span> Keys</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>ff <span class="op">=</span> webdriver.Firefox()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ff.get(<span class="st">&quot;schemainfoCreator-test.html&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">&quot;schemaInfo unit-test&quot;</span> <span class="kw">in</span> ff.title</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    element <span class="op">=</span> WebDriverWait(ff, <span class="dv">10</span>).until(EC.presence_of_element_located((By.ID, <span class="st">&quot;OK&quot;</span>)))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">finally</span>:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    ff.quit()</span></code></pre></div>
+<h3 data-number="2.2" id="closure-compiler">closure-compiler</h3>
+<p>the google <a
+href="https://developers.google.com/closure/compiler/">closure
+compiler</a> was used to ensure strict <code>typing</code> even though
+it is <code>javascript</code>:</p>
+<pre><code>closure_compiler/jcc schemainfoCreator.js</code></pre>
+<p><strong>hint:</strong> it was no joy to use this tooling due to a
+lack of documentation and examples.</p>
+<h3 data-number="2.3" id="fastxmllint.c">fastXmlLint.c</h3>
+<p>it took a bit of time to get into the internals of libxml2 and the <a
+href="http://www.xmlsoft.org/html/index.html">antique API
+documentation</a> is more confusing than helpful. anyway, two
+interesting results:</p>
+<ol type="1">
+<li><p>even though <code>xmllint</code> can parse xml documents with a
+multi-document relax-ng schema it can’t be used to parse a
+multi-document relax-ng schema itself, see <a
+href="https://stackoverflow.com/questions/36850163/parse-multi-document-relax-ng-schema-using-libxml2">discussion</a></p></li>
+<li><p><code>ltrace</code> is your best friend in reverse-engineering
+shared object/library usage:</p>
+<p>for instance, running:</p>
+<p><code>ltrace -f xmllint --relaxng html5-rng/xhtml.rng test_fail1.html</code></p>
+<p>would yield:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlSAXDefaultVersion</span><span class="er">(</span><span class="ex">2,</span> 0x40bca9, 116, 112<span class="kw">)</span> <span class="ex">=</span> 2</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">getenv</span><span class="er">(</span><span class="st">&quot;XMLLINT_INDENT&quot;</span><span class="kw">)</span> <span class="ex">=</span> nil</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlGetExternalEntityLoader</span><span class="er">(</span><span class="ex">0x7fff26fdca5d,</span> 0x40bd36, 1, 76<span class="kw">)</span> <span class="ex">=</span> 0x7f969b6c1160</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlSetExternalEntityLoader</span><span class="er">(</span><span class="ex">0x407660,</span> 0x40bd36, 1, 76<span class="kw">)</span> <span class="ex">=</span> 0x7f969b6c1160</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlLineNumbersDefault</span><span class="er">(</span><span class="ex">1,</span> 0x40bd36, 1, 76<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlSubstituteEntitiesDefault</span><span class="er">(</span><span class="ex">1,</span> 0x40bd36, 0, 76<span class="kw">)</span> <span class="ex">=</span> 0</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">__xmlLoadExtDtdDefaultValue</span><span class="er">(</span><span class="ex">1,</span> 0x40bd36, 0, 76<span class="kw">)</span> <span class="ex">=</span> 0x7f969b9c0a1c</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlRelaxNGNewParserCtxt</span><span class="er">(</span><span class="ex">0x7fff26fdaf23,</span> 0x40bd36, 0, 76<span class="kw">)</span> <span class="ex">=</span> 0x245c490</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlRelaxNGSetParserErrors</span><span class="er">(</span><span class="ex">0x245c490,</span> 0x404ac0, 0x404ac0, 0x7f969af39080<span class="kw">)</span> <span class="ex">=</span> 0x245c490</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlRelaxNGParse</span><span class="er">(</span><span class="ex">0x245c490,</span> 0x404ac0, 0x404ac0, 0x7f969af39080<span class="kw">)</span> <span class="ex">=</span> 0x2527f70</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ex">xmlRelaxNGFreeParserCtxt</span><span class="er">(</span><span class="ex">0x245c490,</span> 0xffffffff, 0x7f969af38678, 0x25b5570<span class="kw">)</span> <span class="ex">=</span> 1</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span></code></pre></div>
+<p>and this is the exact order of libxml2 function calls
+<code>xmllint</code> issues to parse <code>test_fail1.html</code>!</p>
+<p><strong>note:</strong> this helped us a lot and made it possible to
+discover the secret <code>xmlLineNumbersDefault</code>
+function!</p></li>
+</ol>
+<h3 data-number="2.4" id="emscripten">emscripten</h3>
+<p>during this project we had the idea to create a <code>c</code> to
+<code>javascript</code> cross-compiler abstraction using
+<code>nix</code> for <code>emscripten</code> and we are happy to
+announce that it is now officially in <code>nixpkgs</code>, see <a
+href="https://github.com/NixOS/nixpkgs/pull/16208">PR 16208</a>.</p>
+<p>this means:</p>
+<ol type="1">
+<li>you can use nix-build to cross-compile all your dependencies like
+<code>libz</code> and afterwards use these in your project</li>
+<li>since <code>nix</code> runs on all linuxes, mac os x and other
+unix-like platforms, you can now enojoy full toolchain automation and
+deployment when doing emscripten.</li>
+</ol>
+<p>if using <code>nixpkgs</code> (master), you can check for emscripten
+targets using:</p>
+<pre><code>nix-env -qaP | grep emscriptenPackages</code></pre>
+<p>and install using:</p>
+<pre><code>nix-env -iA emscriptenPackages.json_c</code></pre>
+<p><strong>note:</strong> don’t mix json_c (native, <code>x86</code>)
+with other libs (emscripten, <code>javascript</code>) in your
+user-profile or you will get weird error messages with
+<code>object code</code> being in the wrong format and such.</p>
+<h3 data-number="2.5" id="nixos-development">nixos development</h3>
+<p><code>nix-shell</code> was the primary development tool along with
+the <a
+href="https://gitlab.com/odfplugfest/xmlmirror/blob/master/default.nix">default.nix</a>
+which can basically spawn two different environments:</p>
+<ul>
+<li><code>nix-shell -A emEnv</code> - emscripten environment: used to
+compile <code>c-code in javascript</code></li>
+<li><code>nix-shell -A nativeEnv</code> - native environment: used to
+develop the <code>c-code</code> in question and also for unit testing
+purposes</li>
+</ul>
+<p>see <code>Makefile.emEnv</code> and <code>Makefile.nativeEnv</code>
+respectivly.</p>
+<p>let’s have a look at the <code>default.nix</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">let</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">emEnvironment</span> = stdenv.mkDerivation rec {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">name</span> = <span class="st">&quot;emEnv&quot;</span><span class="kw">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">shellHook</span> = <span class="st">&#39;&#39;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">export</span> <span class="va">HISTFILE</span><span class="op">=</span><span class="st">&quot;.zsh_history&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">alias</span> make=<span class="st">&quot;colormake -f Makefile.emEnv&quot;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">alias</span> c=<span class="st">&quot;while true; do inotifywait * -e modify --quiet &gt; /dev/null; clear; make closure| head -n 30; done&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">alias</span> s=<span class="st">&quot;python customserver.py&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">alias</span> jcc=closure_compiler/jcc</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;welcome to the emEnvironment&quot;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">PS1</span><span class="op">=</span><span class="st">&quot;emEnv: </span><span class="dt">\$</span><span class="st">? \w \[</span><span class="va">$(</span><span class="fu">tput</span> sgr0<span class="va">)</span><span class="st">\]&quot;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;&#39;</span><span class="kw">;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="ex">buildInputs</span> = [ json-c libz xml-js ] ++ [ colormake nodejs emscripten autoconf automake libtool pkgconfig gnumake strace ltrace python openjdk ncurses ]<span class="kw">;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="er">}</span><span class="kw">;</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="ex">...</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="er">in</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># use nix-shell with -A to select the wanted environment to work with:</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   --pure is optional</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nix-shell -A nativeEnv --pure  </span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nativeEnv</span> = nativeEnvironment<span class="kw">;</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nix-shell -A emEnv --pure  </span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="ex">emEnv</span> = emEnvironment<span class="kw">;</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<p>you will notice that emEnv is a <code>stdenv.mkDerivation</code> and
+it uses <code>shellHook</code> and <code>buildInputs</code>.</p>
+<p>some remarks:</p>
+<ul>
+<li>we set a <code>HISTFILE</code> and get a project based history which
+is nice</li>
+<li>using <code>alias</code> we override <code>make</code> with
+<code>colormake</code> and also set the target Makefile to
+<code>Makefile.emEnv</code></li>
+<li>setting a custom <code>PS1</code> makes it easier to identify the
+shell when working on <code>n+1</code> projects at the same time</li>
+<li>the <code>s</code> alias runs a python webserver with
+<code>xhtml</code> mime-type support, which is handy when developing
+with <code>chromium</code> as XHR requests will be working then</li>
+</ul>
+<p><strong>note:</strong> the <code>default.nix</code> does contain
+<code>libz</code>, <code>json-c</code>, <code>xml-js</code> packaging
+and since this is now in <code>nixpkgs</code> it is kind of obsolete
+now.</p>
+<h2 data-number="3" id="conclusion">conclusion</h2>
+<p>we (paul/joachim) want to thank <strong>Jos van den Oever</strong>
+(prolific <a href="http://www.vandenoever.info/">open source
+contributor</a> and co-chair of the <a
+href="https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=office">OASIS
+ODF TC</a> on behalf of the <a
+href="https://logius.nl/standaarden">Dutch government</a>) for inspiring
+the creation of this tool. ODF is a prominent example of a real-world
+standard that leverages the <code>relax ng</code> standard, and we
+expect xmlmirror to be very useful in the creation of more <a
+href="https://gitlab.com/odfplugfest/odfautotests">ODF autotests</a>.
+Jos has also graciously offered to provide an initial host repository
+for xmlmirror.</p>
+<ul>
+<li><p>schema parsing in codemirror can now easily be extended with all
+<code>relax ng</code> schemas!</p></li>
+<li><p>also thanks to <a
+href="https://github.com/profpatsch">profpatsch</a> for his explanations
+on the <code>nix</code> feature called <code>override</code>, see <a
+href="https://github.com/qknight/nixpkgs/blob/c514693eb62539545745b71cb0ac52733a9966ad/pkgs/top-level/emscripten-packages.nix#L11">emscripten-packages.nix</a></p></li>
+<li><p>we also want to thank <a href="https://www.nlnet.nl/">nlnet</a>
+foundation for their financial contribution from the <a
+href="https://nlnet.nl/odf/">ODF fund</a> which enabled us to complete
+this interesting project. thanks as well to <strong>Michiel
+Leenaars</strong> (not only from <a
+href="https://www.nlnet.nl/">nlnet</a> but also one of the people behind
+the <a href="http://odfplugfest.org">ODF plugfests</a>) for his interest
+in the project. now we have a real powerful xmleditor, made huge
+progress with the emscripten toolchain on nixos and have created a
+pretty useful development workflow.</p></li>
+</ul>
+<p>if you have questions/comments, see <a
+href="https://nixcloud.io">nixcloud.io</a> for contact details.</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/xmlmirror.mdwn" title="posts\xmlmirror.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+[[!summary chatGPT: A status update for Ogre on Gentoo, including information about the samples browser, the use of CMake for the Ogre library, issues with key repeat and the Ogre configurator, the need for FreeImage, the complexity of the samples, and problems with compiling projects and using Nvidia CG support. Also includes information about an ebuild for Ogre 1.7rc1 and links to relevant forums and resources.]]
+[[!meta date="2010-02-20 03:42"]]
+[[!img media/ogrelogo-small.jpg alt="" style="float: right" width="200px"]]
+
+[[!tag gentoo linux ogre3d packagemanager technology usability]]
+
+[[!series ogre]]
+
+
+
+# status update for ogre  on gentoo
+	
+  * **1.7 will have a samples browser**
+i actually do hate the sample browser deployment as well as the concept it does implement. if one uses cmake and forgets to modify the 'CMAKE_INSTALL_PREFIX' but afterwars installs the library using 'DESTDIR=/tmp make install' nothing will work since all resources.cfg, plugins.cfg and media.cfg contain the wrong location and since the program is installed as root but executed as normal user it fails horribly when starting the SampleBrowser. but more important - since the sample browser loads the plugins as shared objects (for example ./lib/Sample_Water.so) **the samples are degraded as 'showcase' only but can't be used to play with directly as it requires a complicated installation mechanism.** i see two fixes: either create another CMakeLists.txt which can build standalone runners for each sample or write a standalone runner for this create .so files. but in general i don't like what they did, it degrades the quality of the samples since you have to run the SampleBrowser, find the plugin you want to have a look at and next you have to search the soure directory for the plugin.
+let's see how the trolls (authors of qt) did that in comparison: they build standalone examples; they give you the source-code and the binary in one directory; they do code documentation based on a comment system which parses the example code.
+
+	
+  * **1.7 will use cmake for the ogre library (instead of autotools) -> i absolutely love this! this still has some quirks but i think it's very good work!
+**
+
+	
+  * using ogre disabled 'key repeat' every time i start my application, i need to type: '**xset r on**' to re-enable it. did not find out why...
+**UPDATE:** seems to be fixed in 1.7rc1
+
+	
+  * ogre displays a configurator everytime i start my application which configures  the ogre 'ogre.cfg'. this window shows up and since 1.7rc1 i  CAN NOT press 'return' directly to continue with the default settings - instead i have to click the 'accept' button with the mouse.  every time! this is VERY ANNOYING! maybe this has something todo with my 'focus widget' policy but since all other programs on my system work and especially since ogre 1.6 did work that way i wonder why this 'ogre configuration widget' does not have focus after i start my application...?
+
+	
+  * freeimage issue: the old ogre 1.6 had devil support but they probably dropped it (i'm not sure about that but i tried to find 'devil' in the source code (1.7rc1) but came up with only a few references, most were in the documentation) and therefore one needs freeimage for which i don't even have an ebuild. so i installed freeimage and afterwards - once again - ogre. i basically compiled and installed ogre a couple of times to find that out - since freeimage is very important and without it no sample works and all you can see is this yello/black textures all over the place and some errors in the log which don't make much sense without massive googling.
+why does the cmake script not stop with a **BIG WARNING: you have samples enabled but freeimage wasn't found** instead the whole library can be built without support for the Media/ archives coming with the samples but then the samples are completely useless.
+**not to forget:  since ogre installed into /usr/local i needed to alter my /etc/ld.so.conf to reflect the new libOgreMain.so location (and others) and afterwards i had to run ldconfig as root **(this is now done by the ebuild i wrote automatically)
+
+	
+  * i wanted to have a look at the samples (despite of naming them samples instead of examples one thinks they are of help). **however all samples share one giant resource system.** this might make sense at first however if you - the newcomer - don't have any clue about unique namespaces in material scripts and textures and compositing of texutres using various vertex and fragment shaders renders the samples are pretty useless because of their complexity.
+**i want simple samples which have all they need in ONE folder with a clean structure and NOT having to rely on external files which are referenced in mystical ways.**
+
+
+i'm not the only person who has serious problems getting ogre to work, see [1] and [2]. [2] is exactly what i meant by low quality downstream support.
+
+AND before anyone asked, NO i did not fill any bug tracker. if you like to do that, please feel free to do so. i hate to waste my time using email and 'gray listening' , then after i get a login. i've filled quite some bugs on bug trackers but as long as they don't provide a frontend i consider 'usable' i won't fill any bugs anymore. i often don't even know where to fill the bugs anyway since they have lots of things you have to fill in... waste of time
+
+right now i'm going back to ogre 1.6 since ogre 1.7 gave me this error when compiling my project:
+
+
+    An exception has occurred: OGRE EXCEPTION(5:ItemIdentityException): Cannot find a group named debugger in ResourceGroupManager::isResourceGroupInitialised at /home/joachim/Desktop/projects/space-game/ogre/OgreMain/src/OgreResourceGroupManager.cpp (line 1880)
+
+
+i have absolutely no clue what could cause this, i did not edit OgreResourceGroupManager.cpp at all. googling didn't reveal anything and the really nice ppl on irc.freenode.org#ogre3d couldn't help me either.
+
+**summary: working with ogre 3d does not make much fun currently
+**
+
+
+# nvidia cg support in ogre
+
+
+actually i did get the cg (nvidia shader stuff) running. i noticed that in plugins.cfg i had*:
+
+
+    #Plugin=Plugin_CgProgramManager.so
+
+
+why does ogre say:
+
+
+    WARNING: material shader/ring has no supportable Techniques and will be blank. Explanation:
+Pass 0: Vertex program shader/gradientVP cannot be used - not supported.
+
+
+instead of:
+
+
+    WARNING: you disabled cg support by not using any Plugin_CgProgramManager.so extension so no cg file will work for every use of cg
+
+
+* this is because we use git and since the project was developed by me the nvidia user and seitz the ati user, he disabled the cg programmanger in his plugins.cfg, i probably updated the file without knowing that
+
+
+# ogre 3d 1.7rc1 ebuild
+
+
+i've writte an ebuild for ogre 1.7rc1, it can be downloaded at [4], i copied some parts from [3] which was very helpful since i never did write an ebuild using cmake before.
+
+i did not check the dependencies and they might probably be incomplete. if you want to use my ebuild you might just install ogre 1.6.5 with all use flags you want and then update to my package without cleaning 'world dependencies'. also note that using my ebuild all samples will be built but the SampleBrowser binary and some others won't be installed. i currently don't understand why but the reason is that **CMAKE_BUILD_TYPE=Gentoo** is set but the CMakeLists.txt somehow expects **CMAKE_BUILD_TYPE=RelWithDebInfo** but i wasn't able to overwrite that value with -D in the ebuild. i've asked in #gentoo-sunrise for support and they told me that this probably has to be fixed upstream. also don't forget to install freeimage!
+
+**i did not upload that ebuild to bugs.gentoo.org - if you want to, please feel free to do so**
+
+
+# links
+
+* [1] <http://www.ogre3d.org/forums/viewtopic.php?f=2&t=54756&start=0>
+* [2] <http://gpnfn.blogspot.com/2010/01/building-cegui-ogre-renderer-in-gentoo.html>
+* [3] <http://aur.archlinux.org/packages/ogre/ogre/PKGBUILD>
+* [4] <http://lastlog.de/misc/ogre-1.7.0_rc1.ebuild>
+
+
+# update
+
+
+2010-02-20: my ebuild does not install the library as well (that is the .so files) so currently everything is built but both the library and the bin/* files are not installed
+
+Documentation about this is in '**/usr/portage/eclass/cmake-utils.eclass**'. About CMAKE_BUILD_TYPE=Gentoo i'd like to quote the cmake-utils.eclass comment:
+
+
+    # You usualy do *NOT* want nor need to set it as it pulls CMake default build-type
+    # specific compiler flags overriding make.conf.
+
+
+My current fix is to overwrite that buildtype with:
+
+    CMAKE_BUILD_TYPE=RelWithDebInfo just before src_configure()
+
+**NOTE:** i've also updated the ebuild at [4]

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="docker_compose_vs_nixcloud.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>docker compose vs nixcloud</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/docker_compose_vs_nixcloud.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="gopass.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="automated_chatGPT_summary.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::nixcloud" title="article series nixcloud" class="seriesbtn btn btn-primary">nixcloud</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="nixcloud-webservices_tests.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="mattermost_with_nixcloud-webservices.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">docker compose vs nixcloud</h1>
+    <div id="date"><p><span id="lastupdated">6 aug 2023</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixcloud" class="tagbtn btn btn-primary">nixcloud</a><a href="timeline.html?filter=tag::docker" class="tagbtn btn btn-primary">docker</a><a href="timeline.html?filter=tag::kubernetes" class="tagbtn btn btn-primary">kubernetes</a><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::webservices" class="tagbtn btn btn-primary">webservices</a></p></div>
+    <h2 data-number="1" id="motivation">motivation</h2>
+<p><strong>this is my summary of years working with
+nix/nixpkgs/nixcloud-webservices and docker.</strong></p>
+<p>i compare <a href="https://github.com/docker/compose/">docker
+compose</a> to <a
+href="https://github.com/nixcloud/nixcloud-webservices">nixcloud.webservices</a>.
+we’ll also look briefly at <a
+href="https://kubernetes.io/">kubernetes</a> and <a
+href="https://github.com/nixcloud/nixcloud-container">nixcloud.containers</a>
+which is <a href="https://linuxcontainers.org/">LXC</a> based.</p>
+<p>in this context, <strong>a complex service would be a LAMP stack, an
+email service, like nixcloud.email or any ‘service’ which would require
+several docker containers, started simultaneously, to work</strong>.</p>
+<h3 data-number="1.1" id="docker-docker-compose">docker / docker
+compose</h3>
+<p><a href="media/docker-compose.png"><img src=media/docker-compose.png class="noFancy" style="float: right" alt="image from docker.com"></a></p>
+<p>a list of pros/cons to <code>docker</code> and
+<code>docker compose</code>:</p>
+<p>pro:</p>
+<ul>
+<li><strong>cross platform development support</strong> (linux, mac,
+windows)</li>
+<li><a href="https://www.docker.com/products/docker-desktop/">docker
+desktop</a> is so amazing during development
+<ul>
+<li>clear overview over containers/volumes/images</li>
+<li>grouping view for <code>docker compose</code> deployments</li>
+<li>useful for maintenance
+<ul>
+<li>very easy to get a prompt in a running container</li>
+<li>good tool to investigate logs</li>
+</ul></li>
+</ul></li>
+<li><code>yaml</code> based, easy to learn</li>
+<li><a
+href="https://docs.docker.com/storage/storagedriver/#images-and-layers">docker
+FS layers</a> (fabulous workaround for <a
+href="https://en.wikipedia.org/wiki/Package_manager">PM</a> shortcomings
+in reproducibility)</li>
+<li>best practice <strong>assumes container to be stateless</strong>:
+<strong>state management in volumes</strong></li>
+<li><strong>huge community</strong> with lots of well designed
+containers on <a href="https://hub.docker.com"
+class="uri">https://hub.docker.com</a></li>
+<li><code>traefik</code> reverse-proxy is easy to use (with let’s
+encrypt ACME integration)</li>
+<li><strong>scaling</strong> potential of hosting using <em>docker
+swarm</em> or even in <em>kubernetes</em> with little adaptions</li>
+</ul>
+<p>con:</p>
+<ul>
+<li><p><strong>security</strong> running containers as root is bad, yet
+many do exactly that</p></li>
+<li><p><strong>no management node concept</strong> (controller in
+kubernetes)</p>
+<p>it would be helpful if the deployment were controlled from a docker
+container itself - a controller node. the controller keeps the central
+configuration and offers this to the other nodes.</p>
+<p>the .env file, the docker-compose.yaml and deployment specific files
+would reside on the controller and managed by it:</p>
+<p>instead the deployment is controlled from the host, making deployment
+management platform dependent:</p>
+<ol type="1">
+<li><code>docker compose down</code></li>
+<li><code>docker compose run --rm setup --domain=example.com --email=admin@example.com</code></li>
+<li><code>docker compose up -d</code></li>
+</ol></li>
+<li><p><strong>stateful management tool</strong></p>
+<p><code>docker compose up</code> alone is not enough, users have to
+pass explicit command line arguments:</p>
+<ul>
+<li><strong>docker/docker compose commands get ridiculously
+long</strong></li>
+<li>management scripts around <em>docker compose</em> <strong>result in
+platform specific code</strong></li>
+<li>problematic global state variables with <em>.env</em></li>
+<li><strong>hard to build deployment variants with consistency</strong>
+(http/https+let’s encrypt or a different set of components)</li>
+<li>inspecting running containers give no clue from where they were
+configured, i.e. the docker-compose.yml file on the filesystem</li>
+</ul></li>
+<li><p><strong>incomplete APIs</strong></p>
+<ul>
+<li><a href="https://pkg.go.dev/github.com/docker/docker/client">docker
+go API</a>: lacks support for some very basic scenarios
+<ul>
+<li>access logs after a non-persistent container stops, see <a
+href="https://github.com/moby/moby/discussions/44219">moby/discussions/44219</a></li>
+<li>no way to access state of a container</li>
+</ul></li>
+<li><code>docker compose</code>:
+<ul>
+<li>has no relevant go bindings</li>
+</ul></li>
+<li><code>docker swarm</code>:
+<ul>
+<li>didn’t find any relevant go bindings either</li>
+</ul></li>
+</ul></li>
+<li><p>for a <code>docker compose down</code> you need to be in the
+right folder or you won’t be able to do this consistently</p>
+<p><a href="https://github.com/compose-spec/compose-spec/issues/94"
+class="uri">https://github.com/compose-spec/compose-spec/issues/94</a></p></li>
+<li><p><strong>debugging restarting containers is hard</strong></p>
+<p>if container is in a restart loop, one cannot get a shell in it to
+access the logs what causes the issue</p></li>
+<li><p><strong>git platform specific document encoding: LF
+vs. LFCR</strong></p>
+<p>when working on Windows vs. working on Linux expect containers to
+fail in strange ways:</p>
+<ul>
+<li><p><a href="https://github.com/qknight/docker-ts5client"
+class="uri">https://github.com/qknight/docker-ts5client</a></p>
+<p>autostart would not work because the init script had ^M</p></li>
+<li><p><a href="https://github.com/matrix-org/synapse/issues/13691"
+class="uri">https://github.com/matrix-org/synapse/issues/13691</a></p>
+<pre><code>bash: /start.py: /usr/local/bin/python^M: bad interpreter: No such file or directory</code></pre></li>
+</ul></li>
+<li><p><code>Dockerfile</code>: rebuilding images burns lots of
+bandwidth and wastes download capacity</p>
+<p>as <code>apk add vim</code> or <code>apt install vim</code> can’t
+cache their downloads as done in nix/nixos</p></li>
+<li><p><strong>yaml syntax is very limited</strong></p>
+<p>yaml is no programming language and has very limited support to
+override configuration values compared to <a
+href="https://nixos.org/manual/nixos/stable/index.html#sec-option-definitions-setting-priorities">nixos
+options</a></p></li>
+<li><p><strong>shared volumes</strong>
+<code>-v ${PWD}/documents:/documents</code></p>
+<ul>
+<li><p>UID/GID mapping of host to guest has <em>platform specific
+differences</em></p>
+<p>windows/mac blend host rights into the container but on linux files
+created inside the container often have root:root as owner and even
+worse, sometimes <strong>u+rw g-rwx o-rwx</strong> as
+permission.</p></li>
+</ul></li>
+<li><p><strong>entrypoint.sh not easily overridable</strong></p>
+<p>the concept of entrypoint.sh is amazing but when deriving a container
+with a Dockerfile the process to write a correct entrypoint.sh is hard
+and might easily degrade over time. it’d be great if one could have a
+mult-stage like environment for this.</p></li>
+<li><p><strong>no way to merge two different docker images</strong></p>
+<p>a workaround is <a
+href="https://docs.docker.com/build/building/multi-stage/">multi-stage
+builds</a>: copy programs from one image to another but this is only
+applicable for a few ‘selected’ binaries</p></li>
+<li><p><strong>docker desktop</strong></p>
+<p>i’ve been using docker desktop for windows for 18 months years now
+and though it is a remarkable help during development, my experience is
+that it is very early days with huge performance issues, memory leaks
+and the UI can be very lagging.</p></li>
+</ul>
+<h4 data-number="1.1.1" id="docker-summary">docker summary</h4>
+<p><code>docker</code> and <code>docker compose</code> is really useful
+as it brings linux development tools onto windows. <em>docker</em>
+brings reproducibility compared to manual setup of the environment but
+not as complete as <em>nix</em>.</p>
+<p>on the other hand, for the reasons listed above, <strong>docker
+deployment side lacks massively on all platforms supported.</strong></p>
+<div class="alert alert-info" role="alert">
+<p>my take for complex services:</p>
+<ul>
+<li>if you use <code>docker</code> / <code>docker compose</code> for
+your own service, using docker is fine. manual maintenance will be
+required lots anyway</li>
+<li><strong>BUT: if you design a service to be run by others, you need
+to automate deployment and maintenance</strong></li>
+</ul>
+</div>
+<p>that said, single containers or simple deployments already bring huge
+benefits, see:</p>
+<ul>
+<li><a href="https://www.linuxserver.io/"
+class="uri">https://www.linuxserver.io/</a></li>
+<li><a href="https://hub.docker.com/"
+class="uri">https://hub.docker.com/</a></li>
+</ul>
+<p>the <code>docker</code>, <code>docker compose</code>,
+<code>docker swarm</code> golang API bindings have been stagnant, as
+pointed out above in parts. in contrast: kubernetes comes with this
+popular library: <a href="https://github.com/kubernetes/client-go"
+class="uri">https://github.com/kubernetes/client-go</a> which features
+the concept of a <a
+href="https://kubernetes.io/docs/concepts/architecture/controller/">controller</a>
+which can be used to automate the deployment.</p>
+<div class="alert alert-info" role="alert">
+<p><strong>my advice for complex services:</strong></p>
+<p><strong>using docker tooling you cannot automate docker deployment
+properly, as there are no APIs to do so,</strong> therefore <strong>i’d
+go for nix (not necessarily using containers).</strong></p>
+</div>
+<h3 data-number="1.2"
+id="nixcloud.webservices-nixcloud.container">nixcloud.webservices &amp;
+nixcloud.container</h3>
+<p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png class="noFancy" style="float: right"></a></p>
+<p>nixos can be compared to <code>docker compose</code> and <a
+href="https://github.com/NixOS/nixops">nixops</a> to
+<code>docker swarm</code>.</p>
+<p>let’s start with a list of pros/cons to nix/nixos usage:</p>
+<p>pro:</p>
+<ul>
+<li><p>nix applications</p>
+<p><a href="https://nixos.wiki/wiki/Applications"
+class="uri">https://nixos.wiki/wiki/Applications</a></p></li>
+<li><p>nix tooling</p>
+<p>the <a
+href="https://nixos.org/manual/nix/stable/language/index.html">nix
+programming language</a> is awesome! you can start with my <a
+href="https://nixcloud.io/tour/">tour of nix</a>.</p></li>
+<li><p><a href="https://nixos.org/">nix reproducibility and declarative
+configuration</a></p>
+<p>see how easy it is to have your own email server abstraction: <a
+href="https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.email.md">nixcloud.email</a></p></li>
+<li><p><a href="https://search.nixos.org/options">nixos option
+system</a></p>
+<p>nixos options system is the administrators dream:</p>
+<ul>
+<li>it is easy to use</li>
+<li>has a concept of <a
+href="https://nixos.org/manual/nixos/stable/index.html#sec-option-definitions-setting-priorities">hierarchical
+value overrides</a></li>
+<li>has standard <em>types</em> and can be extended with <em>custom
+types</em>, see <a
+href="https://nixos.org/manual/nixos/stable/index.html#section-option-types-submodule">submodules</a></li>
+<li>has good support for deprecating options</li>
+</ul></li>
+<li><p><a href="https://search.nixos.org/options">nixos option
+search</a></p>
+<p>once the service is contributed into nixpkgs, you can use the option
+search system.</p></li>
+<li><p><a
+href="https://nixos.org/manual/nixos/stable/index.html#sec-nixos-tests">nixos
+testing</a></p>
+<p>the best testing systems i’ve ever seen, see <a
+href="https://nixos.org/manual/nixos/stable/index.html#sec-nixos-tests">nixos
+tests</a>.reproducibility it uses KVM VMs with a python abstraction to
+control VM states.</p></li>
+<li><p><a
+href="https://nixos.org/manual/nix/stable/language/derivations.html">nix
+derivations</a></p>
+<p>a derivation can be software as vim (binary, icons, scripts, …), or
+only a simple configuration file which is created on the fly from the
+nixos options system. docker uses the <em>Dockerfile</em> and each line
+this file generates a FS snapshot which is hashed. in nixos the
+<em>Dockerfile</em> concept matches to the
+<em>configuration.nix</em>.</p>
+<p>i find the derivation concept hugely more powerful than the
+Dockerfile concept.</p></li>
+<li><p>nixos container support</p>
+<ul>
+<li><strong>systemd-nspawn</strong> (default nixos system), see <a
+href="https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html">systemd-nspawn</a></li>
+<li>at nixcloud we created <strong>lxc support</strong> for more
+security <a
+href="https://github.com/nixcloud/nixcloud-container">nixcloud-container</a></li>
+<li>create <strong>docker containers</strong> from nix expressions <a
+href="https://nixos.wiki/wiki/Docker">docker on nix</a></li>
+<li>general <strong>docker containers</strong> support</li>
+</ul></li>
+<li><p><a
+href="https://github.com/nixcloud/nixcloud-webservices/">nixcloud-webservices</a></p>
+<ul>
+<li><p><a
+href="https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.email.md">nixcloud.email</a>
+- email server with 5 lines of code</p></li>
+<li><p><a
+href="https://github.com/nixcloud/nixcloud-webservices/blob/master/documentation/nixcloud.TLS.md">nixcloud.TLS</a>
+- this way TLS is handled outside of your application</p></li>
+<li><p><a
+href="https://github.com/nixcloud/nixcloud-container">nixcloud-container</a>
+- LXC support</p>
+<p>if you want to decouple the system nixos from the container nixos,
+you can use nixcloud-container in imperative mode, see <a
+href="https://github.com/nixcloud/nixcloud-container#declarative-vs-imperative-containers"
+class="uri">https://github.com/nixcloud/nixcloud-container#declarative-vs-imperative-containers</a>.</p></li>
+</ul></li>
+<li><p>run your software in different environments</p>
+<p>once your service can be built from nix you can put everywhere:</p>
+<ul>
+<li>native</li>
+<li>nixos-container (systemd-nspawn)</li>
+<li>nixos-container (lxc)</li>
+<li>docker container</li>
+<li>KVM VM</li>
+<li>nixops: remote system</li>
+</ul>
+<p>since nix has support for all of these.</p></li>
+<li><p><strong>nix-shell</strong></p>
+<p>nix-shell is a tool to create a shell environment from a nix
+expression. this is useful for development and testing.</p></li>
+<li><p><strong>nix-flake</strong></p>
+<p>nix-flakes are used to extend nixpkgs with third-party software, see
+<a href="https://github.com/nix-community/NUR"
+class="uri">https://github.com/nix-community/NUR</a> as example.</p>
+<p>flake documentation:</p>
+<ul>
+<li><a href="https://nixos.wiki/wiki/Flakes"
+class="uri">https://nixos.wiki/wiki/Flakes</a></li>
+<li><a
+href="https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html"
+class="uri">https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake.html</a></li>
+</ul></li>
+</ul>
+<p>con:</p>
+<ul>
+<li><p><strong>nix expression programming</strong></p>
+<ul>
+<li><strong>won’t work with windows</strong>, see <a
+href="https://discourse.nixos.org/t/nix-on-windows/1113/6"
+class="uri">https://discourse.nixos.org/t/nix-on-windows/1113/6</a></li>
+<li>works with linux and mac</li>
+</ul></li>
+<li><p><strong>nixos tests</strong></p>
+<ul>
+<li><p>nixos tests are integration tests, see</p>
+<ul>
+<li><a
+href="https://github.com/NixOS/nixpkgs/blob/4a446a0ce24d7e09ec1a4b660aeeb903934ed2f3/nixos/tests/all-tests.nix#L499">all-tests.nix</a></li>
+<li><a
+href="https://github.com/NixOS/nixpkgs/blob/4a446a0ce24d7e09ec1a4b660aeeb903934ed2f3/nixos/tests/mysql/mysql.nix#L86">tests/mysql/mysql.nix</a></li>
+</ul></li>
+<li><p><strong>won’t work with windows: nixos tests require
+KVM</strong></p></li>
+</ul></li>
+<li><p><strong>nix package manager</strong></p>
+<ul>
+<li><p><strong>won’t work with windows</strong></p>
+<p>works in WSL but the mix with native windows tools and WSL is
+complicated.</p></li>
+</ul></li>
+<li><p><strong>you are using nixos but the require software not in
+nixpkgs?</strong></p>
+<p>you want clion or goland which is hypothetically not abstracted in
+nixpkgs? in my experience this can range from an easy fix for nixpkgs or
+be a nightmare.</p></li>
+<li><p><strong>no IDE integration for language wrapper of
+nix</strong></p>
+<p>if you use <strong>clion for development</strong>, you will have to
+compile the source manually and once you change is final you will have
+to adapt the nix expression so also nix can build it.</p>
+<p>if you use <strong>goland</strong> then dependency management for
+golang will have a different dependency resolution than the nix
+expression wrapping it.</p>
+<p><a
+href="https://discourse.nixos.org/t/nixos-bazel-and-clion-other-ide/1288/10"
+class="uri">https://discourse.nixos.org/t/nixos-bazel-and-clion-other-ide/1288/10</a></p></li>
+<li><p><strong>you need to build software for windows
+native</strong></p>
+<p><strong>won’t work with windows</strong> but you might be able to
+setup a cross-compiler for it.</p></li>
+</ul>
+<h4 data-number="1.2.1" id="nix-summary">nix summary</h4>
+<div class="alert alert-info" role="alert">
+<p><strong>my advice for complex services:</strong></p>
+<ul>
+<li>if you manage the software for the target audience and linus is your
+target platform, then the nix path is a good choice.</li>
+<li>if you develop for linux / windows / mac, then nix would be a
+debatable choice</li>
+<li>if your developer team consists of mostly conservative windows
+users, then nix is not a good choice</li>
+</ul>
+<p>or in a nutshell:</p>
+<p><strong>nix is great if you develop, deploy and manage the software
+yourself for a linux-like platform.</strong></p>
+</div>
+<h3 data-number="1.3" id="kubernetes">kubernetes</h3>
+<p>kubernetes works on windows, mac and linux and one can use the
+controller concept to automate the deployment of services.</p>
+<p>say you build docker containers but you use kubernetes to deploy
+them, then you can use the controller concept to automate the deployment
+of your services.</p>
+<ul>
+<li><a href="https://github.com/kubernetes/client-go"
+class="uri">https://github.com/kubernetes/client-go</a></li>
+<li><a
+href="https://kubernetes.io/docs/concepts/architecture/controller/">controller</a>
+concept</li>
+</ul>
+<h4 data-number="1.3.1" id="kubernetes-summary">kubernetes summary</h4>
+<div class="alert alert-info" role="alert">
+<p><strong>my advice for complex services:</strong></p>
+<p>only go this path if you are really forced to as kubernetes has nice
+features but adds lots of burden. if you use ‘a managed kubernetes
+cluster’ this might result in huge costs.</p>
+<p>note: by no means i’m an kubernetes expert.</p>
+</div>
+<h2 data-number="2" id="conclusion">conclusion</h2>
+<p>my main question would be: “who or what is the controller your
+services”.</p>
+<ul>
+<li>for <code>docker</code> the admin is the controller (no
+automation)</li>
+<li><code>kubernetes</code> has a controller concept, so it can be
+automated in golang</li>
+<li>on <code>nixos</code> the controller is likely implemented in the
+nix language, so it can be automated</li>
+</ul>
+<div class="alert alert-info" role="alert">
+<p><strong>my overall advice for complex services:</strong></p>
+<p>the nix strategy is an ‘all in’ solution and hugely powerful if the
+programming languages you use are supported by nixpkgs and if the
+colleagues rock.</p>
+</div>
+<p>hopefully this article sheds some light on the options and helps you
+to make a decision what stack to use.</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/docker_compose_vs_nixcloud.mdwn" title="posts\docker_compose_vs_nixcloud.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+[[!meta date="2015-11-11 23:38"]]
+[[!tag nixos nixcloud compiler yocto]]
+
+[[!img media/nixos-lores.png alt="" class="noFancy" style="float: right"]]
+[[!summary "nixos cross compiler for powerpc64 big endian"]]
+
+# motivation
+porting nixos to new architectures like 'powerpc64 big endian' just got easier using a cross compiler to build the 'bootstrap-tools'!
+
+# porting nixos to new architectures
+
+documented here:
+
+* [https://nixos.org/wiki/CrossCompiling#bootstrap-tools](https://nixos.org/wiki/CrossCompiling#bootstrap-tools)
+
+# nix and perl relation
+but i wanted to point out that **getting all the perl aspects in nix installed correctly is quite annoying**. i even had to package a perl CPAN module for nix 1.10 for yocto to get nix running properly!
+
+meta-oe/meta-perl/recipes-perl/wwwcurl/www-curl-perl_4.17.bb
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+SUMMARY = "WWW::Curl - Perl extension interface for libcurl"
+SECTION = "libs"
+LICENSE = "Artistic-1.0 | GPL-1.0+"
+
+LIC_FILES_CHKSUM = "file://LICENSE;md5=a14040e6fa5b252da082d4dd0af3a542"
+
+SRC_URI = "https://cpan.metacpan.org/authors/id/S/SZ/SZBALINT/WWW-Curl-${PV}.tar.gz"
+SRC_URI[md5sum] = "997ac81cd6b03b30b36f7cd930474845"
+SRC_URI[sha256sum] = "52ffab110e32348d775f241c973eb56f96b08eedbc110d77d257cdb0a24ab7ba"
+
+S = "${WORKDIR}/WWW-Curl-${PV}"
+EXTRA_CPANFLAGS = "EXPATLIBPATH=${STAGING_LIBDIR} EXPATINCPATH=${STAGING_INCDIR}"
+DEPENDS += " curl curl-native"
+BBCLASSEXTEND="native"
+
+inherit cpan
+
+do_configure_prepend() {
+    b="${STAGING_DIR_TARGET}/usr/include"
+    sed -i "s:/usr/local/include/curl:${b}:g" Makefile.PL
+}
+
+do_compile() {
+    cpan_do_compile
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+the good news is, there is a plan to get rid of perl in nix, which i consider a very good thing, see:
+
+* [https://www.bountysource.com/issues/4399291-get-rid-of-the-perl-dependency](https://www.bountysource.com/issues/4399291-get-rid-of-the-perl-dependency)
+
+# powerpc64 big endian bootstrap-tools
+i had nix-1.10 running on powerpc64 big endian using yocto linux as base system but since i lost access to the system i didn't finish with the bugs in the system build.
+
+here is the download to the bootstrap-tools i had been building:
+
+* [https://nixcloud.io/downloads/powerpc64/bootstrap-tools.tar.xz](https://nixcloud.io/downloads/powerpc64/bootstrap-tools.tar.xz)
+* [https://nixcloud.io/downloads/powerpc64/busybox](https://nixcloud.io/downloads/powerpc64/busybox)
+
+# conclusion
+
+thanks very very much for **viric's support**. basically all this knowledge i derived from him! 
+

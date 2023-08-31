@@ -1,0 +1,50 @@
+[[!specialpage]]
+
+# motivation
+
+[mop](https://www.linkedin.com/messaging/thread/2-MzllY2JlODQtMzFhMy00YTcxLWE1N2YtZDFlMjVjM2Y2MWIzXzAxMw==/)
+wrote the <https://github.com/m-o-p/labsystem> in php
+
+i would love to reimplement this in rust using websockets, a persistent service (REST) and life preview capabilities with cooperative editing.
+
+* **everything based on markdown**
+
+  * prelab as mdwn
+  * lab as mdwn (with chapters)
+  * lab question as mdwn
+  * similar to in form similar to content on <https://github.com/nixcloud/pankat>, see <https://lastlog.de/blog/posts/labsystem.mdwn> for example which generates <https://lastlog.de/blog/labsystem.html>
+
+* **db backend** either:
+
+  the db will hold:
+
+  * user/team settings
+  * user prelab answers
+  * team answers
+  * their scores
+  * course schedule (start/end/reminders)
+  * comments
+
+  probably implemented using:
+
+  * <https://github.com/jmoiron/sqlx>
+  * (or <https://diesel.rs/>)
+
+* **cooperative editor** for
+  * tutors: for prelab/lab/questions
+  * students: giving answers
+  * maybe <https://github.com/ekzhang/rustpad>
+
+* **content sharing** using git, maybe something similar to
+  * <https://ankiweb.net/>
+
+* **ui** using [elm](https://elm-lang.org/)
+
+* **live preview**
+   * once content was change it is updated live for everyone
+
+* **license**
+  * AGPL
+
+# summary
+

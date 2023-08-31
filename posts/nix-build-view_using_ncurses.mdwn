@@ -1,0 +1,63 @@
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+[[!meta date="2014-05-31 16:01"]]
+[[!tag nixos linux packagemanager usability]]
+[[!summary nix-build-view is a graphical frontend for nix-build, to visualize parallel execution of downloads and builds, taking place when doing nixos-rebuild for example.]]
+
+# motivation
+
+**nix-build-view is a graphical frontend for nix-build, to visualize parallel execution of downloads and builds, taking place when doing nixos-rebuild for example.**
+
+i've been working on nix-build-view a lot and this is the first preview of my work. if you like/dislike my work please let me know using email to js@lastlog.de. you can find my work at [1]. 
+
+
+[[!img media/nix-build-view.jpeg size=700x alt="" style="float: none" caption="nix-build-view visualizing nix-build"]]
+
+# looking back
+
+**this project was born on FOSDEM14 when i was talking to niksnut and iElectric and was motivated by the quality of Gentoo tools in regards to usability.**
+
+originally i did not want to use ncurses because of its C-nature i despise. but after hacking several prototypes i concluded it can't just be done NOT using ncurses since NIX is running on linux, mac os x and other posix systems and they might have different terminals.
+
+**anyway, an interesting finding was that a terminal is like viewing a richt text document with a given resolution to render to. however, it is very limited and one cannot navigate the cursor in the document like one would expect of a DOM-tree nowadays. it is more like a 1980...**
+
+one thing that hurts is how string and color processing is done both in a normal terminal and using ncurses. both do NOT have a notion of colored text, this has to be composed by the application developers. this was the primary reason i created AdvancedString and AdvancedStringContainer [2]. i've also added a list of unit tests for AdvancedString, see [3].
+
+# current state
+
+the current implementation of nix-build-view/ is a RFC (not in the classical sense though). if you think i've been missing something please let me know.
+
+    nix-shell -p cmake -p clang -p ncurses
+    git clone https://github.com/qknight/nix-build-view/
+    cd nix-build-view//nix-build-view
+    mkdir build
+    cd build
+    cmake ..
+    make
+    ./nix-build-view
+
+currently i'm emulating nix-build but the next thing is to connect nix-build-view to nix-build either by integrating nix-build-view into nix-build or by using some form of message passing. i'm not sure yet how to go on.
+
+there are known issues and i've listed a lot of them in the code itself using the keyword 'FIXME'.
+
+# TODOs
+
+the good news is that nix-build-view is nearly done and that i will integrate nix-build-view into nixos soon.
+
+some open points at this time are:
+
+* **reduce the amount of update() calls** from FetchWidgetManager/BuildWidgetManager
+* **make rendering more effiction** by adding caching
+* **fixing all FIXMEs** in the code
+* **integrate nix-build-view** into nix-build or attach it using message passing
+
+# summary
+
+my goal was to have a tool equal to **htop** in quality. i'm sure nix-build-view will be very helpful and many NixOS devs already had great interest in nix-build-view.
+
+i'll keep you posted about usability updates in NixOS of which i think we need to address!
+
+# links
+
+* [1] <https://github.com/qknight/nix-build-view/>
+* [2] <https://github.com/qknight/nix-build-view//blob/e22e781cc7e7a6d5226396bc0f64bd4a94dca1cc/nix-build-view/AdvancedString.hpp>
+* [3] <https://github.com/qknight/nix-build-view//blob/e22e781cc7e7a6d5226396bc0f64bd4a94dca1cc/nix-build-view/TDD-AdvancedStringTest.cpp>

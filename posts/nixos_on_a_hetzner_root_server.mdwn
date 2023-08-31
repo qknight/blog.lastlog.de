@@ -1,0 +1,154 @@
+[[!summary chatGPT: A tutorial on running Nix OS on a Hetzner platform, including extracting the Nix OS installation using VirtualBox and configuring the root server for file deployment.]]
+[[!meta date="2011-05-10 10:50"]]
+
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+[[!tag nixos hetzner]]
+
+# motivation
+
+running nix os [1] on a hetzner [2] platform using:
+	
+  * hetzner: root server x2
+  * virtualbox: to extract all needed files
+**Note:** my host computer is a 'core 2 duo' and the hetzner target system is a 'amd' system
+  * hetzner: robot and rescue system
+  * nix os: Minimal installation CD, 64-bit Intel/AMD (x86_64-linux)
+[http://nixos.org/releases/nixos/latest-iso-minimal-x86_64-linux](http://nixos.org/releases/nixos/latest-iso-minimal-x86_64-linux)
+
+## extracting the 'nix os installation' using a virtualbox machine
+
+  1. create a new virtual machine in virtualbox
+  2. use the 'nix os minimal installation cd' iso image and boot it
+  3. follow the nixos installation guide at [3] (no need for any raid setup here!)
+  4. (**DON'T FORGET TO ENABLE SSHD IN /mnt/etc/nixos/configuration.nix before doing nixos-install**)
+
+     **services.sshd.enable = true;**
+  5. the mountPoint can be set using labels:
+
+        { mountPoint = "/";
+          label="nixos";
+        };
+
+  6. in case you want to use a different version of grub you can add a  line like this to configuration.nix:
+
+        nixpkgs.config.packageOverrides = pkgs : rec { grub2 = pkgs.grub198; };
+
+  7. if the 'grub' installation step failed this is not critical (at this point)
+we don't need a bootable virtualbox image; we only need the files!
+
+
+after the installation finished, don't reboot (extract the files instead):
+
+  1. /mnt contains the installation, so we are now creating a tar.gz from that installation
+  2. conveniently one can use ssh to create a tar.gz on the host system, so:
+  3. start sshd on the host system and check that the virtualbox networking is working, then
+  4. **tar zcvf - /mnt | ssh root@192.168.56.1 "cat > /root/nixos-2011-05-08.tar.gz**
+
+now you 'could' remove the virtualbox image, we don't need it anymore.
+
+
+## root server configuration
+
+
+
+
+### let's create the raid and prepare the system for file deployment:
+
+  1. start the rescue system and login using ssh
+  2. remove all raids (the default debian installation uses md0/md1/md2)
+  3. (maybe reboot to reflect the changes)
+  4. create one partition per device:
+        fdisk /dev/sda -> create one giant /dev/sda1 partition
+        fdisk /dev/sdb -> create one giant /dev/sdb1 partition
+  5. create a new raid (raid1):
+[sourcecode language="bash"]mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda1 /dev/sdb1[/sourcecode]
+  6. (maybe wait until the raid finished syncing, see 'cat /proc/mdstat')
+  7. create a filesystem (see nix os manual):
+        mkfs.ext4 -O dir_index -j -L nixos /dev/md0
+  NOTE: **using nix os the /dev/md0 is often named /dev/md127**
+  8. mount it on /mnt:
+        mount LABEL=nixos /mnt
+
+### copy the files to the prepared raid:
+
+	
+    mount LABEL=nixos /mnt
+    cd /mnt
+    wget http://lastlog.de/misc/nixos-2011-05-08.tar.gz
+
+i copied this file (created earlier in this documentation) to my other root-server, don't use it: USE YOUR OWN FILES
+
+    tar xzf nixos-2011-05-08.tar.gz
+
+and all needed files are there.
+
+**Note:** there are no /dev; /sys; or /proc files contained in the tar file! this is intentional
+
+**Note:** in case you don't have a place to put that nixos-*.tar.gz you can copy it to your machine using scp
+
+
+### install the bootloader manually:
+
+
+the rescue image is based on debian and therefore we can use apt-get to install grub2!
+
+    apt-get install grub2
+    grub-install --no-floppy --root-directory=/mnt /dev/sda
+    grub-install --no-floppy --root-directory=/mnt /dev/sdb
+
+
+### final setup step:
+
+
+add your public ssh key to /mnt/root/.ssh/authorized_keys
+
+
+
+	
+    mkdir /mnt/root/.ssh
+    vi /mnt/root/.ssh/authorized_keys
+    copy'n'paste your pubkey
+
+create a key pair if you don't have already: **ssh-keygen**
+
+### software-raid using mdadm
+
+it's wise to disable the hard-drive write caches to avoid data loss on a power fail, so add this to your /etc/nixos/configuration.nix:
+
+    powerManagement.powerUpCommands="/var/run/current-system/sw/sbin/hdparm -W 0 /dev/sda /dev/sdb";
+
+
+**note:** this can reduce throughput but i think it's totally worth it.
+
+
+### client machine ssh setup
+
+
+one the client machine (which is used to connect to the hetzner nix os installation later) configure ~/.ssh/config:
+
+
+    Host nixos
+    hostname 88.198.52.216
+    User root
+    IdentityFile ~/.ssh/id_rsa_nixos
+
+
+finally type:
+
+
+    ssh nixos
+
+
+and you should get a nixos shell!
+
+to debug the setup you can use tools like:
+	
+  * ping
+  * ssh -v <- add the -v to the parameter list of ssh
+  * read the logs of the nixos installation using /mnt/var/log/messages
+
+# links
+
+* [1] <http://nixos.org/>
+* [2] <http://www.hetzner.de/>
+* [3] <http://hydra.nixos.org/build/1082174/download/1/nixos/manual.html#id418003>

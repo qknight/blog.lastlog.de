@@ -1,0 +1,31 @@
+[[!meta date="2016-11-06 00:35"]]
+[[!tag nixos pulseaudio]]
+
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!summary streaming audio in tcp using pulseaudio and avahi]]
+
+# motivation
+
+this is a simple setup for streaming `pulseaudio` streams over the network. 
+
+# server
+
+https://github.com/openlab-aux/vuizvui/blob/master/machines/labnet/labtops.nix#L26
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix }
+hardware.pulseaudio = {
+  enable = true;
+  tcp.enable = true;
+  tcp.anonymousClients.allowedIpRanges = [ "172.16.0.0/16" ];
+  zeroconf.publish.enable = true;
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+# client
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix }
+pulseaudio.zeroconf.discovery.enable=true;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+to use the new setup simply play some music and in `pavucontrol` you can select 
+a different output device for the listed stream.

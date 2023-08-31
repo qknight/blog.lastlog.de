@@ -1,0 +1,45 @@
+[[!summary chatGPT: The article discusses how computers can be infected by viruses and how websites can infect computers through various attack patterns. It also explores social aspects of internet porn and the challenges of hiding online activities. The article raises concerns about privacy and the potential consequences of being exposed.]]></person—
+
+
+[[!meta date="2009-06-28 02:09"]]
+[[!tag society technology]]
+
+if you think of your computer as a living system (it is probably not, but that depends on how you define a 'living system') it can be infected by a virus.
+
+aids (see [1]) stands for **Acquired Immune Deficiency Syndrome **and is associated with having sexual contact.
+
+so how would a website infect your computer? i would guess by the usual attack patterns:
+	
+  * flash-plugin bugs when streaming content
+  * malicious java script
+  * malicious adds
+  * malicious downloads (exe files containing viruses)
+  * exploits in the codes used to stream films
+  * exploits in the browsers
+
+and what can one do not to get infected? i would reply with the very old concept: abstinence. if that is not an option use condoms:
+	
+  * addblockers
+  * disable javascript
+  * use a different installation than the main system
+
+i think it is also very interesting to analyze some social aspects of internet porn and how it affects society.
+
+consider you want to hide your habit of surfing sex sites, this can be challenging as i want to point out:
+
+  * your provider (probably) logs all your visits to any page
+  * since many porn sits might be using google add sense you might be not anonymous anymore
+  * normal cookies
+  * flash cookies (yes nobody thinks about this)
+  * local temp files
+  * browser history
+  * and many more i currently can't think of
+
+so as in the real world having an affair can be quite challenging to to cover up. and once you are revealed the consequences can be various. this is also valid for the topic of this post: it could change for the better - since you don't have to hide anything anymore - but on the other hand someone evil could use cross site scripting against you to force a unnoticed child porn download which could have major consequences.
+
+i won't say anything about psychological issues but at least i would like to mention that they exist.
+
+it is interesting to see how well these patterns (or concepts) both in 'real life' and 'virtual reality' match.
+
+#links 
+ * [1] <http://de.wikipedia.org/wiki/Aids>

@@ -1,0 +1,72 @@
+[[!meta date="2023-08-03 22:50"]]
+[[!img posts/gopass/gopass.png width="100px" alt="" style="float: right" class="noFancy"]]
+[[!summary using one password manager for multiple platforms]]
+[[!tag gopass]]
+
+# motivation
+
+i need a password store with these properties:
+
+* support for multiple OSes (android/linux/windows)
+* versioned (git)
+* secure (gpg)
+* self-hosted (simple git repo with ssh access)
+* usable in teams (using several mounts, i.e. private/company store for sets of passwords)
+
+and with [gopass](https://www.gopass.pw/) i have all of these!
+
+in a nutshell, gopass uses git as backend, encrypts the passwords using gpg and accesses the git repo via ssh keys or passwords.
+the only downside, gopass leaks the directory structure/file names, as those are not encrypted.
+
+# how i use it
+
+the documentation is all over the place and some issues are really hard to come by.
+
+a good start for everyday use:
+
+<https://woile.github.io/gopass-cheat-sheet/>
+
+## backend
+
+i'm using <https://github.com> repository:
+
+* create github.com/yourname/yourrepo and make it private so not everybody can clone the repo
+* add [Deploy keys](https://github.com/yourname/yourrepo/settings/keys), generated in the android app
+
+## windows
+
+i used *chocolatey* as described in the installation manual at:
+
+<https://github.com/gopasspw/gopass/blob/master/docs/setup.md#windows>
+
+    choco install gopass
+
+## android
+
+<https://github.com/android-password-store/Android-Password-Store>
+
+[[!img posts/gopass/android-password-store.png width="200px" alt="" style="float: none" class="noFancy"]]
+
+the settings:
+
+    repository URL: git@github.com/yourname/yourrepo.git
+    authentication mode: ssh key
+
+the password store app syncs on each change, which is nice.
+
+## linux
+
+simply install gopass, git and gpg
+
+
+# yet unsolved issues
+
+* otp integration (still use andotp, need to check [gopass otp](https://github.com/gopasspw/gopass/blob/master/docs/features.md#adding-otp-secrets))
+* ssh cert management (is there a gopass-agent?)
+* is there iphone support?
+
+# conclusion
+
+i wish i had moved to gopass / password store years ago.
+
+**especially sharing passwords with a team, this is an ideal solution**. major benefit is that one does not have to use ntfs file mounts, to store keepassx databases and can basically update the local copy of the db with `gopass sync` and then be offline for a while and still able to use it daily.

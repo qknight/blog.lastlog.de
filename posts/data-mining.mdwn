@@ -1,0 +1,574 @@
+[[!meta date="2016-10-26 16:35"]]
+[[!tag nixos grafana monitoring selenium data-mining linux usability]]
+
+[[!img media/grafana.png class="noFancy" style="float: right"]]
+[[!summary crawling webpages using selenium, visualizing results using grafana with influxdb backend.]]
+
+# motivation
+
+inspired by the [shackspace's](http://shackspace.de/) [grafana](http://grafana.org/) usage for moisture/temperature monitoring i wanted to use grafana myself.
+since i'm also active in the [fablab neckar-alb](https://www.fablab-neckar-alb.org/) and we are having a nice project, called [cycle-logistics tübingen](https://www.swt-umweltpreis.de/profile/cycle-logistics-t%C3%BCbingen/), to monitor this seemd to be a good opportunity to apply this toolchain.
+
+we are interested in the **voting behaviour**:
+
+* [mine data from here](https://www.swt-umweltpreis.de/profile/) using [selenium](http://docs.seleniumhq.org/) with headless-firefox
+* using [golang](https://github.com/influxdata/influxdb/tree/master/client) to import that data into [influxdb](https://www.influxdata.com/)
+* visualize influxdb's data using [grafana](http://grafana.org/)
+
+this blog posting documents all steps needed to rebuild the setup so you can leverage this toolchain for your own projects! 
+
+here is a screenshot of how it looks:
+
+[[!img media/grafana2.png title="swt-umweltpreis.de at 26.10.2016 at 14:00 o'clock"]]
+
+# setup
+
+[[!img media/grafana_setup.jpg title="data mining setup"]]
+
+below you can find a detailed listing and discussion of the single programs used. the 
+[source code](https://github.com/qknight/selenium_crawler) can be found on github, except the [nixos](#nixos) specific parts which is listed below exclusively.
+
+
+## selenium
+
+selenium is used to visit <https://www.swt-umweltpreis.de/profile/>, parse the `DOM tree` and to export the data as `data.json`. 
+
+to execute `collect_data.py` one needs an python environment with two additional libraries. [nix-shell](http://chriswarbo.net/projects/nixos/nix_shell_shebangs.html) along with `collect_data-environment.nix` is used to create that environment on the fly. 
+
+### collect_data.py
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .python }
+#! /usr/bin/env nix-shell
+#! nix-shell collect_data-environment.nix --command 'python3 collect_data.py'
+
+from selenium import webdriver
+from selenium import selenium
+from selenium.webdriver.common.keys import Keys
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
+from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
+from pyvirtualdisplay import Display
+
+import sys
+import os
+
+display = Display(visible=0, size=(800, 600))
+display.start()
+
+from distutils.version import LooseVersion, StrictVersion
+if LooseVersion(webdriver.__version__) < LooseVersion("2.51"):
+    sys.exit("error: version of selenium ("
+        + str(LooseVersion(webdriver.__version__))
+        + ") is too old, needs 2.51 at least")
+
+ff = webdriver.Firefox()
+
+st = "https://www.swt-umweltpreis.de/profile/"
+ff.get(st)
+
+v = ff.execute_script("""
+var t = document.getElementById('profile').childNodes; 
+var ret = []
+for (var i = 0; i < t.length; i++) {
+  if ('id' in t[i]) {
+    if(t[i].id.includes('profil-')) {
+      var myID = t[i].id.replace("profil-","");
+      var myVotes = t[i].getElementsByClassName('profile-txt-stimmen')[0].innerHTML;
+      var myTitle = t[i].getElementsByClassName('archive-untertitel')[0].innerHTML;
+      var myVerein = t[i].getElementsByClassName('archive-titel')[0].innerHTML;
+      //console.log(myID,myVerein, myTitle, myVotes)
+      var r = new Object();
+      r.Id = parseInt(myID);
+      r.Votes = parseInt(myVotes);
+      r.Verein = myVerein; 
+      r.Title = myTitle;
+      ret.push(r)
+    }
+  }
+}
+var date = new Date();
+var exp = {};
+exp.Date = date;
+exp.Data = ret;
+var j = JSON.stringify(exp,  null, "\t");
+console.log(j);
+return j;
+""")
+
+print (v)
+
+ff.quit()
+display.stop()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### collect_data-environment.nix
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .nix }
+with import <nixpkgs> { };
+
+let 
+  pkgs1 = import (pkgs.fetchFromGitHub {
+    owner = "qknight";
+    repo = "nixpkgs";
+    rev = "a1dd8b2a5b035b758f23584dbf212dfbf3bff67d";
+    sha256 = "1zn9znsjg6hw99mshs0yjpcnh9cf2h0y5fw37hj6pfzvvxfrfp9j";
+  }) {};
+
+in
+
+pkgs1.python3Packages.buildPythonPackage rec {
+  name = "crawler";
+  version = "0.0.1";
+
+  buildInputs = [ pkgs.firefox xorg.xorgserver ];
+
+  propagatedBuildInputs = with pkgs1.python3Packages; [
+    virtual-display selenium
+  ];
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<div class="alert alert-info" role="alert">
+<strong>info: </strong>
+in the above environment, two different versions of `nixpkgs` are mixed, which is a `nix` speciality. 
+
+`virtual-display` and `selenium` from an older `nixpkgs` base called `pkgs1` while `firefox` is the one coming with the nixos operating system called `pkgs`.
+</div>
+
+# golang import
+
+the go based importer is very simple and basically follows the example from the [influxdb client](https://github.com/influxdata/influxdb/tree/master/client) code base.
+
+if you want to build the `inject_into_fluxdb` binary you can simply use `nix-shell` and inside that shell simply type `go build`. you have to put that binary into the right place, which is `/var/lib/crawler/`, manually since this was only a prototype. 
+
+<div class="alert alert-warning" role="alert">
+<strong>warning</strong> use `nixos-rebuild switch` with the nixos specific changes from below first so that the nixos system will create the user/group and directory (`crawler`/`crawler` and `/var/lib/crawler`). and when you deploy stuff into that directory, make sure you use `chown crawler:crawler . -R` in that directory.
+</div>
+
+### inject_into_fluxdb
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .go }
+package main
+
+import (
+  "encoding/json"
+  "github.com/fatih/structs"
+  "github.com/influxdata/influxdb/client/v2"
+  "io/ioutil"
+  "log"
+  "strconv"
+  "time"
+  "fmt"
+//   "os"
+)
+
+type rec struct {
+  Id     int
+  Votes  int
+  Verein string
+  Title  string
+}
+
+type json_message struct {
+  Date string
+  Data []rec
+}
+
+const (
+  MyDB     = "square_holes"
+  username = "bubba"
+  password = "bumblebeetuna"
+)
+
+func main() {
+
+  f, err2 := ioutil.ReadFile("data.json")
+  if err2 != nil {
+    log.Fatalln("Error: ", err2)
+    return
+  }
+
+  var l json_message
+  err2 = json.Unmarshal(f, &l)
+  if err2 != nil {
+    log.Fatalln("Error: ", err2)
+    return
+  }
+
+  // Make client
+  c, err := client.NewHTTPClient(client.HTTPConfig{
+    Addr:     "http://localhost:8086",
+    Username: username,
+    Password: password,
+  })
+
+  if err != nil {
+    log.Fatalln("Error: ", err)
+  }
+
+  // Create a new point batch
+  bp, err := client.NewBatchPoints(client.BatchPointsConfig{
+    Database:  MyDB,
+    Precision: "s",
+  })
+
+  if err != nil {
+    log.Fatalln("Error: ", err)
+  }
+  
+  layout := "2006-01-02T15:04:05.000Z"
+  t, err3 := time.Parse(layout, l.Date)
+
+  if err3 != nil {
+      fmt.Println(err)
+      return
+  }
+  
+  for _, r := range l.Data {
+    pt, err := client.NewPoint("frei", map[string]string{"Id": strconv.Itoa(r.Id)}, structs.Map(r), t.Local())
+    bp.AddPoint(pt)
+    if err != nil {
+      log.Fatalln("Error: ", err)
+    }
+  }
+
+  // Write the batch
+  c.Write(bp)
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### deps.nix
+
+[go2nix](https://github.com/kamilchm/go2nix) in version 1.1.1 has been used to generate the `default.nix` and `deps.nix` automatically. this is also the reason for the weird directory naming inside the GIT repo. 
+
+<div class="alert alert-warning" role="alert">
+<strong>warning</strong> there are two different implementation of a go to nix dependency converter and both are called `go2nix`. i was using the one from `kamilchm` the other never worked for me.
+</div>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .nix }
+# This file was generated by go2nix.
+[
+  {
+    goPackagePath = "github.com/fatih/structs";
+    fetch = {
+      type = "git";
+      url = "https://github.com/fatih/structs";
+      rev = "dc3312cb1a4513a366c4c9e622ad55c32df12ed3";
+      sha256 = "0wgm6shjf6pzapqphs576dv7rnajgv580rlp0n08zbg6fxf544cd";
+    };
+  }
+  {
+    goPackagePath = "github.com/influxdata/influxdb";
+    fetch = {
+      type = "git";
+      url = "https://github.com/influxdata/influxdb";
+      rev = "6fa145943a9723f9660586450f4cdcf72a801816";
+      sha256 = "14ggx1als2hz0227xlps8klhn5s478kczqx6i6l66pxidmqz1d61";
+    };
+  }
+]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+### default.nix
+
+<div class="alert alert-info" role="alert">
+<strong>info: </strong>
+`go2nix` generates a `default.nix` which is basically a dropin when used in `nixpkgs` but i wanted to use it with `nix-shell` so a few lines needed changes. just be awere of that!
+</div>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .nix }
+{ pkgs ? import <nixpkgs>{} } :
+let 
+  stdenv = pkgs.stdenv;
+  buildGoPackage = pkgs.buildGoPackage;
+  fetchgit = pkgs.fetchgit;
+  fetchhg = pkgs.fetchhg;
+  fetchbzr = pkgs.fetchbzr; 
+  fetchsvn = pkgs.fetchsvn;
+in
+
+buildGoPackage rec {
+  name = "crawler-${version}";
+  version = "20161024-${stdenv.lib.strings.substring 0 7 rev}";
+  rev = "6159f49025fd5500e5c2cf8ceeca4295e72c1de5";
+
+  goPackagePath = "fooooooooooo";
+
+  src = ./.;
+
+  goDeps = ./deps.nix;
+
+  meta = {
+  };
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# nixos
+
+### configuration.nix
+
+<div class="alert alert-info" role="alert">
+**info:**
+in the `configuration.nix` excerpt `apache`, which is called `httpd` in nixos`, is used as a [reverse proxy](https://de.wikipedia.org/wiki/Reverse_Proxy). you don't have to follow that example but it is a nice setup once one gets it working.
+</div>
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .nix }
+  ...
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+      ./crawler.nix
+    ];
+  ...
+  services.grafana = {
+    enable=true;
+    port=3012;
+    rootUrl="https://nixcloud.io/grafana";
+    security = {
+      adminPassword="supersecret";
+      secretKey="+++evenmoresecret+++";
+    };
+    users = {
+      allowSignUp = false;
+      allowOrgCreate = true;
+    };
+    analytics.reporting.enable = false;
+
+  };
+
+  services.influxdb = {
+    enable = true;
+  };
+  ...
+  services.httpd = {
+    enable = true;
+    enablePHP = true;
+    logPerVirtualHost = true;
+    adminAddr="js@lastlog.de";
+    hostName = "lastlog.de";
+    extraModules = [
+      { name = "php7"; path = "${pkgs.php}/modules/libphp7.so"; }
+      { name = "deflate"; path = "${pkgs.apacheHttpd}/modules/mod_deflate.so"; }
+      { name = "proxy_wstunnel"; path = "${pkgs.apacheHttpd}/modules/mod_proxy_wstunnel.so"; }
+    ];
+ virtualHosts =
+    [ 
+      # nixcloud.io (https)
+      {
+        hostName = "nixcloud.io";
+        serverAliases = [ "nixcloud.io" "www.nixcloud.io" ];
+
+        documentRoot = "/www/nixcloud.io/";
+        enableSSL = true;
+        sslServerCert = "/ssl/acme/nixcloud.io/fullchain.pem";
+        sslServerKey = "/ssl/acme/nixcloud.io/key.pem";
+       extraConfig = ''
+          Alias /.well-known/acme-challenge /var/www/challenges/nixcloud.io/.well-known/acme-challenge
+          <Directory "/var/www/challenges/nixcloud.io/.well-known/acme-challenge">
+            Options -Indexes
+            AllowOverride None
+            Order allow,deny
+            Allow from all
+            Require all granted
+          </Directory>
+          RedirectMatch ^/$ /main/
+          #Alias /main /www/nixcloud.io/main/page
+          <Directory "/www/nixcloud.io/main/">
+            Options -Indexes
+            AllowOverride None
+            Require all granted
+          </Directory>
+
+          SetOutputFilter DEFLATE
+
+          <Directory "/www/nixcloud.io/">
+            Options -Indexes
+            AllowOverride None
+            Order allow,deny
+            Allow from all
+          </Directory>
+
+          # prevent a forward proxy! 
+          ProxyRequests off
+
+          # User-Agent / browser identification is used from the original client
+          ProxyVia Off
+          ProxyPreserveHost On
+
+          RewriteEngine On
+          RewriteRule ^/grafana$ /grafana/ [R]
+
+          <Proxy *>
+          Order deny,allow
+          Allow from all
+          </Proxy>
+
+          ProxyPass /grafana/ http://127.0.0.1:3012/ retry=0
+          ProxyPassReverse /grafana/ http://127.0.0.1:3012/
+       '';
+      }
+    ]
+   ...
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### crawler.nix
+
+simply put `crawler.nix` into `/etc/nixos` and reference it from [configuration.nix](#configuration.nix) using the `imports` directive. 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .nix }
+{ config, pkgs, lib, ... } @ args:
+
+#with lib;
+
+let
+  cfg = config.services.crawler;
+  stateDir = "/var/lib/crawler/";
+in { 
+  config = {
+    users = {
+      users.crawler= {
+        #note this is a hack since this is not commited to the nixpkgs
+        uid             = 2147483647;
+        description     = "crawler server user";
+        group           = "crawler";
+        home            = stateDir;
+        createHome      = true;
+      };
+
+      groups.crawler= {
+        #note this is a hack since this is not commited to the nixpkgs
+        gid = 2147483648;
+      };
+    };
+
+    systemd.services.crawler= {
+      script = ''
+          source /etc/profile
+          export HOME=${stateDir}
+          ${stateDir}/collect_data.py > ${stateDir}/data.json
+          cd ${stateDir}
+          ${stateDir}/inject_into_fluxdb 
+        '';
+      serviceConfig = {
+        Nice = 19;
+        IOSchedulingClass = "idle";
+        PrivateTmp = "yes";
+        NoNewPrivileges = "yes";
+        ReadWriteDirectories = stateDir;
+        WorkingDirectory = stateDir;
+      };
+    };
+
+    systemd.timers.crawler = { 
+      description = "crawler service";
+      partOf      = [ "crawler.service" ];
+      wantedBy    = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*:0/30";
+        Persistent = true;
+      };
+    };
+  };
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<div class="alert alert-info" role="alert">
+<strong>info: </strong>
+note the `timerConfig.OnCalendar` setting which starts the crawling every 30 minutes.
+</div>
+
+
+### /var/lib/crawler
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[root@nixcloud:/var/lib/crawler]# ls -lathr
+total 5.6M
+drwxr-xr-x 21 root    root    4.0K Oct 24 18:09 ..
+drwx------  3 crawler crawler 4.0K Oct 24 23:24 .cache
+drwx------  3 crawler crawler 4.0K Oct 24 23:24 .dbus
+drwxr-xr-x  2 crawler crawler 4.0K Oct 24 23:24 Desktop
+drwx------  4 crawler crawler 4.0K Oct 24 23:24 .mozilla
+drwxr-xr-x  3 crawler crawler 4.0K Oct 25 13:37 github.com
+-rw-r--r--  1 crawler crawler  490 Oct 25 13:37 collect_data-environment.nix
+-rwxr-xr-x  1 crawler crawler 1.8K Oct 25 18:15 collect_data.py
+drwx------  8 crawler crawler 4.0K Oct 25 18:15 .
+drwxr-xr-x  8 crawler crawler 4.0K Oct 25 18:15 .git
+-rwxr-xr-x  1 crawler crawler 5.6M Oct 25 18:16 inject_into_fluxdb
+-rw-r--r--  1 crawler crawler 5.1K Oct 27 12:30 data.json
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### data.json
+
+this is an example of the `data.json` which is generated by selenium and with `jq`, a [very nice tool to process json in a shell](https://stedolan.github.io/jq/), one can experiment with the values.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .json }
+{
+  "Date": "2016-10-27T11:00:55.123Z",
+  "Data": [
+    {
+      "Id": 338,
+      "Votes": 2252,
+      "Verein": "Ziegenprojekt am Jusi und Florian",
+      "Title": "Schwäbischer Albverein Kohlberg/Kappishäuseren"
+    },
+    {
+      "Id": 215,
+      "Votes": 2220,
+      "Verein": "„Karl, der Käfer, wurde nicht gefragt …“ – ein Baumprojekt",
+      "Title": "Waldkindergarten Schurwaldspatzen e.V."
+    },
+    {
+      ...
+    },
+    {
+      "Id": 194,
+      "Votes": 34,
+      "Verein": "Plankton: Das wilde Treiben im Baggersee!",
+      "Title": "Tübinger Mikroskopische Gesellschaft e.V. (Tümpelgruppe)"
+    }
+  ]
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### jq usage example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+cat data.json | jq '.Data[0]'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+shows:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.json}
+{
+  "Id": 338,
+  "Votes": 2252,
+  "Verein": "Ziegenprojekt am Jusi und Florian",
+  "Title": "Schwäbischer Albverein Kohlberg/Kappishäuseren"
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# grafana setup
+
+first you need to add an influxdb data source:
+
+[[!img media/grafana_config1.png title="data source"]]
+
+based on that you need to configure the graph to use the influxdb source:
+
+[[!img media/grafana_config2.png title="graph setting"]]
+
+
+
+# summary
+
+hope you enjoyed reading this and if you have further questions, drop an email to: <a href="mailto:js@lastlog.de?subject=cfp@nixcloud">js@lastlog.de</a>. 
+
+thanks,
+ 
+qknight
+

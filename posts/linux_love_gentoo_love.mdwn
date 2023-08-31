@@ -1,0 +1,36 @@
+[[!summary chatGPT: The author updates their Gentoo box and praises the stability and usability of the new portage KDE, the Nvidia graphics driver, and the performance of various applications, expressing overall happiness with the update and plans for future improvements.]]
+[[!meta date="2009-11-20 20:38"]]
+[[!tag audio gentoo linux society technology usability]]
+
+recently i updated my gentoo box. the computer is a c2c processor with a fast nvidia graphics card. **but what is cool about that "you" wonder**?
+
+[[!img media/200px-gentoo_linux_logo_matte-svg.png size=200x style="float: right"]]
+
+actually the new portage kde 4.3.3 seems to be very stable (read usable) for me. the **proprietary** graphics **driver** **nvidia.ko** is doing great! i use suspend2ram about 10 times a day. i leave the pc in **suspend2ram** **for days** and it only needs **3W of power**! suspend2ram needs **2-3 secs** for going down and about **7 secs** to come back up! plasma is now at a point that i see it is going to be useful. the expose clone of the kde folks is very very nice to use. dragon player seems to get stable so i can use it with the smb:// kio plugin to watch films from my server. firefox64 selfcompiled now uses a 64bit flash plugin. and finally nearly all applications i'm using regularly work like a charm, which include:
+
+
+
+	
+  * firefox (even watching flash films, fullscreen still stutters but then usually once can do: mplayer -fs /tmp/FlashAVE3 (name is somehow similar)
+  * very **fast 3d **support (**nvidia i love you!**) in kde and in fullscreen games as well as normal **2d acceleration** for movies
+  * that said, the new **kde desktop effects** are the best user experience i've had for years now (i didn't test vista/win7) but mac os x
+  * sound seems to be working now. to be honest i don't understand why (didn't test skype tough)
+  * the game 'spring' runs with 280fps on my computer (that is a peak value of course) but then with medium details on a map with 5on5 (10 kaik ais) it still seems to be no problem to get decent 60fps!
+
+**to conclude**: i'm very happy especially since this suspend2ram thing now works. both pcs (i just cloned the gentoo image from the first pc) did work with the same settings altough both use different hardware.
+
+that is really really cool!
+
+currently i'm looking forward getting:
+
+
+
+	
+  * into **kdevelop 3.9.95**
+  * **akonadi**: using a backend !google for pim (i don't have a google calender nor do i use google mail)
+  * getting rid of my laptop with this awful radeon r300 card, i'll probably buy a **"hp elite" with a nvidia card** and a 6mb L2 cache (c2c cpu)
+
+
+to all gentoo readers out there: i love this distribution so much since portage is doing well and the update (although taking long) was a great success.
+
+**UPDATE:** i forgot to feature  the graphics card i use: it is a '**Gigabyte GeForce 9600 GT Passiv 512MB** for 83,90 euro' (20 nov 2009) which is as silent as you can imagine: **0 dB**

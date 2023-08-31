@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="ODOO_evaluation.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>ODOO evaluation</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/ODOO_evaluation.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="owncloud_ssl_client_certificates.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="attic-backup.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">ODOO evaluation</h1>
+    <div id="date"><p><span id="lastupdated">13 feb 2015</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::erp" class="tagbtn btn btn-primary">erp</a><a href="timeline.html?filter=tag::odoo" class="tagbtn btn btn-primary">odoo</a><a href="timeline.html?filter=tag::python" class="tagbtn btn btn-primary">python</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/company_logo.png"><img src=media/company_logo.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>i’ve been looking into various open source ERP systems on [1] and
+started with odoo version 8.0.</p>
+<h2 data-number="2" id="odoo">odoo</h2>
+<p>the ERP i’m searching for must fulfill the following
+requirements:</p>
+<ul>
+<li>html5 interface (with great usbility)</li>
+<li>API for automated unit testing</li>
+</ul>
+<p>things i want to realise with it:</p>
+<ul>
+<li>payment (accounting)</li>
+<li>address database for customers
+<ul>
+<li>room management</li>
+</ul></li>
+<li>hosting data for creating a catalogue</li>
+<li>statistics</li>
+<li>data import (from previous ERP)</li>
+</ul>
+<h3 data-number="2.1" id="what-i-liked">what i liked</h3>
+<p>at first glance:</p>
+<ul>
+<li><strong>pure html5 interface</strong> on the client (there is xmlrpc
+[4] for scripting!)</li>
+<li><strong>nice, clean and modern interface</strong>
+<ul>
+<li><p>consistent design, very nice!</p></li>
+<li><p>ajax use, for example in the search field</p>
+<p><a href="media/erp_odoo2.jpg"><img src=media/erp_odoo2.jpg alt=""></a></p></li>
+</ul></li>
+<li>written in python</li>
+<li><strong>they use git</strong> and github.com</li>
+<li><strong>they use postgresql</strong></li>
+<li>easy to install</li>
+<li>documentation [4] and [5] seems to be well done</li>
+<li>like the ‘as a question’ [6] which reminds me of stackoverflow</li>
+</ul>
+<h3 data-number="2.2" id="what-i-disliked">what i disliked</h3>
+<p>at first glance:</p>
+<ul>
+<li><p><strong>odoo use long-polling (not websockets) for the internal
+chat. all other modules i tried <em>lack</em> support for such
+transparent updates.</strong> this includes:</p>
+<ul>
+<li>calendar</li>
+<li>messaging</li>
+<li>fleet management<br />
+</li>
+<li>human resources</li>
+<li>sales</li>
+</ul>
+<p><strong>this is hard to accept for me! webdesign from the 80ties! but
+compared to ‘apache ofbiz’ it seems pretty modern. anyway i hate systems
+which force me to press F5 when something changed!</strong> this is
+annoying, especially in the fleet management where you have to click the
+drop down to see all data after each F5.</p></li>
+<li><p>calendar</p>
+<p>lacks room management?!</p>
+<p><a href="media/erp_odoo1.jpg"><img src=media/erp_odoo1.jpg alt=""></a></p></li>
+<li><p><strong>no REST interface</strong></p></li>
+<li><p><strong>removing of optional components broke the
+interface</strong> by leaving menus which just won’t do anything
+(experienced with installing/removing the fleed module)</p></li>
+<li><p>the installation for the ubuntu 14.04 [3] was incomplete:</p>
+<ul>
+<li>python-pypdf was missing</li>
+<li>python-passlib was missing</li>
+</ul>
+<p>thus <strong>incomplete dependencies</strong>! as a result the
+<strong>initial database deployment was corrupted</strong> and it took
+me quite a while until i realised i had to remove the database first and
+then restart the daemon afterwards which then recreated the db
+successfully. one solution would be to use nix on nixos!</p></li>
+<li><p>using <code>./odoo.py scraffoldd openacademy addons</code> does
+not have any effect, as the scraffold<strong>d</strong> is accidentaly
+written with two d but ./odoo.py does not report any error!</p></li>
+</ul>
+<h2 data-number="3" id="conclusion">conclusion</h2>
+<p>i got mixed feelings about this <strike>project</strike> product:</p>
+<ul>
+<li><strong>nice html5 interface</strong> which at first glance seems
+good <strong>but requires manual refresh -&gt; ugly!</strong></li>
+<li><strong>i need to implement my own module [5] to experience the API
+is well designed</strong></li>
+<li><strong>don’t like the odoo marketing</strong> (too much design and
+fuss)</li>
+<li>need to look into optional modules, but installing them is not
+straight forward ;P</li>
+</ul>
+<p>my overall impression is rather positive.</p>
+<h2 data-number="4" id="links">links</h2>
+<ul>
+<li>[1] <a
+href="https://en.wikipedia.org/wiki/List_of_ERP_software_packages"
+class="uri">https://en.wikipedia.org/wiki/List_of_ERP_software_packages</a></li>
+<li>[2] <a href="https://www.odoo.com/"
+class="uri">https://www.odoo.com/</a></li>
+<li>[3] <a
+href="https://www.techreceptives.com/install-odoo-v8-ubuntu-14-04-lts/"
+class="uri">https://www.techreceptives.com/install-odoo-v8-ubuntu-14-04-lts/</a></li>
+<li>[4] <a
+href="https://www.odoo.com/documentation/8.0/api_integration.html#calling-methods"
+class="uri">https://www.odoo.com/documentation/8.0/api_integration.html#calling-methods</a></li>
+<li>[5] <a
+href="https://www.odoo.com/documentation/8.0/howtos/backend.html"
+class="uri">https://www.odoo.com/documentation/8.0/howtos/backend.html</a></li>
+<li>[6] <a
+href="https://www.odoo.com/forum/help-1/question/are-the-translation-language-files-finished-for-odoo-v8-updated-9-feb-2015-64234"
+class="uri">https://www.odoo.com/forum/help-1/question/are-the-translation-language-files-finished-for-odoo-v8-updated-9-feb-2015-64234</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/ODOO_evaluation.mdwn" title="posts\ODOO_evaluation.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

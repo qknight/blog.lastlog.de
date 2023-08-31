@@ -1,0 +1,40 @@
+[[!summary chatGPT: The author has been experiencing crashes on their HP EliteBook 8530w after resuming from suspend and found that disabling compositing in KDE helped, but the crashes still occurred. They then disabled compositing and AIGLX in xorg.conf, which seemed to resolve the issue. They are currently using Nvidia drivers and have 2D and 3D acceleration running. There have been continued crashes, but it is difficult to debug.]]
+[[!meta date="2010-09-19 23:20"]]
+[[!tag gentoo]]
+
+[[!img media/hp-com-elitebook-8530w.jpg size=180x caption="hp elite book 8530w, source hp.com" style="float: right"]]
+
+# the problem
+
+since my last posting the 'hp elitebook 8530w' kept crashing quite often, when doing a resume after pm-suspend. i think i found a cure. disabling 'compositing' using:
+
+  * kde - system settings - desktop - 'enabled desktop effects'
+
+made it work. but for some unknown reason there were these random crashes when resuming.
+
+# the fix
+
+it is NOT enough to disable this in kde as for some reason, it sometimes got reenabled without my influence (i don't have any clue why). so today i tried to find a way to make these crashes reproducable: with some good results.
+
+the problem was definitely related to 'compositing' (or AIGLX?) so i remembered the times when the 'compositing' extension was disabled by default, maybe for good reason?
+
+i disabled it by editing xorg.conf:
+
+    Section "Extensions"
+    Option  "Composite" "Disable"
+    EndSection
+    Section "ServerFlags"
+    Option  "AIGLX" "off"
+    EndSection
+
+after a restart of xdm with this new settings i could not get it to crash as i did before. that is good news to me! maybe it's time to test **x11-drivers/nvidia-drivers-256.35** again!
+
+right now i'm  using =x11-drivers/nvidia-drivers-195.36.24 with 2.6.34-gentoo-r1 with this graphics card:
+
+    01:00.0 VGA compatible controller: nVidia Corporation G96M [Quadro FX 770M] (rev a1)
+
+i also have 2d and 3d acceleration running. *yepee*
+
+# update
+
+**21.09.2010** this is so strange, i still receive regular crashes on 'resume' but maybe they are not directly related to the nvidia module. the problem is that this is very hard to debug as there is no graphical output nor any log files to start with ...

@@ -1,0 +1,156 @@
+[[!summary chatGPT: The author discusses their experience with network management on Linux, specifically focusing on the drawbacks and benefits of their own network configuration setup using scripts. They also mention their thoughts on NetworkManager and suggest improvements, such as better debugging options and a graphical interface for monitoring network activity. Finally, they propose the concept of a "pyramid of services" to visualize the dependencies between network services and the ability to restart services at different layers of the pyramid.]]
+[[!meta date="2009-10-25 04:16"]]
+[[!tag gentoo linux technology usability]]
+
+# motivation
+network management on linux differs from distro to distro. trying various of these i liked what SuSE did over the year. they included a **network manager like applet 'knetwork'** with kde 3 which even included isdn (ppp) links.
+
+gentoo has it's own network configuration which is quite static using /etc/conf.d/net. i use this for static setups but i've written my own scripts for my laptop (aka desktop) machine. just one example:
+
+
+# wpa_supplicant_generic_dhcp_ath0
+    #!/bin/bash -v
+    echo "sh /root/config/wpa_supplicant_generic_dhcp_ath0" > /root/last-lan.sh
+    if [ -f /var/run/dhcpcd-ath0.pid ]; then
+    rm /var/run/dhcpcd-ath0.pid
+    fi
+    killall dhcpcd
+    killall wpa_supplicant
+    killall vpnc
+    ifconfig br0 down
+    ifconfig ath0 down
+    ifconfig eth0 down
+    brctl delif br0 ath0
+    brctl delif br0 eth0
+    brctl delbr br0
+    
+    rmmod ath5k
+    modprobe ath5k
+    #iw reg set EU #does not work
+    sleep 1
+    ifconfig ath0 up
+    wpa_supplicant -B -dd -D wext -i ath0 -c /etc/wpa_supplicant.conf
+    route del default
+    #dhcpcd ath0
+    iptables -t nat -A POSTROUTING -o ath0 -j MASQUERADE
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    
+    ethtool -s eth0 speed 100
+    dhcpcd ath0
+    #dhclient ath0
+    
+    cp /etc/resolv.conf /etc/resolv.conf.dnsmasq
+    echo "nameserver 127.0.0.1" > /etc/resolv.conf
+    ifconfig eth0 10.0.0.1/24 up
+    dhcpd eth0
+
+
+although my scripts work very well (even when i restart my computer the last script is automatically run from /etc/init.d/local) this setup has it drawbacks in usability.
+
+**benefits**:
+
+  * starts a dhcpd instance, so my  laptop acts as a dhcp server (not included)
+  * my local dnsmasq installation can be accessed from the eth0 subnet
+  * setup for eth0 is automatically made & routing is enabled by default
+  * i can adapt to new networks quite fast with yet another config file instantiation
+  * once bridging is working for eth0|ath0 i can increase usability since i can transparently use either wireless lan or ethernet, say for backups the later might be much faster without having to kill all connections. (not included)
+
+
+**drawbacks**:
+
+  * although networks using none|wpa1|wpa2 it tends to have problems with vpn (i wrote another script)
+  * it lacks usability, no monitoring what happens (in case of an issue i run it on a shell)
+  * on bad connections with wifi the **dhcp step fails quite some times**, running the script again will result in (loss of time)
+  * it reloads the wireless lan driver (helpful when i was using kismet for finding new networks), still this might not be necessary all the time (loss of time)
+  * bad in regards to hot plugging (and therefore automation) after inserting a wireless lan usb stick (or similar)
+  * my scripts require a **static interface naming scheme**, gentoo provides this by default:
+**/etc/udev/rules.d/70-persistent-net.rules**
+
+
+i considered NetworkManager (NM). i like most of it's technology as for instance the **DBUS** interface it uses is probably the best way one could implement something like NM. i also like the integration into gentoo but this came pretty late (ubuntu was the first distro which had quite acceptable NM support).
+
+but NM does a very bad job if things don't work. there is no debugging possible. example:
+
+  * NM using WPA2 needs to create a wpa_supplicant.conf on the fly before executing wpa_supplicant. i did not find any way to see this file anywhere
+  * NM won't help me to see wpa_supplicant errors
+  * NM will show the signal power if i'm connected to a certain network. this is limited to one interface in general. what about several wifi cards? what about bluetooth links?
+  * NM lacks a graphical interface (or any interface at all) for debugging what is going on
+
+this made me think about network and interface usage in general. i'm using many tools for years now as:
+	
+  * **ip** - for ipv4/ipv6 interface configuration & routing
+  * **dhcpcd/dhclient **(managing dhcp address automation)
+  * **wpa_supplicant** (wpa|wpa2|EAP)
+  * **vpnc** (instead of cisco vpn)
+  * **dns** (resolv.conf / dnsmasq) (openresolv is on the agenda, didn't have time yet)
+
+
+but these tools although relying on each other are monolithic and static software monsters. if one wants to understand what networks are all about it is one thing: **dynamics in every aspect**
+
+the next graph shows a 'network grammar' which describes the possible dependencies or how one can stack various programs:
+
+[[!img media/blog-lastlog-de-networkmanager.png alt="" caption="network grammer" size=800x]]
+
+
+but on '**run time**' you will end up in a '**state graph**' with every application somehow connected to others in various ways. states are also triggered on timeouts (for example when the '**dhcp server**' **wasn't accessible** by the local dhclient one is forced to take action). now let's look how the grammar applies on 'run time':
+
+[[!img media/blog-lastlog-de-networkmanager2.png alt="" caption="network state graph" size=800x]]
+
+the two previous graphics also demonstrate the stacking capabilities. looking at the grammar makes this obvious. (the **grammar** and the **flow graph** are far from complete but illustrate the basic concept).
+
+	
+  * if someone types '**ip l set eth0 down**' all connections regarding eth0 as source or target are removed as well es default or specialized routes over (through) that interfaces are dropped without being restored on 'ip l set eth0 up'.
+    example
+
+        # ip l set eth0 up
+        # tcpdump -i eth0 &
+        [1] 5866
+        listening on eth0, link-type EN10MB (Ethernet), capture size 96 bytes
+
+        # ip l set eth0 down
+        tcpdump: pcap_loop: recvfrom: Network is down
+        0 packets captured
+        0 packets received by filter
+        0 packets dropped by kernel
+        [1]  + exit 1     tcpdump -i eth0
+
+    **HINT:** dhclient for instance keeps running if the interface goes down
+
+    **HINT:** ssh only detaches the eth0 interface from being used and on up reattaches it
+
+    **SOURCE:** equery b ip -> sys-apps/iproute2-2.6.28 (/sbin/ip)
+
+        iproute2-2.6.28::iplink.c shows:
+        } else if (strcmp(*argv, "down") == 0) {
+        req->i.ifi_change |= IFF_UP;
+        req->i.ifi_flags &= ~IFF_UP;
+
+this triggers the kernel in some way which then signals the change to every process using this interface.
+
+
+
+	
+  * in a state graph every object can perform an action considered best suited by the affected object. this helps to delegate some jobs to daemons (for example dhcpd) but every object affects the '**state machine**'
+  * the protocol for interaction is **DBUS** (there is a wpa_supplicant dbus interface, as well as one for dhcpclient usage)
+
+maybe this idea inspires someone to rewrite NM with usability (in the sense of **automation** and **debugging feedback**) in mind. i think NM is on the right track already.
+
+NM should:
+	
+  * show the connection state: either layer1 connection/layer2 connection/layer 3 connection
+  * link quality per interface (wlan/bluetooth)
+
+    [[!img media/blog-lastlog-de-network-meter.png alt="" caption="network meter"]]
+
+  * have a debug console which can be triggered
+  * should have a 'in detail' network information dialog
+
+    [[!img media/blog-lastlog-de-network-information.png alt="" caption="network information"]]
+
+	
+  * should generate a wpa_supplicant.conf which can be viewed (so that one can see what the on-the-fly config file generator has created)
+  * should pipe the output of all involved processes to a debug line, so that one can sort output per process with a global time line
+  * regarding the 'grammar' above one can think of a '**pyramid of services**'. if one of the services in the middle fails all above have to be restarted (or at least signaled on change). say vpnc fails, we need to reconnect it with all the things one has to do -> removing the current route, reset a new one (probably the same) and prior to that we have to reconnect as soon as the service is known to fail. vpnc for example fails quite some times since.
+this 'pyramid of services' should be visible to the user and a user 'must have' the possibility to see the status of every 'floor' in this pyramid. if layer 3 connection is working, l3 must light up. if a user wants to restart all services above layer 3 there must be a 'restart all services above' button. currently in NM one has to do all the steps from bottom up.
+
+

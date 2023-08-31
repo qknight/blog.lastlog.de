@@ -1,0 +1,18 @@
+[[!summary chatGPT: The internet was originally designed as a decentralized fail-safe structure, but many protocols and services today rely on central points of failure, which opens the door to censorship. Peer-to-peer (p2p) networks offer a solution by allowing the sharing of files and opinions in a democratic manner.]]
+[[!meta date="2009-05-19 01:26"]]
+[[!tag society technology]]
+
+originally the internet was engineered as a decentraled fail save structure. looking at the basic design one can see that there is a hierarchy in the network which is organized in different subnets which then are connected through routers using protocols like BGP/OSPF/IS-IS or RIP.although nearly all things in IT change fast - this is still the same principle since day one.
+
+we have lots of protocols on top of this decentralized foundation which have one central point of failure, to name some:
+	
+  * dns
+  * server/client principle
+
+dns is important but still no decentralized replacement in sight. p2p filesharing for instance does not require dns to work it has it's own naming sheme using 'distributed hash tables' which works under the most difficult conditions.
+
+the client/server principle is a very important substructure but today most internet services are based on a single server which is - again - a single point of failure. this fact is important to face since this opens the door to do censorship efficiently. in a democratic world we need 'free speech' which is best expressed by sharing opinions. a p2p network gives you that ability - to share a opinion.
+
+with p2p you can share files which you want to be spread. you can use the concept of p2p for more than just spreading files - imagine a p2p webservice for a page you like. this way you could help to balance the load, prevent DoS attacks and most important you can show others your opinion.
+
+maybe you think differently about p2p now... it is not just about downloading files!

@@ -1,0 +1,30 @@
+[[!meta date="2009-05-13 12:00"]]
+[[!tag linux openmoko shr]]
+[[!summary chatGPT: Initial Impressions of OpenMoko Neo Freerunner: Navigating Software Instabilities and Recognizing Potential]]
+
+this is actually my first blog entry here and i would like to start bloggin about my openmoko - neo freerunner phone. it's been a while ago since i bought this smartphone and i love it i have lots of problems with it.
+
+i'm currently using SHR which is great in concept and would serve all i require which is basically:
+	
+  * gps software and tracking using tangogps
+  * basic gsm usage as using this device to receive phone calls and to make phone calls
+  * having a offline wikipedia
+
+all other things i consider nice to have.
+
+the main problem i am facing is the instability of the software. i think of a few different bugs which happen to force a restart since it makes the neo unusable
+
+  * the 'white' screen of death: suddenly after clicking something on the screen it gets white and the moko freezes. already logged in usb ssh sessions are frozen instantly and i have to eject the battery to force a restart
+  * the 'white vertical flash' of annoyance: sometimes the screen just starts to have this pattern which looks like a white wave of 'white' - one can get rid of this using xrandr. normally i rotate the screen 180 degrees and it's gone
+  * kernel panic - this does not happen so often and i don't see any pattern in that (i only see a blinking red led)
+  * 'sd freeze' - sometimes processes having a reference to the sd card seem to wait forever and the mobile can't be shut down - one has to remove the battery to reset the device
+  * the 'xbuffer screwup' issue: this didn't happen after i reinstalled the SHR image to SHR unstable. i might have introduced this issue with my 'opkg update; opkg upgrade' updates. developers have already told me that the packages **are not meant to be updated** and that i should reinstall the moko with a testing or unstable SHR image instead. this issue however would screw up x buffers in a way that the images (best seen in tangogps) have colored pixels in a random pattern all over the image. in tangogps the map tiles where kind of rerendered with this pattern in an additive way. looked funny somehow. using xrandr made the widgets render correct after the rotation but the tiles from tantogps still were broken - my fix was a device reset.
+
+my current conclusion for the neo freerunner is - i hate it. i regret spending 300 euro on that device. **BUT** i didn't expect this phone 'sold as a developer platform' to be working perfectly. however i expected that at least the device drivers where in a better shape and a basic system would be working. on the other hand i see great potential:
+	
+  * the dbus integration in SHR is the best i've ever seen on any device
+  * the look and feel is appropriate for a phone
+  * the opkg.org repositiory is a great idea and a lot of work must have been spent to design this page
+  * the software stack has already some very nice programs, namely: woosh, tangogps and evopedia (a offline wikipedia) which is very usable right now
+
+

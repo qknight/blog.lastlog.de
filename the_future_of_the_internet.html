@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="the_future_of_the_internet.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>the future of the internet</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/the_future_of_the_internet.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="libnoise_viewer.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="qgraphicsscene_used_as_a_qabstractitemview_ii.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">the future of the internet</h1>
+    <div id="date"><p><span id="lastupdated">1 feb 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::society" class="tagbtn btn btn-primary">society</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/konqueror-icon.png"><img src=media/konqueror-icon.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>before thinking about ‘the future of the internet’ let’s have a look
+what the ‘internet’ actually is. the internet consists of <strong>two
+low level</strong> protocols, that is: <strong>tcp</strong> and
+<strong>udp</strong> and the most prominent protocol
+<strong>ip</strong>. and many other protocols are building on this, as
+http for instance. you are currently reading this blog page using http,
+that means you are also connected to the internet.</p>
+<p>if you want to be a part of the internet you need a internet address
+- in short an ‘<strong>ip address</strong>’.** <strong>since most of use
+are using ipv4 that means often ppl share one ip which is bad since you
+can’t address some person sharing an ip with someone else directly.
+Sharing usually means </strong>NAT** - network address translation - and
+it also means that the internet does not work correctly. NAT is a
+failure and was never meant to be in the original design of the
+internet.</p>
+<p>say you call your friend and he has no phone in his room - but one at
+his mother’s room. usually you can’t call between [22,8] o’clock. the
+same thing is true for nat - you usually can’t reach the other person
+directly.</p>
+<p>the only possible solution to this problem is <strong>ipv6</strong>.
+however we fail to integrate it. we currently fail at a lot of things
+(germany 2010):</p>
+<ul>
+<li><strong>apply ipv6 a standard</strong> before others do it (and we
+have to accept their policies &amp; concepts)</li>
+<li><strong>removing 24h disconnects</strong> for dsl</li>
+<li>creating <strong>balanced upload/download</strong> links</li>
+<li>instead of forcing providers to make dsl uptime 99.9%, we still
+<strong>heavily rely on the telephone system</strong> which has in
+comparison far better service guarantees (for instance dialing 112)</li>
+<li>have more applications using <strong>osi-layer 5 (session
+layer)</strong> instead of binding a session to ip:tcp states</li>
+</ul>
+<h2 data-number="2" id="so-what-was-the-internet-again">So ‘what was the
+internet again’?</h2>
+<p>Actually the internet is much more than just what you can do with
+your browser using http. Before looking at http in detail let’s have a
+look at popular protocols which do NOT use http.</p>
+<ul>
+<li>the first thing which comes into my mind are all the network
+implementations for <strong>games</strong> which most often use UDP and
+in some rare cases use TCP. this is a very big class of
+applications</li>
+<li>then we have <strong>SIP</strong> and similar implementations as
+‘speech over ip’ in short VOIP. most internet providers tend to like
+SIP. gamers often use TeamSpeak or Mumble but there is skype folks as
+well. the most notable difference between all sip like implementations
+and skype is that skype’s implementation bases on a p2p structure but
+since it is closed source one can only speculate how chat and speech is
+using this framework.</li>
+<li>then there are the <strong>chat clients</strong> in various flavors
+ranging from irc &amp; psyc and to IM protocols as xmpp(jabber), irc,
+msn, aim &amp; others. these chat clients - more often than not - have
+also webinterfaces which let’s YOU access the service via http as well.
+using http is a very interesting approach since it uses http for that
+and http usually DOES NOT WORK WELL with such an service but we’ll have
+a look at that later</li>
+<li><strong>p2p filesharing</strong> which is (at least bandwidth wise)
+the most popular internet service. i think about bittorrent (kademlia)
+or other similar concepts (this does not include services like
+rapidshare!).</li>
+<li>last but not least there is a concept known as ‘<strong>middle
+ware</strong>’. for a very long time i did not understand the importance
+of having a ‘middle ware’ when designing internet protocols.
+<strong>corba</strong> and it various implementations for what one would
+call a ‘middle ware’ and from the protocol designer’s point of view it
+gives you a very high degree of object interoperability.</li>
+<li>when a game developer has to write network code usually the choice
+tends to UDP since the laggy nature of TCP flow control can’t be ignored
+when one uses a internet connection with lots of packet loss. however
+UDP basically does not care for lost packages at all which kind of
+‘overcompensates’ the problem one wants to solve. so most developers
+extend UDP until all needed features are there. when the network code is
+done and objects as players interact with other players via the network
+(read ip here) the game developer basically has created his own ‘middle
+ware’.</li>
+<li>the concept using a ‘middle ware’ is very easy to understand: you
+don’t want to care what the network looks like you just know it’s there
+but instead of writing parsers for tcp or udp streams with
+‘<strong>object serialization</strong>’ and ‘<strong>object
+marshaling</strong>’ one can just use an adapter in the programming
+language of choice which handles all this. of course using custom types
+here is most often not as easy as using core types as ‘int’, ‘double’,
+‘float’ and ‘string’ but handled in most cases.</li>
+</ul>
+<h2 data-number="3" id="http-problems">http problems</h2>
+<p>so after looking at the <strong>use case</strong> of ip let’s have a
+look at http and what** problems http has and how they are
+solved<strong>. the biggest issue using http is not the performance hit
+introduced by html/xml and bandwidth loss on the other hand.
+instead</strong> the biggest issue when using http is the fact that http
+is a ‘polling’ only protocol** so a client might download a webpage as:
+http://www.lastlog.de but then closes the connection. this works well
+when you only want to look at webpages and if you are only interested in
+client side events as mouseclicks &amp; similar. but if you want to
+implement an interactive chat using http it gets more complicated since
+you would have to query the server every second for new messages from
+other users (even if there was no new message at all). the server CANNOT
+connect to your browser and tell you about ‘the new message’ right away
+as it is done in all the IM protocols.</p>
+<p>so there are some new concepts as <strong>spdy://</strong> from
+google [1] but there are other similar ideas as well. all lead to a next
+generation http protocol with callback capabilities.
+<strong>opera</strong> for instance features ‘<strong>a socket in the
+browser</strong>’ which is a interesting concept. both concepts
+transform the ‘user’ from a pure consumer into a
+‘consumer/producer’.</p>
+<p>in the first days most internet providers had ‘terms’ in their
+‘<strong>terms and agreements</strong>’ which forced you to offer no
+webservices with your private internet connection. the situation since
+the internet was introduced has changed and providers now sell devices
+as the fritz-box with <strong>DDNS</strong> clients for services as
+<strong>dyndns.org</strong> preinstalled. this change needs to be
+extended further as the classic pattern of ‘private’ and ‘commercial’
+usage merge more every day. it gets hard to distinguish between the
+service levels needed for either of the two scenarios. we need to
+extend:</p>
+<ul>
+<li>service guarantees (uptime/bandwidth)</li>
+<li>extend upload (currently internet connections are pure consumer
+connections)</li>
+<li>extended QoS guarantees where i think of ‘<strong>big bandwidth but
+high latency</strong>’ vs. ‘<strong>small bandwidth with low
+latency</strong>’ since the normal ‘telephone line’ <strong>will vanish
+soon</strong> we need some way of backup line for emergencies of various
+kinds</li>
+</ul>
+<p>So after some history, what makes opera with websockets
+revolutionary? It’s the ‘ease of use’ to put content online. You don’t
+need a provider to host your stuff, just host it yourself! But there are
+pitfals as upload bandwidth is small even with VDSL, i don’t know why…
+my scale of guesses range from:</p>
+<ul>
+<li>‘reducing costs since most users are consumers’ to</li>
+<li>forcing users to ‘shut up’ and to sell enterprise servers for much
+money</li>
+</ul>
+<p>there are many points for both sides and <strong>i don’t have much
+background to make a good guess</strong>.</p>
+<h2 data-number="4" id="some-final-thoughts">Some final thoughts:</h2>
+<ul>
+<li>Currently I’m waiting for a revolution: the upcomming ‘ipv6’ could
+make skype ‘vanish’ since traversing NAT is the biggest problem in
+creating a ‘free clone’ of skype (this is also valid for SIP). also
+filesharing as p2p will work much better.</li>
+<li>http will be extended with something like spdy:// very soon, which
+will make ajax programming pattern much more powerful</li>
+<li><strong>the normal browser will not host only some ajax scripts but
+will also host parts of the database and programs</strong> nowadays
+running on the webservers only and therefore turn into a local
+webserver. the first step was ajax, the second step needed is spdy://
+and the third step to make this work will be adapted software for
+webservers to run in such a scenario. looking at the success of http is
+that it is a easy to use protocol with working standards and it can pass
+nearly every firewall. it basically hosts all kind of services. the next
+big step will be to make the browser to look like a application. again -
+the first step is something like google docs, the second step was making
+it a tv with plugins as flash. the next revolution for example is
+compiling c/c++ code in a way that it runs on top of the flash plugin
+[2]. <strong>in the end the browser and any normal host application
+merge…</strong></li>
+<li><strong>flash will vanish</strong> - since the biggest use case is
+streaming videos and commercials, so guess what users will disable once
+most videos are played using the in-browser player (which has also huge
+performance improvements)?<strong> </strong></li>
+</ul>
+<h2 data-number="5" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://www.chromium.org/spdy/spdy-whitepaper"
+class="uri">http://www.chromium.org/spdy/spdy-whitepaper</a></li>
+<li>[2] <a
+href="http://www.flashmagazine.com/news/detail/play_doom_online_-_thanks_to_adobe_alchemy/"
+class="uri">http://www.flashmagazine.com/news/detail/play_doom_online_-_thanks_to_adobe_alchemy/</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/the_future_of_the_internet.mdwn" title="posts\the_future_of_the_internet.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

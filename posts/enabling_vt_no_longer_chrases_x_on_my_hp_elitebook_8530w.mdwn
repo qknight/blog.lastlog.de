@@ -1,0 +1,68 @@
+[[!summary chatGPT: The author discusses their difficulties in using VirtualBox with 64-bit guests on their host OS and their attempts to fix it, eventually finding success with the x11-drivers/nvidia-drivers-256.35 driver. They also mention the various functions that are now working with this driver, but note that it may not be stable.]]
+[[!meta date="2010-07-21 11:21"]]
+[[!img media/.jpg alt="" style="float: right"]]
+[[!tag gentoo linux technology usability]]
+
+# motivation
+
+i always wanted to use VirtualBox with 64bit guests. but this did not work for a very long time. i guess this has something to do with that Quadro FX 770M card.
+
+
+    lspci
+    01:00.0 VGA compatible controller: nVidia Corporation G96M [Quadro FX 770M] (rev a1)
+
+
+so on which architecture is my host OS?
+
+    arch
+    x86_64
+
+# what were the previous problems?
+
+
+i've always experimented with the bios setting, on my hp bios this is called: "Virtualization Technology" and it can either be enabled or disabled. but for various versions of x11-drivers/nvidia it:
+
+
+
+	
+  * did not start X with an error message in /var/log/Xorg.0.log
+  * crash the computer with a black screen (and more than average but constant fan noise)
+
+however it was always able to use the xorg driver called 'nv' to use the system. only the proprietary nvidia module did not work as expected.
+
+here is a list of driver versions i've experimented with (**which did NOT work**):
+
+  * x11-drivers/nvidia-drivers-180.27
+  * x11-drivers/nvidia-drivers-180.29
+  * x11-drivers/nvidia-drivers-180.44
+  * x11-drivers/nvidia-drivers-180.51
+  * x11-drivers/nvidia-drivers-180.60
+  * x11-drivers/nvidia-drivers-185.18.36
+  * x11-drivers/nvidia-drivers-185.18.36-r1
+  * x11-drivers/nvidia-drivers-190.42-r3
+  * x11-drivers/nvidia-drivers-190.53
+  * x11-drivers/nvidia-drivers-190.53-r1
+  * x11-drivers/nvidia-drivers-195.36.24
+
+
+# what did fix it?
+
+
+installing **x11-drivers/nvidia-drivers-256.35** finally fixed it!
+
+
+# what does work?
+
+  * 3d game, so 3d acceleration support is there
+  * 2d acceleration does seem to work as well
+  * pm-suspend (hibernate-ram) seems to work as well
+  * using VirtualBox with a 64 bit image (enabling System->Acceleration->Hardware Virtualization [x] Enable VT-X/AMD-V)
+  * mode switch to consoles (alt+f1 to alt+f12) does work and i can see it actually (no black screen)
+
+
+i hope this driver is somehow stable. currently it's hardmasked in gentoo.
+
+
+# update: fr 23 jul
+
+using **x11-drivers/nvidia-drivers-256.35** did break suspend's resume with several crashes. i've disabled VT in the bios and now i'm using the latest stable release.

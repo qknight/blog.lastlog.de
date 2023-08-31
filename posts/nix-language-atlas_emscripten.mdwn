@@ -1,0 +1,104 @@
+[[!meta date="2018-03-18 17:35"]]
+[[!tag nixos javascript emscripten nix toolchain]]
+
+[[!img media/Emscripten_logo_full.png width="250px" class="noFancy" style="float: right"]]
+
+[[!summary how emscripten can be used with nix]]
+[[!series nix-language-atlas]]
+
+# motivation
+
+in the nix-language-atlas series on lastlog.de/blog i want to discuss how well programming languages, for which i'm familiar with, integrate with nix. today, let's revisit emscripten, as there also had been improvements since [i wrote about it last time](https://lastlog.de/blog/posts/xmlmirror.html#emscripten).
+
+projects we have done:
+
+* <https://lastlog.de/blog/posts/xmlmirror.html>
+* <https://lastlog.de/blog/posts/tour_of_nix.html>
+
+# what's new
+
+* emscripten toolchain:
+    * refactored to force a common revision (for example `1.37.16`) on `emscripten`, `emscripten-fastcomp` and `emscripten-fastcomp-clang` called `emscriptenVersion`
+    * added a unit test in `emscripten` to verify a small part of the toolchain
+    * initial emscripten documentation in nixpkgs (not on https://nixos.org/nixpkgs/manual yet)
+* added 2 more unit tests & repaired all builds
+
+for details see the PR <https://github.com/NixOS/nixpkgs/pull/37291>.
+
+want to give this a shot from nixos?
+
+    git clone https://github.com/nixos/nixpkgs/
+    cd nixpkgs
+    git checkout f41a3e7d7d327ea66459d17bfbe4a751b2496cb1
+    nix-env -f default.nix -I nixpkgs=. -iA emscriptenPackages
+    installing ‘emscripten-json-c-0.13’
+    installing ‘emscripten-libxml2-2.9.7’
+    installing ‘emscripten-xmlmirror’
+    installing ‘emscripten-zlib-1.2.11’
+    ...
+
+## dynamic/static libraries
+
+in the above toolchain we are using libraries in `.so` format, not the `.a` format and in the end we link them together using emcc. this has some advantages:
+
+* building .so files is best practice on linux
+* thus easy to do
+* license wise smart, some packages can't be statically linked legally IIRC
+
+## coverage
+
+nix emscripten toolchain is now supported from:
+
+* NixOS (nix)
+* linux (nix)
+* mac os (NI)X
+* windows [(WSL+ubuntu+nix)](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+
+especially the microsoft WSL release with the creators update is a very interesting audience as it makes it so easy to use nix on windows. no mingw, no cygwin! took me 10 minutes to install nix on windows!
+
+for testing i've been compiling this very toolchain on my windows 10 computer. IO is slow but it works and it is easy to deploy.
+
+# emsdk
+
+i've sumbled on this questions in <https://github.com/juj/emsdk>:
+
+> How do I change the currently active SDK version?
+>
+> How do I build multiple projects with different SDK versions in parallel?
+>
+> How do I use Emscripten SDK with a custom version of python, java, node.js or some other tool?
+
+this are very interesting questions and all get easy once one uses this nixpkgs based toolchain as pointed out. i've been using the `emsdk` in the past but now that we have the 'bits' automated in nixpkgs i'm happy to not have to work statefully anymore!
+
+# ideas
+
+during my last two days of work on the toolchain update, i had these ideas and motivations for the future:
+
+* more documentation:
+    * nix-shell -A usage
+    * cross platform nix usage
+    * section how to (fast) write good and lasting unit tests
+    * how to use older nixpkgs vs. newer ones (slightly modify a very old project for instance which has a bug)
+* packaging some common targts, what would these be? 
+    * bzip2? 
+    * empython?
+    * SDL? 
+    * some games?
+    * <https://github.com/kripken/emscripten/wiki/Porting-Examples-and-Demos>
+    * <https://github.com/emscripten-ports>
+* package the caching of emscripten in `~/.emscripten` properly, so that build artefacts can be reused over builds (time save) and remove the `HOME=$TMPDIR` requirement (ugly)
+
+        DEBUG:root:adding object /home/joachim/.emscripten_cache/asmjs/dlmalloc.bc to link
+        DEBUG:root:adding object /home/joachim/.emscripten_cache/asmjs/libc.bc to link
+
+* update `nix-instantiate`, which we use in the 'tour of nix', to a more recent version and also package it into the toolchain as an example
+* hydra builds
+* be more transparent on the license, ideally we could generate a list of licenses in the final folder
+
+@nixos community: i'd love to get some feedback on this, so send me an email to <js@lastlog.de> if you have some interesting input.
+
+# summary
+
+thanks to `kripken` (emscripten author) for his help! i'd love to put more effort into this, i think it's really worth it so if you have any funding for general development or want to have something special realized, let me know!
+
+another interesting project i've learned about lately would be <https://github.com/NixOS/nixpkgs/pull/37291> from <https://github.com/Ericson2314>.

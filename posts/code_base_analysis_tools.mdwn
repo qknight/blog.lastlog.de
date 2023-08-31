@@ -1,0 +1,16 @@
+[[!draft]]
+
+# motivation
+
+let's have a quick look at tools
+
+* kcachegrind: https://lastlog.de/blog/owncloud_ssl_client_certificates.html#understanding-code-using-kcachegrind to see what code gets called
+* dependencies.sh for library usage: https://lastlog.de/blog/tour_of_nix.html#implementation
+* golang/clion/idea for go/cpp/java with code path analysis so one can click the functions and see where they get called.
+* https://cmake.org/cmake/help/latest/module/CMakeGraphVizOptions.html
+* in seldom cases i've been using a debugger and step through the code but usually this doesn't work well
+* i've had a look into QIRA, see https://www.youtube.com/watch?v=eGl6kpSajag (did not use it yet)
+
+so when i work on a new codebase i tend to use a mix of the former mentioned tools and then use pen+paper and draw it. next i try to memorize it.
+
+quite sad that there are no better tools yet. been on the lookout ever since, nothing.

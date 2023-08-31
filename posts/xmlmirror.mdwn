@@ -1,0 +1,198 @@
+[[!meta date="2016-07-21 08:35"]]
+[[!tag nlnet nixos xmlmirror emscripten javascript odf]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!summary about how to create a powerful xml editor using emscripten, libxml2 and codemirror.]]
+[[!series emscripten]]
+
+# motivation
+
+we are happy to announce the initial release of a useful new tool called [xmlmirror](https://gitlab.com/odfplugfest/xmlmirror). as the name more or less spells out, [xmlmirror](https://gitlab.com/odfplugfest/xmlmirror) is an XML webeditor with schema validation, based on [webforms](https://en.wikipedia.org/wiki/Form_(HTML)) and implemented with [codemirror](https://codemirror.net/). xmlmirror further uses a library called [Fast-XML-Lint](https://gitlab.com/odfplugfest/xmlmirror) which uses [libxml2](http://xmlsoft.org/) for schema verification and which is compiled with [emscripten](https://github.com/kripken/emscripten). or in layman's terms: a web application that really helps you to create complex XML documents from scratch, as well as fix existing documents that are broken.
+
+[[!img media/xmlmirror.jpg class="noFancy" ]]
+
+[live demo](https://lastlog.de/misc/xmlmirror/DemoUltimate.xhtml) / [source code](https://gitlab.com/odfplugfest/xmlmirror/tree/master)
+
+## features
+
+* a webform based editor to create complex `xml documents`
+* supports `xml schema` validation based on schema files in:   
+     * `xml file format` and 
+     * `relax ng` file format, 
+
+     both through libxml2
+* features **autocomplete**-functionality for **tags** and **attributes** using [codemirrors xmlcomplete](https://codemirror.net/demo/xmlcomplete.html) which is [documented here]( https://codemirror.net/doc/manual.html#addon_xml-hint)
+* validation implemented using [webworkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) which is basically multithreading in javascript
+* schema/xml document sizes up to ~500k lines each
+* [converter from single file relax ng documents to codemirror's schemaInfo](https://gitlab.com/odfplugfest/xmlmirror/blob/master/schemainfoCreator.js)
+* [MIT Licensed](https://opensource.org/licenses/MIT)
+* hosted on [gitlab.com](https://gitlab.com)
+
+# more details
+
+## selenium
+
+unit testing was implemented using [selenium 2.53](http://www.seleniumhq.org/):
+
+`nix-shell -p python35Packages.selenium firefox-bin --command "python3 selenium_test.py"`
+
+it works like this:
+
+1. opens a specially crafted html document: `schemainfoCreator-test.html` in a webbrowser 
+2. executes it and looks for "OK" or a 10 seconds timeout
+
+selenium_test.py:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python } 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+ff = webdriver.Firefox()
+ff.get("schemainfoCreator-test.html")
+
+assert "schemaInfo unit-test" in ff.title
+
+try:
+    element = WebDriverWait(ff, 10).until(EC.presence_of_element_located((By.ID, "OK")))
+finally:
+    ff.quit()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## closure-compiler
+
+the google [closure compiler](https://developers.google.com/closure/compiler/) was used to ensure strict `typing` even though it is `javascript`:
+
+    closure_compiler/jcc schemainfoCreator.js
+
+**hint:** it was no joy to use this tooling due to a lack of documentation and examples.
+
+## fastXmlLint.c
+
+it took a bit of time to get into the internals of libxml2 and the [antique API documentation](http://www.xmlsoft.org/html/index.html) is more confusing than helpful. anyway, two interesting results:
+
+1. even though `xmllint` can parse xml documents with a multi-document relax-ng schema it can't be used to parse a multi-document relax-ng schema itself, see [discussion](https://stackoverflow.com/questions/36850163/parse-multi-document-relax-ng-schema-using-libxml2)
+
+2. `ltrace` is your best friend in reverse-engineering shared object/library usage:
+
+    for instance, running: 
+
+    `ltrace -f xmllint --relaxng html5-rng/xhtml.rng test_fail1.html`
+
+    would yield:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash } 
+    ...
+    xmlSAXDefaultVersion(2, 0x40bca9, 116, 112) = 2
+    getenv("XMLLINT_INDENT") = nil
+    xmlGetExternalEntityLoader(0x7fff26fdca5d, 0x40bd36, 1, 76) = 0x7f969b6c1160
+    xmlSetExternalEntityLoader(0x407660, 0x40bd36, 1, 76) = 0x7f969b6c1160
+    xmlLineNumbersDefault(1, 0x40bd36, 1, 76) = 0
+    xmlSubstituteEntitiesDefault(1, 0x40bd36, 0, 76) = 0
+    __xmlLoadExtDtdDefaultValue(1, 0x40bd36, 0, 76) = 0x7f969b9c0a1c
+    xmlRelaxNGNewParserCtxt(0x7fff26fdaf23, 0x40bd36, 0, 76) = 0x245c490
+    xmlRelaxNGSetParserErrors(0x245c490, 0x404ac0, 0x404ac0, 0x7f969af39080) = 0x245c490
+    xmlRelaxNGParse(0x245c490, 0x404ac0, 0x404ac0, 0x7f969af39080) = 0x2527f70
+    xmlRelaxNGFreeParserCtxt(0x245c490, 0xffffffff, 0x7f969af38678, 0x25b5570) = 1
+    ...
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    and this is the exact order of libxml2 function calls `xmllint` issues to parse `test_fail1.html`!
+
+    **note:** this helped us a lot and made it possible to discover the secret `xmlLineNumbersDefault` function!
+
+
+## emscripten
+
+during this project we had the idea to create a `c` to `javascript` cross-compiler abstraction using `nix` for `emscripten` and we are happy to announce that it is now officially in `nixpkgs`, see [PR 16208](https://github.com/NixOS/nixpkgs/pull/16208).
+
+this means:
+
+1. you can use nix-build to cross-compile all your dependencies like `libz` and afterwards use these in your project
+2. since `nix` runs on all linuxes, mac os x and other unix-like platforms, you can now enojoy full toolchain automation and deployment when doing emscripten.
+
+if using `nixpkgs` (master), you can check for emscripten targets using:
+
+    nix-env -qaP | grep emscriptenPackages
+
+and install using:
+
+    nix-env -iA emscriptenPackages.json_c
+
+**note:** don't mix json_c (native, `x86`) with other libs (emscripten, `javascript`) in your user-profile or you will get weird error messages with `object code` being in the wrong format and such.
+
+## nixos development
+
+
+
+`nix-shell` was the primary development tool along with the [default.nix](https://gitlab.com/odfplugfest/xmlmirror/blob/master/default.nix) which can basically spawn two different environments:
+
+* `nix-shell -A emEnv` - emscripten environment: used to compile `c-code in javascript`
+* `nix-shell -A nativeEnv` - native environment: used to develop the `c-code` in question and also for unit testing purposes
+
+see `Makefile.emEnv` and `Makefile.nativeEnv` respectivly.
+
+let's have a look at the `default.nix`:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash} 
+let 
+
+...
+
+emEnvironment = stdenv.mkDerivation rec {
+  name = "emEnv";
+  shellHook = ''
+    export HISTFILE=".zsh_history"
+    alias make="colormake -f Makefile.emEnv"
+    alias c="while true; do inotifywait * -e modify --quiet > /dev/null; clear; make closure| head -n 30; done"
+    alias s="python customserver.py"
+    alias jcc=closure_compiler/jcc
+    echo "welcome to the emEnvironment"
+    PS1="emEnv: \$? \w \[$(tput sgr0)\]"
+  '';
+
+  buildInputs = [ json-c libz xml-js ] ++ [ colormake nodejs emscripten autoconf automake libtool pkgconfig gnumake strace ltrace python openjdk ncurses ];
+};
+
+...
+
+in
+
+{
+  # use nix-shell with -A to select the wanted environment to work with:
+  #   --pure is optional
+
+  # nix-shell -A nativeEnv --pure  
+  nativeEnv = nativeEnvironment;
+  # nix-shell -A emEnv --pure  
+  emEnv = emEnvironment;
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+you will notice that emEnv is a `stdenv.mkDerivation` and it uses `shellHook` and `buildInputs`. 
+
+some remarks:
+
+* we set a `HISTFILE` and get a project based history which is nice
+* using `alias` we override `make` with `colormake` and also set the target Makefile to `Makefile.emEnv`
+* setting a custom `PS1` makes it easier to identify the shell when working on `n+1` projects at the same time
+* the `s` alias runs a python webserver with `xhtml` mime-type support, which is handy when developing with `chromium` as XHR requests will be working then
+
+**note:** the `default.nix` does contain `libz`, `json-c`, `xml-js` packaging and since this is now in `nixpkgs` it is kind of obsolete now.
+
+# conclusion
+
+we (paul/joachim) want to thank **Jos van den Oever** (prolific [open source contributor](http://www.vandenoever.info/) and co-chair of the [OASIS ODF TC ](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=office) on behalf of the [Dutch government](https://logius.nl/standaarden)) for inspiring the creation of this tool. ODF is a prominent example of a real-world standard that leverages the `relax ng` standard, and we expect xmlmirror to be very useful in the creation of more [ODF autotests](https://gitlab.com/odfplugfest/odfautotests). Jos has also graciously offered to provide an initial host repository for xmlmirror. 
+
+* schema parsing in codemirror can now easily be extended with all `relax ng` schemas!
+
+* also thanks to [profpatsch](https://github.com/profpatsch) for his explanations on the `nix` feature called `override`, see [emscripten-packages.nix](https://github.com/qknight/nixpkgs/blob/c514693eb62539545745b71cb0ac52733a9966ad/pkgs/top-level/emscripten-packages.nix#L11)
+
+* we also want to thank [nlnet](https://www.nlnet.nl/) foundation for their financial contribution from the [ODF fund](https://nlnet.nl/odf/) which enabled us to complete this interesting project. thanks as well to **Michiel Leenaars** (not only from [nlnet](https://www.nlnet.nl/) but also one of the people behind the [ODF plugfests](http://odfplugfest.org)) for his interest in the project. now we have a real powerful xmleditor, made huge progress with the emscripten toolchain on nixos and have created a pretty useful development workflow.
+
+
+if you have questions/comments, see [nixcloud.io](https://nixcloud.io) for contact details.

@@ -1,0 +1,390 @@
+[[!summary chatGPT: A guide for partitioning and installing NixOS on a Hetzner root server with 2x3TB disks using GPT instead of fdisk.]]
+[[!meta date="2012-04-28 11:09"]]
+[[!tag linux nixos packagemanager usability hetzner]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+#what is this?
+
+i recently **upgraded my hetzner root server** and therefore had a system with **2x3tb disks**. **as fdisk can't be used to partition disks > 2tb i had to use gpt instead** which was quite tricky until it was working. so here is my installation guide. parts of it applies also to other distributions.
+
+this guide uses concepts from the **hetzner wiki OpenBSD installation guide** [1].
+
+**note:**
+	
+  * **gpt is used** for both disks
+  * there is **no extra /boot** partition (the system will **directly boot from the lvm which is on top of the mdadm**); this works since grub2
+  * this setup is **pretty similar to using fdisk (MBR) partitions**
+  * this **guide still uses BIOS to boot** (no EFI/UEFI)
+  * **/dev/sda1 **and** /dev/sdb1 **are** very small partitions (2Mib); **they are used to **store the grub2 boot stages**, see [5]
+
+## disk layout
+
+[[!img media/nix9000-disklayout3.jpg alt="" size=500x]]
+
+
+update: 26.5.2012: updated the image according to the **swap** comment from **nbp. **swap should not be in the lvm as it might degrade the performance.
+
+
+
+
+
+## the installation
+
+
+
+
+### first remove old partitions/mdadm setups
+
+
+
+
+### uninstall:
+    lvremove /dev/myvolgrp/home
+    lvremove /dev/myvolgrp/system
+    lvremove /dev/myvolgrp/swap
+    vgremove myvolgrp
+    pvremote /dev/md0
+    mdadm --stop /dev/md0
+    # to remove the md0 permanently
+    mdadm --zero-superblock /dev/sda1
+    mdadm --zero-superblock /dev/sdb1
+
+
+### creating the partitions
+
+**update 26.5.2012: also add the swap partition here (not done below!).**
+
+    parted /dev/sda
+    mklabel gpt
+    mkpart non-fs 0 2
+    mkpart primary 2 3001G
+    p
+    Number Start End Size File system Name Flags
+    1 17.4kB 2000kB 1983kB non-fs
+    2 2097kB 3001GB 3001GB primary
+         
+    set 1 bios_grub on
+    p
+    Number Start End Size File system Name Flags
+    1 17.4kB 2000kB 1983kB non-fs bios_grub
+    2 2097kB 3001GB 3001GB primary
+
+
+### creating the new mdadm softraid device
+
+
+    mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sda2 /dev/sdb2
+    mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device. If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+    Continue creating array? y
+    mdadm: Defaulting to version 1.2 metadata
+    mdadm: array /dev/md0 started.
+
+### LVM+filesystems
+
+
+    pvcreate /dev/md0
+    Physical volume "/dev/md0" successfully created
+    
+    vgcreate myVolGrp /dev/md0
+    Volume group "myVolGrp" successfully created
+    
+    lvcreate -n system -L50G myVolGrp
+    lvcreate -n swap -L8G myVolGrp
+    
+    mkfs.ext4 -O dir_index -j -L system /dev/myVolGrp/system
+    mkswap -L swap /dev/myVolGrp/swap
+
+**note: **the disk layout diagram mentiones a tmp partition which** happended to be added later ;-)**
+
+
+### using a virtual machine + vnc to boot the iso image
+preparing the host system:
+
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+
+
+### on the hostsystem
+
+    #download latest console only 64bit nixos installer
+    nixos-minimal-0.1pre33860-33874-x86_64-linux.iso
+
+make sure /dev/myVolGrp/system and /dev/myVolGrp/swap are not in use:
+
+    apt-get install sudo
+    qemu-system-x86_64 -enable-kvm -m 1024 -hda /dev/md0 -net nic -net tap -cdrom nixos-minimal-0.1pre33860-33874-x86_64-linux.iso -boot d -vnc localhost:0
+    
+**note:** in contrast to original article [1] i use '-enable-kvm' which speeds things up!
+
+
+### from your homecomputer
+
+execute this two commands (in two different shells):
+
+    ssh -L 5900:localhost:5900 root@176.9.99.117
+    vncviewer localhost
+
+
+### inside the qemu/kvm system via vncviewer
+
+
+how we have to prepare install the system on the devices we had preparted in the steps before:
+
+    inside do:
+    login as root
+    mount -L system /mnt
+    
+    cd /mnt
+    nixos-option --install
+    vi /etc/nixos/configuration.nix
+    
+    stop dhcpcd
+    ip a add 172.2.0.2/16 dev eth0
+    ip r add via 172.2.0.1
+    echo "nameserver 8.8.8.8" > /etc/resolv.conf
+    # use ping www.google.de to verfy that the routing is working
+    
+    # example url, configuration.nix is appended to this article
+    curl http://lastlog.de/configuration.nix
+    mv configuration.nix /mnt/etc/nixos/configuration.nix
+    # now the installation, make sure you read the nixos installation guide as well, but in short:
+    nixos-install
+    # only the grub2 installation should have failed (as there is no /dev/sda1 in the virtual machine!)
+    #finally we halt the system
+    halt
+
+im hostsystem we need to install grub2:
+
+    apt-get install grub2
+    grub-install --no-floppy --root-directory=/mnt --recheck /dev/sda
+    Installation finished. No error reported.
+    
+    grub-install --no-floppy --root-directory=/mnt --recheck /dev/sdb
+    Installation finished. No error reported.
+    
+    # now we add a ssh key so we can login into this system later on
+    cd /mnt
+    mkdir root
+    cd root
+    mkdir .ssh
+    chown 0700 .ssh/
+    cd .ssh
+    echo "ssh-rsa AAAAB3Nz.....aU79sGVhyOPRz joachim@ebooK" > authorized_keys
+
+from your homecomputer login into the installed system (reboot the host) and then issue this command:
+
+    ssh root@176.9.99.117 -i ~/.ssh/myprivatekey
+
+after the first login, nixos-rebuild switch might fail with this error message:
+
+    nixos-rebuild switch --fast
+    building the system configuration...
+    updating GRUB 2 menu...
+    installing the GRUB bootloader on /dev/sda...
+    /nix/store/iaypdz5mm1qk8izs9412cb28v9vwwcn4-grub-1.99/sbin/grub-probe: error: no such disk.
+    Auto-detection of a filesystem of /dev/mapper/myVolGrp-system failed.
+    Try with --recheck.
+    If the problem persists please report this together with the output of 
+    "/nix/store/iaypdz5mm1qk8izs9412cb28v9vwwcn4-grub-1.99/sbin/grub-probe --device-map="/boot/grub/device.map" 
+    --target=fs -v /boot/grub" to
+    grub-probe --device-map="/boot/grub/device.map" --target=fs -v /boot/grub
+    grub-probe: info: Cannot stat `/dev/disk/by-id/scsi-35000c5003f556643', skipping.
+    grub-probe: info: Cannot stat `/dev/disk/by-id/scsi-35000c5003f5363a6', skipping.
+    grub-probe: info: changing current directory to /dev.
+    grub-probe: info: changing current directory to pts.
+    grub-probe: info: changing current directory to shm.
+    grub-probe: info: changing current directory to myVolGrp.
+    grub-probe: info: changing current directory to md.
+    grub-probe: info: changing current directory to disk.
+    grub-probe: info: changing current directory to by-label.
+    grub-probe: info: changing current directory to by-uuid.
+    grub-probe: info: changing current directory to by-partlabel.
+    grub-probe: info: changing current directory to by-partuuid.
+    grub-probe: info: changing current directory to by-path.
+    grub-probe: info: changing current directory to by-id.
+    grub-probe: info: changing current directory to snd.
+    grub-probe: info: changing current directory to mapper.
+    grub-probe: info: opening myVolGrp-system.
+    grub-probe: error: no such disk.
+
+so what is inside this device.map anyway?
+
+    cd /boot/grub
+    cat device.map
+    (hd0) /dev/disk/by-id/scsi-35000c5003f556643
+    (hd1) /dev/disk/by-id/scsi-35000c5003f5363a6
+
+**Jordan_U#grub@irc.freenode.net** **recommended** to **remove the device.map.** that made it work:
+
+    rm /boot/grub/device.map
+
+
+
+## rescue system state by going to the previous version
+in theory you should be able to use vkvm from hetzner, which does basically what i am doing here, but it didn't work for me since non of my browsers worked with the java plugin and i had problems with the vncviewer on port 47774.
+
+boot the hetzner 64 bit linux rescue system which contains qemu+kvm:
+
+    apt-get install sudo
+    qemu-system-x86_64 -enable-kvm -m 1024 -hda /dev/md0 -cdrom nixos-minimal-0.1pre33860-33874-x86_64-linux.iso -boot d -vnc localhost:0
+
+    ssh -L 5900:localhost:5900 root@176.9.99.117
+    vncviewer localhost
+
+now inside the vncviewer
+
+    mount /dev/myVolGrp/system /mnt
+    cd /mnt
+    for a in dev proc sys; do mount --bind /$a /mnt/$a; done;
+    chroot . /bin/sh
+
+now inside that new shell, type:
+
+    ls -l /nix/var/nix/profiles/system-*
+    lrwxrwxrwx 1 root root 76 Jul  3 23:31 /nix/var/nix/profiles/system-67-link -> /nix/store/d146zhm0mzdbb8v41yr782v96zncqhxa-nixos-0.2pre4832_edab9e4-e533af9
+    lrwxrwxrwx 1 root root 76 Jul  7 22:45 /nix/var/nix/profiles/system-68-link -> /nix/store/d0l5zg81x6yc3mxbrd3zxv3m4xhwabs7-nixos-0.2pre4832_edab9e4-9e98650
+
+since we want to go to the previous boot entry, we type:
+
+    /nix/var/nix/profiles/system-67-link/bin/switch-to-configuration boot
+
+since we are done here, type:
+
+    exit      # this will exit from the chroot into the rescue system
+    cd / 
+    umount /mnt
+    reboot
+
+# summary
+
+
+took quite some time to figure all this out so i guess someone else might have interested in this guide as well. i also tried to install, using EFI, but soon discovered that this might be a very complicated road to go and therefore skipped that.
+it is cool to see that there is a **very helpful community surrounding key projects** required to get this installation done. i would have had to spend much more time if i wouldn't have had someone to ask from time to time.
+
+
+## links
+
+
+* [1] <http://wiki.hetzner.de/index.php/OpenBSD>
+* [2] <https://wiki.archlinux.de/title/Gpt>
+* [3] <https://wiki.archlinux.org/index.php/GRUB2#GPT_specific_instructions>
+* [4] <http://www.wensley.org.uk/gpt>
+* [5] <http://en.wikipedia.org/wiki/GNU_GRUB#GRUB_version_2>
+>
+
+## configuration.nix
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+
+# Edit this configuration file which defines what would be installed on the
+# system. To Help while choosing option value, you can watch at the manual
+# page of configuration.nix or at the last chapter of the manual available
+# on the virtual console 8 (Alt+F8).
+
+{config, pkgs, ...}:
+
+{
+require = [
+# Include the configuration for part of your system which have been
+# detected automatically.
+./hardware-configuration.nix
+];
+
+boot.initrd.kernelModules = [
+# Specify all kernel modules that are necessary for mounting the root
+# file system.
+#
+# "ext4" "ata_piix"
+"af_packet" "snd_pcm_oss" "snd_mixer_oss" "rtc_cmos" "rtc_core" "rtc_lib" "snd_hda_codec_via" "i915" 
+"joydev" "drm_kms_helper" "snd_hda_intel" "rng_core" "drm" "snd_hda_codec" "thermal" "i2c_algo_bit" 
+"button" "snd_hwdep" "intel_agp" "psmouse" "i2c_i801" "evdev" "snd_pcm" "video" "agpgart" "pcspkr" 
+"serio_raw" "iTCO_wdt" "i2c_core" "snd_timer" "output" "e1000e" "snd" "soundcore" "snd_page_alloc" 
+"sg" "loop" "ipv6" "kvm" "freq_table" "processor" "thermal_sys" "hwmon" "ext4" "mbcache" "jbd2" 
+"crc16" "raid456" "async_pq" "async_xor" "xor" "async_memcpy" "async_raid6_recov" "raid6_pq" 
+"async_tx" "md_mod" "sd_mod" "crc_t10dif" "sata_sil" "ata_piix" "dm_mod" "usb_storage" 
+"usb_libusual" "usbhid" "hid" "ohci1394" "ieee1394" "ahci" "libata" "scsi_mod" "ehci_hcd" 
+"uhci_hcd" "usbcore" "nls_base" "scsi_wait_scan" "unix"
+];
+
+boot.loader.grub = {
+# Use grub 2 as boot loader.
+enable = true;
+version = 2;
+
+# Define on which hard drive you want to install Grub.
+devices = [ "/dev/sda" "/dev/sdb" ];
+};
+boot.extraKernelParams = [ "vga=normal" "nomodeset" ];
+
+networking = {
+hostName = "nix9000"; # Define your hostname.
+# wireless.enable = true; # Enables Wireless.
+};
+
+# Add file system entries for each partition that you want to see mounted
+# at boot time. You can add filesystems which are not mounted at boot by
+# adding the noauto option.
+fileSystems = [
+# Mount the root file system
+#
+{ mountPoint = "/";
+#device = "/dev/sda2";
+label = "system";
+}
+#{ mountPoint = "/boot";
+# label = "boot";
+#}
+
+# Copy & Paste & Uncomment & Modify to add any other file system.
+#
+# { mountPoint = "/data"; # where you want to mount the device
+# device = "/dev/sdb"; # the device or the label of the device
+# # label = "data";
+# fsType = "ext3"; # the type of the partition.
+# options = "data=journal";
+# }
+];
+
+swapDevices = [
+# List swap partitions that are mounted at boot time.
+#
+{ label = "swap"; }
+];
+
+# Select internationalisation properties.
+# i18n = {
+# consoleFont = "lat9w-16";
+# consoleKeyMap = "us";
+# defaultLocale = "en_US.UTF-8";
+# };
+
+# List services that you want to enable:
+
+# Add an OpenSSH daemon.
+services.openssh.enable = true;
+
+# Add CUPS to print documents.
+# services.printing.enable = true;
+
+# Add XServer (default if you have used a graphical iso)
+# services.xserver = {
+# enable = true;
+# layout = "us";
+# xkbOptions = "eurosign:e";
+# };
+
+environment.systemPackages = with pkgs; [
+zsh wget wgetpaste vimprobable2
+];
+
+# Add the NixOS Manual on virtual console 8
+#services.nixosManual.showManual = true;
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

@@ -1,0 +1,214 @@
+[[!meta date="2015-11-14 22:15"]]
+[[!tag javascript html5 emscripten nixcloud nixos]]
+
+[[!img media/Emscripten_logo_full.png width="250px" class="noFancy" style="float: right"]]
+[[!summary a tour of nix is an educational purpose project on teaching the Nix programming language. It is also an introduction on how to use LLVM and emscripten to convert C++ programs to run in the browser.]]
+[[!series emscripten]]
+
+# motivation
+lately i've been working with emscripten 1.29.10 and i compiled **nix-instantiate** from **c++ to javascript**. why?
+
+nix is a tricky programming language to get into. the motivation for 'a tour of nix' was to make it easier for new developers to get into nix. compiling nix-instantiate and later nix-repl to javascript might be enablers for new technologies like:
+
+* **webbased editor with nix-syntax autocompletion**, directly from the language itself by using nix-repl
+* **extend the nix documentation with interactive API usage examples** (much like 'a tour of go' and godocs)
+* **use nix to deploy javascript**
+
+while the former points are all interesting targets in itself, this posting will focus on 'a tour of nix' and 'emscripten'. [A tour of Nix](https://nixcloud.io/tour) is a html5/javascript based tutorial about the nix programming language.
+
+[[!img media/tour_of_nix.jpg  title="" alt="the 'A touf of nix'-webpage"]]
+
+# implementation
+
+nix-instantiate is a very good candidate among the various nix-tools. since emscripten emulates a complete POSIX-filesystem we 
+
+
+1. clone nix/nixpkgs
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    git clone https://github.com/nixos/nix
+    git clone https://github.com/nixos/nixpkgs
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+    'nix' contains nix-instantiate which we want to compile to javascript while 'nixpkgs' will be bundled with nix-instantiate.js so we can use the lib functions.
+
+2. development environment
+
+    to play with the code, run:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    nix-shell --pure -p vim emscripten nodejs autoconf automake pkgconfig perlPackages.DBDSQLite perl perlPackages.WWWCurl  bzip2 zlib libtool bison flex curl sqlite git file
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+    **note:** we will be using llvm instead of gcc since emscripten is llvm only!
+
+2. learn about nix-instantiate dependencies
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    ./dependencies.sh =nix-instantiate dependencies.jpg
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    [dependencies.sh](http://domseichter.blogspot.de/2008/02/visualize-dependencies-of-binaries-and.html) lists the dependencies of the vanialla nix-instantiate
+
+    [[!img media/nix-instantiate-dependencies.jpg  title="" alt="the dependencies of nix-instantiate"]]
+
+    what had to be changed:
+
+    - the **build-system** was dramatically changed to use:
+
+        - only builds nix-instantiate (all other targets removed)
+        - **static linking** for all libs (.a instead of .so)
+        - O3, -g0
+
+    - source code changes: **libraries** were removed from nix-instantiate
+
+        - bzip2, curl, ssl, sqlite3, dl, z, m, crypto, gc
+        - removed sigaction(..) code
+        - libstore requirement from nix-instantiate was removed
+        - various other changes to make nix compile and work in a browser
+
+    - **bundle (a bash script)** was added to src/nix-instantiate
+
+    to test emscripten a simple 'hello world' example was created.
+
+4. the build using './bundle'
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    emcc -g0 -O3 nix-instantiate.bc ../libexpr/libnixexpr.bc ../libstore/libnixstore.bc ../boost/format/libnixformat.bc ../libutil/libnixutil.bc ../libmain/libnixmain.bc \
+      -o nix-instantiate.js \
+      --preload-file nix/derivation.nix \
+      --preload-file nixpkgs \
+      --preload-file test.nix \
+      -s NO_EXIT_RUNTIME=1 \ #important
+      -s INVOKE_RUN=0 \ #important
+      -s ALLOW_MEMORY_GROWTH=1 \ # importatnt!
+      -s TOTAL_MEMORY=350777216 \ # could be less i suppose
+      --pre-js pre-js.js \ # important for nix-instantiate (to remove the spinner)
+      -s DISABLE_EXCEPTION_CATCHING=0 \ # important for nix-instantiate (when the expression creates an error)
+      --llvm-lto 3
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+5. after you executed ./bundle:
+
+    you can test if everything went fine, if it built a new version of:
+
+      * nix-instantiate.data
+      * nix-instantiate.js
+      * nix-instantiate.js.mem
+
+6. nix-instantiate.js usage
+
+    **index.html includes nix-instantiate.js** and calls it every time we want to evaluate a nix expression
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+    <script type="text/javascript" charset="utf-8">
+      ...
+      var runNix = function() {
+        var start = new Date().getTime();
+        console.log("running runNix()");
+        document.getElementById('runInfo').innerHTML = "computation in progress";
+        document.getElementById('output').value = "";
+        Module['print'] = function(text) {
+          Module['return'] = text + '\n'; 
+          document.getElementById('output').value += text;
+          document.getElementById('runInfo').innerHTML = "";
+          var end = new Date().getTime();
+          var time = end - start;
+          console.log('Execution time: ' + time + ' ms');
+        };
+        Module['printErr'] = function(text) {
+          text = text.replace("[31;1m", "");
+          text = text.replace("[1m", "");
+          text = text.replace("[1m", "");
+          text = text.replace("[0m","");
+          text = text.replace("[0m","");
+          text = text.replace("/test.nix","line");
+          text = text.replace("/test.nix","line");
+          text = text.replace("/test.nix","line");
+          console.log(text);
+          Module['return'] = text + '\n'; 
+          document.getElementById('runInfo').innerHTML = "";
+          document.getElementById('output').value += text;
+        };
+        var input_text = editor.getValue();
+        FS.writeFile('/test.nix', input_text, {encoding: 'utf8'});
+        Module['arguments'] = ['-I', 'nixpkgs=nixpkgs', '--eval', '--strict', '--show-trace', '/test.nix'];
+        Module.callMain(Module['arguments'])
+      };         
+    </script>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    this is actually similar to calling nix-instantiate from the shell:
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+    nix-instantiate -I nixpkgs=nixpkgs/ --eval, --strict, --show-trace, /test.nix    
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    **note:** i want to point out that **callMain** was used over **cwrap** 
+
+7. code optimization
+
+     **check your webserver has compression enabled!** 
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
+    services.httpd = {
+      enable = true;
+      logPerVirtualHost = true;
+      adminAddr="js@lastlog.de";
+      hostName = "lastlog.de";
+      extraModules = [
+        { name = "php5"; path = "${pkgs.php}/modules/libphp5.so"; }
+        { name = "deflate"; path = "${pkgs.apacheHttpd}/modules/mod_deflate.so"; }
+      ];
+      virtualHosts = [
+        # nixcloud.io
+        {
+          hostName = "nixcloud.io";
+          serverAliases = [ "nixcloud.io" "www.nixcloud.io" ];
+          documentRoot = "/www/nixcloud.io/";
+          extraConfig = ''
+              RedirectMatch ^/$ /main/page
+              <Directory "/www/nixcloud.io/main/">
+                Options -Indexes
+                AllowOverride None
+                Require all granted
+              </Directory>
+              SetOutputFilter DEFLATE
+          '';
+        };
+      ]
+    };
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    this is how we at nixcloud set up mod_deflate for apache, which curiously is not a default option. **this reduces the 30mb download to 6mb only!**
+
+8. html5 specialities
+
+    we got a working browser history, so you can use the 'back' and 'forward' buttons of your browser to navigate the page
+
+        // implement browser forward and back button actions
+        window.addEventListener("popstate", function(e) {
+          var id = getURLParameter("id");
+          var diff = id - current_question - 1;
+          change_question_withoutHistoryChange(diff);
+        });
+        
+        // update current question and modify the window.history
+        var change_question = function(myinput) {
+          change_question_withoutHistoryChange(myinput);
+          window.history.pushState('', '',  window.location.pathname + '?id=' + (current_question + 1));
+        }
+
+# documentation
+
+* [http://aidanhs.github.io/empython/](http://aidanhs.github.io/empython/)
+* [https://github.com/aidanhs/empython](https://github.com/aidanhs/empython)
+* [http://kripken.github.io/emscripten-site/_sources/docs/optimizing/Optimizing-Code.txt](http://kripken.github.io/emscripten-site/_sources/docs/optimizing/Optimizing-Code.txt)
+
+# conclusion
+
+i especially wanted to **thank aidanhs**, the author of empython, for all his time with very valuable hints on how to address my problems. 
+
+**happy nix-learning from paul and joachim!** also thanks a lot for the irc support on emscripten from: **irc.mozilla.org#emscripten**!
+
+

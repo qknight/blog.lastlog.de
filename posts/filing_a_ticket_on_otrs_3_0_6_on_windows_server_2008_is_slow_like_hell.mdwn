@@ -1,0 +1,125 @@
+[[!summary chatGPT: Setting up a local SMTP server on Windows Server 2008 to improve email sending efficiency in OTRS ticketing system without the need for an external mail server.]]
+[[!meta date="2011-08-03 15:40"]]
+[[!tag otrs windows]]
+
+[[!img media/acquia_marina_logo.jpg size=320x alt="" style="float: right"]]
+
+# problem description
+
+when filing a telephone or email ticket often several recipients are contacted via email. dependent on the otrs configuration this is done in sync, so that a user gets success or fail for message sending in realtime. that means if no local mailserver is used it can be quite time consuming.
+
+for example: filing a ticket here for say the 'inhouse support crew' would issue 5 emails and using an external mailserver that means:
+
+
+
+	
+  * 5x 1,2 seconds ~= 5-8 seconds
+
+
+where the otrs-GUI is frozen for the user after clicking 'create'. dependent on how busy the remote email server is this can hinder usability quite fast.
+
+so this post might be interesting for everyone who wants to use otrs but does not also operate a in-house mailserver.
+
+
+# my setup
+
+
+
+
+
+	
+  * otrs 3.0.6
+  * windows server 2008 r2
+  * no local mailserver
+
+
+
+
+# the solution
+
+
+**windows server 2008 has support for a  local smtp server (smart host setup or satellite system setup)** which can be used as relay. this setup is very easy is much better than using an external mailserver directly because the **microsoft smtp relay server has also a local queue** so messages won't get lost if there is a partial network failure.
+
+so basically i used [1], [2], [3], [4] to create the setup.
+
+important points where:
+
+
+
+	
+  * **using smtp.mail.emea.microsoftonline.com**
+  * **tls encryption**
+  * **user/pass authentification**
+
+
+
+
+after the configuration is final:
+
+
+
+
+**test the setup using: 'telnet localhost 25' and type the commands as found in [5].**
+
+
+
+
+# **the ms smtp relay queue**
+
+
+
+
+one should keep an eye on the queue which is in: **c:\inetpub\mailroot\Queue**
+
+
+
+
+# the otrs configuration
+
+
+
+
+use the **webinterface** and **login as root@localhost**:
+
+
+
+
+in otrs one has to login, go to admin->sysconfig->type smtp into the search bar, then 'Core::Sendmail', in there configure:
+
+
+
+
+
+
+
+
+	
+  * SendMailModule -> **SMTP**
+  * SendMailModule::Host ->** localhost**
+  * SendMailModule::Port -> **25**
+  * **disable AuthUser/AuthPassword**
+
+
+
+
+finally you are done and should file a ticket (which is known to produce an email as a side-effect) and check if that mail is sent.
+
+
+
+
+
+
+
+**Note: i like that this smtp relay has a local queue, that is what i've been missing on linux for ages... (which is quite sad)**
+
+
+
+
+# links
+
+
+* [1] <http://www.itsolutionskb.com/2008/11/installing-and-configuring-windows-server-2008-smtp-server/>
+* [2] <http://www.petri.co.il/configure_iis_to_be_a_smart_host_for_exchange.htm>
+* [3] <http://www.cmsconnect.com/praetor/webhelpg2/chapter_2_-_pre-installation_considerations/Configuring_the_SMTP_Server.htm>
+* [4] <http://www.geeksengine.com/article/php-microsoft-smtp.html>
+* [5] <http://www.astahost.com/info.php/Sending-Mail-Telnet_t3325.html>

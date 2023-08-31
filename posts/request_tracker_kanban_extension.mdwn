@@ -1,0 +1,69 @@
+[[!meta date="2016-03-12 02:15"]]
+[[!tag javascript html5 RT perl mojolicious usability technology]]
+
+[[!summary extending legacy software like request tracker with webtechnology from a decade later]]
+
+# motivation
+
+lately we extended the famous [request tracker](https://en.wikipedia.org/wiki/Request_Tracker) software with a [看板](https://en.wikipedia.org/wiki/Kanban)-interface:
+
+[[!img media/kanban.jpg]]
+
+# features
+
+
+* jQuery UI
+* drag'n'drop operations:
+ 
+    * drag ticket to other 'state'
+    * drag ticket to lane 'user' to have it assigned to a certain user+status
+    * using the javascript callback you can basically do many cool &amp; creative things
+
+* WebSocket are used to update all kanban-views in realtime after a ticket has changed
+* by *overriding perl functions* we added an introspection layer on `sub _Set()`, `sub Create()` and `sub MergeInto()` function calls
+* using a **reverse proxy** (apache) we made example.com/rt look like one webpage even though it is internally served using two webservers
+* mojolicious reuses the `session cookies` form RT to indirectly verify user credentials
+* using the `REST 1.0` interface of RT tickets are queried from the kanban-view
+
+# backend
+
+we first started with twiggy + AnyEvent but it turned out that it was so much easier implementing it using **mojolicious due to its async nature, feature richness and wonderful documentation**.
+
+[[!img media/internals-and-setup.png class="noFancy"]]
+
+## redis & normalization
+
+[redis](http://redis.io/) was used as **IPC** between the two webservers. one **problem** was that RT would **often send 4 ticket updates** for the same ticket within 200ms, thus we had to add a `normalizer` to reduce the amount of events passed to the UI.
+
+## sessions/cookies
+
+since the **reverse proxy** forwards all the cookies from the browser, not only to RT but also to the mojolicious webserver, we just used that to check if a user is allowed to subscribe to the ticket-life update feed.  
+this was implemented by brute-forcing the `REST 1.0` interface with a bogus query and the given cookies.
+
+## UI consistency
+
+the UI requires to catch all events but a user might have used 'suspend' or was otherwise disconnect for a short time-period. we implemented a `sequence number` and thus every sent updates increases it. if the client notices that his internal `sequence number` differs from the supplied one it will just 'rest' the view by reloading all tickets.
+
+## usability
+
+the merge/link buttons have a `auto-completion` feature using [jQuery's autocomplete](https://jqueryui.com/autocomplete/) which is very cool. just play with it and see how easy it is to integrate into your webpages!
+
+we also integrated a full-screen mode so that you can put the kanban on a big screen.
+
+
+# documentation
+
+if you like to play with the implementation or are interested in the source code:
+
+* <https://github.com/nixcloud/rt-extension-kanban>
+* <https://github.com/nixcloud/rt-coreExtension-websocket>
+
+
+# conclusion
+
+this was a very cool project and we think that the mojolicious implementation can be adapted/used for other rt-extensions or even other perl based projects.
+
+we would like to thank [LiHAS](http://lihas.de/) (sponsor) and Best Practical Solutions and #perl ppl for their help.
+
+best wishes,   
+joachim &amp; paul

@@ -1,0 +1,51 @@
+[[!summary chatGPT: A user is experiencing issues with a poor driver for their ATI Radeon R300 card on Linux, leading to frequent X crashes and the need to restart X when hot plugging external displays; they also mention the problem of ssh not being able to resume disconnected sessions, and propose using "screen" to solve this issue and suggest implementing it in the "konsole" terminal emulator.
+[[!meta date="2009-10-20 20:58"]]
+[[!tag linux technology usability]]
+
+Since I am using a **ATI Radeon "R300"** card, that is a card with a very poor written driver (at least for linux) I'm facing frequent X-Crashes or I am forced to restart X on '**hot plugging**' of external displays.Yes 'hot plugging' does sometimes work, sometimes not.
+
+Since I'm also admin of several servers I'm also faced to the fact that ssh can not resume a disconnected session - that is since the session (OSI-model, layer 5, see [1]) isn't implemented the layer 4 connection is associated as session instead.  That is a common among many programs used today - either surfing the internet or the local network**.** **However** **the consequence is that once the connection is down it is unlikely to be resumed** even though socket is still open on both server and client while the ip has not changed - a simple tcp timeout on one end can reset the connection.
+
+If such a session is broken the result is that all started processes (which can be many, since they can be run in the background with the & operator) are closed immediately. For some operations as "mv dir1 dir2/" this can be fatal. Since this will **result in inconsistencies** most of the times.
+
+The mainstream solution to this problem is using a program called "screen". **This "screen" has many features which make it a program worth knowing** - even for local use, see [2] for screen commands I'm frequently using.
+
+
+[[!img media/screen_in_konsole.png alt="today i had the already mentioned problem: **xbuffer screwup**" style="float: none"]]
+
+So back to the topic of this posting the issue with the bad R300 driver and X session resets.
+
+The issue here is:
+	
+  * once the X server goes down my music I'm currently listening is also going down
+  * all my 'konsole' consoles are killed (which can be plenty)
+  * all my programs which use X (no wonder) are also gone
+
+**I would like to have 'konsle' to use a screen on every new 'konsole tab' I create**. Or since screen itself can nest several consoles in one screen instance (that is one process) - why not start a single screen and attach the 'konsole' session to this screen. When a second tab is opened the second tab is automatically adding a new screen tab as well.
+
+Once X goes down all processes are exited as already known - except screen. 'Screen' **does not react** to **SIGTERM **- it just keeps running. Later when you started into a new 'X session' you can open any console as for example 'xterm' or 'konsole' and with 'screen -r' you can resume your session.
+
+Now imagine 'konsole' to do this wrapping automatically. I could live with a toggle to switch the associated console back and forth between '**session**' behavior and '**pervasive**' behavior.
+
+**UPDATE: **Think of this 'screen in konsole' as you are already used to with firefox's multiple tabs when doing store/restore after logout/login. (not reboot of course since our screen instances are useless after reboot).
+
+This would be an incredible feature for 'konsole'.
+
+#links
+
+* [1] <http://en.wikipedia.org/wiki/OSI_model>
+* [2] <http://lastlog.de/wiki/index.php/Screenbefehle>
+* [3] <http://defindit.com/readme_files/bash_examples.html>
+
+#update
+**UPDATE: ** 'eliasp' just told me to edit the 'konsole' profile with Settings->Manage current profile. Setting the command to "**screen /bin/zsh**" instead of "**/bin/zsh**" at least creates screen consoles on every new 'konsole' tab opened. I love this workaround but konsole should also resume. Consider a X crash now, after relaunch of kde I open just new 'screens' instead of **attache** them.
+
+**UPDATE:** 'eliasp' also mentioned [3]. I once tried to start 'screen' on my internet server on login. The problem doing so is not recognized when using 'ssh' but it will** stop 'scp' from working**. Using [3] one can also detect "Disable xon/xoff and interactive login" when running screen on the remote side. This probably helps to circumvent the scp issue. Maybe once can also detect a running instance of 'screen' and reattache with 'screen -dr' or something alike.
+
+I thank 'eliasp' for his feedback.
+
+** **
+
+**UPDATE:** the proposal was accepted: [http://forum.kde.org/brainstorm.php#idea83059](http://forum.kde.org/brainstorm.php#idea83059)
+
+**UPDATE:** (2009-11-12) [https://launchpad.net/byobu](https://launchpad.net/byobu) seems to do things as expected. I have not tested this yet but a friend of mine reported that.

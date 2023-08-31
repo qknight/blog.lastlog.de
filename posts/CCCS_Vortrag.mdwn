@@ -1,0 +1,17 @@
+[[!meta date="2013-03-23 21:54"]]
+[[!tag linux usability nixos]]
+[[!img media/nixos-lores.png style="float: right"]]
+[[!summary NixOS vortrag beim CCCS ]]
+
+# NixOS vortrag beim CCCS 
+am 08.11.2012 habe ich in stuttgart in der stadtbibliothek, am mailaender platz, einen vortrag ueber NixOS gehalten.
+
+die **folien** liegen unter [1] und der **audio-mittschnitt** unter [2]. video gibts leider keines ;P
+
+vielen dank der stadtbibliothek und stefan schlott! und auch vielen dank an sirko kemter [3] und [4] von dem ich gelernt habe was man alles mit inkscape machen kann!
+
+# links
+* [1] <http://lastlog.de/misc/CCCS-stuttgart-vortrag-nixos.svg>
+* [2] <http://www1.stuttgart.de/stadtbuecherei/druck/audio/cccs/cccs_audio.php#39>
+* [3] <http://www.youtube.com/watch?v=m0nfQk1c4qw> (Präsentationen mit Inkscape und JessyInk)
+* [4] <http://karl-tux-stadt.de/ktuxs/>

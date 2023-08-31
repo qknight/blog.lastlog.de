@@ -1,0 +1,39 @@
+[[!meta date="2016-02-08 22:15"]]
+[[!tag nixcloud bash nixos wordpress]]
+
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!summary about the effort of making wordpress deployment reproducible.]]
+
+# motivation
+
+[wordpress](https://wordpress.org) uses svn for **plugins** and **themes** but not for the translations nor the software itself. this is a short update on how to fix the situation for the translations.
+
+# concept
+
+this was actually the simplest thing i could come up with: **a bash script** downloads the languages in different versions and commits them to individual git branches.
+
+1. query all 'current' versions:
+
+        https://api.wordpress.org/core/version-check/1.7/
+
+2. now query each version and download all files and store each 'hu_HU' version into its own branch:
+
+        [new branch]      hr-4.0 -> hr-4.0
+        [new branch]      hr-4.1 -> hr-4.1
+        [new branch]      hr-4.2 -> hr-4.2
+        [new branch]      hr-4.3 -> hr-4.3
+        [new branch]      hr-4.4 -> hr-4.4
+        [new branch]      hu_HU-4.0 -> hu_HU-4.0
+        [new branch]      hu_HU-4.1 -> hu_HU-4.1
+        [new branch]      hu_HU-4.2 -> hu_HU-4.2
+        [new branch]      hu_HU-4.3 -> hu_HU-4.3
+        [new branch]      hu_HU-4.4 -> hu_HU-4.4
+
+see [this script](https://github.com/nixcloud/wordpress-translations/blob/master/update.sh) for more details. and the [this README.md](https://github.com/nixcloud/wordpress-translations/blob/master/README.md) on how to use it with a nix expression.
+
+# links
+
+for more details, visit:
+
+[https://github.com/nixcloud/wordpress-translations](https://github.com/nixcloud/wordpress-translations)
+

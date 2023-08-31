@@ -1,0 +1,201 @@
+[[!summary chatGPT: A cloud consists of similar computers that run the same OS and have various technical and non-technical motivations, such as load balancing and marketing; using cloud services can lead to loss of control, loss of infrastructure, loss of software compatibility, loss of knowledge, and personal experiences with different online services; personal clouds and decentralized infrastructure are alternatives to centralized cloud services, but they face challenges and require standardized package management, symmetrical internet connections, scalability, powerful hardware, encryption, IPv6, and a clear understanding of data protection; private clouds have a long way to go before they can match the features and quality of big clouds; using the internet without losing individuality and freedom of expression can be complicated for average internet users.]]
+[[!meta date="2012-07-11 17:03"]]
+[[!tag packagemanager security society technology usability virtualization]]
+
+[[!img media/konqueror.png alt="" caption="what does 'cloud' stand for?" style="float: right" size=200x]]
+
+# what does ‘cloud’ stand for?
+
+simply speaking, a cloud consists similar computers (homogeneous hardware). usually every single cloud computer runs the same OS (host system), each controlling various guests. the main technical motivations are:
+
+  * load balancing of **cpu load **(move the VM to a machine with more CPU power)
+  * load balancing of **input/ouput load** (RAM increase; faster storage raid; in memory databases)
+  * load balancing of **bandwidth usage **(move the VM to the most demanding users)
+  * **increase redundancy **(reduce hardware failures; reduce power loss issues)
+
+the main non-technical motivations seem to be:
+	
+  * **marketing** - 'cloud' sounds cool, although a 'cloud' is basically just a subset of the internet
+  * **vendor lock-in** - probably no surprise to anyone
+  * **centralization** - cheaper to manage; grants more control over the platform
+
+**if you are a customer to a service which is hosted in the cloud **you usually don't see the cloud at all, hence the term 'cloud':
+	
+  * **amazon**: when buying books or other things
+  * **google**: using google search; reading email; google maps
+  * **microsoft azure**: whatever that platform is good for, is actually anybody using this?
+
+**if you are using one or more machines from a cloud,** there are basically two interesting patterns:
+	
+  * **actively maintain each computer:** implement distributed file systems and distributed services
+  * **using an abstraction: **someone implemented the handling of nodes and services you are going to develop thus it is running on top of an abstraction
+
+to sum up, if you **want to use cloud computers, you have to decide between:**
+	
+  * **SaaS** - Software as a Service (something like google mail)
+  * **PaaS** - Platform as a Service (something like ms azure / amazon e2)
+
+as the trend in hardware design is going towards multicore along with NUMA it seems the cloud is undergoing similar changes. as a rule of thumb i'd say that '**cloud computing can be seen as an approach to build a distributed operating system**'.
+
+# cloud problems
+
+not too long ago you would have maintained your own infrastructure with access to the hardware and software used. but times have changed and the americanization of things, that is by building 'super services', is about to change the internet yet again.
+
+i see this issues (no special order):
+
+## loss of control
+
+this is probably the strongest argument against using third party proprietary services as you can't fix it when it is broken. but cloud computing usually means a loss of privacy as well. the article [2] mentioning various points from richard stallman and larry ellison probably makes this point clear. it is interesting to see this SaaS wikipedia article [3] which reads like a campaign for SaaS - probably written by someone with a marketing background. there is the dangers to loose your data to foreign countries, as mentioned in [7].
+
+## loss of own infrastructure
+
+you don't have your own infrastructure anymore, thus you don't have physical control over your devices. additionally you then depend on working internet connections. it is likely that the infrastructure you rely on runs in one or several different countries.
+
+## loss of software not designed for the cloud
+
+the various versions of the **GPL had a great influence on how software could be used and distributed** but with the advent of the cloud this changes drastically. the way programs, especially webservices, are designed makes the GPL concept useless as it does not affect you at all. however, there is a new license, the 'Affero General Public License' [4] which fills that gap.
+
+why is wordpress is not licensed AGPL i wonder? my first guess is laziness as every author of every single patch would have to be asked for license change persmission. but the wordpress hosters could be using the GPL to greenwash their software as they would not have to hand out proprietary extension which might not be released. but who knows?!
+
+
+## loss of knowledge how to setup services similar to today's cloud servcies
+
+
+think about email - who operates his own mailserver nowadays? most friends of mine use google mail and this implies: once you are familiar with a service and its workflow you usually do not want to change. especially if the service seems to be free as in google mail for example (but most of my friends seem not to care that google replaced 'currency' by 'privacy' which is used as payment instead).
+
+as a consequence the knowledge about how to run your own mail server gets lost. if you understand german, listen to alternativlos 18 - 'Peak Oil, den Weltuntergang, und wie man sich vorbereiten kann' [5]** minute 74 ff** - they discuss this issue.
+
+## my personal experience
+
+i have a strong tendency to use devices which are capable of bringing me certain services offline. this is why i put a lot of effort into the evopedia application for instance. the nokia n900 is probably another good example where i try to maintain an offline infrastructure - i didn't even have mobile internet on the n900 for a complete year and yet i was able to do most things using sip/mappero/evopedia and others.
+
+here are some thoughts about online services i use:
+
+### wordpress
+i use **wordpress.com** right now and i really hate it for these points:
+
+  * you **can't write offline**
+  * initial **uploading images** or updating them** is a frustrating process**
+  * i sometimes **loose parts of articles while writing**
+  * there is **no good backup process **for offline backups
+  * i **hate the WYSIWYG editor** as it does not work very well
+  * **wordpress is inconsitent in producing a good web 2.0 workflow**, it feels like reloading the page all the time instead of doing so for single dom-tree elements only, as it would be done with web 2.0; if you don't trust me, have a look at [6] - how the upcoming wikipedia editor works
+
+of course i could host wordpress on my own webserver and i wanted to do that for a long time. the problem is that wordpress is optimized to be run on wordpress.com thus i think it might be too much work for me to support it with proper security updates and plugin management.** instead i search for a blog system which uses markdown in combination to git but i didn't find yet what i am searching for.**
+
+don't get me wrong, i really like wordpress but i don't like this dependency and lack of flexibility using their software.
+
+### google mail/docs
+
+
+i really love 'google docs' as it is a wonderful collaborative platform but i can't use it as i have to disclose all documents to google i'd be working on.
+
+
+### google android
+
+
+like google mail and google docs, android has a very good cloud integration. but if you want to use services other than google's, it is a horrible platform. for instance i keep installing xabber [12] although google uses jabber but intentionally made you require to install third party software in order to use non google jabber. same goes for most other services. if i had to use an android phone i would buy one with proper CyanogenMod [13] support.
+
+
+### github.com
+
+
+great service for source code hosting using git. still the platform itself is not available like for [http://gitorious.org/](http://gitorious.org/) or  [http://gitlabhq.com/](http://gitlabhq.com/). github.com uses a wiki which is bound to the platform and not contained in the git repo.
+
+note: although i never used [http://www.fossil-scm.org](http://www.fossil-scm.org/) i like the idea that it contains a wiki in the repository as well
+
+i use github.com only for free and open source projects.
+
+
+# better without clouds
+
+
+the conventional use of the term 'cloud' simply indicates a buzzword or business term for vendor lock-in and centralized infrastructure you don't have control of. that is good to know as it helps to recognize and avoid such services. what one should use instead is decentralized infrastructure located near the user, connected to the internet where needed, giving the user the control over the platform.
+
+arguably this concept is implemented as a new trend called '**personal cloud**' or '**private cloud server**'. but these terms are limiting the trend to personal or private matters, yet i would like to see it in businesses as well.
+
+
+## hardware
+
+
+following the concept of decentralization **users can host their own files and other things** as address books / calenders **on their own home devices**.
+
+a list of interesting devices to give you an idea:
+	
+  * **sheevaplug** [9] - there is even a nixos version for this device (by viric)!
+  * **pogoplug** [10]
+  * **tonidoplug** [11]
+  * **fritz!box** (with myfritz and fritznas) [14]
+
+## software
+
+### software implementing services
+
+a list of software i find interesting:
+
+  * **despora** [15] - decentralized facebook
+  * **owncloud** [16] - dropbox like service
+  * **sparkleshare** [21] - is a collaboration and sharing tool that is designed to keep things simple and to stay out of your way.
+  * **tomahawk** [19] - a nice music streaming service
+  * various p2p / torrent like services:
+    * **mldonkey** [17]
+
+still most 'personal or private clouds' scale differently compared to the big 3 mentioned in the beginning of this article. for instance, most of these services are configured in the client/server way and they usually do not implement concepts as failover, backups or load balancing. for that to happen it requires a new set of tools and decentralized frameworks based on p2p technologies - which has just not happened yet.
+
+there is also a political issue: most internet users do not have a decent upload channel, which basically means that their internet connection is not very good.
+
+
+#### software for managing services
+
+	
+  * **openshift** [20] - is a cloud computing platform as a service product from red hat
+  * **openstack** [21] - is a global collaboration of developers and cloud computing technologists producing the ubiquitous open source cloud computing platform for public and private clouds.
+  * **disnix** [8] - is a distributed deployment extension for Nix, a purely functional package manager.
+
+i've used neither but i like to point out that there is ongoing open source involvement and interestingly non of these technologies are used in private clouds. **private clouds seem to implement the classical client/server paradigm at the moment. **there is a **remarkable exception**, that is **filesharing using p2p/kademlia** which implements a basically read only storage which scales pretty well already.
+
+## a matter of design
+
+to make the private cloud or a decentralized cloud a success we need:
+
+	
+  * a **standardized package manager** with proper software life-cycle management
+  * **symmetrical internet connections** with decent upload/download speeds
+  * **transparent support for scalability/reliability/redundancy** (the points mentioned in the beginning of the article)
+  * **powerful hardware **with low power usage but capable of high loads
+  * **encryption and certificates **or** a chain of trust**
+  * **ipv6 **- we need good endpoint communication capabilities
+  * ****a clear understanding of where we want to put our personal data and how we can protect it****
+
+i think each requirement on its own is already implemented somewhere but not in combination to each. there is not yet a library providing the software/protocol requirements and the hardware is either not powerful enough or is not intended to be used in that way required.
+
+# conclusion
+
+still it is a long way for the private clouds to have the same level of features/quality as the big clouds already have. **for the time being it seems to be complicated for the average internet user to use the internet without loosing too much of his individuality**, thus the **freedom of expression**.
+
+
+# links
+
+
+* [1] <http://www.google.de/search?sourceid=chrome&ie=UTF-8&q=richard+stallman+cloud>
+* [2] <http://www.guardian.co.uk/technology/2008/sep/29/cloud.computing.richard.stallman>
+* [3] <http://de.wikipedia.org/wiki/Software_as_a_Service>
+* [4] <http://en.wikipedia.org/wiki/Affero_General_Public_License>
+* [5] <http://alternativlos.org/18/>
+* [6] <https://www.mediawiki.org/wiki/VisualEditor:InezSandbox>
+* [7] <http://www.engadget.com/2011/06/30/microsoft-european-cloud-data-may-not-be-immune-to-the-patriot/>
+* [8] <http://nixos.org/disnix/>
+* [9] <http://de.wikipedia.org/wiki/SheevaPlug>
+* [10] <http://pogoplug.com/>
+* [11] <http://en.wikipedia.org/wiki/Tonido>
+* [12] <http://www.xabber.com/>
+* [13] <http://www.cyanogenmod.com/>
+* [14] <https://www.myfritz.net/was_ist_myfritz.xhtml>
+* [15] <http://de.wikipedia.org/wiki/Diaspora_(Software)>
+* [16] <http://de.wikipedia.org/wiki/Owncloud>
+* [17] <http://de.wikipedia.org/wiki/Mldonkey>
+* [18] <http://trac.edgewall.org/>
+* [19] <http://www.tomahawk-player.org/>
+* [20] <http://en.wikipedia.org/wiki/OpenShift>
+* [21] <http://openstack.org/>
+* [22] <http://sparkleshare.org/>

@@ -1,0 +1,420 @@
+[[!summary chatGPT: A guide addressing volume control issues on Linux systems, particularly focusing on the HP EliteBook 8530w using Gentoo Linux. The guide covers using ACPI events, modifying X bindings, and installing on-screen display (OSD) solutions for volume changes.]]
+[[!meta date="2010-07-10 09:47"]]
+[[!tag audio gentoo linux usability]]
+
+[[!img media/img_0042.jpg alt="" style="float: right" size=230x]]
+
+# motivation
+
+**windows xp** changes volumes no matter what the user is doing. in linux this is often not possible because things are done differently (read: "wrong"). however, this guide will help you to fix it or at least tells you why it is done wrong. i'm experimenting with my '**hp elitebook 8530w**' using gentoo linux. in linux the volume keys are most often bound to X, as: **XF86AudioRaiseVolume** and **XF86AudioLowerVolume**, see this example ~/.Xmodmap (not mine)
+
+    keycode 176 = XF86AudioRaiseVolume
+    keycode 174 = XF86AudioLowerVolume
+
+
+this is a bad design because things don't work well. a different concept was issued by my thinkpad t43: mute/increase/decrease of volume was done using a hardware mixer. this means alsa wasn't used at all.
+
+this posting addresses alternative approaches on how to use the volume up/down/mute buttons in a global X independent way.
+
+
+# common linux audio setup
+
+
+currently linux features two desktop audio systems:
+
+
+
+	
+  * alsa
+  * pulseaudio
+  * (jack audio connection kit)
+
+
+most often a weird combination of both simultaneously, with confusing results. **point is**: changing volumes.
+
+
+# volume settings issues
+
+
+volume levels can be changed for both: alsa and pulseaudio. the difference is that if you change the 'master' volume of alsa, you also change it for all pulseaudio clients. while changing an individual volume in a 'pulseaudio client' will only change the volume for that specific client.
+
+most of the time volume changes are redirected to alsa, for example '**kmix**' does catch events like **XF86AudioRaiseVolume** and changes the volume of the 'selected master channel'. one can select 'master' or 'pcm' as 'master channel' (others as well, depends on the audio setup).  using this architecture has pitfalls, as you **CAN NOT** change volumes, when:
+
+
+
+	
+  * playing fullscreen-**games** (using **opengl **or** sdl)**
+  * embedded **adobe flash** animations (**skips fullscreen** on **XF86AudioRaiseVolume**)
+  * X is NOT running (or has crashed)
+  * **system load is too high** (X input handling is delayed)
+  * **kmix** is not running (or kde is not running yet)
+
+
+
+
+# xorg input handlin**g**
+
+the linux kernel adds input devices in '**/dev/input/**'. **xorg** will use only devices configured in '/etc/X11/xorg.conf'. Let's see '**/var/log/Xorg.0.log**':
+
+	
+  * **/dev/input/mice** (**mouse**)
+
+	
+  * **/dev/input/event3 (keyboard)**
+
+        (II) config/hal: Adding input device AT Translated Set 2 keyboard
+        (**) AT Translated Set 2 keyboard: always reports core events
+        (**) AT Translated Set 2 keyboard: Device: "**/dev/input/event3**"
+        (II) AT Translated Set 2 keyboard: Found keys
+        (II) AT Translated Set 2 keyboard: Configuring as keyboard
+        (II) XINPUT: Adding extended input device "AT Translated Set 2 keyboard" (type: KEYBOARD)
+	
+  * **/dev/input/event7 (HP multimedia keys)**
+        (II) config/hal: Adding input device HP WMI hotkeys
+        (**) HP WMI hotkeys: always reports core events
+        (**) HP WMI hotkeys: Device: "**/dev/input/event7**"
+        (II) HP WMI hotkeys: Found keys
+        (II) HP WMI hotkeys: Configuring as keyboard
+        (II) XINPUT: Adding extended input device "HP WMI hotkeys" (type: KEYBOARD)
+
+one can get a complete list by typing "**xinput list**" as a normal user in a xterm. the default setup of X will use 'hal' to manage hardware.
+
+# monitoring for acpi keys
+
+let's see if one receives any of the acpi key-events using acpi_listen. **i press** '**fn+f8**', which is a special key with a **battery symbol** on it.
+
+**xev** reports (run as normal user):
+
+
+    KeyPress event, serial 45, synthetic NO, window 0x3200001,  root 0x27a, subw 0x0, time 26309626, (51,-20), root:(55,930),  state 0x0, keycode 244 (keysym 0x1008ff93, XF86Battery), same_screen YES,  XLookupString gives 0 bytes:  XmbLookupString gives 0 bytes:  XFilterEvent returns: False  KeyRelease event, serial 45, synthetic NO, window 0x3200001,   root 0x27a, subw 0x0, time 26309686, (51,-20), root:(55,930), state 0x0, keycode 244 (keysym 0x1008ff93, XF86Battery), same_screen YES,  XLookupString gives 0 bytes:  XFilterEvent returns: False
+
+
+
+
+**acpi_listen** reports (run as root or normal user):
+
+    button/battery BAT 00000080 00000000
+
+
+repeating this experiment with a different keycombination as 'fn+f1' resulted only in a xev event but NO acpi event was reported by acpi_listen.
+
+
+
+
+this means we can NOT just use any 'fn+whatever' combination as a acpi shortcut. we are probably limited to what is provided by the hp acpi firmware.
+
+
+
+
+**to sum up**: this means some keys or key combinations provide an acpi event while also a normal key event (which is delivered to X and monitored using xev). acpi is independent of X so if the multimedia keys (volume up/down/mute) produce acpi events it is good. if not we still can do what we want but with a little more effort as it will require to monitor /dev/input/eventX for volume keys. 
+
+
+# syncing hardware-mute with software-mute
+
+my 'hp elitebook 8530w' does mute the soundcard directly (no operating system operation needed). this is helpful since instant muting sometimes is VERY IMPORTANT. however, if no kmix is running, then the XF86AudioMute isn't processed and alsa still thinks the devices is unmuted (with an 'out of the box setup').
+
+
+the truth is that the audio-signal flow can be interrupted serially, in two ways:
+
+  * first by alsa, which does software mute
+  * but the 'hp elitebook 8630w' also does hardware muting
+
+if both are muted, using alsamixer to unmute won't restore sound since the hardware mute still is set. this can be very confusing. 
+
+my old thinkpad t43 was able to mask the hardware mute (on an acpi basis, see ibm-acpi [2]), in order to make 'software' mute the only option.
+	
+  * this is nice as it is more intuitive
+  * this is bad as all the issues which this posting talks about were very problematic. most users would therefore NOT mask the hardware mixer mute as this could mean 'not to be able to quickly mute' in certain situations.
+
+# looking at the hp-wmi.c code
+
+
+the handling of acpi can either be done using the generic acpi subsystem or with some special care as for example ibm-acpi [2]. since i can't use the ibm-acpi with my hp laptop, let's have a look what that hp-wmi thing does.
+
+'**/usr/src/linux/drivers/platform/x86/hp-wmi.c**' shows that this code is meant to:
+
+  * rfkill **wireless** lan
+  * rfkill **bluetooth** dongle
+  * wwan? (whatever that is)
+  * register a **sysfs interface**
+
+on **hp-wmi** module load, '**/sys/devices/platform/hp-wmi**' is created. this is the interface used by '**net-wireless/rfkill**'.
+
+
+    # rfkill list
+    7: hci0: Bluetooth
+    Soft blocked: no
+    Hard blocked: no
+    8: phy2: Wireless LAN
+    Soft blocked: no
+    Hard blocked: no
+    15: hp-wifi: Wireless LAN
+    Soft blocked: no
+    Hard blocked: no
+    16: hp-bluetooth: Bluetooth
+    Soft blocked: no
+    Hard blocked: no
+
+
+
+
+this interface can be used to disable the devices. so this is not what we want. maybe the hp can't mask the hardware mute at all.
+
+# but how is the mute button connected?
+
+since i'm using a laptop, the mute button might just be a hard wired toggle for the soundcards mute state. let's check that using an external multimedia usb keyboard.  lsusb:
+
+
+    Bus 008 Device 003: ID 04b3:3003 IBM Corp. Rapid Access III Keyboard
+
+
+
+
+**using the mute button there doesn't change anything** until i start 'kmix'. so my first assumption might be correct.
+
+
+
+
+using 'acpi-listen' as root:
+
+ 
+    button/mute MUTE 00000080 00000000
+
+but looking at /etc/acpi there does not seem to be any script caring about acpi event. looking at /var/log/messages:
+
+    tail -f /var/log/messages
+    ...
+    Jul  5 16:24:21 ebooK logger: ACPI event unhandled: button/mute MUTE 00000080 00000000
+
+so it's probably a hard wired button toggle.
+
+my previous laptop, 'thinkpad t43', did handle the volume up/down and mute directly (similar of how the mute button is implemented on the elitebook 8530w). i quote from the ibm-acpi implementation documentation [2]:
+
+
+    0x1017	0x16	MUTE		**Mute internal mixer. This key is always handled by the firmware, even when unmasked.**
+
+
+so this might be handled by the hp-wmi firmware as well.
+
+# /etc/acpi/default.sh script (adapted)
+
+    #!/bin/sh
+    # /etc/acpi/default.sh
+    # Default acpi script that takes an entry for all actions
+    
+    set $*
+    
+    group=${1%%/*}
+    action=${1#*/}
+    device=$2
+    id=$3
+    value=$4
+    
+    log_unhandled() {
+            logger "ACPI event unhandled: $*"
+    }
+    
+    case "$group" in
+            video)
+                    case "$action" in
+                            brightnessup)
+                            /etc/acpi/brightness.sh up
+                            ;;
+    
+                            brightnessdown)
+                            /etc/acpi/brightness.sh down
+                            ;;
+                    esac
+                    ;;
+            button)
+                    case "$action" in
+                            volumedown)
+                            /etc/acpi/volume.sh down
+                            ;;
+                            volumeup)
+                            /etc/acpi/volume.sh up
+                            ;;
+                            mute)
+                            /etc/acpi/volume.sh mute
+                            ;;
+    
+                            power)
+                                    #/sbin/init 0
+                                    ;;
+    
+                            # if your laptop doesnt turn on/off the display via hardware
+                            # switch and instead just generates an acpi event, you can force
+                            # X to turn off the display via dpms.  note you will have to run
+                            # 'xhost +local:0' so root can access the X DISPLAY.
+                            #lid)
+                            #  xset dpms force off
+                            #  ;;
+    
+                            sleep)
+                                    /usr/sbin/pm-suspend
+                                    ;;
+                            *)  log_unhandled $* ;;
+                    esac
+                    ;;
+    
+            ac_adapter)
+                    case "$value" in
+                            # Add code here to handle when the system is unplugged
+                            # (maybe change cpu scaling to powersave mode).  For
+                            # multicore systems, make sure you set powersave mode
+                            # for each core!
+                            #*0)
+                            #  cpufreq-set -g powersave
+                            #  ;;
+    
+                            # Add code here to handle when the system is plugged in
+                            # (maybe change cpu scaling to performance mode).  For
+                            # multicore systems, make sure you set performance mode
+                            # for each core!
+                            #*1)
+                            #  cpufreq-set -g performance
+                            #  ;;
+    
+                            *)  log_unhandled $* ;;
+                    esac
+                    ;;
+    
+            *)  log_unhandled $* ;;
+    esac
+
+# /etc/acpi/volume.sh
+    
+    #!/bin/bash
+    # script to change the volume via acpi calls by joachim schiele 2010-06-30
+    
+    if [ "$1"x == "up"x ]; then
+            volume=$(amixer get Master | grep "Front Left: Playback" | awk '{print $4}')
+            Y=$(echo  "$volume+1" | bc)
+            amixer set Master $Y
+            P=$(echo "$Y/30*100" | bc -l)
+    fi
+    
+    if [ "$1"x == "down"x ]; then
+            volume=$(amixer get Master | grep "Front Left: Playback" | awk '{print $4}')
+            Y=$(echo  "$volume-1" | bc)
+            amixer set Master $Y
+            P=$(echo "$Y/30*100" | bc -l)
+    fi
+    
+    if [ "$1"x == "mute"x ]; then
+            $(amixer get Master | grep "Front Left: Playback" | grep '\[off\]')
+            state=$?
+            volume=$(amixer get Master | grep "Front Left: Playback" | awk '{print $4}')
+            Y=$(echo  "$volume")
+            amixer set Master $Y
+            P=$(echo "$Y/30*100" | bc -l)
+    
+            echo "state=$state"
+    
+            if [ $state -ne 1 ]; then
+                    amixer set Master unmute
+            else
+                    amixer set Master mute
+            fi
+    fi
+
+
+
+# changing volumes not using kmix (using acpi)
+
+see my last posting [1] on how to use acpi to change the display brightness. this time we are going to **change the volume level** using **acpi**. volume script
+
+    # cat /etc/acpi/events/volume
+
+this script ignores stereo balance (left speaker louder than right speaker). but it works great for my laptop.
+
+    # /etc/acpi/default.sh
+
+one can find out the group and action with (run as root):
+
+    acpi_listen
+
+and then create an event:
+
+    button/volumedown VOLDN 00000080 00000000
+    button/volumedown VOLDN 00000080 00000000
+    button/volumeup VOLUP 00000080 00000000
+    button/volumeup VOLUP 00000080 00000000
+
+
+now extract the needed information: '**button/volumedown' **and** 'button/volumeup**'. put these into the /etc/acpi/default.sh script as i already did above. you can experiment with the script using the command line:
+
+
+    ./default.sh button/volumedown
+
+# changing volumes not using kmix (using /dev/input/eventX)
+
+
+my laptop produces an acpi event (even for an externally attached usb keyboads) but i guess most computers won't. this is why i've adapted a c program and a script [3] to parse /dev/input/eventX.
+
+using this program is very easy, just follow the steps in the README.
+
+    # ./mediakeys-controller /dev/input/event3
+    calling script for volume down
+    calling script for volume down
+    calling script for volume up
+    calling script to toggle mute state
+
+
+
+
+works perfectly here (but since the acpi stuff works also i'm using acpi). the reason is that [3] does not support hotplugging of new devices and it will only open one device at program start. this needs to be fixed but i think of it more as a prove of concept code.
+
+
+# fixing the X-bindings
+
+there are still the bindings for the volume keys in X, we need to remove bindings for **XF86AudioRaiseVolume,** **XF86AudioLowerVolume** and **XF86AudioMute**. i simply removed the kmix key bindings for these keys. doing so works but one would have to remove keybindings from many applications.
+
+a far better approach is to remove the keymappings so that no such events are produced, done using:  keycodes via '~/.Xmodmap'.
+
+let's find the key bindings first:
+
+    # xmodmap -diplay :0.0 -pke | grep -i vol
+    keycode 122 = XF86AudioLowerVolume NoSymbol XF86AudioLowerVolume
+    keycode 123 = XF86AudioRaiseVolume NoSymbol XF86AudioRaiseVolume
+
+now let's kill those bindings with empty assignments:
+
+
+    xmodmap -e "keycode 122 ="
+    xmodmap -e "keycode 123 ="
+
+do the same for:
+
+    keycode 121 = XF86AudioMute NoSymbol XF86AudioMute
+
+
+to make these changes permanent, we need to create a ~/.Xmodmap, mine looks like this:
+
+
+    # cat ~/.Xmodmap
+    keycode 121 =
+    keycode 122 =
+    keycode 123 =
+
+# installing an OSD
+
+x11-libs/xosd is a very nice OSD. one can indicate volume change. but it somehow does look buggy from time to time:
+	
+  * sometimes using osd_cat won't show any osd (only X restart makes it work again)
+  * osd_cat does not work very good with mplayer
+  * it is not very fast and it does not look nice
+
+i would like to use the osd of kmix. as kmix already changes volumes (see the sliders when using alsamixer from the console) one would simply have to write an option in kmix settings to enable the osd also on passive changes (where kmix didn't change the volume). i've not done this so far.
+
+# links
+
+* [1] <http://invalidmagic.wordpress.com/2010/06/30/no-more-crashes-after-resuming-from-pm-suspend/>
+* [2] <http://ibm-acpi.sourceforge.net/README>
+* [3] <http://github.com/qknight/mediakeys-controller>
+
+
+# errata
+
+
+update: fixed the **/etc/acpi/default.sh** script /etc/acpi/events/volume is now **/etc/acpi/volume.sh** for mute as well

@@ -1,0 +1,283 @@
+[[!meta date="2023-05-24 03:35"]]
+[[!tag ruckig emscripten motionplanning]]
+[[!series emscripten]]
+
+[[!summary using the ruckig library for motion planning in the browser]]
+
+[[!img media/Emscripten_logo_full.png width="250px" class="noFancy" style="float: right"]]
+
+<style>
+
+    #box1 {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+    }
+    .container1 {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .input-group1 {
+        flex-basis: 50%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group1 label,
+    .input-group1 input {
+        width: 100%;
+    }
+    #top {
+        flex: 0 1 auto;
+    }
+    #gd {
+        flex: 1 1 auto;
+    }
+    #error-box {
+        background-color: #ff0000de;
+        z-index: 99;
+        height: 40%;
+        width: 100%;
+        border-top: black dotted 5px;
+        border-bottom: black dotted 5px;
+        visibility: hidden;
+    }
+    #ohsnap {
+        font-size: 40px;
+    }
+    #error-box-text {
+        font-size: 23px;
+    }
+</style>
+
+
+# motivation
+
+as i had to maintain a **motion planning library** in the past, i was freaked to find [ruckig library](https://github.com/pantor/ruckig). see also <https://arxiv.org/pdf/2105.04830.pdf>.
+
+i wanted to use it in the browser, so i compiled using [emscripten](https://emscripten.org/) and used [plotly.js](https://plotly.com/javascript/) for the UI. the result can be found here: <https://github.com/qknight/ruckig/tree/15_visualizer>
+
+## motion planing in the browser
+
+
+<div id="box">
+<div id="top">
+<div class="container1" style="background-color: #7ce5e5;">
+<div class="input-group1">
+<label for="current_position">current_position:</label>
+<input type="number" value="-5" id="current_position" name="current_position">
+</div>
+<div class="input-group1">
+<label for="current_velocity">current_velocity:</label>
+<input type="number" value="0" id="current_velocity" name="current_velocity">
+</div>
+<div class="input-group1">
+<label for="current_acceleration">current_acceleration:</label>
+<input type="number" value="0" id="current_acceleration" name="current_acceleration">
+</div>
+</div>
+
+<div class="container1" style="background-color: #88ec71;">
+<div class="input-group1">
+<label for="target_position">target_position:</label>
+<input type="number" value="5" id="target_position" name="target_position">
+</div>
+<div class="input-group1">
+<label for="target_velocity">target_velocity:</label>
+<input type="number" value="0" id="target_velocity" name="target_velocity">
+</div>
+<div class="input-group1">
+<label for="target_acceleration">target_acceleration:</label>
+<input type="number" value="0" id="target_acceleration" name="target_acceleration">
+</div>
+</div>
+
+<div class="container1" style="background-color: #ffdf2f;">
+<div class="input-group1">
+<label for="max_jerk">max_jerk:</label>
+<input type="number" value="1" id="max_jerk" name="max_jerk">
+</div>
+<div class="input-group1">
+<label for="max_velocity">max_velocity:</label>
+<input type="number" value="21" id="max_velocity" name="max_velocity">
+</div>
+<div class="input-group1">
+<label for="max_acceleration">max_acceleration:</label>
+<input type="number" value="1.148" id="max_acceleration" name="max_acceleration">
+</div>
+</div>
+</div>
+
+<div id="error-box">
+<div id="ohsnap">oh snap...</div>
+<div id="error-box-text">
+tbd
+</div>
+</div>
+
+<div id="gd"></div>
+</div>
+<script></script>
+<script src="posts/ruckig/plotly-2.23.2.min.js"></script>
+<script src="posts/ruckig/15_visualizer.js"></script>
+
+<script>
+  function updateGraphCallback(rawjson) {
+      console.log("updateGraphCallback has been called", rawjson)
+      updateGraph(rawjson)
+  }
+
+  function updateGraph(rawjson) {
+      var t = [], p = [], v = [], a = [], j = [];
+      var isMobileViewPort = false;
+      if (window.matchMedia("(min-width: 600px)").matches) {
+        isMobileViewPort = true;
+      }
+
+      json = JSON.parse(rawjson)
+      console.log(json)
+
+      for (var i = 0; i < json["curve"]["data"].length; i++) {
+          //time, position, velocity, acceleration, jerk
+          row = json["curve"]["data"][i]
+          t.push(row[0]);
+          p.push(row[1]);
+          v.push(row[2]);
+          a.push(row[3]);
+          j.push(row[4]);
+      }
+      var data = [
+          {x: t, y: p, name: "position [m]"},
+          {x: t, y: v, name: "velocity [m/s]"},
+          {x: t, y: a, name: "acceleration [m/s^2]"},
+          {x: t, y: j, name: "jerk [m/s^3]"},
+      ];
+      var shapes = [{
+          type: 'line',
+          yref: 'paper',
+          xref: 'x',
+          x0: json["trajectory_duration"],
+          y0: -10,
+          x1: json["trajectory_duration"],
+          y1: 10,
+          line: {
+              color: 'black',
+              width: 0.5,
+          }
+      }]
+      var layout = {
+          "title": "S-Curve diagram",
+              autosize: true,
+              dragmode: 'pan',
+              margin: {
+                  l: 50,
+                  r: 10,
+                  b: 70,
+                  t: 50,
+                  pad: 10
+              },
+          hovermode: "x",
+          shapes,
+          showlegend: isMobileViewPort
+      };
+      var config = {
+          'modeBarButtonsToRemove': ['zoom'],
+          scrollZoom: true,
+          displayModeBar: isMobileViewPort,
+      }
+      Plotly.newPlot("gd", data, layout, config);
+  }
+
+computeCurve = Module.cwrap('computeCurve', 'string', ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number', 'number'])
+
+function getParamter(key) {
+    value = document.getElementById(key).value
+    return value
+}
+
+function GetParamtersAndComputeCurve() {
+    var url = new URL(window.location);
+
+    var current_position = getParamter("current_position");
+    url.searchParams.set("current_position", current_position)
+    var current_velocity = getParamter("current_velocity")
+    url.searchParams.set("current_velocity", current_velocity)
+    var current_acceleration = getParamter("current_acceleration")
+    url.searchParams.set("current_acceleration", current_acceleration)
+
+    var target_position = getParamter("target_position")
+    url.searchParams.set("target_position", target_position)
+    var target_velocity = getParamter("target_velocity")
+    url.searchParams.set("target_velocity", target_velocity)
+    var target_acceleration = getParamter("target_acceleration")
+    url.searchParams.set("target_acceleration", target_acceleration)
+
+    var max_velocity = getParamter("max_velocity")
+    url.searchParams.set("max_velocity", max_velocity)
+    var max_jerk = getParamter("max_jerk")
+    url.searchParams.set("max_jerk", max_jerk)
+    var max_acceleration = getParamter("max_acceleration")
+    url.searchParams.set("max_acceleration", max_acceleration)
+
+    window.history.pushState({}, '', url)
+
+    var ret = computeCurve(
+        current_position,
+        current_velocity,
+        current_acceleration,
+        target_position,
+        target_velocity,
+        target_acceleration,
+        max_velocity,
+        max_jerk,
+        max_acceleration
+    );
+    if (ret !== "") {
+        document.getElementById('error-box-text').innerHTML = ret;
+        document.getElementById('error-box').style.visibility = "visible";
+    } else {
+        document.getElementById('error-box').style.visibility = "hidden";
+    }
+};
+
+function setDefaultValue(key, defaultValue) {
+    const urlParams = new URLSearchParams(document.URL);
+    value = defaultValue;
+    if (urlParams.has(key)) {
+        value = urlParams.get(key)
+    }
+    document.getElementById(key).setAttribute('value', value);
+    document.getElementById(key).setAttribute( "onchange", "GetParamtersAndComputeCurve()" );
+}
+
+function InitParameters() {
+    console.log("InitParameters")
+    setDefaultValue("current_position", -5)
+    setDefaultValue("current_velocity", 0)
+    setDefaultValue("current_acceleration", 0)
+
+    setDefaultValue("target_position", 5)
+    setDefaultValue("target_velocity", 0)
+    setDefaultValue("target_acceleration", 0)
+
+    setDefaultValue("max_velocity", 21)
+    setDefaultValue("max_jerk", 1)
+    setDefaultValue("max_acceleration", 1.148)
+
+    GetParamtersAndComputeCurve()
+}
+     console.log('before Module[onRuntimeInitialized');
+
+Module['onRuntimeInitialized'] = InitParameters;
+</script>
+
+note: above should be a plotly.js graph, if not, it might not work in your browser.
+
+# conclusion
+
+i've documented the process in the [README.md](https://github.com/qknight/ruckig/commit/45ba491c35707d76e239770a695cf47d563e644e?short_path=afd3506#diff-afd35063cd397b0616c3d498af9af06d61ffef7c30146885432e0c0265ed7813) and using the docker image from emscripten is is now trivial to kick off!
+
+this work shines because of the quality of emscripten! compiling c/c++ code to javascript, even with cmake, is blazingly easy.
+
+oh, and since you are still here, my favourite video in this regard is <https://www.youtube.com/watch?v=KPoeNZZ6H4s>!

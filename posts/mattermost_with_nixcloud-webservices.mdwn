@@ -1,0 +1,81 @@
+[[!img media/mattermost.png width="100px" class="noFancy" style="float: right"]]
+
+[[!summary declarative mattermost with nixcloud-webservices]]
+[[!meta date="2023-08-25 09:47"]]
+[[!tag nixcloud mattermost]]
+[[!series nixcloud]]
+
+# motivation
+
+in 2018 we packaged [mattermost](https://mattermost.com/) in [nixcloud-webservices](https://github.com/nixcloud/nixcloud-webservices) for declarative setup support.
+
+so if you ever want to get rid of [imperative container setup using docker compose (@andrewzigler)](https://youtu.be/20KSKBzZmik?t=88), then nixcloud-webservices might be for you!
+
+using *nixcloud-webservices* with **nixcloud.webservices.mattermost**, **nixcloud.email** and **nixcloud.TLS** it is possible to setup a complete chat system without much effort.
+
+<div class="alert alert-info" role="alert">
+please note: since we gave up on nixcloud in ~2019/2020 we stopped all development. however, the idea is still valid in 2023, so i will document it here.
+</div>
+
+## setup
+
+so using nixcloud-webservices you can setup a complete chat system with these few lines of code:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.nix}
+nixcloud.webservices.mattermost.ncchat = {
+  enable = true;
+  EmailSettings = {
+    SendEmailNotifications = true;
+    ConnectionSecurity = "STARTTLS";
+    EnableSMTPAuth = true;
+    SMTPPort = 587;
+    SMTPServer = "mail.nixcloud.io";
+    SMTPUsername = "info@nixcloud.io";
+    SMTPPassword = "xxxxxxxxxxxxx";
+    RequireEmailVerification = true;
+    FeedbackEmail = "info@nixcloud.io";
+    FeedbackName = "nixcloud";
+  };
+  proxyOptions = {
+    domain = "mattermost.nixcloud.io";
+    port = 8080;
+  };
+};
+
+nixcloud.email= {
+  enable = true;
+  domains = [ "nixcloud.io" ];
+  ipAddress = ipAddress;
+  ip6Address = ip6Address;
+  fqdn = "mail.lastlog.de";
+  enableGreylisting = false;
+  users = [ ... ];
+};
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## used resources
+
+the setup from above will install mattermost on the local system and start it using systemd. it will also create a database and a user for the database.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash}
+root@mail ~# cd /var/lib/nixcloud/webservices/mattermost-ncchat
+root@mail /v/l/n/w/mattermost-ncchat# ls -la
+total 28
+drwxrwxr-x+  4 root              root              4096 May 11  2019 .
+drwx--x--x  13 root              root              4096 Jul  4  2019 ..
+-rw-rw-r--+  1 root              root                 0 May 11  2019 .database-create-mattermost
+drwxrwxr-x+  3 root              root              4096 Nov 29  2018 postgresql
+drwxrwxr-x+  6 mattermost-ncchat mattermost-ncchat 4096 Aug 22 07:34 www
+
+du -sh .
+570M    .
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+so if you wanted to do a backup of this particular mattermost instance, you would need the nix code above and all the files in /var/lib/nixcloud/webservices/mattermost-ncchat
+
+# summary
+
+i like to point out that the postgresql database is part of the service and all the files are stored in one directory **/var/lib/nixcloud/webservices/mattermost-ncchat**.
+
+this makes it easy to backup and restore the service and it also makes it easy to run several such services.

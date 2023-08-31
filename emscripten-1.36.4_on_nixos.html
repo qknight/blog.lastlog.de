@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="emscripten-1.36.4_on_nixos.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>emscripten-1.36.4 on nixos</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/emscripten-1.36.4_on_nixos.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="request_tracker_kanban_extension.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="android_calendar_and_CalDav.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::emscripten" title="article series emscripten" class="seriesbtn btn btn-primary">emscripten</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="tour_of_nix.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="nixos-augsburg-sprint.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">emscripten-1.36.4 on nixos</h1>
+    <div id="date"><p><span id="lastupdated">25 may 2016</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::emscripten" class="tagbtn btn btn-primary">emscripten</a><a href="timeline.html?filter=tag::javascript" class="tagbtn btn btn-primary">javascript</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right" class="noFancy"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>emscripten on nixos, a status update.</p>
+<h2 data-number="2" id="section">1.36.4</h2>
+<p>since the project i’m hacking on requires me to develop on nixos,
+which is awsome btw, i had to figure how to compile xml.js on nixos. one
+requirement was the <a
+href="https://github.com/NixOS/nixpkgs/pull/15684/">revision bump from
+1.36.4 to 1.36.4</a>.</p>
+<h2 data-number="3" id="compiling-xml.js">compiling xml.js</h2>
+<p>since xml.js wouldn’t compile on nixos caused by a missing library:
+<code>cannot find -lgcc</code>. see the <a
+href="https://github.com/NixOS/nixpkgs/issues/15636#issuecomment-221453043">bug-report</a>
+for details.</p>
+<p>in a nut-shell: using 1.36.4 emscripten <strong>xml.js compiles/works
+with ubuntu but fails on nixos</strong>.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>.<span class="op">/</span>script<span class="op">/</span>libxml2   </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: warning: AM_INIT_AUTOMAKE: two<span class="op">-</span> <span class="kw">and</span> three<span class="op">-</span>arguments forms are deprecated.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>aclocal.m4:<span class="dv">9742</span>: AM_INIT_AUTOMAKE <span class="kw">is</span> expanded <span class="im">from</span>...</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: the top level</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>libtoolize: putting auxiliary files <span class="kw">in</span> <span class="st">&#39;.&#39;</span>.</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>libtoolize: copying <span class="bu">file</span> <span class="st">&#39;./ltmain.sh&#39;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>libtoolize: putting macros <span class="kw">in</span> AC_CONFIG_MACRO_DIRS, <span class="st">&#39;m4&#39;</span>.</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>libtoolize: copying <span class="bu">file</span> <span class="st">&#39;m4/libtool.m4&#39;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>libtoolize: copying <span class="bu">file</span> <span class="st">&#39;m4/ltoptions.m4&#39;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>libtoolize: copying <span class="bu">file</span> <span class="st">&#39;m4/ltsugar.m4&#39;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>libtoolize: copying <span class="bu">file</span> <span class="st">&#39;m4/ltversion.m4&#39;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>libtoolize: copying <span class="bu">file</span> <span class="st">&#39;m4/lt~obsolete.m4&#39;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: warning: AM_INIT_AUTOMAKE: two<span class="op">-</span> <span class="kw">and</span> three<span class="op">-</span>arguments forms are deprecated.</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>aclocal.m4:<span class="dv">713</span>: AM_INIT_AUTOMAKE <span class="kw">is</span> expanded <span class="im">from</span>...</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: the top level</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>Unescaped left brace <span class="kw">in</span> regex <span class="kw">is</span> deprecated, passed through <span class="kw">in</span> regex<span class="op">;</span> marked by <span class="op">&lt;--</span> HERE <span class="kw">in</span> m<span class="op">/</span>\${ <span class="op">&lt;--</span> HERE ([<span class="op">^</span> \t<span class="op">=</span>:<span class="op">+</span>{}]<span class="op">+</span>)}<span class="op">/</span> at <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>klmb2g54ini7y5hcf5sfx92agsifgazi<span class="op">-</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span><span class="bu">bin</span><span class="op">/</span>automake line <span class="fl">3936.</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: warning: AM_INIT_AUTOMAKE: two<span class="op">-</span> <span class="kw">and</span> three<span class="op">-</span>arguments forms are deprecated.  For more info, see:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: http:<span class="op">//</span>www.gnu.org<span class="op">/</span>software<span class="op">/</span>automake<span class="op">/</span>manual<span class="op">/</span>automake.html<span class="co">#Modernize-AM_005fINIT_005fAUTOMAKE-invocation</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">60</span>: installing <span class="st">&#39;./compile&#39;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>configure.ac:<span class="dv">52</span>: installing <span class="st">&#39;./missing&#39;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>klmb2g54ini7y5hcf5sfx92agsifgazi<span class="op">-</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>share<span class="op">/</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>am<span class="op">/</span>ltlibrary.am: warning: <span class="st">&#39;libxml2.la&#39;</span>: linking libtool libraries using a non<span class="op">-</span>POSIX</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>klmb2g54ini7y5hcf5sfx92agsifgazi<span class="op">-</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>share<span class="op">/</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>am<span class="op">/</span>ltlibrary.am: archiver requires <span class="st">&#39;AM_PROG_AR&#39;</span> <span class="kw">in</span> <span class="st">&#39;configure.ac&#39;</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>Makefile.am:<span class="dv">22</span>:   <span class="cf">while</span> processing Libtool library <span class="st">&#39;libxml2.la&#39;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>klmb2g54ini7y5hcf5sfx92agsifgazi<span class="op">-</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>share<span class="op">/</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>am<span class="op">/</span>ltlibrary.am: warning: <span class="st">&#39;testdso.la&#39;</span>: linking libtool libraries using a non<span class="op">-</span>POSIX</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>klmb2g54ini7y5hcf5sfx92agsifgazi<span class="op">-</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>share<span class="op">/</span>automake<span class="op">-</span><span class="fl">1.15</span><span class="op">/</span>am<span class="op">/</span>ltlibrary.am: archiver requires <span class="st">&#39;AM_PROG_AR&#39;</span> <span class="kw">in</span> <span class="st">&#39;configure.ac&#39;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>Makefile.am:<span class="dv">173</span>:   <span class="cf">while</span> processing Libtool library <span class="st">&#39;testdso.la&#39;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>Makefile.am: installing <span class="st">&#39;./depcomp&#39;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard tutorial<span class="op">/*</span>.html: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard tutorial<span class="op">/*</span>.c: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard tutorial<span class="op">/*</span>.pdf: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard tutorial<span class="op">/</span>images<span class="op">/*</span>.png: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard tutorial<span class="op">/</span>images<span class="op">/</span>callouts<span class="op">/*</span>.png: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard API<span class="op">*</span>.html: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard <span class="op">*</span><span class="fl">.1</span>: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard <span class="op">*</span>.xsl: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard <span class="op">*</span>.html: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard <span class="op">*</span>.gif: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard html<span class="op">/*</span>.html: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: warning: wildcard html<span class="op">/*</span>.png: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">21</span>: (probably a GNU make extension)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">301</span>: warning: <span class="bu">filter</span><span class="op">-</span>out <span class="op">%/</span>xmlversion.h, $(wildcard $(top_srcdir: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">301</span>: (probably a GNU make extension)</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">301</span>: warning: wildcard $(top_srcdir: non<span class="op">-</span>POSIX variable name</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>doc<span class="op">/</span>Makefile.am:<span class="dv">301</span>: (probably a GNU make extension)</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>checking build system <span class="bu">type</span>... x86_64<span class="op">-</span>unknown<span class="op">-</span>linux<span class="op">-</span>gnu</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>checking host system <span class="bu">type</span>... x86_64<span class="op">-</span>unknown<span class="op">-</span>linux<span class="op">-</span>gnu</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>checking <span class="cf">for</span> a BSD<span class="op">-</span>compatible install... <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>n4zpfi4zzw10s2g91v1swkwq41v1afzz<span class="op">-</span>coreutils<span class="op">-</span><span class="fl">8.25</span><span class="op">/</span><span class="bu">bin</span><span class="op">/</span>install <span class="op">-</span>c</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>checking whether build environment <span class="kw">is</span> sane... yes</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>checking <span class="cf">for</span> a thread<span class="op">-</span>safe mkdir <span class="op">-</span>p... <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span>n4zpfi4zzw10s2g91v1swkwq41v1afzz<span class="op">-</span>coreutils<span class="op">-</span><span class="fl">8.25</span><span class="op">/</span><span class="bu">bin</span><span class="op">/</span>mkdir <span class="op">-</span>p</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>checking <span class="cf">for</span> gawk... gawk</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>checking whether make sets $(MAKE)... yes</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>checking whether make supports nested variables... yes</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>checking whether make supports nested variables... (cached) yes</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>checking <span class="cf">for</span> gcc... <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">0l</span><span class="er">lznkhcyyndfhwqah01i1zcdhqxrx0d</span><span class="op">-</span>emscripten<span class="op">-</span><span class="fl">1.36.4</span><span class="op">/</span>share<span class="op">/</span>emscripten<span class="op">/</span>emcc</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>checking whether the C compiler works... yes</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>checking <span class="cf">for</span> C compiler default output <span class="bu">file</span> name... a.out</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>checking <span class="cf">for</span> suffix of executables... </span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>checking whether we are cross compiling... configure: error: <span class="kw">in</span> `<span class="op">/</span>home<span class="op">/</span>joachim<span class="op">/</span>Desktop<span class="op">/</span>projects<span class="op">/</span>nlnet<span class="op">/</span>xml.js<span class="op">/</span>build<span class="st">&#39;:</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="er">configure: error: cannot run C compiled programs.</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>If you meant to cross <span class="bu">compile</span>, use `<span class="op">--</span>host<span class="st">&#39;.</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="er">See `config.log&#39; for more details</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>ERROR:root:Configure step failed <span class="cf">with</span> non<span class="op">-</span>zero <span class="cf">return</span> code <span class="dv">1</span><span class="op">!</span> Command line: [<span class="st">&#39;../libxml2/configure&#39;</span>, <span class="st">&#39;--with-http=no&#39;</span>, <span class="st">&#39;--with-ftp=no&#39;</span>, <span class="st">&#39;--with-python=no&#39;</span>, <span class="st">&#39;--with-threads=no&#39;</span>, <span class="st">&#39;--with-debug&#39;</span>] at <span class="op">/</span>home<span class="op">/</span>joachim<span class="op">/</span>Desktop<span class="op">/</span>projects<span class="op">/</span>nlnet<span class="op">/</span>xml.js<span class="op">/</span>build</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>make: <span class="op">***</span> Es wurden keine Ziele angegeben und keine „make“<span class="op">-</span>Steuerdatei gefunden.  Schluss.</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span> cat build<span class="op">/</span>config.log</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3602</span>: checking whether the C compiler works</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3624</span>: <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">0l</span><span class="er">lznkhcyyndfhwqah01i1zcdhqxrx0d</span><span class="op">-</span>emscripten<span class="op">-</span><span class="fl">1.36.4</span><span class="op">/</span>share<span class="op">/</span>emscripten<span class="op">/</span>emcc    conftest.c  <span class="op">&gt;&amp;</span><span class="dv">5</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3628</span>: $? <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3676</span>: result: yes</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3679</span>: checking <span class="cf">for</span> C compiler default output <span class="bu">file</span> name</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3681</span>: result: a.out</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3687</span>: checking <span class="cf">for</span> suffix of executables</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3694</span>: <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">0l</span><span class="er">lznkhcyyndfhwqah01i1zcdhqxrx0d</span><span class="op">-</span>emscripten<span class="op">-</span><span class="fl">1.36.4</span><span class="op">/</span>share<span class="op">/</span>emscripten<span class="op">/</span>emcc <span class="op">-</span>o conftest    conftest.c  <span class="op">&gt;&amp;</span><span class="dv">5</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3698</span>: $? <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3720</span>: result:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3742</span>: checking whether we are cross compiling</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3750</span>: <span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">0l</span><span class="er">lznkhcyyndfhwqah01i1zcdhqxrx0d</span><span class="op">-</span>emscripten<span class="op">-</span><span class="fl">1.36.4</span><span class="op">/</span>share<span class="op">/</span>emscripten<span class="op">/</span>emcc <span class="op">-</span>o conftest    conftest.c  <span class="op">&gt;&amp;</span><span class="dv">5</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">60</span><span class="er">a1aqx579bjff3c90cw0l1zwyj2qxhg</span><span class="op">-</span>binutils<span class="op">-</span><span class="fl">2.26</span><span class="op">-</span>dev<span class="op">/</span><span class="bu">bin</span><span class="op">/</span>ld: cannot find crt1.o: No such <span class="bu">file</span> <span class="kw">or</span> directory</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">60</span><span class="er">a1aqx579bjff3c90cw0l1zwyj2qxhg</span><span class="op">-</span>binutils<span class="op">-</span><span class="fl">2.26</span><span class="op">-</span>dev<span class="op">/</span><span class="bu">bin</span><span class="op">/</span>ld: cannot find crti.o: No such <span class="bu">file</span> <span class="kw">or</span> directory</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">60</span><span class="er">a1aqx579bjff3c90cw0l1zwyj2qxhg</span><span class="op">-</span>binutils<span class="op">-</span><span class="fl">2.26</span><span class="op">-</span>dev<span class="op">/</span><span class="bu">bin</span><span class="op">/</span>ld: cannot find crtbegin.o: No such <span class="bu">file</span> <span class="kw">or</span> directory</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="op">/</span>nix<span class="op">/</span>store<span class="op">/</span><span class="dv">60</span><span class="er">a1aqx579bjff3c90cw0l1zwyj2qxhg</span><span class="op">-</span>binutils<span class="op">-</span><span class="fl">2.26</span><span class="op">-</span>dev<span class="op">/</span><span class="bu">bin</span><span class="op">/</span>ld: cannot find <span class="op">-</span>lgcc</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>clang: error: linker command failed <span class="cf">with</span> exit code <span class="dv">1</span> (use <span class="op">-</span>v to see invocation)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3754</span>: $? <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3761</span>: .<span class="op">/</span>conftest</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>..<span class="op">/</span>libxml2<span class="op">/</span>configure: line <span class="dv">3763</span>: .<span class="op">/</span>conftest: No such <span class="bu">file</span> <span class="kw">or</span> directory</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3765</span>: $? <span class="op">=</span> <span class="dv">127</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>configure:<span class="dv">3772</span>: error: <span class="kw">in</span> `<span class="op">/</span>home<span class="op">/</span>joachim<span class="op">/</span>Desktop<span class="op">/</span>projects<span class="op">/</span>nlnet<span class="op">/</span>xml.js<span class="op">/</span>build<span class="st">&#39;:</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="er">configure:3774: error: cannot run C compiled programs.</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>If you meant to cross <span class="bu">compile</span>, use `<span class="op">--</span>host<span class="st">&#39;.</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="er">See `config.log&#39; for more details</span></span></code></pre></div>
+<p>the interesting bit is that the <code>crt1.o</code>,
+<code>crti.o</code> and <code>crtbegin.o</code> as well as
+<code>libgcc.so / libgcc_s.so</code> are coming from different packages
+like <code>gcc</code> and <code>glibc</code> IIRC.</p>
+<h2 data-number="4" id="attempted-fix">attempted fix</h2>
+<p>i’ve spent a while trying to fix these requirements with
+<code>./gen.sh</code> a little scripte which creates fake libraries.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="op">%</span> cat <span class="op">/</span>home<span class="op">/</span>joachim<span class="op">/</span>Desktop<span class="op">/</span>projects<span class="op">/</span>nlnet<span class="op">/</span>xml.js<span class="op">/</span>lib<span class="op">/</span>gen.sh</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="op">-</span>v</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>rm <span class="op">*</span>.o</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>rm <span class="op">*</span>.so</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>echo <span class="st">&quot;crtbegin&quot;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>echo <span class="st">&quot;int main() </span><span class="sc">{}</span><span class="st">&quot;</span> <span class="op">&gt;</span> foo.cpp</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>g<span class="op">++</span> <span class="op">-</span>c <span class="op">-</span>Wall <span class="op">-</span>Werror <span class="op">-</span>lc <span class="op">--</span>entry main foo.cpp <span class="op">-</span>o foo.o</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>mv foo.o crtbegin.o</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">##### crt1 with _start symbol</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>echo <span class="st">&quot;crt1&quot;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>echo <span class="st">&quot;void _start() </span><span class="sc">{}</span><span class="st">&quot;</span> <span class="op">&gt;</span> foo.c</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>gcc <span class="op">-</span>c <span class="op">-</span>Wall <span class="op">-</span>Werror <span class="op">-</span>fpic foo.c <span class="op">-</span>o crt1.o</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> crtbegin crti crtend crtn<span class="op">;</span> do</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  rm <span class="op">-</span>f foo.o foo.c</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  echo <span class="st">&quot;void foo123_$i(void) </span><span class="sc">{}</span><span class="st">&quot;</span> <span class="op">&gt;</span> foo.c</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  gcc <span class="op">-</span>c <span class="op">-</span>Wall <span class="op">-</span>Werror <span class="op">-</span>fpic foo.c <span class="op">-</span>o foo.o</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  mv foo.o $i.o</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>done</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> libgcc_s1  libgcc1 <span class="op">;</span> do</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  rm <span class="op">-</span>f foo.o foo.c</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  echo <span class="st">&quot;void foobar_$i(void) </span><span class="sc">{}</span><span class="st">&quot;</span> <span class="op">&gt;</span> foo.c</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  cat foo.c</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  echo <span class="st">&quot;1&quot;</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  gcc <span class="op">-</span>c <span class="op">-</span>Wall <span class="op">-</span>Werror  foo.c <span class="op">-</span>o foo.o</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  echo <span class="st">&quot;2&quot;</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  gcc <span class="op">-</span>shared  <span class="op">-</span>o $i.so foo.o</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>done</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>ar rc libgcc1.a foo.o</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>mv libgcc1.a libgcc.a</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>mv libgcc_s1.so libgcc_s.so</span></code></pre></div>
+<p>so i came up with extending environment variables:
+<strong>NIX_LDFLAGS</strong> and</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>export NIX_LDFLAGS<span class="op">=</span><span class="st">&quot;-L /home/joachim/Desktop/projects/nlnet/xml.js/lib -rpath /nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib64 -rpath /nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib  -L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib -L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib -L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib -L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib -L/home/joachim/Desktop/projects/nlnet/xml.js/lib&quot;</span></span></code></pre></div>
+<p><code>strace -f -s 200 -e execve emconfigure  ../libxml2/configure --with-http=no --with-ftp=no --with-python=no --with-threads=no --with-debug</code></p>
+<p>would show something like:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>[pid <span class="dv">24762</span>] execve(<span class="st">&quot;/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld&quot;</span>, [<span class="st">&quot;/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld&quot;</span>, <span class="st">&quot;-dynamic-linker&quot;</span>, <span class="st">&quot;/nix/store/iifa17bpi78d0l62463z7sn25jc3545j-glibc-multi-2.23/lib/ld-linux-x86-64.so.2&quot;</span>, <span class="st">&quot;--eh-frame-hdr&quot;</span>, <span class="st">&quot;-m&quot;</span>, <span class="st">&quot;elf_x86_64&quot;</span>, <span class="st">&quot;-dynamic-linker&quot;</span>, <span class="st">&quot;/lib64/ld-linux-x86-64.so.2&quot;</span>, <span class="st">&quot;-o&quot;</span>, <span class="st">&quot;conftest&quot;</span>, <span class="st">&quot;crt1.o&quot;</span>, <span class="st">&quot;crti.o&quot;</span>, <span class="st">&quot;crtbegin.o&quot;</span>, <span class="st">&quot;/run/user/1000/conftest-904287.o&quot;</span>, <span class="st">&quot;-L/home/joachim/Desktop/projects/nlnet/xml.js/build/../lib&quot;</span>, <span class="st">&quot;-lgcc&quot;</span>, <span class="st">&quot;--as-needed&quot;</span>, <span class="st">&quot;-lgcc_s&quot;</span>, <span class="st">&quot;--no-as-needed&quot;</span>, <span class="st">&quot;-lc&quot;</span>, <span class="st">&quot;-lgcc&quot;</span>, <span class="st">&quot;--as-needed&quot;</span>, <span class="st">&quot;-lgcc_s&quot;</span>, <span class="st">&quot;--no-as-needed&quot;</span>, <span class="st">&quot;crtend.o&quot;</span>, <span class="st">&quot;crtn.o&quot;</span>, <span class="st">&quot;-L&quot;</span>, <span class="st">&quot;/home/joachim/Desktop/projects/nlnet/xml.js/lib&quot;</span>, <span class="st">&quot;-rpath&quot;</span>, <span class="st">&quot;/nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib64&quot;</span>, <span class="st">&quot;-rpath&quot;</span>, <span class="st">&quot;/nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib&quot;</span>, <span class="st">&quot;-L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib&quot;</span>, <span class="st">&quot;-L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib&quot;</span>, <span class="st">&quot;-L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib&quot;</span>, <span class="st">&quot;-L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib&quot;</span>, <span class="st">&quot;-L/home/joachim/Desktop/projects/nlnet/xml.js/lib&quot;</span>, <span class="st">&quot;-L/nix/store/iifa17bpi78d0l62463z7sn25jc3545j-glibc-multi-2.23/lib&quot;</span>, <span class="st">&quot;-L/nix/store/hcndjf2r2rcrf39x77wklckn60sx89dx-gcc-5.3.0-lib/lib&quot;</span>, <span class="st">&quot;-rpath&quot;</span>, <span class="st">&quot;/nix/store/iifa17bpi78d0l62463z7sn25jc3545j-glibc-multi-2.23/lib&quot;</span>, <span class="st">&quot;-rpath&quot;</span>, <span class="st">&quot;/nix/store/hcndjf2r2rcrf39x77wklckn60sx89dx-gcc-5.3.0-lib/lib&quot;</span>], [<span class="op">/*</span> <span class="dv">125</span> <span class="bu">vars</span> <span class="op">*/</span>]) <span class="op">=</span> <span class="dv">0</span></span></code></pre></div>
+<p>the return value of <code>0</code> is the key but it didn’t work
+anyways….</p>
+<h2 data-number="5" id="the-fix">the fix</h2>
+<p>the <a
+href="https://github.com/kripken/emscripten/blame/07b87426f898d6e9c677db291d9088c839197291/emcc.py#L192">emscripten
+source code</a> mentiones this fix:</p>
+<p><code>export EMCONFIGURE_JS=2</code> is the key in this case.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Whether we fake configure tests using clang - the local, native compiler - or not. if not we generate JS and use node with a shebang</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>Beither approach <span class="kw">is</span> perfect, you can <span class="cf">try</span> both, but may need to edit configure scripts <span class="kw">in</span> some cases</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>By default we configure <span class="kw">in</span> js, which can <span class="cf">break</span> on local filesystem access, etc., but <span class="kw">is</span> otherwise accurate so we</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>disable this <span class="cf">if</span> we think we have to. A value of <span class="st">&#39;2&#39;</span> here will force JS checks <span class="kw">in</span> <span class="bu">all</span> cases. In summary:</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span> <span class="op">-</span> use native compilation <span class="cf">for</span> configure checks</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="op">-</span> use js when we think it will work</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="op">-</span> always use js <span class="cf">for</span> configure checks</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>use_js <span class="op">=</span> <span class="bu">int</span>(os.environ.get(<span class="st">&#39;EMCONFIGURE_JS&#39;</span>) <span class="kw">or</span> <span class="dv">1</span>)</span></code></pre></div>
+<p>so every time you fail with ./configure for some weird reason like
+the one above or other, try <code>export EMCONFIGURE_JS=2</code>,
+distclean the build and build again.</p>
+<p>hf!</p>
+<h2 data-number="6" id="summary">summary</h2>
+<p>with this new knowledge it might get feasible to use nix as a tool
+chain for more complex emscripten setups!</p>
+<p>thanks to <strong>matthewbauer</strong> and
+<strong>joelmo</strong>#nixos@irc.kde.org for their support and
+ideas!</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/emscripten-1.36.4_on_nixos.mdwn" title="posts\emscripten-1.36.4_on_nixos.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

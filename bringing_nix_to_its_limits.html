@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="bringing_nix_to_its_limits.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>bringing nix to its limits</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/bringing_nix_to_its_limits.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="replacing_automake_by_cmake.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="prove_binary_deployment_by_recompiling_and_comparing.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">bringing nix to its limits</h1>
+    <div id="date"><p><span id="lastupdated">14 feb 2011</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>searching for a ‘<strong>cross platform</strong>’, ‘<strong>cross
+distribution</strong>’ package manager, one question that arises in
+regards to nix is:</p>
+<pre><code>can nix be used for &#39;**source deployment&#39; and &#39;binary deployment**&#39; on windows?</code></pre>
+<p>in the last post i discussed how to install nix 0.16 [1] on windows
+but back then i could not find any working gui tool. i was not able to
+compile such a tool either with the tools found in nixpkgs [2]. the
+problem is that the used toolchain is optimized for posix environments
+(linux and others) with dependencies to X11.</p>
+<p><strong>how to use nix to build software for windows then?
+</strong>the solution to this problem is easy: we have to extend the
+current toolchain (used in nixpkgs) by a new one.<strong> </strong></p>
+<p>first, let’s see what others do: other distributions already support
+‘cross compilers’ to compile program in linux (but for windows). the
+drawback of such a solution is that it binds the developer to a certain
+distribution. so what concepts do exist, in order to build software, for
+windows:</p>
+<ul>
+<li><p><strong>windows+cygwin (running nix inside cygwin)</strong> using
+the posix toolchain (nixpkgs) this is already working and
+supported</p></li>
+<li><p><strong>windows+cygwin (running nix inside cygwin)</strong> using
+a different toolchain: MinGW this is what this blog posting is
+about</p></li>
+<li><p><strong>using nix on any posix conform distrubtion</strong> with
+a <strong>cross compiler setup</strong> using the MinGW toolchain there
+are some references to MinGW found in the nixpkgs already, according to
+developers on irc.freenode.org#nixos [10] this is used for cross
+compiler setups. still i could not find any mingw expression to
+experiment with such a cross compiler setup in nix.</p></li>
+</ul>
+<p>so why would i want to have <strong>windows+cygwin+nix</strong> with
+a ** native windows mingw toolchain**?</p>
+<ul>
+<li><p><strong>nix can be used as a package manager for
+windows</strong></p></li>
+<li><p><strong>nix does support ‘source deployment’ and ‘binary
+deployment’ </strong> so it is a important target for developers on all
+platforms/distributions</p></li>
+<li><p><strong>nix is not bound to any distribution in particular
+</strong> which also makes it an excellent tool for ‘cross distribution’
+packaging (when using nix in a prefix installation in contrast to using
+NIX OS)</p></li>
+<li><p><strong>nix can be used to create abstract targets of all
+kind</strong> examples: creating NSIS installers, automated software
+builds/tests</p></li>
+<li><p><strong>nix can be used to build ‘cross compiler chains’
+</strong>this would actually be interesting for me as well (but not
+covered here)<strong> </strong></p></li>
+</ul>
+<h2 data-number="2"
+id="creating-a-new-mingw-based-nix-toolchain">creating a new mingw based
+nix toolchain</h2>
+<p>this is not that easy, but we somehow have to** replace/extend the
+linux based toolchain with a MinGW toolchain** optimized for
+windows.</p>
+<h3 data-number="2.1" id="first-what-should-be-supported">first: what
+should be supported?</h3>
+<p>on windows, that is:</p>
+<ul>
+<li><p><strong>direct hardware access</strong> (using windows api and
+device drivers) / directX</p></li>
+<li><p>using Qt natively (<strong>without X11</strong>)</p></li>
+<li><p>things like ‘start menu’ shortcuts</p></li>
+</ul>
+<p>we will use qt 4.7 as an example how to do that.</p>
+<h3 data-number="2.2"
+id="how-to-build-software-for-windows-natively">how to build software
+for windows natively?</h3>
+<p>first let’s build software for windows, how it would be done using
+windows:</p>
+<ul>
+<li><p>download the <strong>Automated MinGW installer</strong> (should
+contain gcc 4.x) at <a
+href="http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/"></a>[3]</p></li>
+<li><p>download the <strong>qt 4.7.1 library</strong> (i used the zip
+distribution for this experiment) [4]</p></li>
+</ul>
+<p>to build the libraries (&amp;later the software)</p>
+<h4 data-number="2.2.1"
+id="making-mingw-work-native-installation">making mingw work (native
+installation)</h4>
+<ol type="1">
+<li><p>as already mentioned, download the ‘Automated MinGW
+installer’</p></li>
+<li><p>install MinGW</p></li>
+</ol>
+<p>NOTE: do not add anything to the global PATH, as we are going to
+setup multiple toolchains, this would be a source of horrible
+side-effects.</p>
+<p>so instead of a global PATH, we could alter the PATH used in cmd.exe
+on the fly (every time we start a new cmd.exe) with:</p>
+<pre><code>PATH = %PATH%;c:\mingw\bin;</code></pre>
+<p>NOTE: windows does not have something like RPATH [5] (rpath is not
+cmake specific but that linked page should give you an basic idea what
+rpath is about), that means a windows program is lost if the library
+(something like mingw.dll) is not found in the same directory as the
+binary is in. as a quick fix to the problem one could expand the PATH
+variable to include also the place, where the respective library is
+in.</p>
+<p>as we’ll with the new nix-toolchain, this simple fact is very
+problematic.</p>
+<p>[7] provides an interesting (maybe outdated) table about how such
+things are handled in other distributions.</p>
+<h4 data-number="2.2.2"
+id="making-qt-work-using-mingw-still-native-installation">making qt work
+(using mingw, still native installation)</h4>
+<p>so as the compiler setup is done, we need to add the qt library.
+download a file called qt-everywhere-opensource-src-4.7.1.zip at
+[5].</p>
+<ol type="1">
+<li><p><strong>using the cmd.exe</strong> from above (with the PATH
+adaption)</p></li>
+<li><p><strong>unzip</strong>
+qt-everywhere-opensource-src-4.7.1.zip</p></li>
+<li><p><strong>cd qt-everywhere-opensource-src-4.7.1</strong></p></li>
+<li><p><strong>configure.exe</strong></p></li>
+<li><p><strong>make install</strong> (will install into the same
+directory, but we don’t care right now)</p></li>
+</ol>
+<p>afterwards we can execute qt programs from the cmd.exe shell. to make
+the examples executable from everywhere either:</p>
+<ul>
+<li><p>(DON’T DO THAT!): <strong>add the MinGW path and the Qt-library
+path to the global PATH</strong> variable</p></li>
+<li><p>(DON’T DO THAT!): <strong>copy the needed dll files into EACH qt
+example directory</strong> to make the examples work from everywhere
+(either from cmd.exe shell or when starting from explorer.exe)</p></li>
+<li><p>add another PATH, namely: c:-everywhere-opensource-src-4.7.1in
+the cmd.exe shell</p></li>
+</ul>
+<p>as a final step we test if the qt examples work (this is kind of a
+module test), <strong>run any qt example from cmd.exe with the extended
+PATH settings applied</strong>. as we now know how to get this toolchain
+working in a native environment, we can try to automate this process
+using nix expressions.</p>
+<h3 data-number="2.3"
+id="adapting-this-buildchain-into-nix-expressions">adapting this
+buildchain into nix expressions</h3>
+<p>to get a working toolchain inside nix i packaged the installation of
+MinGW from c:and created something like mingw.tar.bz2 for
+redistribution. see the nix expressions in [6] and consult the README in
+order to get the nix expression to work in your cygwin environment (this
+time not cmd.exe anymore, instead use the cygwin shell).</p>
+<ul>
+<li><p>winmingw.nix downloads my re-release of mingw and installs
+it</p></li>
+<li><p>it also makes the tools like mingw32-make available for use
+inside your cygwin shell</p></li>
+</ul>
+<p>NOTE: make sure your cygwin (not cmd.exe) has ~/.nix-profile/bin in
+your PATH environment variable (example: export
+PATH=~/.nix-profile/bin:$PATH).</p>
+<h4 data-number="2.3.1"
+id="how-to-install-cygwinnix-and-my-nix-expressions-on-windows">how to
+install cygwin/nix and my nix expressions on windows:</h4>
+<ol type="1">
+<li><p><strong>install a full cygwin environment</strong> (several gb of
+files, use the setup.exe installer) or see my last post about
+this</p></li>
+<li><p><strong>make nix 0.16 work </strong> again: see my last post
+about this</p></li>
+<li><p>use <strong>git clone with my local repo</strong> in [6] cd ~;
+mkdir .nixpkgs; cd .nixpkgs; git clone …</p></li>
+<li><p>install winmingw: <strong>nix-env.exe -i
+winmingw</strong></p></li>
+<li><p>check that the mingw tools are there, type:
+<strong>mingw32-make.exe</strong> or
+<strong>mingw32-make</strong></p></li>
+</ol>
+<p>NOTE: after installing winmingw notice that there are a lot of new
+tools symlinked from ‘~/.nix-profile/bin’. <strong>interestingly this
+also includes symlinks to libraries (read dll files) files</strong>. so
+why symlink dll files?</p>
+<h3 data-number="2.4"
+id="installing-qt-using-the-new-mingw-toolchain">installing qt using the
+new mingw toolchain</h3>
+<p>there is another <strong>anomaly</strong> using cygwin in comparison
+to all other posix systems. in windows all executables do have the
+<strong>.exe suffix</strong> while on linux they don’t. as the cygwin
+shell must be compatible to both worlds, the designer of cygwin made
+this decision:</p>
+<ul>
+<li><p>programs can be <strong>executed by typing: ‘curl.exe’ but also
+by typing ‘curl’</strong>, both times it is the same program which gets
+executed</p></li>
+<li><p>there is an <strong>exception to the rule above</strong>, if a
+<strong>script called ‘curl’</strong> also exists (which is executable),
+it is <strong>executed instead</strong> of curl.exe</p></li>
+<li><p>if the script ‘curl’ and the binary ‘curl.exe’ are in the same
+directory, then the <strong>‘curl’ script has precedence</strong>, when
+typing ‘curl’ in a shell</p></li>
+</ul>
+<p>at least [8] states it that way. i also experimented with these
+commands:</p>
+<ol type="1">
+<li><p>touch AA; touch AA.exe (both files get created)</p></li>
+<li><p>touch AA.exe; touch AA (only AA.exe is created and later the
+timestamp is updated)</p></li>
+</ol>
+<p>i guess (1) is true on all posix systems (at least for those i’ve
+been working with so far). but <strong>(2) is cygwin specific and
+implies some issues on would not think of</strong>.</p>
+<p>to track down an issue which is caused by the fromer rule it cost me
+at least 1-2 hours. the problem was that my winqt.nix expression was
+fine but always exited with ‘error 1’ after the unzip operation (without
+any error message, except the exit 1 code). i always thought that i did
+something wrong with the nix language. but then i decided to run the
+command (which would normally be executed by nix) in a shell and found
+out that the <strong>cygwin shell bahaves differently than the cmd.exe
+shell for the exact same command</strong>.</p>
+<p>to my surprise i got prompted by unzip (in the cygwin shell) with the
+question if i want to [o]verwrite or [r]ename ‘configure.exe’ (cause by
+a file configure). i wondered quite some time what problem could cause
+this?! so i extracted it again, but this time in cmd.exe with no
+prompt.</p>
+<h2 data-number="3" id="important-conclusions">important
+conclusions</h2>
+<p>Edit: further discussion should be redirected to the nix wiki
+[11].</p>
+<h3 data-number="3.1" id="problem-1-symlinks-and-dll-files">problem 1:
+symlinks and dll files</h3>
+<ul>
+<li><p><strong>all programs in nix are installed into a unique
+prefix</strong> but are available as a symlink from
+~/.nix-profile/bin</p></li>
+<li><p><strong>symlinking the same program twice does therefore not
+work</strong> but happens rarely anyway</p></li>
+<li><p>however: <strong>symlinking two different dll files sharing the
+same name is not possible</strong>, this is the biggest issue right
+now</p></li>
+</ul>
+<p>a solution would be static linking. therefore:</p>
+<ul>
+<li><p>two programs having the same binary name (‘firefox’ for
+example)</p></li>
+<li><p>two programs sharing the same library name (‘mingw32.dll’ for
+example)</p></li>
+</ul>
+<p>the former point is easy to accomplish but the later is not. ‘viric’
+(a developer from irc.freenode.org#nixos) pointed out that in order to
+fix this issue we could use ‘side-by-side sharing’ [9].</p>
+<p>NOTE: <strong>it would be very interesting to see, if such a thing
+would actually work.</strong></p>
+<h3 data-number="3.2" id="problem-2-directory-and-file-handling">problem
+2: directory and file handling</h3>
+<p>the other important problem is how file handling is implemented in
+cygwin. the <strong>current behaviour seems to be convenient for users
+but is a no-go for packaging </strong>as it might cause a lot of
+unforeseen consequences (and we all have played halfile and know where
+this could be going).</p>
+<h2 data-number="4" id="links">links</h2>
+<ul>
+<li>[1] <a href="http://nixos.org/nix/"
+class="uri">http://nixos.org/nix/</a></li>
+<li>[2] <a href="http://nixos.org/nixpkgs/"
+class="uri">http://nixos.org/nixpkgs/</a></li>
+<li>[3] <a href="http://mingw.org" class="uri">http://mingw.org</a></li>
+<li>[4] <a href="http://qt.nokia.com/products/"
+class="uri">http://qt.nokia.com/products/</a></li>
+<li>[5] <a href="http://www.cmake.org/Wiki/CMake_RPATH_handling"
+class="uri">http://www.cmake.org/Wiki/CMake_RPATH_handling</a></li>
+<li>[6] <a href="https://github.com/qknight/mingw-nix-on-windows"
+class="uri">https://github.com/qknight/mingw-nix-on-windows</a></li>
+<li>[7] <a
+href="http://www.fortran-2000.com/ArnaudRecipes/sharedlib.html"
+class="uri">http://www.fortran-2000.com/ArnaudRecipes/sharedlib.html</a></li>
+<li>[8] <a href="http://hem.bredband.net/richardc/Cygwin.html"
+class="uri">http://hem.bredband.net/richardc/Cygwin.html</a></li>
+<li>[9] <a href="http://msdn.microsoft.com/en-us/library/ms995843.aspx"
+class="uri">http://msdn.microsoft.com/en-us/library/ms995843.aspx</a></li>
+<li>[10] <a href="http://webchat.freenode.net/?channels=nixos"
+class="uri">http://webchat.freenode.net/?channels=nixos</a></li>
+<li>[11] <a href="http://wiki.nixos.org/wiki/Nix_on_Windows"
+class="uri">http://wiki.nixos.org/wiki/Nix_on_Windows</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/bringing_nix_to_its_limits.mdwn" title="posts\bringing_nix_to_its_limits.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

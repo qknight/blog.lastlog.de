@@ -1,0 +1,110 @@
+[[!summary chatGPT: The article discusses the benefits of developing software on NixOS, a Linux operating system that provides a development environment per project to avoid pollution and regression issues caused by system-wide changes. It also includes examples of configuration files and mentions upcoming features in NixOS.]]
+[[!meta date="2012-03-23 22:28"]]
+[[!tag cmake linux nixos packagemanager qt usability]]
+
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+# motivation
+i've just finished a wiki page on how to **develop arbitrary software on nixos** [1] (thanks to viric!).  as this is fundamentally different to all other linux and non linux operating systems i think this is worth a posting about this subject in my blog.
+
+the **interesting aspect** is that **nix**/nixos **provides** such **a development environment per project** so one is not forced to pollute the system environment with the ongoing changes which always lead to **horrible side effects as regression** (you know **when old habits stop working** as a tiny update of libX breaks tool Z).
+
+the way it is used is covered by [1] already.
+
+# a slightly more complex example
+
+## config.nix
+    
+         1  {
+         2    packageOverrides = pkgs : with pkgs; rec {
+         3      # example environment from viric
+         4      sdlEnv = pkgs.myEnvFun {
+         5        name = "sdl";
+         6        buildInputs = [ stdenv doxygen SDL SDL_image SDL_ttf SDL_gfx cmake SDL_net pkgconfig ];
+         7      };
+         8
+         9      # a custom library NOT included in nixpkgs (maybe later it is but assume for this example it is not)
+        10      libnoise = callPackage ./libnoise.nix {};
+        11
+        12      # this is the needed environment for development of my spring random map generator
+        13      # type 'load-srmg-env' to load it after installing it using 'nix-env -i env-srmg'
+        14      srmgEnv = pkgs.myEnvFun {
+        15        name = "srmg";
+        16        buildInputs = [ stdenv doxygen cmake libnoise qt4 ];
+        17      };
+        18    };
+        19  }
+
+
+in the ~/.nixpkgs/config.nix expression i added a custom library which is then available with nix-env, this way it can be installed using (**nix-env -i libnoise**).
+
+the **interesting point is that line 2** contains the **rec keyword** indicating that **all 3 attributes in the attribute set (line 2 to 18) may recursively reference each other**. this is **required** as the the **srmgEnv** on line 14 where the **buildInputs** lists **libnoise**.
+
+the **libnoise expression** is outsourced (line 10) into the **file libnoise.nix** (listed below).
+
+
+## libnoise.nix
+
+
+
+    
+         1  {stdenv, doxygen, fetchgit, cmake}:
+         2
+         3  stdenv.mkDerivation rec {
+         4    name = "libnoise-1.0.0";
+         5
+         6    # i also change bits in the library and therefore i like to have it local
+         7    # in case i change anything this needs to be done to reflect the change
+         8    # 1. make the change 
+         9    # 2. use 'git add file_which_has_changed'
+        10    # 3. use 'git commit'
+        11    # 4. use 'git log' to find the most recent rev
+        12    # 5. paste the copied rev in the rev field below
+        13    # 6. reinstall the libnoise 
+        14    src = fetchgit {
+        15      url = /home/joachim/Desktop/projects/libnoise;
+        16      rev = "8b5b89b7241a112dfe0b387f7589ea9a2df00b02";
+        17      sha256 = "";
+        18    };
+        19
+        20    buildInputs = [ cmake doxygen ];
+        21
+        22    meta = {
+        23      description = "libnoise";
+        24      homepage = "http://www.github.com/qknight/libnoise";
+        25      license = "LGPL2";
+        26      maintainers = with stdenv.lib.maintainers; [qknight];
+        27    };
+        28  }
+        29
+
+
+the **libnoise.nix file is interesting** as **it references a local git repository**. it also lists what to do in order to alter the package.
+
+once the srmg-env is installed (**nix-env -i env-srmg**) it can be used using: **load-srmg-env. **as mentioned in [1] this environment will then behave as if one had used ubuntu linux and then installed all the required libraryies.
+
+
+# future
+
+
+as i noted in [1] nix will soon get a toggle (**nix-build --run-env '<nixpkgs>' -A xterm, see [2]**) which will clone the environment of virtually any **sourceScription** on the system. this means one can hack on any software easily by injecting code into the build chain on an arbitrary position - still, this changes won't be persistent, meaning:
+
+  * after **reinstallation** of the sourceScription the **former version will be installed**
+  * the **environment** will **not last a reboot** of the system (not 100% sure about this)
+
+still it is one step towards the concept of the midstream platform (mentioned in my diploma thesis) and is a great way to test a quick hack.
+
+update: 23.5.2012
+
+<del>**another** interesting **potential property** is that **tools like kdevelop** could be **patched to automatically see all the include paths of a complete project** and therefore are able to **provide automatic code completion** without having too much manual effort.
+
+</del>
+
+**kdevelop can do that already**! when importing the project's 'CMakeLists.txt', kdevelop reads the 'found' entries and therefore collects all the library paths!
+
+
+# links
+
+
+* [1] <https://nixos.org/wiki/Howto_develop_software_on_nixos>
+* [2] <https://github.com/NixOS/nix/commit/7f38087f35e6f74a73bfdb28da8acd8930565d51>

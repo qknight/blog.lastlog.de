@@ -1,0 +1,209 @@
+[[!summary chatGPT: This is a guide on how to log/analyze serial traffic and write a simulator for a UPS using NUT on Debian and NixOS. The author shares their experience with a specific UPS and discusses its pros and cons. The guide also includes links to further information.]]
+[[!meta date="2012-04-05 07:27"]]
+[[!tag linux nixos packagemanager usability]]
+
+[[!img media/nut-logo.png alt="" style="float: right"]]
+
+# what is this?
+
+i bought an UPS with two ports: serial and usb. and because i did not know much about the UPS (**AEG - PROTECT HOME VA 600**) i started to look at the communication protocol. turns out there are **lots of good tools for serial line interception** but nearly none for the usb stuff. sadly the driver i wrote isn't needed at all as an email to the nut-ML revealed that this UPS uses the Q1 protocol which is already supported pretty well using the **blazer_usb and blazer_ser module**.
+
+anyway it was pretty interesting to hack on NUT using **debian** and **later nixos**. so **here is a guide how to log/analyze serial traffic and how to write a simulator for either side.**
+
+and not to forget:** thanks to Arnaud Quette for his ups/nut support. **there is also a **brief nut setup introduction**, see [1].
+
+# sniff serial port data between UPS and PC
+	
+  1. set serial settings to:
+
+        enable serial port
+        port number:     com 1 irq 4 io port 0x3f8
+        port mode:       host device
+        port/file path: /tmp/interceptty
+
+  2. **maybe correct the permissions to /tmp/interceptty**
+	
+  3. **interceptty -s 'ispeed 2400 ospeed 2400' -l /dev/ttyS0 | tee mylog | interceptty-nicedump**
+	
+  4. on the linux host:
+
+        tail -F mylog | grep "<"**
+	
+  5. **start **virtualbox vm with a windows xp** installed
+
+  note: **ignore this virtualbox warning: "Ioctl failed for serial device '/tmp/interceptty' (VERR_INVALID_PARAMETER). The device will not work properly.". it works anyway, at least on my system (using ubuntu 10.10 with standard virtualbox).**
+
+# using the virtual python UPS
+
+  1. on the server side open /dev/remserialVM
+
+        remserial -d -p 23000 -s "2400 raw" -l /dev/remserialVM /dev/ptmx
+
+	
+  2. on the client side (same host), do:
+
+        remserial -d -r 127.0.0.1 -p 23000 -s "2400 raw" -l /dev/remserialPY /dev/ptmx
+
+	
+  3. **chmod 0777 /dev/remser***
+
+	
+  4. change the virtualbox serial settings:
+
+        port mode: host device
+        port/file path: /dev/remserialVM
+
+	
+  5. then format a 'message' with a hexeditor also called "hexeditor"
+
+	
+  6. start the vm
+
+	
+  7. then send the formated message:
+        cat message > /dev/remserialPY
+
+	
+  8. if the message was received by the windows ups monitoring software (it will think that the message it received originated from the UPS and not that it was crafted manually)
+
+**note:** instead of manually sending messages, i also used the script: ./simulate-ups.py which does that automatically.
+
+
+
+
+**note:** simulate-ups-monitor.py can be used in an analog way but simply using the ups with a real serial port. i should mention btw, that i was using both a **usb2serial adapter** and an old computer which still contains one of those **ancient serial ports**.
+
+
+
+
+# simulate-ups.py
+
+
+    #!/usr/bin/python
+    import serial
+    ser = serial.Serial('/dev/remserialPY', 2400)
+     
+    line = ''
+    count=0
+     
+    def process_command(cmd):
+            print " < incomming: " + cmd
+            if cmd == "Q1":
+                    print "REQUEST FOR DATA FROM USV"
+                    n = ("20").decode("hex")
+                    d = ("0d").decode("hex")
+                    a = ("28").decode("hex") + \
+                        "000.0" + n + \
+                        "000.0" + n + \
+                        "000.5" + n + \
+                        "005" + n + \
+                        "00.0" + n + \
+                        "00.6" + n + \
+                        "25.0" + n + \
+                        "00000001" + d
+                    ser.write(a)
+    
+    while True:
+            ch = ser.read(1)
+            if ch == "\x0d":
+                    process_command(line)
+                    line = ''
+            else:
+                    line = line + ch
+
+
+
+
+# simulate-ups-monitor.py
+
+
+
+    
+    #!/usr/bin/python
+    import serial
+    import re
+    import time
+    import sys
+    
+    ser = serial.Serial('/dev/ttyS0', 2400)
+    #, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE, 0)
+    
+    line = ''
+    count=0
+    status="unknown"
+    
+    def write(cmd):
+            #print "sending " + cmd;
+            ser.write(cmd)
+    
+    def print_status(status):
+                    print "status is: Unknown|LostCom|Normal|ScheduledShutdown|60SecsShutdown|ActiveShutdown|CriticalPowerFail: " + status
+    
+    def process_command(cmd):
+            valid = re.compile(r"\([0-9][0-9][0-9].[0-9] [0-9][0-9][0-9].[0-9] [0-9][0-9][0-9].[0-9] [0-9][0-9][0-9] [0-9][0-9].[0-9] [0-9][0-9].[0-9] [0-9][0-9].[0-9] [01][01][01][01][01][01][01][01]")
+            if valid.match(cmd):
+                    #print status + " : VALID REPLY FROM USV   ->    " + cmd
+                    #(239.5 239.5 235.6 000 49.9 13.6 25.0 00001001
+                    netz_eingang=cmd.split(' ')[0].lstrip('(')
+                    netz_unknown=cmd.split(' ')[1]
+                    netz_ausgang=cmd.split(' ')[2]
+                    percent=cmd.split(' ')[3]
+                    hz=cmd.split(' ')[4]
+                    bat_voltage=cmd.split(' ')[5]
+                    temperature=cmd.split(' ')[6]
+                    bits=cmd.split(' ')[7]
+                    bit1=bits[0]
+                    bit2=bits[1]
+                    bit3=bits[2]
+                    bit4=bits[3]
+                    bit5=bits[4]
+                    bit6=bits[5]
+                    bit7=bits[6]
+                    bit8=bits[7]
+                    print status + " " + cmd
+            else:
+                    print "invalid reply detected: " + cmd
+                    sys.exit(1)
+    
+    write( ("51310d").decode("hex"))
+    
+    while True:
+            ch = ser.read(1)
+            if ch == "\x0d":
+                    process_command(line)
+                    time.sleep(1)
+                    write( ("51310d").decode("hex"))
+                    line = ''
+            else:
+                    line = line + ch
+
+
+
+
+# simulate the UPS monitor
+
+
+
+    
+    # ./simulate-ups-monitor.py
+    VALID REPLY FROM USV -> (241.5 241.4 237.5 000 49.9 13.5 25.0 00001001
+    VALID REPLY FROM USV -> (241.5 241.4 237.5 000 49.9 13.5 25.0 00001001
+    VALID REPLY FROM USV -> (241.4 241.4 237.5 000 49.9 13.5 25.0 00001001
+
+
+
+
+# summary
+
+
+so **would i buy a AEG Protect Home VA 600 again**? currently there is no 'time left' estimation and therefore i shutdown the system either after 25 seconds or on LB (low battery) but after reloading the batteries the shutdown usually is triggered by the 25 seconds rule after a state change to OB (on battery). i think this is a decent setup and therefore **i would probably buy that UPS again**. **but i don't really have a clue about UPS devices so there might be much better ones in the same price range**, maybe someone on the NUT/UPS ML can make a better recommendation.
+
+what i really dislike is that this product ships with linux support BUT not with NUT support. i later realized that they created their own linux software. what a waste of time, i would rather love to get the specification and then use NUT instead - probably this is the case for nearly all the users seeing that this devices has linux support. but my request to get the specification was simply ignored, so i think there are **better vendors out there**.
+
+another interesting aspect of nut is how complex the integration in the system is.
+
+
+# links
+
+
+* [1] <https://nixos.org/wiki/How_to_setup_UPS/NUT>

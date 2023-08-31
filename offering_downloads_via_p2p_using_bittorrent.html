@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="offering_downloads_via_p2p_using_bittorrent.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>offering downloads via p2p using bittorrent</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/offering_downloads_via_p2p_using_bittorrent.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="acronis_true_image_2009.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="tcp.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">offering downloads via p2p using bittorrent</h1>
+    <div id="date"><p><span id="lastupdated">31 mar 2010</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::gentoo" class="tagbtn btn btn-primary">gentoo</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::p2p" class="tagbtn btn btn-primary">p2p</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a></p></div>
+    <p><a href="media/200px-bittorrent_logo-svg.png"><img src=media/200px-bittorrent_logo-svg.png alt="" style="float: right" size=200x caption="BitTorrent logo, source: wikipedia"></a></p>
+<h2 data-number="1" id="motivation">motivation</h2>
+<p>if you ever wanted to <strong>publish a file via bittorrent</strong>,
+here is a small guide how to do it with linux (using a shell). this
+guide - in contrast to most other guides found in the net - is
+<strong>NOT about downloading files </strong>using bitTorrent, instead
+is is about <strong>PUBLISHING FILES</strong>! first of, our tools:</p>
+<ul>
+<li><p><strong>bittornado</strong> [1] for
+<strong>tracker/seeder</strong> (that is the central part of your
+hosting service) <strong>BitTornado-0.3.17.tar.gz worked</strong>, while
+net-p2p/bittornado-0.3.18-r2 did fail</p></li>
+<li><p><strong>mktorrent</strong> [7] to <strong>create a
+.torrent</strong> on the shell</p></li>
+<li><p><strong>ktorrent</strong> [2] used as ‘normal’
+<strong>client</strong> (that would be a user of your service)</p></li>
+</ul>
+<p>bittorrent is basically nothing more than a <strong>simple protocol
+how to copy files and how to enforce integrity by hashing a big file
+into chunks of smaller files of equivalent 1Mib blocks</strong> (size
+may vary from .torrent to .torrent). a mixture of all related computers
+hosting chunks are called the swarm. if in doubt just read the wikipedia
+article [3] to get the terms &amp; concepts. a very nice matrix about
+bitTorrent clients and tracker capabilities can be found at [4].</p>
+<h3 data-number="1.1"
+id="the-basic-idea-about-hosting-downloads-with-bittorrent">the basic
+idea about hosting downloads with bitTorrent</h3>
+<p>open source projects often offer files via bitTorrent. to offer a
+file in bitTorrent one has to do this:</p>
+<ol type="1">
+<li><p><strong>create a .torrent</strong> of the file or directory one
+wants to offer</p></li>
+<li><p><strong>host a tracker</strong> (which manages the swarm, usually
+a tracker is a central server)</p></li>
+<li><p><strong>connect a</strong> ’<strong>seed’ to the
+tracker,</strong> so that others can download the file and spread it
+further</p></li>
+<li><p><strong>test &amp; monitor the </strong>tracker or swarm</p></li>
+<li><p><strong>security</strong></p></li>
+</ol>
+<p>in general this is nothing new as this technique is used already for
+years. i would like to create a very lightweight documentation about how
+these 4 points are achieved with ease, so here we go:</p>
+<h4 data-number="1.1.1" id="create-a-torrent">(1) create a torrent</h4>
+<p>let’s use one of my 23Mib screencasts to create a .torrent for (just
+use whatever you want) using mktorrent [7]</p>
+<pre><code># wget &#39;http://lastlog.de/misc/wordpress/libnoise-viewer.ogv&#39;
+# mktorrent -a http://myregisteredname.dyndns.org:6969/announce -c &#39;a screencast showing what libnoise-viewer does&#39; libnoise-viewer.ogv
+mktorrent 0.4 (c) 2007 Emil Renner Berthing
+Hashed 92/92 pieces.
+Writing metainfo file... done.</code></pre>
+<p>Now we created the <strong>libnoise-viewer.ogv.torrent</strong> as it
+can be found in the directory after we used mktorrent. for my private
+computers i use a dyndns.org DDNS service which is updated on every
+reconnect of my firtzbox.</p>
+<h4 data-number="1.1.2" id="host-a-tracker">(2) host a tracker</h4>
+<p>in my case i host this tracker at a dialup connection using dsl. this
+might not be ideal (but redundancy might get better if clients use a
+dht, more on that later). since the computer is behind a nat (network
+address translation) we have to forward some ports (sockets) to the
+server hosting the tracker behind the nat. this can be done by using
+your fritzbox configuration dialog (or equivalent, whatever you use - i
+will just pick that example with a fritzbox) .</p>
+<pre><code># mkdir torrent;
+# mv *.torrent torrent/
+# bttrack.py --port 6969 --dfile dstate --logfile tracker.log --allowed_dir torrent/
+# netstat -tulpen
+tcp        0      0 0.0.0.0:6969            0.0.0.0:*               LISTEN      0          234712     21631/python2.5</code></pre>
+<p>we could check for html output with curl as well (curl should
+basically installed on every linux installation)</p>
+<pre><code># curl localhost:6969</code></pre>
+<p>the output should be some html code with tracker version and a list
+of torrents (tracked files)</p>
+<p>so we see that the <strong>bttrack.py service</strong> using
+<strong>tcp</strong> with** port 6969** is up and running. if you are
+behind nat - as i am - also check from a remote machine, if the service
+is working (can also be done using curl).</p>
+<p>if you need to configure a fritzbox or other socket/html based router
+which has no direct internet configuration enabled you can also use a
+ssh redirect. in my case i can access my server behind the nat with ssh.
+so if you want to configure your fritzbox as if you had your computer
+plugged in the local lan swith see a different documentation of mine at
+[8] (german only).</p>
+<p>i used the <strong>tcp portrange from 6881 to 6999</strong> for the
+<strong>tracker</strong> as well as for the <strong>seeder</strong>
+connections, so forward these ports.</p>
+<p><a href="media/ktorrent1.png"><img src=media/ktorrent1.png alt=""></a></p>
+<h4 data-number="1.1.3" id="connect-a-seed-to-the-tracker">(3) connect a
+‘seed’ to the tracker</h4>
+<p>without doing this nobody will be able to download anything, since
+nothing is there! so let’s add some data. be aware that if that seed is
+behind nat as well it might not work at all.</p>
+<pre><code># btdownloadheadless.py --responsefile /root/torrent/libnoise-viewer.ogv.torrent --minport 6881 --maxport 6999 --max_upload_rate 20 --saveas /root/libnoise-viewer.ogv
+saving:         libnoise-viewer.ogv (22.8 MB)
+percent done:   0.0
+time left:      Download Succeeded!
+download to:    /root/libnoise-viewer.ogv
+download rate:
+upload rate:    12.4 kB/s
+share rating:   oo  (0.4 MB up / 0.0 MB down)
+seed status:    0 seen recently, plus 0.076 distributed copies
+peer status:    1 seen now, 7.6% done at 6.7 kB/s</code></pre>
+<p>so now you have to <strong>upload the libnoise-viewer.ogv.torrent to
+somewhere</strong>, or copy it to your client directly.</p>
+<p>you might want to have a look at the other parameters as for
+instance:</p>
+<ul>
+<li><p>–max_upload_rate <arg> maximum kB/s to upload at (0 = no limit,
+-1 = automatic) (defaults to 0)</p></li>
+<li><p>–minport <port></p></li>
+<li><p>–maxport <port></p></li>
+</ul>
+<p>you can also use several of these clients from different machines to
+ensure redundancy here as well. it will scale pretty well! you can also
+use any other torrent program as ktorrent or rtorrent for instance.</p>
+<h4 data-number="1.1.4" id="test-monitor-the-tracker-or-swarm">(4)
+<strong>test &amp; monitor the </strong>tracker or swarm</h4>
+<p>use rtorrent or ktorrent and import the libnoise-viewer.ogv.torrent
+and see if the download works. if it works you are done!</p>
+<p><strong>monitoring</strong> is basically done by visiting the
+tracker, as:</p>
+<ul>
+<li><p>there must be <strong>at least one seed</strong> (that is your
+seed)</p></li>
+<li><p><strong>see the logs</strong> created by the tracker, that is:
+tracker.log</p></li>
+<li><p>you can also do bandwidth monitoring, ktorrent has a nice monitor
+included (in case you are seeding) but you most likely don’t need
+bandwidth monitoring for the tracker as it won’t use much
+bandwidth</p></li>
+<li><p>both services might open many connections and some firewalls
+can’t handle this well since the resources needed for ‘connection
+tracking’ in statefull firewalls will be exceeded soon resulting in
+strange effects.</p></li>
+</ul>
+<p><a href="media/ktorrent.png"><img src=media/ktorrent.png alt="" size=900x></a></p>
+<h4 data-number="1.1.5" id="security">(5) security</h4>
+<p>i did run the script as root but if you want to establish a service
+which should be secure and reliable <strong>DO NOT RUN AS USER
+ROOT</strong>! just create a new user and run it as this new user. this
+is very easy since bittorrent does NOT use any <strong>privileged
+ports</strong> (1-1024) but <strong>bitTorrent uses unprivileged
+ports</strong> instead (all others as 1025-65535). in my example even
+less.</p>
+<p>if you have frequent issues with the tracker you could use
+<strong>minit</strong> [5] <strong>to restart the service
+automatically</strong>.</p>
+<p><strong>summary</strong></p>
+<p>i hope this helps you to offer big downloads easier. just keep in
+mind that you have to follow two rules:</p>
+<ol type="1">
+<li><p>for every new download you need to create a new .torrent
+file</p></li>
+<li><p>you need to inject a seed for every .torrent via a
+tracker</p></li>
+</ol>
+<p>using bittorrent will show it’s full potential when we migrated to
+<strong>ipv6</strong> since nat is (asipv6 mentioned in about every 5th
+posting on my blog) is a real problem.</p>
+<h3 data-number="1.2" id="errata">errata</h3>
+<ul>
+<li><p>since the tracker seems not to be stable for both versions of
+bittornado we <strong>now use bittorrent instead</strong>. the concepts
+apply 1:1 so the adaption isn’t very complicated</p></li>
+<li><p>be aware that <strong>NAT will most likely kill a lot of upload
+potential </strong>of the clients since most clients will not have a
+direct valid ipv4 address but will be behind NAT all the time with
+improper port forwarding. this will then result in much less throughput
+and clients will have small download rates in general. one exception to
+this rule will be two clients which can utilize the full potential if
+one has configured proper port forwarding while the other is behind
+nat.</p></li>
+</ul>
+<h3 data-number="1.3" id="links">links</h3>
+<ul>
+<li>[1] <a href="http://en.wikipedia.org/wiki/BitTornado"
+class="uri">http://en.wikipedia.org/wiki/BitTornado</a></li>
+<li>[2] <a href="http://ktorrent.org/"
+class="uri">http://ktorrent.org/</a></li>
+<li>[3] <a href="http://en.wikipedia.org/wiki/BitTorrent_(protocol)"
+class="uri">http://en.wikipedia.org/wiki/BitTorrent_(protocol)</a></li>
+<li>[4] <a
+href="http://en.wikipedia.org/wiki/Comparison_of_BitTorrent_clients"
+class="uri">http://en.wikipedia.org/wiki/Comparison_of_BitTorrent_clients</a></li>
+<li>[5] <a href="http://www.fefe.de/minit/"
+class="uri">http://www.fefe.de/minit/</a></li>
+<li>[6] <a
+href="http://www.linux.com/news/software/applications/8230-bittorrent-for-linux"
+class="uri">http://www.linux.com/news/software/applications/8230-bittorrent-for-linux</a></li>
+<li>[7] <a href="http://torrentfreak.com/how-to-create-a-torrent/"
+class="uri">http://torrentfreak.com/how-to-create-a-torrent/</a></li>
+<li>[8] <a href="http://lastlog.de/wiki/index.php/Ssh"
+class="uri">http://lastlog.de/wiki/index.php/Ssh</a></li>
+</ul>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/offering_downloads_via_p2p_using_bittorrent.mdwn" title="posts\offering_downloads_via_p2p_using_bittorrent.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

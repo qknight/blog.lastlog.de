@@ -1,0 +1,88 @@
+[[!meta date="2016-08-10 16:35"]]
+[[!tag nixos tuebix linux usability]]
+
+[[!img media/tuex.png class="noFancy" style="float: right"]]
+[[!summary cfp software written in golang for the tuebix linuxtag in tuebingen]]
+
+# motivation
+
+managing a 'call for papers' can be a lot of work. the tuebix [cfp](https://github.com/nixcloud/cfp)-software was created in the best practice of [KISS](https://en.wikipedia.org/wiki/KISS_principle).
+
+# tuebix
+
+we held a [linuxtag](https://de.wikipedia.org/wiki/Linuxtag) at the [university of tübingen](https://www.uni-tuebingen.de/) called [tuebix](http://www.tuebix.org/2016/programm_raumplan/) 
+and we had a talk about `nixos` and a workshop about `nixops`.
+
+[[!img media/cfp.jpg  ]]
+
+[source](https://github.com/nixcloud/cfp)
+
+# concept
+
+the `cfp`-software backend is written in `golang`. the frontend was done in [materializecss](http://materializecss.com/). 
+
+the workflow: 
+
+* user fills the form-fields and gets instant feedback because of javascript checks
+* after 'submit' it will generate a `json` document and send it via email to a mailinglist
+* the mailinglist is monitored manually and people are contacted afterwards manually
+
+after the `cfp` is over, one can use [jq](https://stedolan.github.io/jq/) to process the data for creating a schedule.
+
+# hosting
+
+security wise it would be good to create a custom user for hosting which was not done here.
+
+## /home/joachim/cfp.sh
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+#!/bin/sh
+source /etc/profile
+cd /home/joachim/cfp
+nix-shell --command "while true; do go run server.go ; done"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## systemd job
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+systemd.services.cfp = {
+  wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      #Type = "forking";
+      User = "joachim";
+      ExecStart = ''/home/joachim/cfp.sh'';
+      ExecStop = ''
+      '';
+    };
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## reverse proxy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~ { .bash }
+... 
+# nixcloud.io (https)
+{
+  hostName = "nixcloud.io";
+  serverAliases = [ "nixcloud.io" "www.nixcloud.io" ];
+
+  documentRoot = "/www/nixcloud.io/";
+  enableSSL = true;
+  sslServerCert = "/ssl/nixcloud.io-2015.crt";
+  sslServerKey = "/ssl/nixcloud.io-2015.key";
+  sslServerChain = "/ssl/nixcloud.io-2015-intermediata.der";
+
+  extraConfig = ''
+    ...
+    RewriteRule ^/cfp$ /cfp/ [R]
+    ProxyPass /cfp/ http://127.0.0.1:3000/ retry=0
+    ProxyPassReverse /cfp/ http://127.0.0.1:3000/
+    ...
+  '';
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# summary
+
+using `nix-shell` it was easy to develop the software and to deploy it to the server. all dependencies are contained. 
+
+for further questions drop me an email: <a href="mailto:js@lastlog.de?subject=cfp@nixcloud">js@lastlog.de</a>
+

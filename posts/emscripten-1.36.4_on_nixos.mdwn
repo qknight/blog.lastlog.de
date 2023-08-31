@@ -1,0 +1,225 @@
+[[!meta date="2016-05-25 04:58"]]
+[[!tag nixos emscripten javascript]]
+[[!series emscripten]]
+[[!img media/nixos-lores.png alt="" style="float: right" class="noFancy"]]
+[[!summary emscripten on nixos works a tiny bit better now]]
+
+# motivation
+
+emscripten on nixos, a status update.
+
+# 1.36.4
+
+since the project i'm hacking on requires me to develop on nixos, which is awsome btw, i had to figure how to compile xml.js on nixos. one requirement was the [revision bump from 1.36.4 to 1.36.4](https://github.com/NixOS/nixpkgs/pull/15684/).
+
+# compiling xml.js
+
+since xml.js wouldn't compile on nixos caused by a missing library: `cannot find -lgcc`. see the [bug-report](https://github.com/NixOS/nixpkgs/issues/15636#issuecomment-221453043) for details.
+
+in a nut-shell: using 1.36.4 emscripten **xml.js compiles/works with ubuntu but fails on nixos**. 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+./script/libxml2   
+
+configure.ac:52: warning: AM_INIT_AUTOMAKE: two- and three-arguments forms are deprecated.
+aclocal.m4:9742: AM_INIT_AUTOMAKE is expanded from...
+configure.ac:52: the top level
+libtoolize: putting auxiliary files in '.'.
+libtoolize: copying file './ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+configure.ac:52: warning: AM_INIT_AUTOMAKE: two- and three-arguments forms are deprecated.
+aclocal.m4:713: AM_INIT_AUTOMAKE is expanded from...
+configure.ac:52: the top level
+Unescaped left brace in regex is deprecated, passed through in regex; marked by <-- HERE in m/\${ <-- HERE ([^ \t=:+{}]+)}/ at /nix/store/klmb2g54ini7y5hcf5sfx92agsifgazi-automake-1.15/bin/automake line 3936.
+configure.ac:52: warning: AM_INIT_AUTOMAKE: two- and three-arguments forms are deprecated.  For more info, see:
+configure.ac:52: http://www.gnu.org/software/automake/manual/automake.html#Modernize-AM_005fINIT_005fAUTOMAKE-invocation
+configure.ac:60: installing './compile'
+configure.ac:52: installing './missing'
+/nix/store/klmb2g54ini7y5hcf5sfx92agsifgazi-automake-1.15/share/automake-1.15/am/ltlibrary.am: warning: 'libxml2.la': linking libtool libraries using a non-POSIX
+/nix/store/klmb2g54ini7y5hcf5sfx92agsifgazi-automake-1.15/share/automake-1.15/am/ltlibrary.am: archiver requires 'AM_PROG_AR' in 'configure.ac'
+Makefile.am:22:   while processing Libtool library 'libxml2.la'
+/nix/store/klmb2g54ini7y5hcf5sfx92agsifgazi-automake-1.15/share/automake-1.15/am/ltlibrary.am: warning: 'testdso.la': linking libtool libraries using a non-POSIX
+/nix/store/klmb2g54ini7y5hcf5sfx92agsifgazi-automake-1.15/share/automake-1.15/am/ltlibrary.am: archiver requires 'AM_PROG_AR' in 'configure.ac'
+Makefile.am:173:   while processing Libtool library 'testdso.la'
+Makefile.am: installing './depcomp'
+doc/Makefile.am:21: warning: wildcard tutorial/*.html: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard tutorial/*.c: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard tutorial/*.pdf: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard tutorial/images/*.png: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard tutorial/images/callouts/*.png: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard API*.html: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard *.1: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard *.xsl: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard *.html: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard *.gif: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard html/*.html: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:21: warning: wildcard html/*.png: non-POSIX variable name
+doc/Makefile.am:21: (probably a GNU make extension)
+doc/Makefile.am:301: warning: filter-out %/xmlversion.h, $(wildcard $(top_srcdir: non-POSIX variable name
+doc/Makefile.am:301: (probably a GNU make extension)
+doc/Makefile.am:301: warning: wildcard $(top_srcdir: non-POSIX variable name
+doc/Makefile.am:301: (probably a GNU make extension)
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking for a BSD-compatible install... /nix/store/n4zpfi4zzw10s2g91v1swkwq41v1afzz-coreutils-8.25/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /nix/store/n4zpfi4zzw10s2g91v1swkwq41v1afzz-coreutils-8.25/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking for gcc... /nix/store/0llznkhcyyndfhwqah01i1zcdhqxrx0d-emscripten-1.36.4/share/emscripten/emcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... configure: error: in `/home/joachim/Desktop/projects/nlnet/xml.js/build':
+configure: error: cannot run C compiled programs.
+If you meant to cross compile, use `--host'.
+See `config.log' for more details
+ERROR:root:Configure step failed with non-zero return code 1! Command line: ['../libxml2/configure', '--with-http=no', '--with-ftp=no', '--with-python=no', '--with-threads=no', '--with-debug'] at /home/joachim/Desktop/projects/nlnet/xml.js/build
+make: *** Es wurden keine Ziele angegeben und keine „make“-Steuerdatei gefunden.  Schluss.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+% cat build/config.log
+
+...
+configure:3602: checking whether the C compiler works
+configure:3624: /nix/store/0llznkhcyyndfhwqah01i1zcdhqxrx0d-emscripten-1.36.4/share/emscripten/emcc    conftest.c  >&5
+configure:3628: $? = 0
+configure:3676: result: yes
+configure:3679: checking for C compiler default output file name
+configure:3681: result: a.out
+configure:3687: checking for suffix of executables
+configure:3694: /nix/store/0llznkhcyyndfhwqah01i1zcdhqxrx0d-emscripten-1.36.4/share/emscripten/emcc -o conftest    conftest.c  >&5
+configure:3698: $? = 0
+configure:3720: result:
+configure:3742: checking whether we are cross compiling
+configure:3750: /nix/store/0llznkhcyyndfhwqah01i1zcdhqxrx0d-emscripten-1.36.4/share/emscripten/emcc -o conftest    conftest.c  >&5
+/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld: cannot find crt1.o: No such file or directory
+/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld: cannot find crti.o: No such file or directory
+/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld: cannot find crtbegin.o: No such file or directory
+/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld: cannot find -lgcc
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+configure:3754: $? = 1
+configure:3761: ./conftest
+../libxml2/configure: line 3763: ./conftest: No such file or directory
+configure:3765: $? = 127
+configure:3772: error: in `/home/joachim/Desktop/projects/nlnet/xml.js/build':
+configure:3774: error: cannot run C compiled programs.
+If you meant to cross compile, use `--host'.
+See `config.log' for more details
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+the interesting bit is that the `crt1.o`, `crti.o` and `crtbegin.o` as well as `libgcc.so / libgcc_s.so` are coming from different packages like `gcc` and `glibc` IIRC. 
+
+# attempted fix
+i've spent a while trying to fix these requirements with `./gen.sh` a little scripte which creates fake libraries.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+
+% cat /home/joachim/Desktop/projects/nlnet/xml.js/lib/gen.sh
+
+#!/usr/bin/env bash 
+set -v
+
+rm *.o
+rm *.so
+echo "crtbegin"
+echo "int main() {}" > foo.cpp
+g++ -c -Wall -Werror -lc --entry main foo.cpp -o foo.o
+mv foo.o crtbegin.o
+
+##### crt1 with _start symbol
+echo "crt1"
+echo "void _start() {}" > foo.c
+gcc -c -Wall -Werror -fpic foo.c -o crt1.o
+
+for i in crtbegin crti crtend crtn; do
+  rm -f foo.o foo.c
+  echo "void foo123_$i(void) {}" > foo.c
+  gcc -c -Wall -Werror -fpic foo.c -o foo.o
+  mv foo.o $i.o
+done
+
+for i in libgcc_s1  libgcc1 ; do
+  rm -f foo.o foo.c
+  echo "void foobar_$i(void) {}" > foo.c
+  cat foo.c
+  echo "1"
+  gcc -c -Wall -Werror  foo.c -o foo.o
+  echo "2"
+  gcc -shared  -o $i.so foo.o
+done
+
+ar rc libgcc1.a foo.o
+
+mv libgcc1.a libgcc.a
+mv libgcc_s1.so libgcc_s.so
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+so i came up with extending environment variables: **NIX_LDFLAGS** and 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+export NIX_LDFLAGS="-L /home/joachim/Desktop/projects/nlnet/xml.js/lib -rpath /nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib64 -rpath /nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib  -L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib -L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib -L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib -L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib -L/home/joachim/Desktop/projects/nlnet/xml.js/lib"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`strace -f -s 200 -e execve emconfigure  ../libxml2/configure --with-http=no --with-ftp=no --with-python=no --with-threads=no --with-debug`
+
+would show something like:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+
+[pid 24762] execve("/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld", ["/nix/store/60a1aqx579bjff3c90cw0l1zwyj2qxhg-binutils-2.26-dev/bin/ld", "-dynamic-linker", "/nix/store/iifa17bpi78d0l62463z7sn25jc3545j-glibc-multi-2.23/lib/ld-linux-x86-64.so.2", "--eh-frame-hdr", "-m", "elf_x86_64", "-dynamic-linker", "/lib64/ld-linux-x86-64.so.2", "-o", "conftest", "crt1.o", "crti.o", "crtbegin.o", "/run/user/1000/conftest-904287.o", "-L/home/joachim/Desktop/projects/nlnet/xml.js/build/../lib", "-lgcc", "--as-needed", "-lgcc_s", "--no-as-needed", "-lc", "-lgcc", "--as-needed", "-lgcc_s", "--no-as-needed", "crtend.o", "crtn.o", "-L", "/home/joachim/Desktop/projects/nlnet/xml.js/lib", "-rpath", "/nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib64", "-rpath", "/nix/store/3qhj8rf3j064qbrm5q2yzkb5vd5qnhzj-shell/lib", "-L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib", "-L/nix/store/97aj51dl9jvn2qyjapi7m2v2gai9mp27-nodejs-4.3.1/lib", "-L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib", "-L/nix/store/g47gdl1h8mzixl9566dnjlwgwvgpyvkr-libtool-2.4.6-lib/lib", "-L/home/joachim/Desktop/projects/nlnet/xml.js/lib", "-L/nix/store/iifa17bpi78d0l62463z7sn25jc3545j-glibc-multi-2.23/lib", "-L/nix/store/hcndjf2r2rcrf39x77wklckn60sx89dx-gcc-5.3.0-lib/lib", "-rpath", "/nix/store/iifa17bpi78d0l62463z7sn25jc3545j-glibc-multi-2.23/lib", "-rpath", "/nix/store/hcndjf2r2rcrf39x77wklckn60sx89dx-gcc-5.3.0-lib/lib"], [/* 125 vars */]) = 0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+the return value of `0` is the key but it didn't work anyways....
+
+# the fix
+
+the [emscripten source code](https://github.com/kripken/emscripten/blame/07b87426f898d6e9c677db291d9088c839197291/emcc.py#L192) mentiones this fix:
+
+`export EMCONFIGURE_JS=2` is the key in this case.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+# Whether we fake configure tests using clang - the local, native compiler - or not. if not we generate JS and use node with a shebang
+
+Beither approach is perfect, you can try both, but may need to edit configure scripts in some cases
+By default we configure in js, which can break on local filesystem access, etc., but is otherwise accurate so we
+disable this if we think we have to. A value of '2' here will force JS checks in all cases. In summary:
+0 - use native compilation for configure checks
+1 - use js when we think it will work
+2 - always use js for configure checks
+use_js = int(os.environ.get('EMCONFIGURE_JS') or 1)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+so every time you fail with ./configure for some weird reason like the one above or other, try `export EMCONFIGURE_JS=2`, distclean the build and build again.
+
+hf!
+
+# summary
+
+with this new knowledge it might get feasible to use nix as a tool chain for more complex emscripten setups!
+
+thanks to **matthewbauer** and **joelmo**#nixos@irc.kde.org for their support and ideas!

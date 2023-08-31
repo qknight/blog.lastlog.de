@@ -1,0 +1,59 @@
+[[!summary chatGPT: The author has created a set of basic Ogre examples and provides screenshots and download links on Github, covering various topics including creating self-contained examples, getting Ogre running, using joystick/gamepad support, creating spheres and rings, using shaders, using CMake, and creating a lightweight CustomMedia system. The author also requests feedback on the examples.]]
+[[!meta date="2010-03-16 23:24"]]
+[[!tag cmake gentoo linux ogre3d packagemanager technology usability]]
+[[!series ogre]]
+
+# more orgre updates - comments on ogre examples
+
+i've finished a set of **basic ogre examples** - since the ones coming with ogre 1.7+ are not very good. you can download them from github.com/qknight,  see [1]. i've added a README which explains all in detail, again see [1]. i wish i had the time to create more of these examples. so here are a few screenshots.
+
+[[!img media/mars.png alt="" caption="mars example (about texturing)" size=700x]]
+
+
+[[!img media/ninja-camera.png alt="" caption="ninja-camera (about using the mouse navigation)" size=700x]]
+
+
+[[!img media/mars-rings.png alt="" caption="mars-rings (about creating circles in ogre)" size=700x]]
+
+
+[[!img media/mars-rings-shader-cg.png alt="" caption="mars-rings-shader-cg (about using shaders)" size=700x ]]
+
+
+# so basically my examples are about:
+	
+  * **how to create fully self-contained simple examples independent of  each other**
+
+	
+  * how to **get ogre running** (with the example framework from the ogre wiki tutorials)
+
+	
+  * using **ois** or **sdl joystick/gamepad support** in ogre
+
+	
+  * how to **create spheres** and how to texture them properly
+
+	
+  * how to **approximate rings** which are approximated circles using line segments
+
+	
+  * how to use **cg (nvidia)** and **glsl (opengl) shaders**
+
+	
+  * **how to use cmake**
+
+	
+  * how to write small but yet powerful example
+
+	
+  * i've also put attention at a **very light weight CustomMedia system**, it will be easy for you to understand how to use materials and textures together with shaders
+
+
+all of these use cmake and you can use them for whatever purpose you like. just note that i've included code from the ogre wiki and i don't know which copyright or license they use which is 'yet' another criticism (but i will stop right here). i would like to **thank the irc folks in #ogre3d@irc.freenode.net for their support**.
+
+**it would be nice if you would drop me a email with feedback on how you liked/used my examples.**
+
+
+# links
+
+
+* [1] <http://github.com/qknight/ogre-examples>

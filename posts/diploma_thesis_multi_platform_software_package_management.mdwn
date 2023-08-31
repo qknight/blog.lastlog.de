@@ -1,0 +1,24 @@
+[[!summary chatGPT: The publication of the author's diploma thesis on package management is now available online, including the source code and introducing new terminology in the field.]]
+[[!meta date="2011-09-24 00:50"]]
+[[!tag gentoo linux MacOSX p2p packagemanager qt security society technology usability virtualization windows]]
+
+finally ... the online** publication of my diploma thesis** (DT) is here, it can be found online [1] including the source at [2].
+
+i hope that the terminology introduced in this DT (chap 9) will be used. this is of course also true for concepts engineered in (chap 7).
+
+    candies can be found here:
+     - chap 4: components used in a package manager
+     - chap 4.6: different integration levels of a package manager
+     - chap 5.13: ways to replicate a system
+     - chap 5.15 ff
+     - chap 6.2: evopedia deployment summary
+     - chap 7 (you might want to read this a few times, it is quite complex)
+     - chap 9: here i introduce some new terminology in package management
+               (probably a _must read_)
+
+see also the README for in [2] for further information.
+
+# links
+
+* [1] <https://github.com/qknight/Multi-PlatformSoftwarePackageManagement/blob/master/Multi-PlatformSoftwarePackageManagement.pdf>
+* [2] <https://github.com/qknight/Multi-PlatformSoftwarePackageManagement>

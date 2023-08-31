@@ -1,0 +1,91 @@
+[[!meta date="2023-04-09 01:58"]]
+[[!tag pankat javascript usability]]
+[[!summary pankat is a static blog generator with integrated live pandoc preview]]
+
+# motivation
+
+the [pankat](https://github.com/nixcloud/pankat) static blog generator is my improvement over the tools i used before: [ikiwiki](https://ikiwiki.info/) and [wordpress](https://wordpress.com/de/).
+i love **writing offline**, **tool assisted** and **articles are versioned** using [git](https://git-scm.com/).
+
+## pankat-static
+
+from the documents source (mdwn) a call to `./pankat-static` will create the documents (html):
+
+[[!img posts/pankat_editor/pankat-static_schema.svg class="noFancy" alt="pankat-static schema"]]
+
+## pankat-server
+
+`./pankat-server` is a webserver with traditional REST API but also a websocket API which allows live preview of the article.
+
+[[!img posts/pankat_editor/pankat-server_schema.svg class="noFancy" alt="pankat-server schema"]]
+
+### live preview
+
+this is `pankat-server` with 'goland' text editor on the left and firefox on the right. but you can use any text editor and it works best if it has auto-save, which is supported by [kate](https://kate-editor.org/de/) for instance.
+
+<video width="620" controls>
+<source src="posts/pankat_editor/live-demo.mp4" type="video/mp4">
+<p>Your browser does not support the video tag.</p>
+</video>
+
+
+
+note: this is not WYSIWYG as you can't edit the preview but it's a great way to see the result of your changes.
+
+## mobile first
+
+another important improvement was **designing the blog to be responsive and mobile friendly**. the **timeline** is a way to summarize everything that has been written in contrast to most blogs which render
+several posts per page and use pagination and hide the comments. pankat focuses on a single article per page style and features an easy to use `left`/`right` keyboard navigation system.
+
+## markdown
+
+concise [markdown syntax](https://daringfireball.net/projects/markdown/syntax) which rendered by [pandoc](https://pandoc.org/) seemed a natural
+ fit.
+
+## reading AIDs
+
+pankat has integrated
+
+* [tocify.js](http://gregfranko.com/jquery.tocify.js/) which generates a
+ table of contents automatically (not shown on mobile).date
+* [anchor.js](https://www.npmjs.com/package/anchor-js) which makes quoting individual sections outlined in h1,h2,h3,... easy.
+
+## inline HTML/CSS/JS
+
+where markdown is not enough one can use inline HTML/CSS/JS. this way one can integrate emscripten libraries or other interactive content.
+
+```javascript
+<script>
+window.addEventListener('load', (event) => {
+  console.log("hello world from pankat article");
+});
+</script>
+```
+
+<script>
+window.addEventListener('load', (event) => {
+  console.log("hello world from pankat article");
+});
+</script>
+
+if you view the code of this article (link at the end), you can see it also executes the javascript code in the article and using `F12` in the console you can read the string output.
+
+## pankat logo
+
+[[!img posts/pankat_editor/pankat.png class="noFancy" alt="pankat; created with https://replicate.com/stability-ai/stable-diffusion" size="250x"]]
+
+<https://replicate.com/stability-ai/stable-diffusion>
+
+```
+prompt: cat and book logo, by mcbess, full colour print, vintage colours, 1960s
+negative_prompt: ugly, tiling, poorly drawn hands, poorly drawn feet, poorly drawn face, out of frame, extra limbs, disfigured, deformed, body out of frame, bad anatomy, watermark, signature, cut off, low contrast, underexposed, overexposed, bad art, beginner, amateur, distorted face.
+```
+
+# conclusion
+
+there are still entries in the [roadmap](https://github.com/nixcloud/pankat/blob/future/documents/blog.lastlog.de/posts/roadmap.mdwn) i want to work out before
+ i merge the [future](https://github.com/nixcloud/pankat/tree/future) branch into master.
+
+lately i got mobile html working again thanks to help from [symisint](https://www.fiverr.com/symisint) from fiverr.
+
+that said, i'm already using it for my blog and i'm happy with it.

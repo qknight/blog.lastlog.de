@@ -1,0 +1,148 @@
+[[!meta date="2013-04-03 10:58"]]
+[[!tag shinken linux security]]
+[[!img media/shinken.png alt="copied from shinken-monitoring.org" style="float: right"]]
+[[!series shinken]]
+[[!summary ensuring only one dhcp server is active]]
+
+# motivation
+
+shinken can be used to monitor dhcp servers easiliy but i wasn't able to find a script which **monitors that nobody accidently enabled another dhcp server** which probably will create a lot of trouble.
+
+## check_dhcp_server_count script
+
+    #! /bin/bash
+    #
+    # js@lastlog.de
+    # 28/03/2013
+    #
+    #  This Nagios dhcp server test plugin checks that there are only known
+    #  active dhcp servers.
+    #
+    # dhcping -s 255.255.255.255 -r -v
+    # Got answer from: 62.8.254.69
+    # received from 62.8.254.69, expected from 255.255.255.255
+    # Got answer from: 62.8.254.91
+    # received from 62.8.254.91, expected from 255.255.255.255
+    # no answer
+    #
+    # chmod u+s /usr/sbin/dhcping
+    # chmod 0755 check_dhcp_server_count
+    # chown shinken:shinken check_dhcp_server_count
+    
+    PROGNAME=`basename $0`
+    PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+    REVISION="0.0.1"
+    
+    . $PROGPATH/utils.sh
+    
+    print_usage() {
+      echo "Usage:"
+      echo "  $PROGNAME --help"
+      echo "  $PROGNAME --test"
+      echo "  $PROGNAME --version"
+    }
+    
+    print_help() {
+      print_revision $PROGNAME $REVISION
+      echo ""
+      print_usage
+      echo ""
+      echo "Nagios dhcp server test plugin - prevent multiple dhcp servers"
+      echo ""
+      echo "--test"
+      echo "   Perform the test"
+      echo "--help"
+      echo "   Print this help screen"
+      echo "--version"
+      echo "   Print version and license information"
+      echo ""
+      support
+    }
+    
+    # Information options
+    case "$1" in
+    --help)
+                    print_help
+        exit $STATE_OK
+        ;;
+    -h)
+                    print_help
+        exit $STATE_OK
+        ;;
+    --version)
+                    print_revision $PROGNAME $REVISION
+        exit $STATE_OK
+        ;;
+    -V)
+                    print_revision $PROGNAME $REVISION
+        exit $STATE_OK
+        ;;
+    --test)
+        
+        n=$(dhcping -s 255.255.255.255 -r -v 2>&1  | grep received | wc -l)
+        case "$n" in
+          1)
+              echo "STATE_OK - exactly one dhcp server found - $(date)"
+              exit $STATE_OK
+          ;;
+          0)
+              echo "STATE_CRITICAL - no dhcp server found - $(date)"
+              exit $STATE_CRITICAL
+          ;;
+          *)
+              echo "STATE_CRITICAL - several dhcp servers found! - $(date)"
+              exit $STATE_CRITICAL
+          ;;
+        esac
+        ;;
+    *)
+        print_usage
+        exit $STATE_UNKNOWN
+    esac
+
+## etc/services/services.cfg
+
+    define service{
+           use                      generic-service
+           service_description      DHCPD_count
+           host_name                myserver.example.com
+           check_command            check_dhcp_server_count
+    }
+
+## commands.cfg
+
+    define command {
+        command_name    check_dhcp_server_count
+        command_line    $PLUGINSDIR$/check_dhcp_server_count --test
+    }
+
+# security
+i don't like setuid [1] for /usr/sbin/dhcping and /usr/local/shinken/libexec/check_dhcp but i don't see any other way to implement it.
+
+    define command {
+        command_name    check_my_dhcp
+        command_line    $PLUGINSDIR$/check_dhcp -i eth12 -m 010203040506 -r 192.168.1.1 -s 192.168.1.76 
+    }
+
+check_dhcp [2] needs also be set: **chmod u+s check_dhcp**
+
+    chmod u+s /usr/local/shinken/libexec/check_dhcp
+    ls -la /usr/local/shinken/libexec/check_dhcp
+    -r-sr-xr-x  1 root    root    141246 2013-02-27 10:53 check_dhcp*
+
+and 
+
+    chmod u+s /usr/sbin/dhcping
+    ls -la /usr/sbin/dhcping
+    -rwsr-xr-x 1 root root 15256 2008-11-25 12:25 dhcping*
+
+
+# summary
+the script is doing its job well so far. i would like to change some tiny things like being able to: 
+
+ * pass it a list of known servers 
+ * and if the returned amount of found servers differs, report that and if possible list all newly found dhcp servers in the error log
+
+# links
+* [1] <http://en.wikipedia.org/wiki/Setuid#Security>
+* [2] <http://nagiosplugins.org/man/check_dhcp>

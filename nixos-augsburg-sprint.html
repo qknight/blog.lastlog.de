@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="nixos-augsburg-sprint.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>nixos-augsburg-sprint</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/nixos-augsburg-sprint.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="android_calendar_and_CalDav.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="xmlmirror.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+      <div id="seriesContainer">
+      <a href="timeline.html?filter=series::emscripten" title="article series emscripten" class="seriesbtn btn btn-primary">emscripten</a>
+        <header class="seriesHeader">
+          <div id="seriesLeft"><a href="emscripten-1.36.4_on_nixos.html"><span class="glyphiconLinkSeries glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article in series"></span>
+            </a>   </div>
+          <div id="seriesRight">   <a href="xmlmirror.html">
+              <span class="glyphiconLinkSeries glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article in series"></span>
+            </a></div>
+        </header>
+      </div>
+
+  <div class="article">
+    <h1 id="SiteTitle">nixos-augsburg-sprint</h1>
+    <div id="date"><p><span id="lastupdated">28 jun 2016</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::sprint" class="tagbtn btn btn-primary">sprint</a><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::linux" class="tagbtn btn btn-primary">linux</a><a href="timeline.html?filter=tag::technology" class="tagbtn btn btn-primary">technology</a><a href="timeline.html?filter=tag::usability" class="tagbtn btn btn-primary">usability</a><a href="timeline.html?filter=tag::emscripten" class="tagbtn btn btn-primary">emscripten</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" class="noFancy" style="float: right"></a></p>
+<h2 data-number="1" id="nixos-sprint">nixos-sprint</h2>
+<p>paul and me visisted the <a
+href="https://openlab-augsburg.de/">augsburger openlab</a> last weekend,
+for a nice nixos sprint with profpatsch. the sprint lasted two days and
+we talked lots about nix/nixpkgs internals.</p>
+<h3 data-number="1.1" id="nix-based-emscripten-toolchain">nix based
+emscripten toolchain</h3>
+<p>we’ve been working on the <a
+href="https://github.com/NixOS/nixpkgs/pull/16208">emscripten nix
+toolchain</a>. current status is: prototype is working and we can
+already compile these targets:</p>
+<ul>
+<li>libz</li>
+<li>libxml2</li>
+<li>json_c</li>
+<li><a
+href="https://gitlab.com/odfplugfest/xmlmirror">xmlmirror</a></li>
+</ul>
+<p><strong>note:</strong> <em>YAY</em>, this is the first nix-based
+emscripten toolchain which should work on nixos but also on <strong>mac
+os x</strong> and on basically <strong>every POSIX supporting
+unix</strong>!</p>
+<h3 data-number="1.2" id="nixexpr-grammar">nixexpr grammar</h3>
+<p><a href="https://github.com/NixOS/nix/pull/948">we had the idea to
+make the nix expression language more forgiving</a> by having it support
+<code>;</code> at the end of a normal function body.</p>
+<h4 data-number="1.2.1" id="random-example-mkderivation">random example:
+mkDerivation</h4>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">json_c_</span> = emscriptenStdenv.mkDerivation rec {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">name</span> = <span class="st">&quot;json_c_&quot;</span><span class="kw">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">version</span> = <span class="st">&quot;json-c-0.12-20140410&quot;</span><span class="kw">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">buildInputs</span> = [ autoconf automake libtool pkgconfig gnumake ]<span class="kw">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">src</span> = fetchgit {</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="ex">url</span> = <span class="st">&quot;https://github.com/json-c/json-c&quot;</span><span class="kw">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rev</span> = <span class="st">&quot;refs/tags/</span><span class="va">${version}</span><span class="st">&quot;</span><span class="kw">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="ex">sha256</span> = <span class="st">&quot;0s9h6147v2vkd4l4k3prg850n0k1mcbhwhbr09dzq97m6vi9lfdi&quot;</span><span class="kw">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="kw">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">postFixup</span> = <span class="st">&quot;echo postFixup&quot;</span><span class="kw">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">preFixup</span> = <span class="st">&quot;echo preFixup&quot;</span><span class="kw">;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">fixupPhase</span> = <span class="st">&quot;echo fixupPhase&quot;</span><span class="kw">;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="er">}</span><span class="kw">;</span></span></code></pre></div>
+<p>you close the scope with <code>};</code> and you always need the
+<code>;</code> which is not optional.</p>
+<h4 data-number="1.2.2" id="function-call">function call</h4>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span> <span class="ex">foo,</span> bar } :</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># function body</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<p>you close the scope with <code>}</code> and you are not allowed to
+use <code>};</code>!</p>
+<p><strong>note:</strong> <a
+href="https://github.com/NixOS/nix/pull/948">with this patch</a> you are
+now allowed to write either <code>}</code> (default) or <code>};</code>
+which is new.</p>
+<h3 data-number="1.3" id="mkderivation-outputs">mkDerivation
+outputs</h3>
+<p>i finally learned that we now have the <a
+href="https://nixos.org/nix/manual/#ssec-derivation"><code>outputs</code>-feature</a></p>
+<p>this means nixos/nix now supports split packages:</p>
+<ul>
+<li><code>foo.deb</code> vs. </li>
+<li><code>foo-dev.deb</code></li>
+</ul>
+<p>as ubuntu and other distros does.</p>
+<p>in <code>nixpkgs</code>, for instance in an
+<code>stdenv.mkDerivation</code> you can now use:</p>
+<pre><code>outputs = [ &quot;lib&quot; &quot;headers&quot; &quot;doc&quot; ];</code></pre>
+<p>to install software into these directories! great!</p>
+<h2 data-number="2" id="summary">summary</h2>
+<p>nice ppl, nice room. 10/10, would hack there again! <strong>huge
+thanks to Profpatsch and helpers.</strong></p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/nixos-augsburg-sprint.mdwn" title="posts\nixos-augsburg-sprint.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

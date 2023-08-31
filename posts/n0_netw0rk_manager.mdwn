@@ -1,0 +1,63 @@
+[[!summary chatGPT: The author created their own network manager called n0 or nNull using Qt 4.x with a server and a client communicating via dbus, and they will release the source code soon. They explain how the network manager works and provide a script they use to change wireless networks. They also mention using dbus to execute scripts and logging the output to the GUI process.]]
+[[!meta date="2009-11-26 04:22"]]
+[[!tag gentoo linux qt technology usability n0]]
+
+I've just finished my own '**network manager**' (called **n0** or **nNull**) using Qt 4.x with a server and a client communicating via dbus. Here are some screenshots:
+
+[[!img media/nnull1.png size=800x caption="netw0rk manager - n0 - dbus client" ]]
+
+[[!img media/nnull2.png size=800x caption="netw0rk manager - n0 - showing the debug console" ]]
+
+[[!img media/nnull3.png size=800x caption="netw0rk manager - n0 - server instance output" ]]
+
+
+I will release the source code along the terms of the GPLv3 in the coming days.
+
+Let's see how it works: similar to the official '**network manager**' there is a tray icon. In the case of '**n0**' or '**nNull**' there is just a collection of scripts listed. These scripts are handwritten by me and usually work great for my setups. If I want to change the wireless network it gets problematic since i have to edit wpa_supplicant.conf or  use **wpa_cli**. Anyway I can live with that. Here is such a script:
+
+
+    #!/bin/bash -v
+    killall dhcpcd
+    if [ -f /var/run/dhcpcd-ath0.pid ]; then
+    rm /var/run/dhcpcd-ath0.pid
+    fi
+    killall wpa_supplicant
+    killall vpnc
+    ifconfig br0 down
+    ifconfig ath0 down
+    ifconfig eth0 down
+    brctl delif br0 ath0
+    brctl delif br0 eth0
+    brctl delbr br0
+    ip l set vbox0 down
+    brctl delbr vbox0
+    brctl addbr vbox0
+    ip l set vbox0 up
+    ip a a 10.0.2.10/24 dev vbox0
+    rmmod ath5k
+    modprobe ath5k
+    #iw reg set DE
+    sleep 1
+    ifconfig ath0 up
+    wpa_supplicant -dd -D wext -i ath0 -c /etc/wpa_supplicant.conf > /root/config/logs/abc-stdout 2> /root/config/logs/abc-stderr &
+    route del default
+    iptables -t nat -A POSTROUTING -o ath0 -j MASQUERADE
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    ethtool -s eth0 speed 100
+    dhcpcd ath0
+    #dhclient ath0
+    cp /etc/resolv.conf /etc/resolv.conf.dnsmasq
+    echo "nameserver 127.0.0.1" > /etc/resolv.conf
+    ifconfig eth0 10.0.0.1/24 up
+    dhcpd eth0
+
+
+The bonus point is that I get a full blown log of the script execution since it uses "#!/bin/bash -v" which is quite verbose. In the near future i might add another debug line to monitor each process started by the network script. This way one could redirect all outputs to the graphical widget with different coloring for example.
+
+I use dbus to execute scripts. For example when I want to connect to one of the two networks I'm frequently using I usually press **Fn+F9** for the first network and **Fn+F10** for the second network. These shortcuts are defined by **/etc/acpi/default.sh** and** **execute this command:
+
+
+    exec qdbus --system de.lastlog.nmInterface /MainApplication executeConfiguration /root/config/internetlab-ath0
+
+
+This way the local '**server backend**' uses dbus to log the output to the attached gui process as seen above. No more '**hidden script**' action. This system is not perfect but it's a good starting point for me for doing further experimentation.

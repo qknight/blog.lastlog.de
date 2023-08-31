@@ -1,0 +1,148 @@
+[[!summary chatGPT: Migrating a Gentoo system from VirtualBox to a libvirt machine running Fedora Core 15 Beta, including problems with image conversion, network and kernel configuration, and virtualbox kernel module building.]]
+[[!meta date="2011-05-20 16:02"]]
+[[!tag gentoo linux packagemanager technology]]
+
+[[!img media/libvirtlogo.png size=150x style="float: right"]]
+# motivation
+
+
+i have a gentoo system inside a virtualbox but i wanted to make some 'long term tests' so i decided to migrate it to a libvirt machine which is running 'fedora core 15 beta'.
+
+
+# problems converting the image
+
+
+first i tried to migrate the 'Gentoo 64 (portage).vdi' directly to a libvirt image, using [2]. but anything i tried: afterwards the image was never bootable so i decided to use ssh to copy all the files instead.
+
+
+
+	
+  1. boot both virtual machines using the '**grml64-mediaum_2010.12.iso**'.
+
+	
+  2. assign the ip addresses
+while i was using on the virtualbox side using: vboxnet0 in a host only networking schema i used a bridge on the other machine which involved lots of manual configuration as: disable networkmanager (on fedora core, remember?), removing the eth0 configuration (which happens to be called em1); adding a new configuration for the bridge br0 (using eth0).
+
+	
+  3. finally i could ping from the virtualbox image to the libvirt guest system
+
+	
+  4. i used '**rsync -av /mnt/gentoo -e ssh 192.168.66.20:/mnt/gentoo**'
+Note: both local gentoo systems were mounted into /mnt/gentoo
+
+	
+  5. but libvirt used a ide host controller (which was very slow)
+therefore i manually removed the ide controller and replaced it by a **VirtIO Disk using 'qcow2' as storage format and 'Virtio' as bus**.
+
+	
+  6. after all the copying i installed grub (grub-1.99rc1) but the original system had a grub1 config!
+the conversion was not simple!
+
+
+
+
+## The grub pitfall
+
+
+virtualbox image using grub1:
+
+
+### cat /boot/grub/menu.lst
+    
+    default 0
+    timeout 30
+    #splashimage=(hd0,0)/boot/grub/splash.xpm.gz
+    
+    title Gentoo Linux 2.6.24-r7
+    root (hd0,0)
+    kernel /boot/kernel-genkernel-x86_64-2.6.36-gentoo-r5  root=/dev/ram0 real_root=/dev/sda1
+    initrd /boot/initramfs-genkernel-x86_64-2.6.36-gentoo-r5
+
+
+in comparison: 'libvirt guest' using grub2
+
+
+### cat /boot/grub/grub.cfg
+    
+    set default=0
+    set timeout=30
+    
+    menuentry "Gentoo Linux 2.6.36-gentoo-r5" {
+            insmod part_msdos
+            insmod ext2
+            set root=(hd0,msdos1)
+            linux /boot/kernel-genkernel-x86_64-2.6.36-gentoo-r5  root=/dev/ram0 real_root=/dev/vda1
+            initrd /boot/initramfs-genkernel-x86_64-2.6.36-gentoo-r5
+    }
+
+
+**Note:** i marked the differences.
+
+**Note:** take care of the different filename as well!
+
+anyway: in the grml shell you can install grub into /dev/vda using:
+
+
+    grub-install --root-directory=/mnt/gentoo /dev/vda
+
+
+
+
+## the kernel configuration pitfall
+
+
+a **libvirt guest** must be aware of **/dev/vda (virtIO)** but my genkernel was not. also i lacked ext4 support. so it is a good idea to included this into the kernel (i had it included as modules but it did not work well).
+
+cat /etc/kernels/kernel-config-x86_64-2.6.36-gentoo-r5 | grep -i virt | grep -v "^#"
+
+    CONFIG_VIRT_TO_BUS=y
+    CONFIG_VIRTIO_BLK=y
+    CONFIG_VIRTIO_NET=y
+    CONFIG_VIRTIO_CONSOLE=y
+    CONFIG_HW_RANDOM_VIRTIO=y
+    CONFIG_VIRTUALIZATION=y
+    CONFIG_VIRTIO=y
+    CONFIG_VIRTIO_RING=y
+    CONFIG_VIRTIO_PCI=y
+    CONFIG_VIRTIO_BALLOON=y
+
+
+just use 'genkernel' to build the new kernel (and don't forget the ext4 support as i did).
+
+
+# fedora core network problems
+
+
+i basically used [3] to make it work. the benefit is now that **em1 is not used** directly but the system uses **br0** to access the internet.
+
+**PRO:** the libvirt guests do get their own 'mac address', thus are separated from being able to see each others traffic.
+
+
+# fedora core yum problems
+
+
+i also tried to install virtualbox and followed the instructions found on virtualbox.org but soon i had the problem that the virtualbox kernel modules won't build and need 'kernel-devel' but after installing the kernel-devel package using 'yum install kernel-devel' **there was a mismatch between 'used kernel' and 'kernel-devel' headers.**
+
+
+# summary
+
+
+libvirt and the 'virtual machine manager' are very nice:
+
+
+
+	
+  * i like that it is so easy to start a virtual machine when the host machine boots.
+  * i also like the 'virtual machine manager' as it **shows cpu/disk io/network io nicely**
+(but that is not limited to libvirt virtualizations).
+  * **fedora core 15 beta** was running quite nicely (except that it crashed while i was writing this article)
+so i can at least say: **it ran for straight 6hours without crash ;P**
+
+
+
+
+# links
+
+* [1] <http://libvirt.org/>
+* [2] <http://blog.loxal.net/2009/04/how-to-convert-vdi-to-vmdk-converting.html>
+* [3] <http://www.howtoforge.com/virtualization-with-kvm-on-a-fedora-11-server>

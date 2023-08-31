@@ -1,0 +1,488 @@
+[[!meta date="2014-04-30 16:33"]]
+[[!summary new ideas for webservice packaging on NixOS]]
+[[!img media/nixos-lores.png alt="" style="float: right"]]
+
+[[!tag nixos linux technology usability containerization webservices]]
+[[!series nixcloud]]
+
+# motivation
+
+NixOS is all about containment. in NixOS practically every program is running in its own environment, seing only the very libraries it requires to work. as a result NixOS uses the dynamic linker very differently as every program more or less behaves like statically linked (expressed by dynamic linking to a very specific and unique path). for programming langues not using the dynamic linker (aka RPATH) there are different methods of containment like using shell scripts which export the PYTHONPATH variable for python script. **while the mentioned containment methods are well established in the NixOS community, doing the same with webservices is not.**
+
+**the focus of this posting is about having multiple seamless webservice(s) on the same NixOS or Nix based host**. it is not about NixOps or Disnix where one could already push several webservices to several hosts on a webservice per host basis. my focus lies on finding a new way how to create isolated, individual environments which work side by side.
+
+in this posting i want to share my thoughts about isolating webservices in the same way and discuss benefits/drawbacks of various approaches. it is also a **followup posting to [1]**. i've held a **talk about declarative webservices [2] at the easterhegg14** but since it was in german here is the english writeup.
+
+[[!img media/advanced-webservices-on-nixos-revisited.jpg style="float: none" width="700px" caption="apache as reverse proxy using vhosts, see [7] to replicate this setup"]]
+
+# warning
+
+<font color="red">
+**please note**: nixos-containers are implemented using **systemd-nspawn** and not LXC containers. the NixOS documentation [5] warns that commands ran as root in a container might damage the host system. they are meant for development currently and not for deployment. i use them for demonstration purpose and if someone wants to use them in production it could be a good idea to implement LXC into NixOS first.
+</font>
+ 
+# new ideas for webservice packaging
+ 
+## approach 1 (what we already have)
+
+
+approach 1 is implemented in [8], where you would use httpd with a **serviceType** like **mediawiki**.  i've described this in detail in [1], so here be only the summary:
+
+* all webservices share a common infrastructure 
+
+    * same httpd
+    * same database (but different tables)
+    * are currenlty fixed to httpd (could be webserver agnostic though)
+
+**note**: this is no news for Nixers but for devs coming from different distributions it indeed is.
+
+### discussion
+
+* **pro**
+
+    * great performance
+    * **everyone can host a complicated webservice with this already (if only packaged well) and i can't stress this point enough!**
+
+* **contra**
+
+   * **until very recently you had to chose between using this httpd abstraction OR nginx OR lighttpd**. using nixos-containers kind of 'fixed' this!
+   * **very unflexible** since these services are not webserver agnostic 
+   * **serviceType**s **are not reflected in the official NixOS documentation, we need to fix that!**
+   * the **auto-updates currently implemented might or might not work** (this is still a bit fuzzy)
+   * users of these services are likely to not understand what is going on behind the scenes
+   * there are no good examples how to make use of the currently packaged **serviceType**s nor are there any unit tests to check if they work (AFAIK) - except for the mediawiki expression which is used on wiki.nixos.org
+
+**example usage of approach 1**: see webservice3 in [7] where i made use of the mediawiki **serviceType**.
+
+## approach 2 (what my easterhegg14 example implements)
+
+how i think webservice composition should be approached:
+
+* **start with an empty environment** like a nixos-container [5] (to get 'full dependencies') where the user has full control over all services and ports
+* **connect all these environments together by a reverse proxy** (or something similar)
+
+    * this is done manually in this example (but should be automated)
+
+* **containment (containers and virtualization) helps to get flexible deployment/hosting**, its primary goal is NOT security
+
+    * **extend nix-docker to make use of this architecture**
+
+### example for 'approach 2' using apache as 'reverse proxy'
+
+let's look at an excerpt from [7]:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.bash .numberLines}
+# for debugging use:
+#   journalctl status httpd.service
+#   journalctl -b -u httpd
+
+# and do not forget to start the containers manually (even the declarative containers)
+#
+# once you did nixos-rebuild switch; 
+# for i in `seq 1 5`; do nixos-container start web$i; done
+# for i in `seq 1 5`; do mkdir -p /var/lib/containers/web$i/webroot/; done
+# for i in `seq 1 5`; do echo "<?php phpinfo(); ?>" > /var/lib/containers/web$i/webroot/index.php; done
+# for i in `seq 1 5`; do echo "hello world from web$i" > /var/lib/containers/web$i/webroot/index.html; done
+
+services.httpd = {
+  enable = true;
+  enableSSL = false;
+  adminAddr = "web0@example.org";
+  virtualHosts =
+  [ 
+    # webservice0 vhost
+    # index.html works, browsing to index.php shows that php is not enabled
+    { 
+      serverAliases = ["webservice0"];
+      documentRoot = "/webroot/";
+      extraConfig = ''
+        <Directory "/webroot/">
+          Options -Indexes
+          AllowOverride None
+          Order allow,deny
+          Allow from all
+        </Directory>
+
+        <IfModule mod_dir.c>
+        DirectoryIndex index.html
+        </IfModule>
+      '';
+    }
+    # webservice1 vhost
+    { 
+      hostName = "webservice1";
+      serverAliases = ["webservice1"];
+      extraConfig = ''
+        # prevent a forward proxy! 
+        ProxyRequests off
+
+        # User-Agent / browser identification is used from the original client
+        ProxyVia Off
+        ProxyPreserveHost On 
+
+        <Proxy *>
+        Order deny,allow
+        Allow from all
+        </Proxy>
+
+        ProxyPass / http://192.168.101.11:80/
+        ProxyPassReverse / http://192.168.101.11:80/
+      '';
+    }
+    ## webservice2 vhost
+    { 
+      hostName = "webservice2";
+      serverAliases = ["webservice2"];
+      extraConfig = ''
+        # prevent a forward proxy! 
+        ProxyRequests off
+
+        # User-Agent / browser identification is used from the original client
+        ProxyVia Off
+        ProxyPreserveHost On 
+
+        <Proxy *>
+        Order deny,allow
+        Allow from all
+        </Proxy>
+
+        ProxyPass / http://192.168.102.11:80/
+        ProxyPassReverse / http://192.168.102.11:80/
+      '';
+    }
+    # webservice3 vhost
+    { 
+      hostName = "webservice3";
+      serverAliases = ["webservice3"];
+      extraConfig = ''
+        # prevent a forward proxy! 
+        ProxyRequests off
+
+        # User-Agent / browser identification is used from the original client
+        ProxyVia Off
+        ProxyPreserveHost On 
+
+        <Proxy *>
+        Order deny,allow
+        Allow from all
+        </Proxy>
+
+        ProxyPass / http://192.168.103.11:80/
+        ProxyPassReverse / http://192.168.103.11:80/
+      '';
+    }
+    # webservice4 vhost
+    { 
+      hostName = "webservice4";
+      serverAliases = ["webservice4"];
+      extraConfig = ''
+        # prevent a forward proxy! 
+        ProxyRequests off
+
+        # User-Agent / browser identification is used from the original client
+        ProxyVia Off
+        ProxyPreserveHost On 
+
+        <Proxy *>
+        Order deny,allow
+        Allow from all
+        </Proxy>
+
+        ProxyPass / http://192.168.104.11:80/
+        ProxyPassReverse / http://192.168.104.11:80/
+      '';
+    }
+    # webservice5 vhost
+    { 
+      hostName = "webservice5";
+      serverAliases = ["webservice5"];
+      extraConfig = ''
+        # prevent a forward proxy! 
+        ProxyRequests off
+
+        # User-Agent / browser identification is used from the original client
+        ProxyVia Off
+        ProxyPreserveHost On 
+
+        <Proxy *>
+        Order deny,allow
+        Allow from all
+        </Proxy>
+
+        ProxyPass / http://192.168.105.11:80/
+        ProxyPassReverse / http://192.168.105.11:80/
+      '';
+    }
+
+  ];
+};
+
+containers.web1 = {
+  privateNetwork = true;
+  hostAddress = "192.168.101.10";
+  localAddress = "192.168.101.11";
+  
+  config = { config, pkgs, ... }: { 
+    networking.firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
+    services.httpd = {
+      enable = true;
+      enableSSL = false;
+      adminAddr = "web1@example.org";
+      documentRoot = "/webroot";
+      # we override the php version for all uses of pkgs.php with this, 
+      #  nix-env -qa --xml | grep php
+      # lists available versions of php
+      extraModules = [
+        { name = "php5"; path = "${pkgs.php}/modules/libphp5.so"; }
+      ];
+    };
+  };
+};
+
+containers.web2 = {
+  privateNetwork = true;
+  hostAddress = "192.168.102.10";
+  localAddress = "192.168.102.11";
+  
+  config = { config, pkgs, ... }: { 
+    # two additional programs are installed in the environment
+    environment.systemPackages = with pkgs; [
+      wget
+      nmap
+    ];
+    networking.firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
+    services.httpd = {
+      enable = true;
+      enableSSL = false;
+      adminAddr = "web2@example.org";
+      documentRoot = "/webroot";
+      extraModules = [
+        # here we are using php-5.3.28 instead of php-5.4.23
+        { name = "php5"; path = "${pkgs.php53}/modules/libphp5.so"; }
+      ];
+    };
+  };
+};
+
+# container with a mediawiki instance
+containers.web3 = {
+  privateNetwork = true;
+  hostAddress = "192.168.103.10";
+  localAddress = "192.168.103.11";
+  
+  config = { config, pkgs, ... }: { 
+    networking.firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
+    services.postgresql = {
+      enable=true;
+      package = pkgs.postgresql92;
+      authentication = pkgs.lib.mkOverride 10 ''
+        local mediawiki all ident map=mwusers
+        local all all ident
+      '';
+      identMap = ''
+        mwusers root   mediawiki
+        mwusers wwwrun mediawiki
+      '';
+    };
+    services.httpd = {
+      enable = true;
+      enableSSL = false;
+      adminAddr = "web3@example.org";
+      documentRoot = "/webroot";
+
+      virtualHosts =
+      [ 
+        {
+          serverAliases = ["webservice3"];
+
+          extraConfig = ''
+            RedirectMatch ^/$ /wiki
+          '';
+          extraSubservices =
+          [
+            {
+              serviceType = "mediawiki";
+              siteName = "webservice3";
+            }
+          ];
+        }
+      ];
+    };
+  };
+};
+
+# lighttpd hello world example
+containers.web4 = {
+  privateNetwork = true;
+  hostAddress = "192.168.104.10";
+  localAddress = "192.168.104.11";
+  config = { config, pkgs, ... }: { 
+    networking.firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
+    services.lighttpd = {
+      enable = true;
+      document-root = "/webroot";
+    };
+  };
+};
+
+# nginx hello world example
+containers.web5 = {
+  privateNetwork = true;
+  hostAddress = "192.168.105.10";
+  localAddress = "192.168.105.11";
+  config = { config, pkgs, ... }: { 
+    networking.firewall = {
+      enable = true;
+      allowedTCPPorts = [ 80 443 ];
+    };
+    services.nginx = {
+      enable = true;
+      config = ''
+        error_log  /webroot/error.log;
+         
+        events {}
+         
+        http {
+          server {
+            access_log /webroot/access.log;
+            listen 80;
+            root /webroot;
+          }
+        }
+      '';
+    };
+  };
+};
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+explanation:
+
+* when you reproduce this setup, look at line **1 to 11** and prepare your nixos-containers
+* **webservice0 can be queried with curl using: "curl http://webservice0"** since the example from [7] will also write to the /etc/hosts file
+* since we need named based resolver here, you might have to modify you /etc/hosts file the same way, if you don't run the webbrowser on the same host you run the reverse-proxy (this was the case for me, since i was using virtualbox for developing this setup)
+* **line 37 to 140** are simple 'reverse proxy' configurations
+* the declarative containers start at 146 with web1 and basically contain a container specific network setup and a firewall configuration as well as service activiations 
+* **line** 193 shows how to change the used php version
+* **line 222 to 245** shows how to make use of **serviceType** named **mediawik** inside a container
+* **line 249** shows a hello world example for lighttpd
+* **line 266** shows a hello world example for nginx
+
+you can use this configuration by copying the needed parts into your own configuration.nix and afterwards run:
+
+    nixos-rebuild switch
+
+**note**: you have to adapt the extraHosts IP address.
+
+then proceed with preparing the nixos-containers as shown in line **1 to 11**
+
+### discussion
+
+* **pro**
+
+    * this would grant more freedom to domain specific language (DSL) webservers like node, mongrel, tomcat (to name a few) 
+    * it integrates the concept of docker in a Nixish way
+    * can be very handy when doing 'destructive' upgrades, since you can copy your container and experiment with the copied instance until you get your update script working. one could also use 'imperative containers' for this...
+
+* **contra**
+
+    * needs more RAM, and occupies more processes
+    * longer startup times
+    * since it is done manually it can be tricky to setup and debug
+
+## approach 3: how this compares to alternatives like docker and nix-docker
+what is the difference between docker and nix-docker:
+
+* **docker on NixOS** is for handling all kinds of docker images
+* **nix-docker** creates a docker image with NixOS inside that image
+
+docker on NixOS already works pretty well. example (**run all commands as root**):
+
+    nix-env -i docker
+    docker -d 
+    
+then on a different shell you can start using docker:
+
+    docker images
+    docker pull ubuntu
+
+and then run something
+
+    docker run -t -i --privileged ubuntu:12.10 bash
+
+docker let's you start webservices [10] from containers, like: 
+
+    docker run -d -p 8080:80 my-site
+
+these ports can obviously be added to the reverse-proxy setup as the internal nixos-containers.
+
+### discussion
+
+* **pro**
+
+    * best level of language level package management (LL-PM) support
+    * many distributions available
+    * very flexible and reproducible configurations with snapshotting
+    * wraps stateful packaging
+
+* **contra**
+
+    * requires a lot of disk space
+    * docker integration in NixOS doesn't start as a system service yet (30.4.2014)
+
+# conclusion
+
+[[!img media/advanced-webservices-on-nixos-revisited2.jpg style="float: none" size=700x caption="when you start using docker, you system will soon look like this..."]]
+
+related to reverse-proxy setup:
+
+* using this reverse-proxy encapsulation isolates webservice packaging nicely
+
+NixOS webservice ideas:
+
+* **all declarative webservices are bound to apache (httpd) currently**
+* **we do not provide good examples how to use them** (in fact, this is also true for nixos servivces in general)
+
+## update 5.5.2014:
+declaratively described webservices can be used without containersi as well. i don't like this since:
+
+* container namespaces make port-usage straight-forward as every mysql instance would be running on the well known mysql port 3306. 
+
+please see [11] where zef hemel did discuss this already. 
+
+# thanks
+
+thanks to: 
+
+* the **shack/CCC** staff for having me at easterhegg14!
+* **goibhniu**  for all the help with debugging the mediawiki expression and writing the wiki.nixos.org documentation!
+* **niksnut**  for creating nixos-containers!
+* **donnie berkholz**  (former gentoo dev) for his talk at fosdem14 titled "is distribution-level package management obsolete?"
+* **zef hemel** for creating nix-docker and also by providing the wordpress example [9]
+
+
+
+# links
+* [1] <http://blog.lastlog.de/posts/advanced_webservices_on_nixos/>
+* [2] <http://media.ccc.de/browse/conferences/eh2014/EH2014_-_5752_-_de_-_degerloch_-_201404201445_-_deklarativ_webservices_unter_nixos_beschreiben_-_joachim_schiele.html>
+* [3] <http://lastlog.de/misc/easterhegg2014-docker-nix-container.svg>
+* [4] <https://nixos.org/wiki/Setting_up_MediaWiki_%26_vhosts>
+* [5] <http://hydra.nixos.org/build/10339703/download/2/nixos/manual.html#ch-containers>
+* [6] <https://github.com/NixOS/nixos-org-configurations/blob/master/nixos-org/webserver.nix> 
+* [7] <https://github.com/qknight/nixos-declarative-containers-example/blob/master/configuration.nix>
+* [8] <https://github.com/NixOS/nixpkgs/blob/29027fd1e12461fc5ff5722bea79df7ff4299599/nixos/modules/services/web-servers/apache-httpd/mediawiki.nix>
+* [9] <http://zef.me/6079/deploying-wordpress-using-nix-docker>
+* [10] <http://www.kstaken.com/blog/2013/07/06/how-to-run-apache-under-docker/>
+* [11] <http://www.infoq.com/articles/docker-containers>

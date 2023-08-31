@@ -1,0 +1,82 @@
+[[!summary chatGPT: Using Meld to resolve conflicts while merging in SVN by configuring .subversion/config and /root/.meld.]]
+[[!meta date="2012-05-21 23:14"]]
+[[!tag linux nixos usability]]
+
+[[!img media/nixos-lores.png style="float: right" alt=""]]
+
+this has been discussed on many blogs but since i had this issue twice now and especially since svn changed the parameter list and therefore many pages describing this are thus wrong, here it is again. also nobody seems to implement the workflow i like, that is:
+
+
+  * on the left side is the file to be edited
+  * on the right side is the new version (this file is only important while merging)
+
+
+[[!img media/meld_in_svn.png alt="" style="float: right" size=700x style="float: none" caption="meld on nixos"]]
+
+
+
+
+**workflow:** what ~/.meld does is to give you **MINE** and **THEIRS** for merging into MINE (MINE is the left side document). after the merge it would copy the modified **MINE** over **MERGED**. and once the conflict is marked '**resolved**' all the different files will vanish and leave a working set of files.
+
+
+
+
+# .subversion/config
+
+
+    merge-tool-cmd = /root/.meld
+
+
+# /root/.meld
+
+
+    #!/bin/sh
+    ### the specified command: base theirs mine merged wcfile
+    /nix/var/nix/profiles/default/bin/meld $3 $2
+    # this cp copies mine to merged
+    cp $3 $4
+    exit 0
+
+afterwards don't forget to make it executable & install meld of course:
+
+    chmod u+x .meld
+    nix-env -i meld
+
+the merge:
+
+    svn up
+    Updating '.':
+    A pkgs/applications/misc/gnome_terminator
+    A pkgs/applications/misc/gnome_terminator/default.nix
+    U pkgs/applications/version-management/git-and-tools/svn2git-kde/default.nix
+    A pkgs/applications/graphics/zgrviewer
+    A pkgs/applications/graphics/zgrviewer/default.nix
+    U pkgs/applications/audio/audacious/default.nix
+    U pkgs/applications/audio/yoshimi/default.nix
+    U pkgs/lib/platforms.nix
+    G pkgs/top-level/all-packages.nix
+    U pkgs/top-level/haskell-defaults.nix
+    
+    Conflict discovered in '/etc/nixos/nixpkgs/pkgs/top-level/python-packages.nix'.
+    Select: (p) postpone, (df) diff-full, (e) edit,
+     (mc) mine-conflict, (tc) theirs-conflict,
+     (s) show all options: <strong>l</strong>
+
+
+
+	
+  1. type '**l**' (like **l**inux) on the keyboard
+
+	
+  2. on the left side is the file you want to patch, so make changes to the left side and save the document
+
+	
+  3. now close meld
+
+	
+  4. back on the shell, type '**r**' (for **r**esolved)
+
+	
+  5. continue with other conflicts
+
+

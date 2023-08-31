@@ -1,0 +1,403 @@
+[[!meta date="2013-03-08 17:58"]]
+[[!tag shinken linux security]]
+[[!img media/shinken.png alt="copied from shinken-monitoring.org" style="float: right"]]
+[[!series shinken]]
+[[!summary shinken with impact graph and ICMP]]
+
+# motivation
+
+in this posting i want to enhance the shinken usage with a few fixes
+
+
+## writing custom service checks for shinken
+
+there exsists a nice documentation for nagios [1] already. i didn't find much in the shinken wiki, so here is what i did.
+
+### the test script in /usr/local/shinken/libexec/check_test
+
+
+    #! /bin/bash
+    #
+    # js@lastlog.de
+    # 05/03/2013
+    #
+    #  This Nagios test plugin was created to demonstrate how it is integrated into shinken
+    #
+    
+    PROGNAME=`basename $0`
+    PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+    REVISION="0.0.1"
+    
+    . $PROGPATH/utils.sh
+    
+    print_usage() {
+      echo "Usage:"
+      echo "  $PROGNAME --help"
+      echo "  $PROGNAME --test"
+      echo "  $PROGNAME --version"
+    }
+    
+    print_help() {
+      print_revision $PROGNAME $REVISION
+      echo ""
+      print_usage
+      echo ""
+      echo "Nagios test plugin"
+      echo ""
+      echo "--test"
+      echo "   Perform a test; in this implementation it either returns: STATE_OK, STATE_CRITICAL, STATE_WARNING or STATE_UNKNOWN "
+      echo "--help"
+      echo "   Print this help screen"
+      echo "--version"
+      echo "   Print version and license information"
+      echo ""
+      support
+    }
+    
+    # Information options
+    case "$1" in
+    --help)
+                    print_help
+        exit $STATE_OK
+        ;;
+    -h)
+                    print_help
+        exit $STATE_OK
+        ;;
+    --version)
+                    print_revision $PROGNAME $REVISION
+        exit $STATE_OK
+        ;;
+    -V)
+                    print_revision $PROGNAME $REVISION
+        exit $STATE_OK
+        ;;
+    --test)
+        # STATE_OK
+        # STATE_WARNING
+        # STATE_CRITICAL
+        # STATE_UNKNOWN
+        # STATE_DEPENDENT
+        # $(($RANDOM%3))
+        case $(($RANDOM%5)) in
+          0)
+              echo "STATE_OK - $(date)"
+              exit $STATE_OK
+          ;;
+          1)
+              echo "STATE_WARNING - $(date)"
+              exit $STATE_WARNING
+          ;;
+          2)
+              echo "STATE_CRITICAL - $(date)"
+              exit $STATE_CRITICAL
+          ;;
+          3)
+              echo "STATE_DEPENDENT - $(date)"
+              exit $STATE_DEPENDENT
+          ;;
+          *)
+              echo "STATE_UNKNOWN - $(date)"
+              exit $STATE_UNKNOWN
+          ;;
+        esac
+        ;;
+    *)
+        print_usage
+        exit $STATE_UNKNOWN
+    esac
+
+also check:
+
+    chown shinken:shinken check_test 
+    chmod 0755 check_test 
+
+execute it on a shell, it should return:
+
+    root@monitoring-vm:/usr/local/shinken/libexec# ./check_test --test
+    STATE_CRITICAL - Thu Mar  7 12:34:19 CET 2013
+    root@monitoring-vm:/usr/local/shinken/libexec# ./check_test --test
+    STATE_WARNING - Thu Mar  7 12:44:23 CET 2013
+    root@monitoring-vm:/usr/local/shinken/libexec# ./check_test --test
+    STATE_UNKNOWN - Thu Mar  7 12:44:23 CET 2013
+    root@monitoring-vm:/usr/local/shinken/libexec# ./check_test --test
+    STATE_DEPENDENT - Thu Mar  7 12:44:24 CET 2013
+    root@monitoring-vm:/usr/local/shinken/libexec# ./check_test --test
+    STATE_OK - Thu Mar  7 12:44:25 CET 2013
+    root@monitoring-vm:/usr/local/shinken/libexec# ./check_test --test
+    STATE_WARNING - Thu Mar  7 12:44:26 CET 2013
+
+### /usr/local/shinken/etc/commands.cfg
+
+append this to commands.cfg
+
+    define command {
+        command_name    check_test
+        command_line    $PLUGINSDIR$/check_test $ARG1$
+    }
+
+### /usr/local/shinken/etc/services/services.cfg
+
+    define service{
+           use generic-service
+           service_description CustomTest
+           host_name lastlog.de
+           check_command check_test!"--test"
+    }
+
+**note:** use generic-service means that our custom service **inherits all attributes from the template generic-service** defined in **/usr/local/shinken/etc/templates.cfg**
+
+### testing the new rules
+
+ 1. restart shinken to test if the new rules work in case of an configuration error, shinken will bail out with:
+
+        /etc/init.d/shinken restart
+        Doing config check
+         * full result is in /tmp/shinken_checkconfig_result
+         * ConfigCheck failed: Configuration is incorrect, sorry, I bail out
+           ...fail!
+
+ 2. have a look at the webinterface, for every test invocation the status is very likely to change between: STATE_OK, STATE_CRITICAL, STATE_WARNING or STATE_UNKNOWN
+
+### shinken webinterface checks
+if everything is working you should see something like this:
+
+[[!img media/shinken1.jpeg]]
+
+**note:** [4] might be a good introduction into advanced dependencies of service checks!
+
+**thanks for the help to Issif#shinken@irc.freenode.net** and [1]
+
+## using thruk with shinken
+deploy thruk [3] and disable shinken webinterface
+
+### installation
+
+    wget http://www.thruk.org/files/pkg/v1.64-2/ubuntu12.10/amd64/thruk_1.64-2_ubuntu12.10_amd64.deb
+    dpkg -i thruk_1.64-2_ubuntu12.10_amd64.deb
+    apt-get -f install    # as listed in the manual at [5]
+
+###  enable livestatus for shinken
+
+shinken has livestatus (127.0.0.1:50000, a python process) already enabled by default. so we need to edit thruk_local.cfg
+
+    netstat -tulpen
+    ...
+    tcp        0      0 0.0.0.0:50000           0.0.0.0:*               LISTEN      999        35960       6918/python
+
+#### /etc/thruk/thruk_local.cfg
+
+ 1. before making this change i had this problem:
+
+        less /var/log/apache2/error.log
+        ...
+        [Thu Mar 07 15:03:35 2013] [notice] child pid 17670 exit signal Segmentation fault (11)
+        [Thu Mar 07 15:03:35 2013] [notice] child pid 17671 exit signal Segmentation fault (11)
+        [Thu Mar 07 15:03:35 2013] [notice] child pid 17672 exit signal Segmentation fault (11)
+        [Thu Mar 07 15:03:35 2013] [notice] child pid 17673 exit signal Segmentation fault (11)
+        ...
+
+ 2. this few lines need to be uncommented (so remove all the # symbols)
+
+        ############################################
+        # put your own settings into this file
+        # settings from this file will override
+        # those from the thruk.conf
+        ############################################
+        
+        ######################################
+        # Backend Configuration, enter your backends here
+        <Component Thruk::Backend>
+            <peer>
+                name   = External Shinken
+                type   = livestatus
+                <options>
+                    peer    = 127.0.0.1:50000
+               </options>
+            </peer>
+        </Component>
+
+ 3. restart thruk and apache2
+
+        /etc/init.d/thruk restart
+        /etc/init.d/apache2 restart
+
+ 4. finally visit: <http://localhost/thruk>: **user thrukadmin** with **password thrukadmin**
+
+#### make thruk work with RRD pnp4nagios graphs
+
+to make this work i used some parts of the documentation [7] but it it required some serious debugging and my current result looks different to what can be found on <http://demo.thruk.org>.
+
+ 1. basically **append the action_url to the generic-service record in the templates.cfg** file as shown below:
+
+        # Generic service definition template - This is NOT a real service, just a template!
+        define service{
+             name                            generic-service         ; The 'name' of this service template
+             active_checks_enabled           1                       ; Active service checks are enabled
+             passive_checks_enabled          1                       ; Passive service checks are enabled/accepted
+        
+             # Check part
+             # By default, there is no check_command here
+             check_interval           5                      ; Check the service every 5 minutes in normal state
+             retry_interval           1                      ; Re-check the service every one minutes until a hard state can be determined
+             max_check_attempts       2                      ; Re-check the service up to 3 times in order to determine its final (hard) state
+             check_period             24x7                   ; The service can be checked at any time of the day
+        
+             # Notification part
+             notifications_enabled           1                       ; Service notifications are enabled
+             notification_options            w,u,c,r                 ; Send notifications about warning, unknown, critical, and recovery events
+             notification_interval           60                      ; Re-notify about service problems every hour
+             notification_period             24x7
+             # If the contacts and contact_groups options are not set, it will notify host contacts instead
+             # contact_groups                  admins
+        
+             # Advanced options. Change with care
+             #event_handler_enabled           1
+             # event_handler                 super_event_kill_everyone!DIE
+             flap_detection_enabled          1                       ; Flap detection is enabled
+             check_freshness                 0
+             freshness_threshold             3600
+             #stalking_options                w,c
+             obsess_over_service             0
+             #escalations                    ToLevel2
+             process_perf_data               1                       ; Process perf data, like for PNP
+             is_volatile                     0                       ; for log monitoring. See doc for more info about it
+        
+             # For the WebUI
+             icon_set                         server ; can be database, disk, network_service, server
+        
+             register                        0
+             action_url /pnp4nagios/graph?host=$HOSTNAME$&srv=$SERVICEDESC$' class='tips' rel='/pnp4nagios/index.php/popup?host=$HOSTNAME$&srv=$SERVICEDESC$
+             }
+
+ 2.  i also made **both NPCDMOD** changes both in **shinken-specific.cfg**. 
+
+#### results
+
+[[!img media/shinken2.jpeg caption="HttpsCertificate produces no graph and leaves me with an error - 'sorry the content could not be loaded'"]]
+
+
+[[!img media/shinken3.jpeg caption="for other services it looks well! - except the tooltip ;P"]]
+
+
+[[!img media/shinken4.jpeg size=500x caption="the mobile interface with RRD graphs!"]]
+
+
+#### security
+
+ 1. change the password for user thrukadmin 
+
+ 2. pnp4nagios uses a password, make thruk aware of that, see pnp_export in [6]
+
+ 3. disable the shinken webinterface in **/usr/local/shinken/etc/shinken-specific.cfg**
+
+    1. just remove the WebUI from the modules list below
+
+           define broker {
+             broker_name broker-1
+             data_timeout 120
+             check_interval 60
+             modules Livestatus, WebUI, Simple-log, NPCDMOD
+             port 7772
+             manage_sub_realms 1
+             spare 0
+             timeout 3
+             address localhost
+             realm All
+             max_check_attempts 3
+             manage_arbiters 1
+           }
+
+    2. restart shinken
+
+           /etc/init.d/shinken restart
+
+    3. verify that the webinterface is not there anymore: <http://localhost:7767>
+
+
+#### resources needed
+
+it seems that thruk is quite memory hungry. in my current setup (13 hosts / 25 services) about 1gb ram minimum is required.
+
+## proxy shinken webinterface via vhost through apache2
+put shinken webservice (port 7767) behind apache vhosts, thus setup a proxy to make the webservice available via port 80 orr 443, see [2]
+and even better [8] and [9].
+
+### modify default vhost in /etc/apache2/sites-available/default
+
+i've added these lines to the configuration file:
+
+        ...
+        # prevent a forward proxy! 
+        ProxyRequests off
+
+        # User-Agent / browser identification is used from the original client
+        # shinken will then return either the mobile or desktop version of the webpage!
+        ProxyVia Off
+        ProxyPreserveHost On 
+
+        # since on ubuntu it is disabled by default, we have to reenable it here
+        # i don't want to touch /etc/apache2/mods-enabled/proxy.conf
+        <Proxy *>
+        Order deny,allow
+        Allow from all
+        </Proxy>
+
+        # prevent pnp4nagios from being reverse-proxied
+        ProxyPass /pnp4nagios !
+        ProxyPass / http://localhost:7767/
+        ProxyPassReverse / http://localhost:7767/
+    
+    </VirtualHost>
+
+### security
+as outlined in [10] i think this configuration should be safe as **it does not create an open forward proxy** since there is **ProxyRequests off** configured. also the reverse proxy is configured to access **only** http://localhost:7767/.
+
+this can be verified by this commands:
+
+    tcpdump src host 1.2.3.4 and dst port 80
+
+first start telnet
+
+    telnet localhost 80
+
+then issue this get (hit return 2 times): **GET http://www.google.com HTTP/1.0**
+
+this is the trace:
+
+    # telnet localhost 80
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    GET http://www.google.com HTTP/1.0
+     
+    HTTP/1.1 303 See Other
+    Date: Sat, 09 Mar 2013 23:35:11 GMT
+    Server: PasteWSGIServer/0.5 Python/2.6.5
+    Content-Length: 0
+    Content-Type: text/html; charset=UTF-8
+    Location: http://www.google.com/user/login
+    Vary: Accept-Encoding
+    Connection: close
+     
+    Connection closed by foreign host.
+
+
+**note:** **there MUST BE no output in the tcpdump shell**! i did enable **ProxyRequests on** for a short test, and then after restarting apache you actually have an open forward proxy which will cause much trouble! for the same request to google one will get a lot of traffic in the tcpdump command then.
+
+
+**thanks VERY MUCH to konkat, Unbelieve and Humbedooh** from httpd#irc.freenode.org!
+
+**note:** one thing that i still don't understand is that konkat got **HTTP/1.1 403 Forbidden** where i get a **HTTP/1.1 303 See Other**.
+
+
+#links
+* [1] <http://community.spiceworks.com/how_to/show/3773-creating-custom-nagios-plugins-scripts-in-bash>
+* [2] <http://www.shinken-monitoring.org/forum/index.php?topic=192.0>
+* [3] <http://www.thruk.org/documentation.html>
+* [4] <http://www.shinken-monitoring.org/wiki/setup_advanced_dependencies_in_shinken>
+* [6] <http://www.thruk.org/documentation.html#_installation>
+* [7] <http://www.shinken-monitoring.org/wiki/use_with_pnp>
+* [8] <http://adolfomaltez.wordpress.com/2011/05/27/apache-as-a-reverse-proxy/>
+* [9] <http://andriigrytsenko.net/2011/02/apache-as-reverse-proxy-for-https-server/>
+* [10] <http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#access>

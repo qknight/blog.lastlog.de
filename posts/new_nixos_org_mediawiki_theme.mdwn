@@ -1,0 +1,66 @@
+[[!summary chatGPT: The author discusses their experience creating a custom mediawiki theme for muse-sequencer.org, highlighting the importance of integrating the main navigation menu for usability and aesthetics. They also mention the ease of adding external and internal links in mediawiki, and recommend using CSS and tools like Firefox+Firebug for web development.]]
+[[!meta date="2011-06-20 10:29"]]
+[[!tag taspring usability visualization]]
+
+# the wiki.nixos.org mediawiki theme
+
+
+for some time i am hosting muse-sequencer.org with a mediawiki but i never was able to design a nice custom layout like it is done on spring RTS [1] for example. however, i often use the 'clean' theme which looks much better than the standard mediawiki theme.
+
+anyway, there are times when you need a 'custom theme', especially when you have to integrate a custom menu bar (as shown in the top part of the nixos-wiki-theme screenshot below). the advantage is that the wiki page feels 'integrated' into the page and especially as the top level menubar helps to navigate the site it can be used to get out of the wiki again.
+
+**therefore, not integrating the main navigation menu into the wiki stylesheet causes a huge hit on usability as users have to alter the URL filed in order to get back to the other pages.** **and the wiki not looking like the rest of the pages also degrades the look and feel.**
+
+[[!img media/nixos_mediawiki_theme.png size=600x]] 
+
+
+for quite some time i did not want to learn that much CSS and php/html but lately the integration of wiki.nixos.org into the nixos.org domain made me think otherwise and so i started to hack a new stylesheet [2] based on the 'clean' skin [3] i already debugged for my page 'lastlog.de'.
+
+**i needed about 9hours** to make the design final and **i would like to thank zmlka@irc.freenode.net#nixos for his help and fine tuning**!  **i would also like to thank viric**@irc.freenode.net#nixos**** for his general attributions towards a nice mediawiki.nix modification which makes it easy to handle several third party mediawiki stylesheets. i might upload these modifications upstream (nixpkgs) soon - if i find the time.
+
+i hope nixos.org folks will use the new style soon!
+
+
+# external and internal links
+
+
+one nice thing i discovered while creating the nixos mediawiki theme was that it is very easy to add external links. i always thought this to be very complicated.
+
+the nixos-mediawiki-theme does have two menues: a top level menu (header) and a bottom menu (footer). i used **require_once(..),** which is a **php command**, to include 'header.php' and 'footer.php'.
+
+this way the style can be extended without having to touch the the style. this is especially nice as nixos wants a stateless packages and one can set the 'links' from the /etc/nixos/configuration.nix context.
+
+another nice thing is that it is very easy to add 'internal' links, that means: the menu generated from 'header.php' can be used to add links which will also end in the mediawiki:
+
+this will create an external link:
+
+
+
+	
+    <li><a href="http://nixos.org/nixos/">NixOS</a></li>
+
+
+this will create an internal link
+
+	
+    <li><a href="demo">Demo</a></li>
+
+
+
+
+# conclusion
+
+
+although it was very time consuming for me to write this stylesheet (except for my 'ajax patterns' [4] project i've never done that before) i learned quite much about stylesheets, thus i encourage you to do the same for your page. soon i will write a little guide how to do that in more detail.
+
+**it is also worth mentioning that CSS can be used to make the content 100% independent of the position in the page but contrary to all my expectations this might not be a default for most pages**.
+
+i would also like to **recommend firefox+firebug** as this helps to analyze css/html errors and also helps to make experimental modifications on the fly!
+
+
+# links
+
+* [1] <https://springrts.com>
+* [2] <https://github.com/qknight/nixos>
+* [3] <https://github.com/qknight/clean>
+* [4] <http://lastlog.de/wiki/index.php/Ajax_patterns>

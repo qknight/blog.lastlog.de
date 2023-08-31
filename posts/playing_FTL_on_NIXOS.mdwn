@@ -1,0 +1,602 @@
+[[!meta date="2015-04-13 03:58"]]
+[[!tag nixos FTL patchelf linux usability]]
+[[!summary FTL game tweaks for nixos, patchelf]]
+[[!img media/nixos-lores.png alt="" style="float: right" caption="" class="noFancy"]]
+
+# motivation
+this posting is about how to **get a binary only x86/amd64 game called FTL [1] on nixos**. the problem to solve is how to tell the game the proper library locations in the /nix/store!
+
+[[!img media/ftl.jpg alt="" caption=""]]
+
+
+# how to make it work
+in order to get the FTL binary to work, you can do either of these possibilities:
+
+* use patchelf without any use of a .nix expression (ad-hoc solution, very hacky)
+* use LD_LIBRARY_PATH (ad-hoc solution, very hacky)
+* use patchelf from a .nix expression (recommended solution)
+
+with this posting i want to document all three solutions for FTL.
+
+## fixing binaries
+
+i've been using FTL FTL.1.5.13.tar.gz and i extract it like this:
+
+    $ tar xzf FTL.1.5.13.tar.gz
+
+the archive contains:
+
+    $ du -a FTL
+    216         FTL/data/amd64/lib/libILU.so.1
+    1280        FTL/data/amd64/lib/libIL.so.1
+    224         FTL/data/amd64/lib/libbass.so
+    2200        FTL/data/amd64/lib/libfreetype.so.6
+    100         FTL/data/amd64/lib/libz.so.1
+    40          FTL/data/amd64/lib/libbassmix.so
+    528         FTL/data/amd64/lib/libpng12.so.0
+    56          FTL/data/amd64/lib/libILUT.so.1
+    2104        FTL/data/amd64/lib/libSDL-1.2.so.0
+    6752        FTL/data/amd64/lib
+    216         FTL/data/amd64/bin/libILU.so.1
+    1280        FTL/data/amd64/bin/libIL.so.1
+    224         FTL/data/amd64/bin/libbass.so
+    2200        FTL/data/amd64/bin/libfreetype.so.6
+    100         FTL/data/amd64/bin/libz.so.1
+    40          FTL/data/amd64/bin/libbassmix.so
+    528         FTL/data/amd64/bin/libpng12.so.0
+    56          FTL/data/amd64/bin/libILUT.so.1
+    2104        FTL/data/amd64/bin/libSDL-1.2.so.0
+    3500        FTL/data/amd64/bin/FTL
+    10252       FTL/data/amd64/bin
+    17008       FTL/data/amd64
+    196548      FTL/data/resources/resource.dat
+    1480        FTL/data/resources/data.dat
+    4           FTL/data/resources/exe_icon.bmp
+    198036      FTL/data/resources
+    180         FTL/data/x86/lib/libILU.so.1
+    1032        FTL/data/x86/lib/libIL.so.1
+    212         FTL/data/x86/lib/libbass.so
+    1792        FTL/data/x86/lib/libfreetype.so.6
+    96          FTL/data/x86/lib/libz.so.1
+    36          FTL/data/x86/lib/libbassmix.so
+    456         FTL/data/x86/lib/libpng12.so.0
+    48          FTL/data/x86/lib/libILUT.so.1
+    1856        FTL/data/x86/lib/libSDL-1.2.so.0
+    5712        FTL/data/x86/lib
+    3396        FTL/data/x86/bin/FTL
+    3400        FTL/data/x86/bin
+    9116        FTL/data/x86
+    28          FTL/data/licenses/LGPL.txt
+    4           FTL/data/licenses/README-RapidXML.txt
+    4           FTL/data/licenses/README-zlib.txt
+    4           FTL/data/licenses/README-SDL.txt
+    8           FTL/data/licenses/README-FreeType.txt
+    4           FTL/data/licenses/README-DevIL.txt
+    56          FTL/data/licenses
+    20          FTL/data/exe_icon.bmp
+    4           FTL/data/FTL
+    224244      FTL/data
+    12          FTL/FTL_README.html
+    4           FTL/FTL
+    224264      FTL
+
+FTL/FTL is a bash script, we skip it and check the FTL/data/amd64/bin/FTL binary:
+
+    $ file FTL/data/amd64/bin/FTL
+    FTL: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.8, stripped
+
+which looks good, now let's execute it:
+
+    $ FTL/data/amd64/bin/./FTL
+    zsh: no such file or directory: ./FTL
+
+note: this error message is not very helpful!
+
+let's have a look at the FTL/data/amd64/bin/FTL ELF part (interpreter and RPATH):
+
+    $ patchelf --print-interpreter FTL/data/amd64/bin/FTL
+    /lib64/ld-linux-x86-64.so.2
+
+    $ patchelf --print-rpath FTL/data/amd64/bin/FTL
+    (empty output)
+
+'/lib64/ld-linux-x86-64.so.2' won't be running on nixos, so let's find a proper interpreter:
+
+    $ du -a /nix/store | grep ld-linux-x86-64.so.2
+    0       /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/ld-linux-x86-64.so.2
+    0       /nix/store/94n64qy99ja0vgbkf675nyk39g9b978n-glibc-2.19/lib/ld-linux-x86-64.so.2
+    0       /nix/store/i11d0d4015p0vbdnjq7lb509v9pwp049-glibc-2.19/lib/ld-linux-x86-64.so.2
+    0       /nix/store/cj7a81wsm1ijwwpkks3725661h3263p5-glibc-2.13/lib/ld-linux-x86-64.so.2
+    4       /nix/store/kp4m5d52ljhb2fyxvnm6jgkbaf3hkdkv-glibc-multi-2.20/lib/ld-linux-x86-64.so.2
+    0       /nix/store/la5imi1602jxhpds9675n2n2d0683lbq-glibc-2.20/lib/ld-linux-x86-64.so.2
+    144     /nix/store/gakif09g14jybn6vkgnzb0kn46kqg1w6-extra-utils/lib/ld-linux-x86-64.so.2
+    4       /nix/store/g9y2f5awcw9jdgirlv7163k3g5hjak0a-system-path/lib/ld-linux-x86-64.so.2
+    0       /nix/store/nrxyygy0wqski1klq0305d3h523k41ps-glibc-2.20/lib/ld-linux-x86-64.so.2
+    0       /nix/store/zm4bhsm8lprkzvrjgqr0klfkvr21als4-glibc-2.17/lib/ld-linux-x86-64.so.2
+    0       /nix/store/c8lg3m5mr246fvlx6xsrxa0sykv4l9pg-bootstrap-tools/lib/ld-linux-x86-64.so.2
+    0       /nix/store/ywxpkmy9kagcsvbjjhi46pr4xwpd6sfm-glibc-2.19/lib/ld-linux-x86-64.so.2
+    0       /nix/store/r2nzgy23qzfn273n9mbqngyidm05670f-glibc-2.19/lib/ld-linux-x86-64.so.2
+    4       /nix/store/i4bqvffrh47rlbc42dkqhzgmrw40zfvy-system-path/lib/ld-linux-x86-64.so.2
+    4       /nix/store/qdd4ypr32j1d373779ggnqqmgqm29xyb-system-path/lib/ld-linux-x86-64.so.2
+    4       /nix/store/vi4r0vw7jipwzfxhrqghzny74jsgxv5c-system-path/lib/ld-linux-x86-64.so.2
+    0       /nix/store/pdskwizjw8ar31hql2wjnnx6g0s6xc50-glibc-2.19/lib/ld-linux-x86-64.so.2
+    0       /nix/store/7yvf54nxwmaslcgyqfghqsqr1dwmr8ld-glibc-2.20/lib/ld-linux-x86-64.so.2
+    4       /nix/store/ggz4x9azga18bs2n2n5ap9qq1m088694-system-path/lib/ld-linux-x86-64.so.2
+    0       /nix/store/k0vqprjmxybr7clvfljk13zsdjwklcch-bootstrap-tools/lib/ld-linux-x86-64.so.2
+    0       /nix/store/q784x64hp3nwdxx7lbgb16f74i2bhxxk-glibc-2.18/lib/ld-linux-x86-64.so.2
+    0       /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2
+    144     /nix/store/nvxln8cf8aprddpvz5zpx8xgn34w9mz3-extra-utils/lib/ld-linux-x86-64.so.2
+    4       /nix/store/5rr3d51im48n5y3sx0kr9l61z0b9i5bs-system-path/lib/ld-linux-x86-64.so.2
+    0       /nix/store/6k9z1sfl7kghmagwd205k3i81pbcw57s-glibc-2.21/lib/ld-linux-x86-64.so.2
+
+now just pick a 'random' one and issue:
+
+    $ patchelf --set-interpreter /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2 FTL/data/amd64/bin/FTL
+
+and run it again:
+
+    $ FTL/data/amd64/bin/FTL
+    ./FTL: error while loading shared libraries: libGL.so.1: cannot open shared object file: No such file or directory
+
+looks much better now, let's see the library (DSOs - dynamic shared objects) status:
+
+    $ ldd FTL/data/amd64/bin/FTL
+        linux-vdso.so.1 (0x00007fff495e2000)
+        libSDL-1.2.so.0 => ../lib/libSDL-1.2.so.0 (0x00007f7d2cdc5000)
+        libGL.so.1 => not found
+        libfreetype.so.6 => ../lib/libfreetype.so.6 (0x00007f7d2cb42000)
+        libIL.so.1 => ../lib/libIL.so.1 (0x00007f7d2c827000)
+        libILU.so.1 => ../lib/libILU.so.1 (0x00007f7d2c612000)
+        libILUT.so.1 => ../lib/libILUT.so.1 (0x00007f7d2c40c000)
+        libbass.so => ../lib/libbass.so (0x00007f7d2d127000)
+        libbassmix.so => ../lib/libbassmix.so (0x00007f7d2c303000)
+        librt.so.1 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/librt.so.1 (0x00007f7d2c0fb000)
+        libstdc++.so.6 => not found
+        libm.so.6 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libm.so.6 (0x00007f7d2bdf8000)
+        libc.so.6 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6 (0x00007f7d2ba49000)
+        libpthread.so.0 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libpthread.so.0 (0x00007f7d2b82b000)
+        libdl.so.2 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libdl.so.2 (0x00007f7d2b627000)
+        libpng12.so.0 => ../lib/libpng12.so.0 (0x00007f7d2b402000)
+        /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2 (0x00007f7d2d056000)
+        libstdc++.so.6 => not found
+        libgcc_s.so.1 => not found
+        libGLU.so.1 => not found
+        libGL.so.1 => not found
+        libz.so.1 => ../lib/libz.so.1 (0x00007f7d2b1ec000)
+
+wonderful, so all the libraries coming with FTL are already in the RPATH of the binary (as libSDL-1.2.so.0, ...), so we have to find the missing ones:
+
+TODO: patchelf for these libraries:
+
+* libGL.so.1
+* libstdc++.so.6
+* libstdc++.so.6
+* libgcc_s.so.1
+* libGLU.so.1
+
+again, use this command to find candidates:
+
+    $ du -a /nix/store | grep libGL.so.1
+
+note: DSOs might introduce other DSOs and thus you might have to add even more libraries than shown here. hint: later we are about to find out that we require libasound.so which is not listed just yet!
+
+and again, pick one:
+
+i picked this one: /nix/store/0sgyyrml3j55nx4mmb3v099n7g1fidr4-mesa-10.2.9/lib/libGL.so.1
+
+so the command goes like this:
+
+    $ patchelf --set-rpath FTL/data/amd64/lib:/nix/store/0sgyyrml3j55nx4mmb3v099n7g1fidr4-mesa-10.2.9/lib/ FTL/data/amd64/bin/FTL
+
+note: FTL/data/amd64/lib contains the bundled libraries! you should run 'patchelf --set-rpath' from the location you want to start the binary later on. in case of FTL this would be 'FTL/' but in this example i was using the parent directory of 'FTL/'. also note that you can set the RPATH to an absolute directory which is good until you move the FTL program into a different location or use relative path names which is good until you decided to run the program from any other directory as the one you issued the 'patchelf --set-rpath' from. *sigh*
+
+and afterwards the ldd output has changed a lot:
+
+    $ ldd FTL/data/amd64/bin/FTL
+        linux-vdso.so.1 (0x00007fff04dcd000)
+        libSDL-1.2.so.0 => FTL/data/amd64/lib/libSDL-1.2.so.0 (0x00007f512a1c8000)
+        libGL.so.1 => /nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/libGL.so.1 (0x00007f5129f3c000)
+        libfreetype.so.6 => FTL/data/amd64/lib/libfreetype.so.6 (0x00007f5129cb9000)
+        libIL.so.1 => FTL/data/amd64/lib/libIL.so.1 (0x00007f512999e000)
+        libILU.so.1 => FTL/data/amd64/lib/libILU.so.1 (0x00007f5129788000)
+        libILUT.so.1 => FTL/data/amd64/lib/libILUT.so.1 (0x00007f5129582000)
+        libbass.so => FTL/data/amd64/lib/libbass.so (0x00007f512a52a000)
+        libbassmix.so => FTL/data/amd64/lib/libbassmix.so (0x00007f5129479000)
+        librt.so.1 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/librt.so.1 (0x00007ff8f3d18000)
+        libstdc++.so.6 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libstdc++.so.6 (0x00007ff8f3a15000)
+        libm.so.6 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libm.so.6 (0x00007ff8f3712000)
+        libc.so.6 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6 (0x00007ff8f3363000)
+        libpthread.so.0 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libpthread.so.0 (0x00007ff8f3145000)
+        libdl.so.2 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libdl.so.2 (0x00007ff8f2f41000)
+        libexpat.so.1 => /nix/store/vydr1x0s2lpw2id04388azad7xaw4m8w-expat-2.1.0/lib/libexpat.so.1 (0x00007ff8f2d18000)
+        libglapi.so.0 => /nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/libglapi.so.0 (0x00007ff8f2aef000)
+        libXdamage.so.1 => /nix/store/j292kvvwsfyqx73a6zyn81ykmrbkcf31-libXdamage-1.1.4/lib/libXdamage.so.1 (0x00007ff8f28ed000)
+        libXfixes.so.3 => /nix/store/98gi4m67cr1cgrw6c1g2r51wyd6x8nld-libXfixes-5.0.1/lib/libXfixes.so.3 (0x00007ff8f26e8000)
+        libX11-xcb.so.1 => /nix/store/vsk28b0riggcmigbgkzahf93xj3hw7gx-libX11-1.6.2/lib/libX11-xcb.so.1 (0x00007ff8f24e7000)
+        libxcb-glx.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-glx.so.0 (0x00007ff8f22d1000)
+        libxcb-dri2.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-dri2.so.0 (0x00007ff8f20cd000)
+        libxcb-dri3.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-dri3.so.0 (0x00007ff8f1ecb000)
+        libxcb-present.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-present.so.0 (0x00007ff8f1cc9000)
+        libxcb-randr.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-randr.so.0 (0x00007ff8f1abd000)
+        libxcb-xfixes.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-xfixes.so.0 (0x00007ff8f18b7000)
+        libxcb-render.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-render.so.0 (0x00007ff8f16ae000)
+        libxcb-shape.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-shape.so.0 (0x00007ff8f14ab000)
+        libxcb-sync.so.1 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-sync.so.1 (0x00007ff8f12a6000)
+        libxshmfence.so.1 => /nix/store/mib83k6wfp6dg7rffk2k3zrr1vhpdm90-libxshmfence-1.2/lib/libxshmfence.so.1 (0x00007ff8f10a4000)
+        libXxf86vm.so.1 => /nix/store/alfnyr2zf1y2y348lrrv9r0b7lhamlz2-libXxf86vm-1.1.3/lib/libXxf86vm.so.1 (0x00007ff8f0e9f000)
+        libXext.so.6 => /nix/store/iaaijiqdji1bhjgpa4rdvdw1a1z9rpn3-libXext-1.3.3/lib/libXext.so.6 (0x00007ff8f0c8d000)
+        libX11.so.6 => /nix/store/vsk28b0riggcmigbgkzahf93xj3hw7gx-libX11-1.6.2/lib/libX11.so.6 (0x00007ff8f0953000)
+        libxcb.so.1 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb.so.1 (0x00007ff8f0735000)
+        libXau.so.6 => /nix/store/4fk2pcy9nwyhsipin43r1svh2h02hk5a-libXau-1.0.8/lib/libXau.so.6 (0x00007ff8f0532000)
+        libXdmcp.so.6 => /nix/store/khd2573yk3v3d8jspf0m9ad2hma64sc0-libXdmcp-1.1.1/lib/libXdmcp.so.6 (0x00007ff8f032d000)
+        libdrm.so.2 => /nix/store/zci3rhzh24s6zwfxdysb9mqwrzbn7lyb-libdrm-2.4.59/lib/libdrm.so.2 (0x00007ff8f0121000)
+        libpng12.so.0 => not found
+        libgcc_s.so.1 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libgcc_s.so.1 (0x00007ff8eff0b000)
+        libpng12.so.0 => /nix/store/i7ifkqarb8m0w58vs96mqvj0giwll2km-libpng-1.2.51/lib/libpng12.so.0 (0x00007ff8efce5000)
+        libGLU.so.1 => /nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/libGLU.so.1 (0x00007ff8efa66000)
+        /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2 (0x00007ff8f4f00000)
+        libz.so.1 => /nix/store/mvjf7dvnpqz9zlvnq4yi86xbc5k9j94r-zlib-1.2.8/lib/libz.so.1 (0x00007ff8ef84e000)
+
+note: it is common that DSOs depend on other DSOs, just use 'ldd' to find out.
+
+patchelf --set-rpath FTL/data/amd64/lib:/nix/store/0sgyyrml3j55nx4mmb3v099n7g1fidr4-mesa-10.2.9/lib/:/nix/store/ds3k0yci9swgglvjmn78p7fcz02ma4vr-gcc-4.8.4/lib64 FTL/data/amd64/bin/FTL
+
+note: sometimes there are folders called /lib and lib64, do NOT mix them as you only want 64bit libraries! but other times also 64bit libraries are in a /lib folder, so happy guessing!
+
+    $ ldd FTL/data/amd64/bin/FTL
+        linux-vdso.so.1 (0x00007fff017d4000)
+        libSDL-1.2.so.0 => FTL/data/amd64/lib/libSDL-1.2.so.0 (0x00007f8617b76000)
+        libGL.so.1 => /nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/libGL.so.1 (0x00007f86178ea000)
+        libfreetype.so.6 => FTL/data/amd64/lib/libfreetype.so.6 (0x00007f8617667000)
+        libIL.so.1 => FTL/data/amd64/lib/libIL.so.1 (0x00007f861734c000)
+        libILU.so.1 => FTL/data/amd64/lib/libILU.so.1 (0x00007f8617137000)
+        libILUT.so.1 => FTL/data/amd64/lib/libILUT.so.1 (0x00007f8616f31000)
+        libbass.so => FTL/data/amd64/lib/libbass.so (0x00007f8617ed8000)
+        libbassmix.so => FTL/data/amd64/lib/libbassmix.so (0x00007f8616e28000)
+        librt.so.1 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/librt.so.1 (0x00007f8616c20000)
+        libstdc++.so.6 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libstdc++.so.6 (0x00007f861691d000)
+        libm.so.6 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libm.so.6 (0x00007f861661a000)
+        libc.so.6 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6 (0x00007f861626b000)
+        libpthread.so.0 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libpthread.so.0 (0x00007f861604d000)
+        libdl.so.2 => /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libdl.so.2 (0x00007f8615e49000)
+        libexpat.so.1 => /nix/store/vydr1x0s2lpw2id04388azad7xaw4m8w-expat-2.1.0/lib/libexpat.so.1 (0x00007f8615c20000)
+        libglapi.so.0 => /nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/libglapi.so.0 (0x00007f86159f7000)
+        libXdamage.so.1 => /nix/store/j292kvvwsfyqx73a6zyn81ykmrbkcf31-libXdamage-1.1.4/lib/libXdamage.so.1 (0x00007f86157f5000)
+        libXfixes.so.3 => /nix/store/98gi4m67cr1cgrw6c1g2r51wyd6x8nld-libXfixes-5.0.1/lib/libXfixes.so.3 (0x00007f86155f0000)
+        libX11-xcb.so.1 => /nix/store/vsk28b0riggcmigbgkzahf93xj3hw7gx-libX11-1.6.2/lib/libX11-xcb.so.1 (0x00007f86153ef000)
+        libxcb-glx.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-glx.so.0 (0x00007f86151d9000)
+        libxcb-dri2.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-dri2.so.0 (0x00007f8614fd5000)
+        libxcb-dri3.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-dri3.so.0 (0x00007f8614dd3000)
+        libxcb-present.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-present.so.0 (0x00007f8614bd1000)
+        libxcb-randr.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-randr.so.0 (0x00007f86149c5000)
+        libxcb-xfixes.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-xfixes.so.0 (0x00007f86147bf000)
+        libxcb-render.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-render.so.0 (0x00007f86145b6000)
+        libxcb-shape.so.0 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-shape.so.0 (0x00007f86143b3000)
+        libxcb-sync.so.1 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb-sync.so.1 (0x00007f86141ae000)
+        libxshmfence.so.1 => /nix/store/mib83k6wfp6dg7rffk2k3zrr1vhpdm90-libxshmfence-1.2/lib/libxshmfence.so.1 (0x00007f8613fac000)
+        libXxf86vm.so.1 => /nix/store/alfnyr2zf1y2y348lrrv9r0b7lhamlz2-libXxf86vm-1.1.3/lib/libXxf86vm.so.1 (0x00007f8613da7000)
+        libXext.so.6 => /nix/store/iaaijiqdji1bhjgpa4rdvdw1a1z9rpn3-libXext-1.3.3/lib/libXext.so.6 (0x00007f8613b95000)
+        libX11.so.6 => /nix/store/vsk28b0riggcmigbgkzahf93xj3hw7gx-libX11-1.6.2/lib/libX11.so.6 (0x00007f861385b000)
+        libxcb.so.1 => /nix/store/16g3p2596fjvkiwlzxgs6qrc0fmj0dnk-libxcb-1.11/lib/libxcb.so.1 (0x00007f861363d000)
+        libXau.so.6 => /nix/store/4fk2pcy9nwyhsipin43r1svh2h02hk5a-libXau-1.0.8/lib/libXau.so.6 (0x00007f861343a000)
+        libXdmcp.so.6 => /nix/store/khd2573yk3v3d8jspf0m9ad2hma64sc0-libXdmcp-1.1.1/lib/libXdmcp.so.6 (0x00007f8613235000)
+        libdrm.so.2 => /nix/store/zci3rhzh24s6zwfxdysb9mqwrzbn7lyb-libdrm-2.4.59/lib/libdrm.so.2 (0x00007f8613029000)
+        libpng12.so.0 => not found
+        libgcc_s.so.1 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libgcc_s.so.1 (0x00007f8612e13000)
+        libpng12.so.0 => not found
+        libGLU.so.1 => /nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/libGLU.so.1 (0x00007f8612b94000)
+        /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2 (0x00007f8617e07000)
+
+now repeat the same procedure time and again to get all the DSOs found.
+
+note: sometimes this does not work as you simply don't have the required libraries installed in the store! then either install them directly or any software which might use them (indirectly). however, when using libraries like this one will have a problem if the libraries are GCed (garbage collected) but the GC does not know that the libraries are still in use (in this case through FTL, by our patchelf hack).
+
+interestinly, using patchelf on the FTL binary with the store paths to libpng12.so.0 seems to have no effect, the outcome is always:
+
+    $  ldd FTL/data/amd64/lib/libIL.so.1
+        linux-vdso.so.1 (0x00007fff3cbcf000)
+        libpng12.so.0 => not found
+        libstdc++.so.6 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libstdc++.so.6 (0x00007f7e2d949000)
+        libm.so.6 => /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/libm.so.6 (0x00007f7e2d646000)
+        libc.so.6 => /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/libc.so.6 (0x00007f7e2d2a9000)
+        libgcc_s.so.1 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libgcc_s.so.1 (0x00007f7e2d092000)
+        /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib64/ld-linux-x86-64.so.2 (0x00007f7e2df6a000)
+
+the reason is that one of the bundled DSOs are actually depending on libpng12.so.0 (amd64/lib/libIL.so.1), so now one has to patchelf the DSO instead...
+
+## fixing DSOs
+
+the FTL binary is a nice example that patchelf does not work for libGLU.so.1 and libpng12.so.0 because you even though you can try to add a RPATH for either to the FTL binary, it will never work as the problem is not the FTL binary but the bundled libraries as 'lib/libILUT.so.1' or 'libILU.so.1'. here an example:
+
+    $ patchelf --set-rpath /nix/store/i7ifkqarb8m0w58vs96mqvj0giwll2km-libpng-1.2.51/lib/:/nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/:/nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/ FTL/data/amd64/lib/libIL.so.1
+
+    $ ldd FTL/data/amd64/lib/libIL.so.1
+        linux-vdso.so.1 (0x00007fff207df000)
+        libpng12.so.0 => /nix/store/i7ifkqarb8m0w58vs96mqvj0giwll2km-libpng-1.2.51/lib/libpng12.so.0 (0x00007f5113b04000)
+        libstdc++.so.6 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libstdc++.so.6 (0x00007f5113800000)
+        libm.so.6 => /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/libm.so.6 (0x00007f51134fd000)
+        libc.so.6 => /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/libc.so.6 (0x00007f5113160000)
+        libgcc_s.so.1 => /nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/libgcc_s.so.1 (0x00007f5112f49000)
+        libz.so.1 => /nix/store/mvjf7dvnpqz9zlvnq4yi86xbc5k9j94r-zlib-1.2.8/lib/libz.so.1 (0x00007f5112d31000)
+        /nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib64/ld-linux-x86-64.so.2 (0x00007f511404b000)
+
+note: beware of ELF 32-bit libs as 'ldd' will just silently fail and tell you there is no lib, altough you added a RPATH pointing to one:
+
+    file /nix/store/55nsmmx7jzpm8i664pbj0adik4z6klcv-glu-9.0.0/lib/libGLU.so.1.3.1
+    /nix/store/55nsmmx7jzpm8i664pbj0adik4z6klcv-glu-9.0.0/lib/libGLU.so.1.3.1: ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV), dynamically linked, not stripped
+
+note: you need to patch the RPATH from the 'FTL/' directory as the binary expects the the 'data' directory to be residing there so you have to patch the RPATH for the bundled libraries again as we were doing that wrong in the first place.
+
+finally running the FTL binary:
+
+    $ FTL/data/amd64/bin/FTL
+    Initializing Crash Catcher...
+    Initializing Video
+    Video Initialized
+    Opengl version = 3.0 Mesa 10.2.9
+    File or path name not found
+    Error opening resource file
+    File or path name not found
+    Error opening resource file
+    Starting audio library...
+    BASS_Init: Failed to init BASS Library!
+    BAS_INIT: 39
+    File or path name not found
+    Error opening resource file
+    Resource Loading Failure (or voluntary quit)!
+
+so we need to make a hack here:
+
+    $ ln -s FTL/data/resources
+    $ FTL/data/amd64/bin/FTL
+    Initializing Crash Catcher...
+    Initializing Video
+    Video Initialized
+    Opengl version = 3.0 Mesa 10.2.9
+    Starting audio library...
+    BASS_Init: Failed to init BASS Library!
+    BAS_INIT: 39
+    Resource Preload: 2.530
+    Loading text....
+    Initializing animations...
+    Animations Initialized!
+    Loading Ship Blueprints....
+    Blueprints Loaded!
+    Initializing Sound Data....
+    Generating world...
+    Loading achievements...
+    Loading score file...
+    Running Game!
+
+and it is working! except that it lacks audio ;P
+
+## fixing audio
+
+there seems to be some problem with a BASS_Init thingy:
+
+    $ ./FTL
+    Loading Arch = amd64
+    Initializing Crash Catcher...
+    Initializing Video
+    Video Initialized
+    Opengl version = 3.0 Mesa 10.2.9
+    Starting audio library...
+    BASS_Init: Failed to init BASS Library!
+    BAS_INIT: 39
+    Resource Preload: 2.607
+    Loading text....
+    Initializing animations...
+    Animations Initialized!
+    Loading Ship Blueprints....
+    Blueprints Loaded!
+    Initializing Sound Data....
+    Generating world...
+    Loading achievements...
+    Loading score file...
+    Running Game!
+
+no clue what is going on, let's try ''strace'' on the binary (not on the FTL shell script):
+
+    $ strace -e open FTL/data/amd64/bin/FTL
+    ... (much crap)
+    write(1, "Starting audio library...\n", 26Starting audio library...
+    ) = 26
+    open("/nix/store/zwimkmxsgg5h036knq623hzffnpkc7q5-libass-0.11.1/lib/libasound.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+    open("/nix/store/nwzpz8lrzry9j223rd84v2r4qs8pc548-libpng-1.2.51/lib/libasound.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+    open("/nix/store/0jcjjqm8c4gn2jiklq4f518n8hwlfhml-mesa-9.1.3/lib/libasound.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+    open("/home/joachim/Desktop/ftl/FTL/data/amd64/lib/libasound.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+    open("/run/opengl-driver/lib/libasound.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+    open("/nix/store/93zfs0zzndi7pkjkjxawlafdj8m90kg5-glibc-2.20/lib/libasound.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+    write(1, "BASS_Init: Failed to init BASS L"..., 40BASS_Init: Failed to init BASS Library!
+    ) = 40
+    write(1, "BAS_INIT: 39\n", 13BAS_INIT: 39
+    ... (more crap)
+
+so it seems to not find **libasound.so.2** either! so finally i was using this command:
+
+    $ LD_LIBRARY_PATH=/nix/store/qhxaivhds8vahb2wzzhcpm820n32acjh-alsa-lib-1.0.28/lib/:$LD_LIBRARY_PATH FTL/data/amd64/bin/FTL
+    Initializing Crash Catcher...
+    Initializing Video
+    Video Initialized
+    Opengl version = 3.0 Mesa 10.2.9
+    Starting audio library...
+    Audio Initialized!
+    Resource Preload: 3.802
+    Loading text....
+    Initializing animations...
+    Animations Initialized!
+    Loading Ship Blueprints....
+    Blueprints Loaded!
+    Initializing Sound Data....
+    Generating world...
+    Loading achievements...
+    Loading score file...
+    Running Game!
+
+note: i don't have an idea where the libasound.so.2 was introduced and thus LD_LIBRARY_PATH is the only working solution so far.
+
+however, FTL seems to be quite unstable and sound does not work, stops working after a while or is just bogus and sounds like noise. after a while FTL crashes, see this:
+
+    $ LD_LIBRARY_PATH=/nix/store/qz8wgnwxmw2jwcd83irff3z0l2lbf1s3-alsa-lib-1.0.28/lib/:$LD_LIBRARY_PATH FTL/data/amd64/bin/FTL
+    Initializing Crash Catcher...
+    Initializing Video
+    Video Initialized
+    Opengl version = 3.0 Mesa 10.2.9
+    Starting audio library...
+    Audio Initialized!
+    Resource Preload: 3.593
+    Loading text....
+    Initializing animations...
+    Animations Initialized!
+    Loading Ship Blueprints....
+    Blueprints Loaded!
+    Initializing Sound Data....
+    Generating world...
+    Loading achievements...
+    Loading score file...
+    Running Game!
+    *** Error in `FTL/data/amd64/bin/FTL': double free or corruption (!prev): 0x00000000056e0e40 ***
+    ======= Backtrace: =========
+    /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6(+0x74866)[0x7f6aaeed8866]
+    /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6(+0x79c16)[0x7f6aaeeddc16]
+    /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6(+0x7b3d1)[0x7f6aaeedf3d1]
+    FTL/data/amd64/lib/libbassmix.so(+0x2f76)[0x7f6aafa23f76]
+    FTL/data/amd64/lib/libbassmix.so(+0x4603)[0x7f6aafa25603]
+    FTL/data/amd64/lib/libbassmix.so(+0x5cd5)[0x7f6aafa26cd5]
+    FTL/data/amd64/lib/libbass.so(+0x2b707)[0x7f6ab0ae1707]
+    FTL/data/amd64/lib/libbass.so(+0x2819f)[0x7f6ab0ade19f]
+    FTL/data/amd64/lib/libbass.so(+0x2d052)[0x7f6ab0ae3052]
+    FTL/data/amd64/lib/libbass.so(+0x2d1e5)[0x7f6ab0ae31e5]
+    /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libpthread.so.0(+0x6f4a)[0x7f6aaec4cf4a]
+    /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/libc.so.6(clone+0x6d)[0x7f6aaef4ed5d]
+    ======= Memory map: ========
+    003fe000-00400000 rw-p 00000000 fe:01 22413413                           /home/joachim/Desktop/ftl/FTL/data/amd64/bin/FTL
+    00400000-00766000 r-xp 00002000 fe:01 22413413                           /home/joachim/Desktop/ftl/FTL/data/amd64/bin/FTL
+    00966000-00967000 rw-p 00368000 fe:01 22413413                           /home/joachim/Desktop/ftl/FTL/data/amd64/bin/FTL
+    00967000-0097a000 rw-p 00000000 00:00 0 
+    00b06000-05718000 rw-p 00000000 00:00 0                                  [heap]
+    7f6a58000000-7f6a58021000 rw-p 00000000 00:00 0 
+    7f6a58021000-7f6a5c000000 ---p 00000000 00:00 0 
+    ...
+
+cause unknown but other users seem to have this problem as well ;P
+
+# alternatives 
+
+## LD_LIBRARY_PATH
+instead of using patchelf on the FTL binary nor any DSOs, one can also use LD_LIBRARY_PATH like this:
+
+    $ cd FTL/data
+    $ LD_LIBRARY_PATH=/nix/store/jrhjp66sdfv0pc95dwgdz2sly9hima23-gcc-4.8.4/lib/:/nix/store/fiz0mz982n1m03qzbpvl40n51bvr4b0m-mesa-10.4.5/lib/:amd64/lib:$LD_LIBRARY_PATH /nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2 amd64/bin/./FTL
+
+what does this do? 
+
+1. first we set the **LD_LIBRARY_PATH to include the required libraries** into the DSO search path, 
+
+2. afterwards it uses **/nix/store/6h129q168ahnl2nzw6azr239cba884ng-glibc-2.18/lib/ld-linux-x86-64.so.2, the dynamic linker**, 
+
+3. to **execute the binary FTL in directory amd64/bin/**.
+
+note: this solution is realy a 'fast forward' one and requires only little effort! 
+
+## ftl.nix
+
+1. copy **FTL.1.5.13.tar.gz to /tmp**
+
+        $ cp FTL.1.5.13.tar.gz /tmp
+
+2. the **ftl.nix** file contains:
+
+        {stdenv, pkgs, lib, makeWrapper, gcc, mesa_glu, path, version }:
+        # build this with:
+        # 64-bit systems
+        #  nix-build -E 'with import <nixpkgs> { }; callPackage ./ftl.nix { path="/tmp/FTL.1.5.13.tar.gz"; version="1.5.13"; }'
+        # 32-bit systems
+        #  nix-build -E 'with import <nixpkgs> { }; callPackage_i686 ./ftl.nix { path="/tmp/FTL.1.5.13.tar.gz"; version="1.5.13"; }'
+        let
+          arch = if stdenv.system == "x86_64-linux" then "amd64" else "x86";
+          libmapper = val: (map (x: x + "/lib") val ++ map (x: x + "/lib64") val); 
+          lib_help = if stdenv.system == "x86_64-linux" then "lib64" else "lib";
+        in
+        assert (path != null);
+        assert (version != null);
+        stdenv.mkDerivation rec {
+          name = "FTL-${version}";
+          src = path;
+          libs = with pkgs; [ stdenv.cc.cc mesa_glu alsaLib zlib ];
+          buildInputs = [ makeWrapper ];
+          phases = [ "unpackPhase" "installPhase" ];
+          installPhase = ''
+            mkdir -p "$out/opt/FTL"
+            cp -r data "$out/opt/FTL"
+            chmod +x "$out/opt/FTL/data/${arch}/bin/FTL"
+            interpreter=$(echo ${stdenv.glibc}/${lib_help}/ld-linux*.so.2)
+            patchelf --set-interpreter $interpreter "$out/opt/FTL/data/${arch}/bin/FTL"
+            patchelf --set-rpath "$out/opt/FTL/data/${arch}/lib" "$out/opt/FTL/data/${arch}/bin/FTL"
+            mkdir "$out/bin"
+            # using makeWrapper to create a wrapper around the wrapper
+            #  --run sets the 'working directory'
+            #  --prefix adds the LD_LIBRARY_PATH export to the binary
+            #  (libmapper libs) generates store location of libraries with lib and lib64 suffixes appended
+            makeWrapper "$out/opt/FTL/data/FTL" "$out/bin/ftl" \
+                --run "cd $out/opt/FTL/data" \
+                --prefix LD_LIBRARY_PATH ':' "${lib.concatStringsSep ":" (libmapper libs)}";
+         '';
+        }
+
+
+3. 
+
+    a)  build this on a 64-bit system:
+
+        nix-build -E 'with import <nixpkgs> { }; callPackage ./ftl.nix { path="/tmp/FTL.1.5.13.tar.gz"; version="1.5.13"; }'
+
+    b)  build this on a 32-bit system:
+
+        nix-build -E 'with import <nixpkgs> { }; callPackage_i686 ./ftl.nix { path="/tmp/FTL.1.5.13.tar.gz"; version="1.5.13"; }'
+
+    **installing it**, this will show something like:
+    
+        $ nix-build -E 'with import <nixpkgs> { }; callPackage /home/joachim/.nixpkgs/ftl.nix { }' 
+        these derivations will be built:
+          /nix/store/i0wqnwzdhgdlr2a18v8s8aivivzn9qfj-FTL-1.5.13.drv
+        building path(s) ‘/nix/store/20k9ch8wafxf8sg7472p2gq1g3d9kjrq-FTL-1.5.13’
+        unpacking sources
+        unpacking source archive /tmp/FTL.1.5.13.tar.gz
+        source root is FTL
+        installing
+        /nix/store/20k9ch8wafxf8sg7472p2gq1g3d9kjrq-FTL-1.5.13
+
+4. now launch the FTL binary with:
+
+        $ /nix/store/20k9ch8wafxf8sg7472p2gq1g3d9kjrq-FTL-1.5.13/bin/ftl
+
+5. if this works for you, issue this command:
+
+        $ nix-env -i /nix/store/20k9ch8wafxf8sg7472p2gq1g3d9kjrq-FTL-1.5.13
+
+    note: **this is very important as it will add /nix/store/20k9ch8wafxf8sg7472p2gq1g3d9kjrq-FTL-1.5.13 to the GCROOTS** (garbage collector roots) so it won't be removed when calling:
+
+        $ nix-collect-garbage -d
+
+    or
+
+        $ nix-store --gc
+
+6. you can now issue:
+
+        $ rm /tmp/FTL.1.5.13.tar.gz
+
+and from now on you can just type 'ftl' in any shell to start FTL!
+
+# summary
+
+it can be quite some work to get proprietary software running on nixos but thanks to the wiki documentation [2], the good examples at [3] and nix language features like **makeWrapper** it gets much better.
+
+still waiting for an automation tough ;-)
+
+# links
+
+* [1] <http://www.ftlgame.com/>
+* [2] <https://nixos.org/wiki/How_to_package_closed-source_software>
+* [3] <https://nixos.org/wiki/How_to_package_closed-source_software#examples>

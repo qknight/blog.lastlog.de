@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>timeline</title>
+
+<script src="js/jquery.min.js"></script>
+
+
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!-- timeline related css begin -->
+<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/colorbox.css" type="text/css" media="screen">
+<link rel="stylesheet" href="css/timeliner.css" type="text/css" media="screen">
+<!-- timeline related css end -->
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on " id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div class="article">
+    <h1 id="SiteTitle">timeline</h1>
+    
+    <script type="application/json" id="MetaData">{"ArticleCount":157,"Tags":{"33C3":[12],"APU":[16],"BPM":[6],"CalDAV":[21],"CardDAV":[21],"DoS":[155],"FTL":[36],"GIT":[43],"MacOSX":[79],"QAbstractItemModel":[107],"RT":[23],"android":[21],"arch":[100],"assistant":[29],"audio":[106,112,123,138],"backup":[37],"bash":[26],"bios":[24,33],"cargo":[13],"chatGPT":[1],"cmake":[74,92,121,129,132,134],"compiler":[28],"containerization":[51],"data-mining":[17],"docker":[2],"documentary":[73,75],"efi":[24],"email":[11,155],"emscripten":[4,8,19,20,22,27],"erp":[38],"europe":[5],"evopedia":[100],"flash":[48],"gentoo":[35,46,79,84,85,89,90,93,95,96,97,101,102,106,108,109,111,112,113,115,117,119,120,121,122,123,124,125,126,130,132,133,134,135,136,137,138,140],"github":[57],"go":[1,32],"google":[21],"gopass":[3],"grafana":[17],"gtk":[32],"hardware":[33,40],"hetzner":[69,86],"html5":[23,27],"infotainment":[56],"javascript":[6,7,8,9,19,22,23,27],"jessyink":[50],"kongress":[12],"kubernetes":[2],"lift":[52],"linux":[14,16,17,18,20,21,31,36,37,39,40,41,43,44,45,47,48,49,51,52,54,56,57,58,59,60,61,65,67,69,71,72,74,76,77,78,79,82,84,87,89,90,92,93,94,95,96,97,102,106,110,111,112,113,114,115,116,117,119,120,121,122,123,124,125,126,129,130,132,133,134,135,136,137,138,140,141,142,143,144,145,148,150,152,156],"lua":[46],"macosx":[88,97],"mail":[114],"mattermost":[0],"mojolicious":[23],"monitoring":[17],"motionplanning":[4],"n0":[135,136],"n900":[76],"nix":[8,13,35],"nixcloud":[0,2,10,11,13,26,27,28],"nixos":[2,8,9,10,11,12,13,14,15,16,17,18,19,20,22,24,25,26,27,28,29,30,31,32,35,36,42,45,46,47,49,51,53,54,55,57,59,65,66,67,69,71,72,74,86,91,92],"nlnet":[11,19],"node.js":[44,47,52],"node2nix":[9],"npm":[9,47],"npm2nix":[9],"odf":[19],"odoo":[38],"odroid":[16,25],"ogre3d":[121,122,124,126],"openmoko":[146,152,156],"otrs":[80],"owncloud":[21,39],"p2p":[79,97,102,104,116,117],"packagemanager":[46,49,55,62,64,66,69,72,74,76,77,78,79,84,88,90,92,93,94,95,97,98,100,101,102,103,108,115,120,121,124,125],"pankat":[1,7],"patchelf":[36],"pci":[33],"pdf":[50],"perl":[23],"php":[34],"podcast":[70,73,75],"pulse":[6],"pulseaudio":[15],"pxe":[24],"pyqwt":[43],"python":[37,38,43,110],"qt":[29,39,74,76,79,88,94,97,100,102,103,104,105,107,110,127,129,131,135,136],"raspberrypi":[44,52],"ruckig":[4],"rust":[13],"scala":[52],"security":[58,60,61,64,70,78,79,90,96],"selenium":[17],"shinken":[58,60,61,62,85],"shr":[156],"society":[42,56,63,64,68,70,75,79,102,116,128,130,134,138,149,150,151,153,154],"spam":[155],"sprint":[14,20],"svg":[50],"taspring":[81,145],"tcp":[63,116,145],"tech":[99],"technology":[5,14,20,21,23,37,42,43,48,51,53,54,56,63,64,68,75,78,79,84,92,93,94,97,104,111,116,117,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,140,141,142,143,144,145,147,149,150,151,153,154],"tests":[10],"tinkerforge":[44,52],"toolchain":[8],"tuebix":[18],"u-boot":[25],"ubuntu":[42,46],"usability":[7,14,16,17,18,20,21,23,29,33,34,36,37,38,39,40,41,42,44,45,46,48,49,50,51,52,53,54,55,56,59,63,64,65,67,68,69,72,74,76,77,78,79,81,83,88,89,90,92,95,97,98,104,105,107,108,111,112,114,115,116,117,118,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,140,141,143,145,146],"virtualization":[64,79],"visualization":[68,77,81,105,107,118,129,131,146],"webkit":[32],"webservices":[2,11,39,51],"windows":[79,80,94,98,103,118],"wordpress":[26],"xmlmirror":[19],"xu4":[25],"yarn":[9],"yarn2nix":[9],"yocto":[28]},"Series":{"emscripten":[4,19,20,22,27],"evopedia":[88,98,100,102,103],"illuminator":[44,52],"nix-language-atlas":[8,9,47],"nixcloud":[0,2,10,11,51,54],"ogre":[121,122,124,126],"qgraphicsscene":[105,127,131],"shinken":[58,60,61,62,85]},"Years":{"2009":[131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156],"2010":[97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130],"2011":[76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96],"2012":[64,65,66,67,68,69,70,71,72,73,74,75],"2013":[55,56,57,58,59,60,61,62,63],"2014":[41,42,43,44,45,46,47,48,49,50,51,52,53,54],"2015":[27,28,29,30,31,32,33,34,35,36,37,38,39,40],"2016":[12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],"2017":[10,11],"2018":[8,9],"2023":[0,1,2,3,4,5,6,7]}}</script>a list of all posts, sorted by date, with the most recent posts at the top.
+    <div id="FilterControl">
+      <div id="FilterControlIcon">
+        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+      </div>
+      <div id="FilterControlElements">
+		<div id="FilterPreSelection">
+		  <a class="btn btn-primary" onClick="toSelectionView()">show tag/series filters</a>
+		</div>
+		<div id="FilterPostSelection">
+          <div id="FilterSelectionContent">
+		    <a class="btn btn-primary" onClick="toClearSelectionView()"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> clear filter</a>
+		    <div id="FilterSelectionText"></div>
+          </div>
+		</div>
+	<div id="FilterSelection"><p class="lead">select a tag or series element below:</p><div id="TagAndSeries"><p id="tagCloud"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shinken', 1)">shinken</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::audio', 1)">audio</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::python', 1)">python</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ogre3d', 1)">ogre3d</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webservices', 1)">webservices</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::openmoko', 1)">openmoko</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::podcast', 1)">podcast</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nix', 1)">nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tcp', 1)">tcp</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::node.js', 1)">node.js</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pankat', 1)">pankat</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::npm', 1)">npm</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::virtualization', 1)">virtualization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::html5', 1)">html5</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tinkerforge', 1)">tinkerforge</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::hardware', 1)">hardware</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::go', 1)">go</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::bios', 1)">bios</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::sprint', 1)">sprint</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::taspring', 1)">taspring</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::macosx', 1)">macosx</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odroid', 1)">odroid</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::documentary', 1)">documentary</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::owncloud', 1)">owncloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ubuntu', 1)">ubuntu</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::raspberrypi', 1)">raspberrypi</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nlnet', 1)">nlnet</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::email', 1)">email</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::hetzner', 1)">hetzner</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::n0', 1)">n0</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::FTL', 1)">FTL</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::scala', 1)">scala</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gopass', 1)">gopass</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::BPM', 1)">BPM</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::mojolicious', 1)">mojolicious</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::efi', 1)">efi</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::assistant', 1)">assistant</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::arch', 1)">arch</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::rust', 1)">rust</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::node2nix', 1)">node2nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::npm2nix', 1)">npm2nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::selenium', 1)">selenium</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::motionplanning', 1)">motionplanning</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::spam', 1)">spam</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::CardDAV', 1)">CardDAV</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::toolchain', 1)">toolchain</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pxe', 1)">pxe</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::backup', 1)">backup</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::github', 1)">github</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::MacOSX', 1)">MacOSX</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::jessyink', 1)">jessyink</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tech', 1)">tech</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::xmlmirror', 1)">xmlmirror</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::u-boot', 1)">u-boot</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::svg', 1)">svg</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::infotainment', 1)">infotainment</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::DoS', 1)">DoS</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::kongress', 1)">kongress</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odoo', 1)">odoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::33C3', 1)">33C3</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tests', 1)">tests</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::yocto', 1)">yocto</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::yarn', 1)">yarn</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::otrs', 1)">otrs</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cargo', 1)">cargo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::google', 1)">google</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gtk', 1)">gtk</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::GIT', 1)">GIT</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::yarn2nix', 1)">yarn2nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pdf', 1)">pdf</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::kubernetes', 1)">kubernetes</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::europe', 1)">europe</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::flash', 1)">flash</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::grafana', 1)">grafana</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::CalDAV', 1)">CalDAV</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::wordpress', 1)">wordpress</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pci', 1)">pci</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webkit', 1)">webkit</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::monitoring', 1)">monitoring</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::bash', 1)">bash</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::erp', 1)">erp</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pyqwt', 1)">pyqwt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tuebix', 1)">tuebix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::mail', 1)">mail</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::QAbstractItemModel', 1)">QAbstractItemModel</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::APU', 1)">APU</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::RT', 1)">RT</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::containerization', 1)">containerization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ruckig', 1)">ruckig</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pulse', 1)">pulse</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pulseaudio', 1)">pulseaudio</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::n900', 1)">n900</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shr', 1)">shr</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::xu4', 1)">xu4</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::lua', 1)">lua</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::compiler', 1)">compiler</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::php', 1)">php</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::patchelf', 1)">patchelf</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::lift', 1)">lift</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::android', 1)">android</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odf', 1)">odf</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::docker', 1)">docker</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::perl', 1)">perl</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::evopedia', 1)">evopedia</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::mattermost', 1)">mattermost</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::chatGPT', 1)">chatGPT</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::data-mining', 1)">data-mining</a></p><p id="seriesCloud"><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::shinken', 1)">shinken</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::evopedia', 1)">evopedia</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::emscripten', 1)">emscripten</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::ogre', 1)">ogre</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::qgraphicsscene', 1)">qgraphicsscene</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nix-language-atlas', 1)">nix-language-atlas</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::illuminator', 1)">illuminator</a></p> 
+
+    </div></div></div></div>
+    <div id="timeline" class="timeline-container">
+    <br class="clear">
+<div class="timeline-wrapper pankat_year pankat_year_2024">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2024</span></h2>
+          <dt class="timeline-event posting_0">mattermost with nixcloud-webservices</dt>
+          <dd class="timeline-event-content posting_0">
+            <div class="postingsEntry">
+              <p class="summary">declarative mattermost with nixcloud-webservices <a href="mattermost_with_nixcloud-webservices.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::mattermost', 1)">mattermost</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_1">automated chatGPT summary</dt>
+          <dd class="timeline-event-content posting_1">
+            <div class="postingsEntry">
+              <p class="summary">creating chatGPT summaries for pankat articles using the api and go <a href="automated_chatGPT_summary.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::go', 1)">go</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::chatGPT', 1)">chatGPT</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pankat', 1)">pankat</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_2">docker compose vs nixcloud</dt>
+          <dd class="timeline-event-content posting_2">
+            <div class="postingsEntry">
+              <p class="summary">comparing docker compose/swarm to nixos, nixcloud.webservices, LXC and kubernetes <a href="docker_compose_vs_nixcloud.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::docker', 1)">docker</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::kubernetes', 1)">kubernetes</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webservices', 1)">webservices</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_3">gopass</dt>
+          <dd class="timeline-event-content posting_3">
+            <div class="postingsEntry">
+              <p class="summary">using one password manager for multiple platforms <a href="gopass.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gopass', 1)">gopass</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_4">ruckig motion planning</dt>
+          <dd class="timeline-event-content posting_4">
+            <div class="postingsEntry">
+              <p class="summary">using the ruckig library for motion planning in the browser <a href="ruckig_motion_planning.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ruckig', 1)">ruckig</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::motionplanning', 1)">motionplanning</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::emscripten', 1)">emscripten</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_5">strategic innovation in europe</dt>
+          <dd class="timeline-event-content posting_5">
+            <div class="postingsEntry">
+              <p class="summary">technocratic white paper on how to make europe a strong strategic player <a href="strategic_innovation_in_europe.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::europe', 1)">europe</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_6">pulse check</dt>
+          <dd class="timeline-event-content posting_6">
+            <div class="postingsEntry">
+              <p class="summary">example how to compute your pulse using js/css from a pankat markdown article using copilot <a href="pulse_check.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::BPM', 1)">BPM</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pulse', 1)">pulse</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_7">pankat editor</dt>
+          <dd class="timeline-event-content posting_7">
+            <div class="postingsEntry">
+              <p class="summary">pankat is a static blog generator with integrated live pandoc preview <a href="pankat_editor.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pankat', 1)">pankat</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2023">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2023</span></h2>
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2019">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2019</span></h2>
+          <dt class="timeline-event posting_8">nix-language-atlas emscripten</dt>
+          <dd class="timeline-event-content posting_8">
+            <div class="postingsEntry">
+              <p class="summary">how emscripten can be used with nix <a href="nix-language-atlas_emscripten.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nix', 1)">nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::toolchain', 1)">toolchain</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nix-language-atlas', 1)">nix-language-atlas</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_9">nix-language-atlas javascript</dt>
+          <dd class="timeline-event-content posting_9">
+            <div class="postingsEntry">
+              <p class="summary">how yarn changed javascript deployment using nix <a href="nix-language-atlas_javascript.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::yarn', 1)">yarn</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::npm', 1)">npm</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::node2nix', 1)">node2nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::npm2nix', 1)">npm2nix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::yarn2nix', 1)">yarn2nix</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nix-language-atlas', 1)">nix-language-atlas</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2018">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2018</span></h2>
+          <dt class="timeline-event posting_10">nixcloud-webservices tests</dt>
+          <dd class="timeline-event-content posting_10">
+            <div class="postingsEntry">
+              <p class="summary">how we do tests and CI at nixcloud. <a href="nixcloud-webservices_tests.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tests', 1)">tests</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_11">nixcloud-webservices</dt>
+          <dd class="timeline-event-content posting_11">
+            <div class="postingsEntry">
+              <p class="summary">creating the ultimate webservice(s) tooling aka nixcloud. <a href="nixcloud-webservices.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nlnet', 1)">nlnet</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::email', 1)">email</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webservices', 1)">webservices</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2017">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2017</span></h2>
+          <dt class="timeline-event posting_12">33C3-nixos</dt>
+          <dd class="timeline-event-content posting_12">
+            <div class="postingsEntry">
+              <p class="summary">nixos assembly on 33C3 kongress <a href="33C3-nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::33C3', 1)">33C3</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::kongress', 1)">kongress</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_13">rust-cargo</dt>
+          <dd class="timeline-event-content posting_13">
+            <div class="postingsEntry">
+              <p class="summary">avoiding cargo usage in nixpkgs. <a href="rust-cargo.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::rust', 1)">rust</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cargo', 1)">cargo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nix', 1)">nix</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_14">nixos sprint in augsburg 2016</dt>
+          <dd class="timeline-event-content posting_14">
+            <div class="postingsEntry">
+              <p class="summary">a report about a nixos hacking sprint in the augsburger 'openlab' hackerspace. <a href="nixos_sprint_in_augsburg_2016.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::sprint', 1)">sprint</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_15">pulseaudio tcp streaming</dt>
+          <dd class="timeline-event-content posting_15">
+            <div class="postingsEntry">
+              <p class="summary">streaming audio in tcp using pulseaudio and avahi <a href="pulseaudio_tcp_streaming.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pulseaudio', 1)">pulseaudio</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_16">apu</dt>
+          <dd class="timeline-event-content posting_16">
+            <div class="postingsEntry">
+              <p class="summary">about running NixOS on a simple yet powerfull server: the APU <a href="apu.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::APU', 1)">APU</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odroid', 1)">odroid</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_17">data-mining</dt>
+          <dd class="timeline-event-content posting_17">
+            <div class="postingsEntry">
+              <p class="summary">crawling webpages using selenium, visualizing results using grafana with influxdb backend. <a href="data-mining.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::grafana', 1)">grafana</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::monitoring', 1)">monitoring</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::selenium', 1)">selenium</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::data-mining', 1)">data-mining</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_18">tuebix</dt>
+          <dd class="timeline-event-content posting_18">
+            <div class="postingsEntry">
+              <p class="summary">cfp software written in golang for the tuebix linuxtag in tuebingen <a href="tuebix.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tuebix', 1)">tuebix</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_19">xmlmirror</dt>
+          <dd class="timeline-event-content posting_19">
+            <div class="postingsEntry">
+              <p class="summary">about how to create a powerful xml editor using emscripten, libxml2 and codemirror. <a href="xmlmirror.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nlnet', 1)">nlnet</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::xmlmirror', 1)">xmlmirror</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odf', 1)">odf</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::emscripten', 1)">emscripten</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_20">nixos-augsburg-sprint</dt>
+          <dd class="timeline-event-content posting_20">
+            <div class="postingsEntry">
+              <p class="summary">a report about a nixos hacking sprint in the augsburger 'openlab' hackerspace. <a href="nixos-augsburg-sprint.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::sprint', 1)">sprint</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::emscripten', 1)">emscripten</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_21">android calendar and CalDav</dt>
+          <dd class="timeline-event-content posting_21">
+            <div class="postingsEntry">
+              <p class="summary">Using CalDAV/CardDAV with owncloud on android and thunderbird <a href="android_calendar_and_CalDav.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::android', 1)">android</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::CalDAV', 1)">CalDAV</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::CardDAV', 1)">CardDAV</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::owncloud', 1)">owncloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::google', 1)">google</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_22">emscripten-1.36.4 on nixos</dt>
+          <dd class="timeline-event-content posting_22">
+            <div class="postingsEntry">
+              <p class="summary">emscripten on nixos works a tiny bit better now <a href="emscripten-1.36.4_on_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::emscripten', 1)">emscripten</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_23">request tracker kanban extension</dt>
+          <dd class="timeline-event-content posting_23">
+            <div class="postingsEntry">
+              <p class="summary">extending legacy software like request tracker with webtechnology from a decade later <a href="request_tracker_kanban_extension.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::html5', 1)">html5</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::RT', 1)">RT</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::perl', 1)">perl</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::mojolicious', 1)">mojolicious</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_24">nixos pxe booting</dt>
+          <dd class="timeline-event-content posting_24">
+            <div class="postingsEntry">
+              <p class="summary">intel PXE is used to boot a computer by using the network as source for the OS. this posting is about how to do that with NixOS. <a href="nixos_pxe_booting.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pxe', 1)">pxe</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::bios', 1)">bios</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::efi', 1)">efi</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_25">odroid xu4 with nixos</dt>
+          <dd class="timeline-event-content posting_25">
+            <div class="postingsEntry">
+              <p class="summary">nixos support for 'armv7l' is getting much better. in this postings i want to show a few insights on how to get nixos running on any ARM board which is running linux already. <a href="odroid_xu4_with_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odroid', 1)">odroid</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::xu4', 1)">xu4</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::u-boot', 1)">u-boot</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_26">wordpress</dt>
+          <dd class="timeline-event-content posting_26">
+            <div class="postingsEntry">
+              <p class="summary">about the effort of making wordpress deployment reproducible. <a href="wordpress.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::bash', 1)">bash</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::wordpress', 1)">wordpress</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2016">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2016</span></h2>
+          <dt class="timeline-event posting_27">tour of nix</dt>
+          <dd class="timeline-event-content posting_27">
+            <div class="postingsEntry">
+              <p class="summary">a tour of nix is an educational purpose project on teaching the Nix programming language. It is also an introduction on how to use LLVM and emscripten to convert C++ programs to run in the browser. <a href="tour_of_nix.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::javascript', 1)">javascript</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::html5', 1)">html5</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::emscripten', 1)">emscripten</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::emscripten', 1)">emscripten</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_28">bootstrap-tools-cross</dt>
+          <dd class="timeline-event-content posting_28">
+            <div class="postingsEntry">
+              <p class="summary">"nixos cross compiler for powerpc64 big endian" <a href="bootstrap-tools-cross.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixcloud', 1)">nixcloud</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::compiler', 1)">compiler</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::yocto', 1)">yocto</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_29">nix-assistant</dt>
+          <dd class="timeline-event-content posting_29">
+            <div class="postingsEntry">
+              <p class="summary">nixos options search for offline usage <a href="nix-assistant.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::assistant', 1)">assistant</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_30">NixOS Chaos Communication Camp 2015</dt>
+          <dd class="timeline-event-content posting_30">
+            <div class="postingsEntry">
+              <p class="summary">NixOS @ chaos communication camp 2015 <a href="NixOS_Chaos_Communication_Camp_2015.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_31">creative packaging in nixpkgs</dt>
+          <dd class="timeline-event-content posting_31">
+            <div class="postingsEntry">
+              <p class="summary">Discover the creative packaging techniques and practices in Nixpkgs, exploring innovative solutions for software packaging and distribution <a href="creative_packaging_in_nixpkgs.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_32">go-webkit2 on nixos</dt>
+          <dd class="timeline-event-content posting_32">
+            <div class="postingsEntry">
+              <p class="summary">webloop on nixos porting attempt <a href="go-webkit2_on_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::go', 1)">go</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webkit', 1)">webkit</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gtk', 1)">gtk</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_33">setup-1.x</dt>
+          <dd class="timeline-event-content posting_33">
+            <div class="postingsEntry">
+              <p class="summary">eGPU made @ shackspace.de <a href="setup-1.x.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::bios', 1)">bios</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pci', 1)">pci</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::hardware', 1)">hardware</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_34">mediawiki-1.16-to-2.24.2 upgrade</dt>
+          <dd class="timeline-event-content posting_34">
+            <div class="postingsEntry">
+              <p class="summary">mediawiki, php using traditional nixos webservices <a href="mediawiki-1.16-to-2.24.2_upgrade.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::php', 1)">php</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_35">useflags in nixos</dt>
+          <dd class="timeline-event-content posting_35">
+            <div class="postingsEntry">
+              <p class="summary">discussion on nixos USE flags similarities to gentoo <a href="useflags_in_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nix', 1)">nix</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_36">playing FTL on NIXOS</dt>
+          <dd class="timeline-event-content posting_36">
+            <div class="postingsEntry">
+              <p class="summary">FTL game tweaks for nixos, patchelf <a href="playing_FTL_on_NIXOS.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::FTL', 1)">FTL</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::patchelf', 1)">patchelf</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_37">attic-backup</dt>
+          <dd class="timeline-event-content posting_37">
+            <div class="postingsEntry">
+              <p class="summary">attic backup tool on nixos <a href="attic-backup.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::backup', 1)">backup</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::python', 1)">python</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_38">ODOO evaluation</dt>
+          <dd class="timeline-event-content posting_38">
+            <div class="postingsEntry">
+              <p class="summary">is ODOO a modern ERP system written in python? <a href="ODOO_evaluation.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::erp', 1)">erp</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::odoo', 1)">odoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::python', 1)">python</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_39">owncloud ssl client certificates</dt>
+          <dd class="timeline-event-content posting_39">
+            <div class="postingsEntry">
+              <p class="summary">adding client SSL certificates two the qt owncloud client <a href="owncloud_ssl_client_certificates.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webservices', 1)">webservices</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::owncloud', 1)">owncloud</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_40">LS-7T</dt>
+          <dd class="timeline-event-content posting_40">
+            <div class="postingsEntry">
+              <p class="summary">trying the LS-7T display from pollin.de with linux <a href="LS-7T.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::hardware', 1)">hardware</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2015">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2015</span></h2>
+          <dt class="timeline-event posting_41">memtest86 fail</dt>
+          <dd class="timeline-event-content posting_41">
+            <div class="postingsEntry">
+              <p class="summary">memtest86 fails because of broken usb stick it was on <a href="memtest86_fail.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_42">ubuntu-14.04-apt problems</dt>
+          <dd class="timeline-event-content posting_42">
+            <div class="postingsEntry">
+              <p class="summary">how to fix broken packages on ubuntu <a href="ubuntu-14.04-apt_problems.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ubuntu', 1)">ubuntu</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_43">PyQwt on github.com</dt>
+          <dd class="timeline-event-content posting_43">
+            <div class="postingsEntry">
+              <p class="summary">PyQwt moved from sf.net to github.com <a href="PyQwt_on_github.com.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::python', 1)">python</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pyqwt', 1)">pyqwt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::GIT', 1)">GIT</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_44">tinkerforge relais raspberry pi 2</dt>
+          <dd class="timeline-event-content posting_44">
+            <div class="postingsEntry">
+              <p class="summary">i've upgraded my illuminator installation, see previous post: <http://blog.lastlog.de/posts/tinkerforge_relais_rapspberry_pi/index.html>. in short that is: added another 'master brick', upgraded from 3 to 4 'dual relay bricklet', added IO-16 bricklet, added distance IR bricklet, added Ralink RT2571W, added 8 hardware buttons, adapted the relais.js software <a href="tinkerforge_relais_raspberry_pi_2.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::raspberrypi', 1)">raspberrypi</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tinkerforge', 1)">tinkerforge</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::node.js', 1)">node.js</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::illuminator', 1)">illuminator</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_45">nixos option search</dt>
+          <dd class="timeline-event-content posting_45">
+            <div class="postingsEntry">
+              <p class="summary">nixos option search <a href="nixos_option_search.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_46">source distribution is broken</dt>
+          <dd class="timeline-event-content posting_46">
+            <div class="postingsEntry">
+              <p class="summary">source code distribution, midstream, hashing of downloads <a href="source_distribution_is_broken.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::lua', 1)">lua</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ubuntu', 1)">ubuntu</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_47">nix-language-atlas nodejs</dt>
+          <dd class="timeline-event-content posting_47">
+            <div class="postingsEntry">
+              <p class="summary">deploying node.js applications on nixos <a href="nix-language-atlas_nodejs.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::npm', 1)">npm</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::node.js', 1)">node.js</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nix-language-atlas', 1)">nix-language-atlas</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_48">linux without flash</dt>
+          <dd class="timeline-event-content posting_48">
+            <div class="postingsEntry">
+              <p class="summary">how to get rid of flash on linux <a href="linux_without_flash.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::flash', 1)">flash</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_49">nix-build-view using ncurses</dt>
+          <dd class="timeline-event-content posting_49">
+            <div class="postingsEntry">
+              <p class="summary">nix-build-view is a graphical frontend for nix-build, to visualize parallel execution of downloads and builds, taking place when doing nixos-rebuild for example. <a href="nix-build-view_using_ncurses.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_50">converting jessyink svg based presentations to png and pdf</dt>
+          <dd class="timeline-event-content posting_50">
+            <div class="postingsEntry">
+              <p class="summary">how to create a presentation using inkscape and jessyink and how to create a pdf from it <a href="converting_jessyink_svg_based_presentations_to_png_and_pdf.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::svg', 1)">svg</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::jessyink', 1)">jessyink</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::pdf', 1)">pdf</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_51">advanced webservices on nixos revisited</dt>
+          <dd class="timeline-event-content posting_51">
+            <div class="postingsEntry">
+              <p class="summary">new ideas for webservice packaging on NixOS <a href="advanced_webservices_on_nixos_revisited.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::containerization', 1)">containerization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::webservices', 1)">webservices</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_52">tinkerforge relais raspberry pi</dt>
+          <dd class="timeline-event-content posting_52">
+            <div class="postingsEntry">
+              <p class="summary">this post documents the various software designs i tried until i ended up with a node.js installation on a raspberry pi (PI for short) which is no used several times a day to control my devices' power states. <a href="tinkerforge_relais_raspberry_pi.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::raspberrypi', 1)">raspberrypi</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tinkerforge', 1)">tinkerforge</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::node.js', 1)">node.js</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::scala', 1)">scala</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::lift', 1)">lift</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::illuminator', 1)">illuminator</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_53">mailinglist to newsgroup wrapper</dt>
+          <dd class="timeline-event-content posting_53">
+            <div class="postingsEntry">
+              <p class="summary">how to read mailing lists with a news reader <a href="mailinglist_to_newsgroup_wrapper.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_54">advanced webservices on nixos</dt>
+          <dd class="timeline-event-content posting_54">
+            <div class="postingsEntry">
+              <p class="summary">a declarative approach to describe webservices <a href="advanced_webservices_on_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::nixcloud', 1)">nixcloud</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2014">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2014</span></h2>
+          <dt class="timeline-event posting_55">loading nix-env automatically</dt>
+          <dd class="timeline-event-content posting_55">
+            <div class="postingsEntry">
+              <p class="summary">how to load a custom environment automatically when entering a directory <a href="loading_nix-env_automatically.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_56">infotainment</dt>
+          <dd class="timeline-event-content posting_56">
+            <div class="postingsEntry">
+              <p class="summary">how infotainment in cars will be in a few years <a href="infotainment.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::infotainment', 1)">infotainment</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_57">nix-git</dt>
+          <dd class="timeline-event-content posting_57">
+            <div class="postingsEntry">
+              <p class="summary">git gc --aggressive for nixpkgs.git <a href="nix-git.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::github', 1)">github</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_58">shinken 1.2.4 on ubuntu desktop 12.10 iv</dt>
+          <dd class="timeline-event-content posting_58">
+            <div class="postingsEntry">
+              <p class="summary">ensuring only one dhcp server is active <a href="shinken_1.2.4_on_ubuntu_desktop_12.10_iv.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shinken', 1)">shinken</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::shinken', 1)">shinken</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_59">CCCS Vortrag</dt>
+          <dd class="timeline-event-content posting_59">
+            <div class="postingsEntry">
+              <p class="summary">NixOS vortrag beim CCCS <a href="CCCS_Vortrag.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_60">shinken 1.2.4 on ubuntu desktop 12.10 iii</dt>
+          <dd class="timeline-event-content posting_60">
+            <div class="postingsEntry">
+              <p class="summary">this posting i want to enhance the shinken usage with a few new ideas <a href="shinken_1.2.4_on_ubuntu_desktop_12.10_iii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shinken', 1)">shinken</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::shinken', 1)">shinken</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_61">shinken 1.2.4 on ubuntu desktop 12.10 ii</dt>
+          <dd class="timeline-event-content posting_61">
+            <div class="postingsEntry">
+              <p class="summary">shinken with impact graph and ICMP <a href="shinken_1.2.4_on_ubuntu_desktop_12.10_ii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shinken', 1)">shinken</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::shinken', 1)">shinken</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_62">shinken 1.2.4 on ubuntu desktop 12.10</dt>
+          <dd class="timeline-event-content posting_62">
+            <div class="postingsEntry">
+              <p class="summary">shinken 1.2.4 on ubuntu desktop 12.10 <a href="shinken_1.2.4_on_ubuntu_desktop_12.10.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shinken', 1)">shinken</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::shinken', 1)">shinken</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_63">NAT traversal library</dt>
+          <dd class="timeline-event-content posting_63">
+            <div class="postingsEntry">
+              <p class="summary">NAT traversal library <a href="NAT_traversal_library.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tcp', 1)">tcp</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2013">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2013</span></h2>
+          <dt class="timeline-event posting_64">the cloud</dt>
+          <dd class="timeline-event-content posting_64">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A cloud consists of similar computers that run the same OS and have various technical and non-technical motivations, such as load balancing and marketing; using cloud services can lead to loss of control, loss of infrastructure, loss of software compatibility, loss of knowledge, and personal experiences with different online services; personal clouds and decentralized infrastructure are alternatives to centralized cloud services, but they face challenges and require standardized package management, symmetrical internet connections, scalability, powerful hardware, encryption, IPv6, and a clear understanding of data protection; private clouds have a long way to go before they can match the features and quality of big clouds; using the internet without losing individuality and freedom of expression can be complicated for average internet users. <a href="the_cloud.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::virtualization', 1)">virtualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_65">bonding eth0 wlan0 together to get an active backup link</dt>
+          <dd class="timeline-event-content posting_65">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article discusses the author's experience setting up a bonded network connection on Linux, allowing seamless switching between wireless and wired connections without losing active connections or disrupting bandwidth. The author provides step-by-step instructions for configuring the network and mentions some potential issues that may arise. They also express the need to package ifenslave and suggest integrating bonding into NixOS networking. <a href="bonding_eth0_wlan0_together_to_get_an_active_backup_link.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_66">problems with the nixos manifest</dt>
+          <dd class="timeline-event-content posting_66">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: How to fix the error message and update Nix archives in NixOS <a href="problems_with_the_nixos_manifest.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_67">svn meld on nixos</dt>
+          <dd class="timeline-event-content posting_67">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Using Meld to resolve conflicts while merging in SVN by configuring .subversion/config and /root/.meld. <a href="svn_meld_on_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_68">newspages quotability and wikis</dt>
+          <dd class="timeline-event-content posting_68">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author questions why the wiki principle, including link stability and collaborative editing, is not widely implemented in webpages and documents and expresses the benefits of using wikis. <a href="newspages_quotability_and_wikis.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_69">booting nixos from lvm on top of mdadm using gpt</dt>
+          <dd class="timeline-event-content posting_69">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A guide for partitioning and installing NixOS on a Hetzner root server with 2x3TB disks using GPT instead of fdisk. <a href="booting_nixos_from_lvm_on_top_of_mdadm_using_gpt.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::hetzner', 1)">hetzner</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_70">quantium cracking</dt>
+          <dd class="timeline-event-content posting_70">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article discusses the potential use of quantum computing for software exploitation and verification, as well as its impact on security and cryptography. It also highlights the promise of detailed quantum research. <a href="quantium_cracking.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::podcast', 1)">podcast</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_71">booting nixos from lvm on top of mdadm</dt>
+          <dd class="timeline-event-content posting_71">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This guide provides instructions for setting up a system using fdisk, mdadm, and LVM, with commands for creating RAID and configuring partitions. It also discusses the advantages of this setup and provides links to related resources. <a href="booting_nixos_from_lvm_on_top_of_mdadm.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_72">programming with serial ports in linux</dt>
+          <dd class="timeline-event-content posting_72">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This is a guide on how to log/analyze serial traffic and write a simulator for a UPS using NUT on Debian and NixOS. The author shares their experience with a specific UPS and discusses its pros and cons. The guide also includes links to further information. <a href="programming_with_serial_ports_in_linux.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_73">documentaries revisited</dt>
+          <dd class="timeline-event-content posting_73">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This post lists a collection of space science and energy-related documentaries, including topics such as black holes, planets, the Hubble telescope, and nuclear energy. <a href="documentaries_revisited.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::documentary', 1)">documentary</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::podcast', 1)">podcast</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_74">developing software using nixos</dt>
+          <dd class="timeline-event-content posting_74">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The article discusses the benefits of developing software on NixOS, a Linux operating system that provides a development environment per project to avoid pollution and regression issues caused by system-wide changes. It also includes examples of configuration files and mentions upcoming features in NixOS. <a href="developing_software_using_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_75">podcasts and documentaries</dt>
+          <dd class="timeline-event-content posting_75">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This post lists a collection of documentaries and podcasts, including space science documentaries, energy-related documentaries, and various podcasts on different topics. <a href="podcasts_and_documentaries.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::documentary', 1)">documentary</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::podcast', 1)">podcast</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2012">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2012</span></h2>
+          <dt class="timeline-event posting_76">n900 findings</dt>
+          <dd class="timeline-event-content posting_76">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author's Nokia N900 camera stopped working after the device fell, but reflashing the device resolved the issue. The author also provides steps for backing up and restoring the device and lists the applications they installed. They also mention that uninstalling fcam may have fixed the camera issue. <a href="n900_findings.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::n900', 1)">n900</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_77">kdevelop on nixos</dt>
+          <dd class="timeline-event-content posting_77">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This post discusses two issues faced when using NixOS, including problems with importing a Makefile-based project in KDevelop and issues with auto-completion due to the absence of /usr/include in NixOS. The post provides some updates and links to potential solutions for these problems <a href="kdevelop_on_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_78">system services on nixos</dt>
+          <dd class="timeline-event-content posting_78">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: How to integrate a daemon into NixOS using cntlm as an example. The process involves writing nix expressions, modifying configuration.nix, and starting the service as a separate user. This approach follows a clean design that encompasses packaging, configuration management, and runtime management. <a href="system_services_on_nixos.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_79">diploma thesis multi platform software package management</dt>
+          <dd class="timeline-event-content posting_79">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The publication of the author's diploma thesis on package management is now available online, including the source code and introducing new terminology in the field. <a href="diploma_thesis_multi_platform_software_package_management.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::MacOSX', 1)">MacOSX</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::virtualization', 1)">virtualization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_80">filing a ticket on otrs 3 0 6 on windows server 2008 is slow like hell</dt>
+          <dd class="timeline-event-content posting_80">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Setting up a local SMTP server on Windows Server 2008 to improve email sending efficiency in OTRS ticketing system without the need for an external mail server. <a href="filing_a_ticket_on_otrs_3_0_6_on_windows_server_2008_is_slow_like_hell.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::otrs', 1)">otrs</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_81">new nixos org mediawiki theme</dt>
+          <dd class="timeline-event-content posting_81">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience creating a custom mediawiki theme for muse-sequencer.org, highlighting the importance of integrating the main navigation menu for usability and aesthetics. They also mention the ease of adding external and internal links in mediawiki, and recommend using CSS and tools like Firefox+Firebug for web development. <a href="new_nixos_org_mediawiki_theme.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::taspring', 1)">taspring</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_82">ubuntu cachefs experiments</dt>
+          <dd class="timeline-event-content posting_82">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The main purpose is to create a 'high availability' file storage with two servers, one with fast disks for file caching and another with slow but large disks. The setup involves using fscache, virtualbox, and Ubuntu 10.10. The experiment also includes testing fscache with NFS and ext2/ext4 filesystems, as well as performance experiments to determine if the setup is worth it. The conclusion is that hot data can be used with the NFS workaround, but not without it. It would be nice to have a similar feature to fscache for any filesystem. <a href="ubuntu_cachefs_experiments.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_83">mediawiki clean skin relocated</dt>
+          <dd class="timeline-event-content posting_83">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience with using the 'clean' skin in Mediawiki, their issues with it on a new server, their modifications to fix the issues, and the new home for the clean skin. <a href="mediawiki_clean_skin_relocated.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_84">converting a virtualbox image to a libvirt</dt>
+          <dd class="timeline-event-content posting_84">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Migrating a Gentoo system from VirtualBox to a libvirt machine running Fedora Core 15 Beta, including problems with image conversion, network and kernel configuration, and virtualbox kernel module building. <a href="converting_a_virtualbox_image_to_a_libvirt.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_85">shinken 0.6 on gentoo</dt>
+          <dd class="timeline-event-content posting_85">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article discusses the author's experience with deploying the monitoring tool Shinken on Gentoo and troubleshooting an issue with the Livestatus service. The author describes the dependencies they installed and provides a solution to the problem they encountered. <a href="shinken_0.6_on_gentoo.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shinken', 1)">shinken</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::shinken', 1)">shinken</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_86">nixos on a hetzner root server</dt>
+          <dd class="timeline-event-content posting_86">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A tutorial on running Nix OS on a Hetzner platform, including extracting the Nix OS installation using VirtualBox and configuring the root server for file deployment. <a href="nixos_on_a_hetzner_root_server.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::hetzner', 1)">hetzner</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_87">overwriting glibc library functions</dt>
+          <dd class="timeline-event-content posting_87">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This posting shows how to alter certain functions in a library to fix issues with the date function in GCC timestamps. A code snippet is provided to create a custom memcpy function to bypass a specific issue in Adobe Flash. <a href="overwriting_glibc_library_functions.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_88">evopedia is running on mac os x</dt>
+          <dd class="timeline-event-content posting_88">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The article provides instructions on how to deploy Evopedia 0.4.2 on Mac OS X using Homebrew or native Qt tools, as well as the option to download a pre-built dmg image. <a href="evopedia_is_running_on_mac_os_x.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::macosx', 1)">macosx</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::evopedia', 1)">evopedia</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_89">a new workstation iii</dt>
+          <dd class="timeline-event-content posting_89">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience with the proprietary NVIDIA driver causing crashes and file loss on their Linux laptop and describes how they used netconsole to track down the issue. They then switched to the nouveau driver which improved performance and power saving, although there were some remaining issues with 2D drawing. The author concludes that KMS+nouveau+gallium3d is the way to go for NVIDIA drivers on Linux. <a href="a_new_workstation_iii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_90">prove binary deployment by recompiling and comparing</dt>
+          <dd class="timeline-event-content posting_90">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The article discusses the challenges of verifying the integrity of source code in binary deployment and suggests using a purely functional package manager like Nix to minimize interference and ensure consistent outcomes. It also explores possible solutions to the problem of timestamps causing differences in files. <a href="prove_binary_deployment_by_recompiling_and_comparing.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_91">bringing nix to its limits</dt>
+          <dd class="timeline-event-content posting_91">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This post discusses using Nix for source deployment and binary deployment on Windows, and explores how to build a MinGW-based Nix toolchain for Windows. <a href="bringing_nix_to_its_limits.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_92">replacing automake by cmake</dt>
+          <dd class="timeline-event-content posting_92">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Discusses issues with the autotools build system in the Nix package manager and the motivation for replacing it with CMake, as well as tips and pitfalls in the process. <a href="replacing_automake_by_cmake.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::nixos', 1)">nixos</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_93">running the nix package manager in a prefix as the home directory</dt>
+          <dd class="timeline-event-content posting_93">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This post discusses how to set up a Nix prefix installation on Gentoo Linux, including the pros and cons of both Gentoo prefix and Nix prefix. It provides instructions for downloading and using Nix prefix, and includes links for further information. <a href="running_the_nix_package_manager_in_a_prefix_as_the_home_directory.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_94">running the nix package manager on windows</dt>
+          <dd class="timeline-event-content posting_94">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article discusses the use of Nix (a package manager like apt or portage) on Windows, including how to build and use it on a Windows system, as well as limitations and potential applications. <a href="running_the_nix_package_manager_on_windows.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_95">gentoo server maintainance issues</dt>
+          <dd class="timeline-event-content posting_95">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Two Gentoo systems experienced issues after updates, with one failing due to glibcxx/gcc update and the other failing to start a service after an update, highlighting the challenges of updating systems and the importance of using compatible software versions. <a href="gentoo_server_maintainance_issues.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_96">gentoo security</dt>
+          <dd class="timeline-event-content posting_96">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A reminder on how to keep a Gentoo system safe and sound, including updating active components, removing unnecessary software, checking for GLSA and kernel updates, managing disk space, and disabling unused services. <a href="gentoo_security.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::security', 1)">security</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2011">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2011</span></h2>
+          <dt class="timeline-event posting_97">mac os x virtualbox</dt>
+          <dd class="timeline-event-content posting_97">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Running Mac OS X from VirtualBox on a Gentoo Linux host system, including tips on disk image size, installing software, downloading Xcode, creating snapshots, and image growth. <a href="mac_os_x_virtualbox.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::macosx', 1)">macosx</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_98">evopedia on windows with installer</dt>
+          <dd class="timeline-event-content posting_98">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Evopedia 0.4.2 has been released for Windows, featuring an experimental installer created using HM NIS EDIT and a built-in p2p torrent downloader for updates and downloads. <a href="evopedia_on_windows_with_installer.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::evopedia', 1)">evopedia</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_99">package management done differently nix</dt>
+          <dd class="timeline-event-content posting_99">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article discusses the author's experience with different Linux distributions and their package managers, highlighting the shortcomings and challenges they faced. They then introduce NIX OS, a package manager with unique features such as the ability to install multiple versions of a program, atomic installations, and easy roll-backs. NIX also replaces other build tools like Make and CMake. The author provides an example of creating a Nix component and installing it on Nix OS. <a href="package_management_done_differently_nix.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tech', 1)">tech</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_100">evopedia is running on arch linux</dt>
+          <dd class="timeline-event-content posting_100">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: evopedia is now available for easy installation on Arch Linux through AUR, and users can also install it directly using the provided PKGBUILD source code. <a href="evopedia_is_running_on_arch_linux.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::evopedia', 1)">evopedia</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::arch', 1)">arch</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::evopedia', 1)">evopedia</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_101">virtualbox extends my host system with several computers on the same network</dt>
+          <dd class="timeline-event-content posting_101">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author describes their setup for experimenting with deployment by installing virtual Linux distributions using Virtualbox, solving networking issues and enabling internet access for all hosts using masquerading and configuring a DHCP server. <a href="virtualbox_extends_my_host_system_with_several_computers_on_the_same_network.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_102">evopedia is running on gentoo linux</dt>
+          <dd class="timeline-event-content posting_102">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Evopedia, an offline Wikipedia reader, has been ported to Gentoo Linux and the ebuild can be found at the given link. Thanks were given to the developers who reviewed the ebuild and hope it will be included in the official distribution soon. <a href="evopedia_is_running_on_gentoo_linux.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::evopedia', 1)">evopedia</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_103">evopedia is running on windows xp</dt>
+          <dd class="timeline-event-content posting_103">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Evopedia, the offline Wikipedia reader, is now running on Windows XP and later versions, with a guide on how to build and modify it for Windows. <a href="evopedia_is_running_on_windows_xp.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::evopedia', 1)">evopedia</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_104">adding torrent support to your qt project</dt>
+          <dd class="timeline-event-content posting_104">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A developer modified a qt torrent example to create a gui-less torrent downloader and found a solution to a problem with the code. <a href="adding_torrent_support_to_your_qt_project.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_105">qgraphicsscene used as a qabstractitemview iii</dt>
+          <dd class="timeline-event-content posting_105">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This posting discusses using a QGraphicsScene/QGraphicsView with a QAbstractItemModel and introduces new concepts for setting up modules and connections, using a messenger class and interface, editing module properties with a QTreeView, and the possibility of using graphviz to layout a graph. <a href="qgraphicsscene_used_as_a_qabstractitemview_iii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::qgraphicsscene', 1)">qgraphicsscene</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_106">no more crashes after resuming from pm suspend iii</dt>
+          <dd class="timeline-event-content posting_106">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author describes issues with their laptop, including problems with graphics, sound, WLAN, and ACPI events. They provide details about the specific issues and mention contacting the relevant development teams for help. <a href="no_more_crashes_after_resuming_from_pm_suspend_iii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::audio', 1)">audio</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_107">qabstractitemmodel vs qstandarditemmodel</dt>
+          <dd class="timeline-event-content posting_107">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Discusses the difference between using a QAbstractItemModel and a QStandardItemModel for implementing a torrent client in Qt, and concludes that using a QStandardItemModel is easier and more convenient. <a href="qabstractitemmodel_vs_qstandarditemmodel.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::QAbstractItemModel', 1)">QAbstractItemModel</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_108">gentoo user only 2gb ram or less</dt>
+          <dd class="timeline-event-content posting_108">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article explains how to write swap back to RAM after it has been swapped out during software installation, with cautionary warnings included. <a href="gentoo_user_only_2gb_ram_or_less.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_109">no more crashes after resuming from pm suspend ii</dt>
+          <dd class="timeline-event-content posting_109">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author has been experiencing crashes on their HP EliteBook 8530w after resuming from suspend and found that disabling compositing in KDE helped, but the crashes still occurred. They then disabled compositing and AIGLX in xorg.conf, which seemed to resolve the issue. They are currently using Nvidia drivers and have 2D and 3D acceleration running. There have been continued crashes, but it is difficult to debug. <a href="no_more_crashes_after_resuming_from_pm_suspend_ii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_110">creating c++ classes using python scripts</dt>
+          <dd class="timeline-event-content posting_110">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This script automates the creation of multiple C++ classes by generating the corresponding .h and .cpp files using Python and string templates. <a href="creating_c++_classes_using_python_scripts.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::python', 1)">python</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_111">enabling vt no longer chrases x on my hp elitebook 8530w</dt>
+          <dd class="timeline-event-content posting_111">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their difficulties in using VirtualBox with 64-bit guests on their host OS and their attempts to fix it, eventually finding success with the x11-drivers/nvidia-drivers-256.35 driver. They also mention the various functions that are now working with this driver, but note that it may not be stable. <a href="enabling_vt_no_longer_chrases_x_on_my_hp_elitebook_8530w.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_112">fixing volume change in linux</dt>
+          <dd class="timeline-event-content posting_112">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A guide addressing volume control issues on Linux systems, particularly focusing on the HP EliteBook 8530w using Gentoo Linux. The guide covers using ACPI events, modifying X bindings, and installing on-screen display (OSD) solutions for volume changes. <a href="fixing_volume_change_in_linux.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::audio', 1)">audio</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_113">no more crashes after resuming from pm suspend</dt>
+          <dd class="timeline-event-content posting_113">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author shares their experience of owning an HP Elitebook 8530w and encountering issues with the nvidia card when resuming from suspend, but was able to fix the issue by updating pm-utils and using the acpi interface to adjust the screen brightness. <a href="no_more_crashes_after_resuming_from_pm_suspend.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_114">spamassassin procmail with vpopmail accounts</dt>
+          <dd class="timeline-event-content posting_114">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience with using Bayesian filtering with SpamAssassin to reduce spam emails, including their setup, configuration, and training of the filter. They provide details on their procmail configuration, local.cf file, and how they experiment with spam. They also mention the importance of using the correct configuration files and permissions, and provide links to additional resources. <a href="spamassassin_procmail_with_vpopmail_accounts.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::mail', 1)">mail</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_115">updating to kde 4.4.2 from kde 4.3.3</dt>
+          <dd class="timeline-event-content posting_115">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The blog post outlines the process of updating Gentoo Linux from KDE 4.3.3 to KDE 4.4.2 (and later 4.4.3). It discusses concepts like package stability in Portage, the user's existing software, preparations for the update, addressing warnings, handling package blocks, removing old KDE components, updating system configuration files, and ultimately achieving a successful installation of KDE 4.4.3, including troubleshooting and resolving dependencies along the way. <a href="updating_to_kde_4.4.2_from_kde_4.3.3.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_116">tcp</dt>
+          <dd class="timeline-event-content posting_116">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A blog post written in German discussing a seminar assignment on the topic of TCP, including links to a PDF, LaTeX tex file, and BibTeX file. <a href="tcp.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tcp', 1)">tcp</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_117">offering downloads via p2p using bittorrent</dt>
+          <dd class="timeline-event-content posting_117">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This guide explains how to publish files using BitTorrent on Linux, including creating a .torrent file, hosting a tracker, connecting a seed to the tracker, testing and monitoring the tracker or swarm, and ensuring security. The guide also mentions the limitations of using NAT and the potential of using IPv6 for better performance. <a href="offering_downloads_via_p2p_using_bittorrent.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::p2p', 1)">p2p</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_118">acronis true image 2009</dt>
+          <dd class="timeline-event-content posting_118">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The user is experiencing issues with Acronis True Image Home 2009 backup software on Windows XP and is looking for a solution regarding incremental backups and consolidation. They disabled the "create a new backup after x incremental or differential backups" option in order to fix the issue. The user suggests that the GUI design could be improved and mentions that they have also tried the 2010 version of the software with no success. They are seeking help or suggestions for a solution. <a href="acronis_true_image_2009.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::windows', 1)">windows</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_119">magic dhcp stuff isc dynamic host configuration protocol</dt>
+          <dd class="timeline-event-content posting_119">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A blog post explaining how to execute custom scripts when a DHCP lease is passed to a client, with instructions and examples for setup in Gentoo Linux. <a href="magic_dhcp_stuff_isc_dynamic_host_configuration_protocol.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_120">kernel 2 6 25 and udev 141 issue</dt>
+          <dd class="timeline-event-content posting_120">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The problem was that the system was halted due to udev not supporting the kernel version, and the fix involved downgrading udev to version 141 after booting from a grml USB stick and making some changes in the system setup. <a href="kernel_2_6_25_and_udev_141_issue.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_121">ogre 3d - 4</dt>
+          <dd class="timeline-event-content posting_121">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author has created a set of basic Ogre examples and provides screenshots and download links on Github, covering various topics including creating self-contained examples, getting Ogre running, using joystick/gamepad support, creating spheres and rings, using shaders, using CMake, and creating a lightweight CustomMedia system. The author also requests feedback on the examples. <a href="ogre_3d_-_4.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ogre3d', 1)">ogre3d</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::ogre', 1)">ogre</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_122">ogre 3d - 3</dt>
+          <dd class="timeline-event-content posting_122">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Object Oriented Input System (OIS) is a cross-platform solution for using different types of input devices and feedback devices, but it may have issues working with certain Linux systems. This content explains how the OIS library has problems with permissions when accessing certain input devices on Linux, and provides solutions for fixing the issue using udev rules. It also discusses the lack of device hotplugging support in OIS and SDL libraries. <a href="ogre_3d_-_3.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ogre3d', 1)">ogre3d</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::ogre', 1)">ogre</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_123">a new workstation ii</dt>
+          <dd class="timeline-event-content posting_123">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author provides updates and discusses various issues with their laptop, including IO-wait problems, crashing during compilation, swapping, crashes on resume, low quality graphic card drivers, KDE PIM application problems, and sound support issues. They also mention using smartd and experiencing problems with Skype and flash. <a href="a_new_workstation_ii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::audio', 1)">audio</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_124">ogre 3d - 2</dt>
+          <dd class="timeline-event-content posting_124">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A status update for Ogre on Gentoo, including information about the samples browser, the use of CMake for the Ogre library, issues with key repeat and the Ogre configurator, the need for FreeImage, the complexity of the samples, and problems with compiling projects and using Nvidia CG support. Also includes information about an ebuild for Ogre 1.7rc1 and links to relevant forums and resources. <a href="ogre_3d_-_2.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ogre3d', 1)">ogre3d</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::ogre', 1)">ogre</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_125">package managers</dt>
+          <dd class="timeline-event-content posting_125">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author proposes a method for automatically detecting dependencies in package managers by monitoring OPEN syscalls and using the 'ldd' command on the built binary. The goal is to have a common package manager for all Linux distributions, as well as other operating systems like macOS and Windows. <a href="package_managers.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::packagemanager', 1)">packagemanager</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_126">ogre 3d</dt>
+          <dd class="timeline-event-content posting_126">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their issues with using Ogre 3D on Gentoo, including installation problems, lack of documentation and samples, and issues with the build system. They suggest looking at how Trolltech handles their Qt release as a possible fix. <a href="ogre_3d.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::ogre3d', 1)">ogre3d</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::ogre', 1)">ogre</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_127">qgraphicsscene used as a qabstractitemview ii</dt>
+          <dd class="timeline-event-content posting_127">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This article discusses the use of QGraphicsItem as a base class and the implementation of the class GraphicsItemModelExtension to query data from a QAbstractItemModel. It also touches on the use of properties and the need for a solution in displaying properties in a top-down manner. <a href="qgraphicsscene_used_as_a_qabstractitemview_ii.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::qgraphicsscene', 1)">qgraphicsscene</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_128">the future of the internet</dt>
+          <dd class="timeline-event-content posting_128">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The internet consists of low level protocols such as TCP, UDP, and IP, and there are various applications and services that use protocols other than HTTP. The biggest issue with HTTP is that it is a polling-only protocol, but there are new concepts like SPDY and websockets that aim to make HTTP more interactive. The future of the internet includes the adoption of IPv6, extended capabilities of HTTP, the merging of private and commercial internet usage, and the disappearance of Flash. <a href="the_future_of_the_internet.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_129">libnoise viewer</dt>
+          <dd class="timeline-event-content posting_129">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience with using multi-threading and the QThread class in the libnoise-viewer software, as well as how they applied a color-gradient to visualize a heightmap. They also mention their positive experience with migrating to cmake and using the KDevelop IDE. <a href="libnoise_viewer.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_130">linux bashing</dt>
+          <dd class="timeline-event-content posting_130">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author is experiencing multiple problems with their Gentoo Linux system, including mouse devices not working, file losses, crashes, slow performance, and instability. They are considering switching to Windows or trying a different desktop environment like XFCE4. <a href="linux_bashing.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2010">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2010</span></h2>
+          <dt class="timeline-event posting_131">qgraphicsscene used as a qabstractitemview</dt>
+          <dd class="timeline-event-content posting_131">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: This is a discussion about using QGraphicsScene as a QAbstractItemView and exploring different design approaches and concepts for a graph editor. <a href="qgraphicsscene_used_as_a_qabstractitemview.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::qgraphicsscene', 1)">qgraphicsscene</a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_132">cmake kdevelop 4</dt>
+          <dd class="timeline-event-content posting_132">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience using CMake for a Qt4 application, finding it easy to use and praising its "out of source" builds, and recommends resources for converting Qt4 applications from qmake to cmake. They also mention the convenience of using cmake with uic for KDE4 projects and express their satisfaction with KDevelop4's features such as language parsing, auto completion, multiple projects in one widget, and worksets. <a href="cmake_kdevelop_4.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_133">a new workstation</dt>
+          <dd class="timeline-event-content posting_133">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A user purchased an HP Elitebook 8530w laptop and had a positive experience with its performance and design, preferring it over other options due to its powerful NVIDIA graphics card and lack of AMD components. The user installed Gentoo on the laptop by cloning an image from another computer and had some initial difficulties with the installation but resolved them. The user praised the laptop's anti-glare display, low power drain in standby mode, and compatibility with Linux. The only issues encountered were with LAN, WLAN, webcam, and touchpad functionality. The user also mentioned using genkernel for creating a new initrd image for encryption support. Overall, the user highly recommends the HP Elitebook 8530w. <a href="a_new_workstation.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_134">cmake and doxygen github com</dt>
+          <dd class="timeline-event-content posting_134">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A developer discusses using cmake with doxygen, provides a code example, and mentions helpful resources. <a href="cmake_and_doxygen_github_com.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::cmake', 1)">cmake</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_135">n0 e28093 netw0rk manager source release</dt>
+          <dd class="timeline-event-content posting_135">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author has released nNull, a client/server program that can execute various scripts and is not limited to network scripts, with a console qt program for the server and a QWidget for the client. <a href="n0_e28093_netw0rk_manager_source_release.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::n0', 1)">n0</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_136">n0 netw0rk manager</dt>
+          <dd class="timeline-event-content posting_136">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author created their own network manager called n0 or nNull using Qt 4.x with a server and a client communicating via dbus, and they will release the source code soon. They explain how the network manager works and provide a script they use to change wireless networks. They also mention using dbus to execute scripts and logging the output to the GUI process. <a href="n0_netw0rk_manager.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::qt', 1)">qt</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::n0', 1)">n0</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_137">uninterruptible power supply suspend2ramsuspend2disk</dt>
+          <dd class="timeline-event-content posting_137">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Using software raids on Linux can be problematic during power outages, but using a single device without software raid or using suspend2ram/suspend2disk can provide a solution. <a href="uninterruptible_power_supply_suspend2ramsuspend2disk.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_138">linux love gentoo love</dt>
+          <dd class="timeline-event-content posting_138">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author updates their Gentoo box and praises the stability and usability of the new portage KDE, the Nvidia graphics driver, and the performance of various applications, expressing overall happiness with the update and plans for future improvements. <a href="linux_love_gentoo_love.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::audio', 1)">audio</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_139">ATI M22 mobility radeon x300 and external monitors</dt>
+          <dd class="timeline-event-content posting_139">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author encountered a limitation in the Radeon X300 graphics card where only one crtc interface could be used at a time, leading to a workaround using the xrandr command to disable and enable outputs, and suggested improvements for error messages. <a href="ATI_M22_mobility_radeon_x300_and_external_monitors.html">open complete article</a></p>
+              <p class="tag"><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_140">networkmanager</dt>
+          <dd class="timeline-event-content posting_140">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author discusses their experience with network management on Linux, specifically focusing on the drawbacks and benefits of their own network configuration setup using scripts. They also mention their thoughts on NetworkManager and suggest improvements, such as better debugging options and a graphical interface for monitoring network activity. Finally, they propose the concept of a "pyramid of services" to visualize the dependencies between network services and the ability to restart services at different layers of the pyramid. <a href="networkmanager.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::gentoo', 1)">gentoo</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_141">process control on logout</dt>
+          <dd class="timeline-event-content posting_141">
+            <div class="postingsEntry">
+              <p class="summary"> <a href="process_control_on_logout.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_142">virtualization</dt>
+          <dd class="timeline-event-content posting_142">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The author is curious about running Linux and Windows simultaneously on one machine, but there are security and performance issues with virtualization, and they are seeking information on how it works and how to set it up. <a href="virtualization.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_143">debugging failing gui only programs</dt>
+          <dd class="timeline-event-content posting_143">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Prior to GUI toolkits, console programs were commonly used, but now GUIs like QMessageBox can be annoying; the proposed fix is to record output buffers and easily toggle a console containing the recorded buffer for debugging and usability purposes. <a href="debugging_failing_gui_only_programs.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_144">installing murmurd mumble bypassing packet management</dt>
+          <dd class="timeline-event-content posting_144">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A guide on how to download and compile Mumble and its dependencies in Linux. <a href="installing_murmurd_mumble_bypassing_packet_management.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_145">NAT IPv4 holepunching nattraversal</dt>
+          <dd class="timeline-event-content posting_145">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: A user's experience trying to play a game of Spring using Springlobby and Skype, encountering issues with connection and NAT traversal, prompting the need for a solution to establish a connection before game launch. The idea of using a udpserver with hole punching and UPnP capabilities is proposed as a potential solution. The user also mentions the availability of expensive servers for hosting games and the potential of IPv6 as a solution. <a href="NAT_IPv4_holepunching_nattraversal.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::taspring', 1)">taspring</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::tcp', 1)">tcp</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_146">openstreetmap heightmaps</dt>
+          <dd class="timeline-event-content posting_146">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The problem of visualizing height differences in maps is discussed, with examples of different rendering methods shown. The idea of creating an OpenStreetMap renderer using the Spring RTS 'colorful heightmap' renderer or an overlay with local rendering is suggested. <a href="openstreetmap_heightmaps.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::openmoko', 1)">openmoko</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::usability', 1)">usability</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::visualization', 1)">visualization</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_147">GPL vs others</dt>
+          <dd class="timeline-event-content posting_147">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Comparing the success of Linux and BSD, the author attributes Linux's popularity to the GPL license, which forces the release of source code upon request, while BSD's more permissive license allows closed-source programs. The author also mentions Minix and expresses interest in a Linux modification that combines Minix's design with Linux. <a href="GPL_vs_others.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_148">linux on the desktop</dt>
+          <dd class="timeline-event-content posting_148">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Linux is not on the desktop yet due to issues with graphic drivers, wireless LAN, updates, security mechanisms, and backups, but its lack of game support is no longer a major concern. <a href="linux_on_the_desktop.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_149">acquiring aids by surfing porn</dt>
+          <dd class="timeline-event-content posting_149">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The article discusses how computers can be infected by viruses and how websites can infect computers through various attack patterns. It also explores social aspects of internet porn and the challenges of hiding online activities. The article raises concerns about privacy and the potential consequences of being exposed. <a href="acquiring_aids_by_surfing_porn.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_150">wireless lan security</dt>
+          <dd class="timeline-event-content posting_150">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The text discusses the security issues with using a bridge in securing a wireless LAN, including the potential for interception, alteration, and insertion of malware. It also debunks the effectiveness of MAC filters in wireless security. <a href="wireless_lan_security.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_151">centralized vs decentralized infrastructures</dt>
+          <dd class="timeline-event-content posting_151">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The content discusses the upcoming wireless LAN standard 802.11s and the concept of mesh networking, highlighting the need for a centralized infrastructure before decentralization can occur in various examples, and mentioning the advantages and security issues of the 802.11s standard. <a href="centralized_vs_decentralized_infrastructures.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_152">openmoko - xbuffer screwup issue</dt>
+          <dd class="timeline-event-content posting_152">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The openmoko device is experiencing frequent errors and the user is seeking a solution. <a href="openmoko_-_xbuffer_screwup_issue.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::openmoko', 1)">openmoko</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_153">p2p networks decentralized</dt>
+          <dd class="timeline-event-content posting_153">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: An example is given where a peer-to-peer (p2p) web service could alleviate costs related to bandwidth usage and server load by distributing the load to clients, and mentions the influence of technologies like Google Gears and web 2.0 Ajax. <a href="p2p_networks_decentralized.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_154">internet vs p2p networks</dt>
+          <dd class="timeline-event-content posting_154">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: The internet was originally designed as a decentralized fail-safe structure, but many protocols and services today rely on central points of failure, which opens the door to censorship. Peer-to-peer (p2p) networks offer a solution by allowing the sharing of files and opinions in a democratic manner. <a href="internet_vs_p2p_networks.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::society', 1)">society</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::technology', 1)">technology</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_155">spam issue intentional</dt>
+          <dd class="timeline-event-content posting_155">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Big email hosters like Gmail could benefit from concentration efforts to handle spam efficiently, while small installations struggle with the resources needed for effective sorting, leading to potential legal Denial-of-Service (DoS) attacks by spam on their competitors. <a href="spam_issue_intentional.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::DoS', 1)">DoS</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::email', 1)">email</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::spam', 1)">spam</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+          <dt class="timeline-event posting_156">hello world</dt>
+          <dd class="timeline-event-content posting_156">
+            <div class="postingsEntry">
+              <p class="summary">chatGPT: Initial Impressions of OpenMoko Neo Freerunner: Navigating Software Instabilities and Recognizing Potential <a href="hello_world.html">open complete article</a></p>
+              <p class="tag"><a class="tagbtn btn btn-primary" onClick="setFilter('tag::linux', 1)">linux</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::openmoko', 1)">openmoko</a><a class="tagbtn btn btn-primary" onClick="setFilter('tag::shr', 1)">shr</a><a class="seriesbtn btn btn-primary" onClick="setFilter('series::', 1)"></a></p>
+            </div>
+            <br class="clear">
+          </dd><!-- /.timeline-event-content -->
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --><div class="timeline-wrapper pankat_year pankat_year_2009">
+		<dl class="timeline-series">
+        <h2 class="timeline-time"><span>2009</span></h2>
+		</dl><!-- /.timeline-series -->
+		</div><!-- /.timeline-wrapper --></div><!-- /.timeline-container -->
+  </div>
+
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+
+<!-- timeline related js begin -->
+<script type="text/javascript" src="js/colorbox.js"></script>
+<script type="text/javascript" src="js/timeliner.js"></script>
+<script src="js/pankat-timeline.js"></script>
+<script>
+  $(document).ready(function() {
+    // Colorbox Modal
+    $(".CBmodal").colorbox({inline:true, initialWidth:100, maxWidth:682, initialHeight:100, transition:"elastic",speed:10});
+  });
+</script>
+<!-- timeline related js end -->
+
+
+
+
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

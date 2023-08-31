@@ -1,0 +1,33 @@
+[[!summary chatGPT: The author discusses their experience with using the 'clean' skin in Mediawiki, their issues with it on a new server, their modifications to fix the issues, and the new home for the clean skin.]]
+[[!meta date="2011-06-02 09:47"]]
+[[!tag usability]]
+
+# motivation
+mediawiki has various built in skins but i usually prefered the 'clean' skin from Kevin Hughes (shown in the screenshot).
+
+lately i had massive problems as i was moving from a **gentoo server** to a **nix os server** probably caused by different php versions but i'm not absolutely sure. anyway as the clean skin [1] was broken with the more recent php version.
+
+[[!img media/mediawiki-skin-clean.png caption="mediawiki clean skin"]]
+
+## wasn't it the fault of different mediawiki versions?
+
+
+i did copy my old mediawiki (and the clean skin) on a 1:1 basis to my nix os based server resulting in the same layout problems compared to using the most recent mediawiki from scratch.
+
+therefore i conclude that issues i fixed are not caused by mediawiki.
+
+
+## the fix
+
+
+finally i decided to hack the skin to make it work again and i came up with 3 small modifications to the code and the skin was working again! after contacting **Kevin Hughes **about my changes** he decided to release the next version of his skin cc-by-sa/3.0** which is great!
+
+but he also said that he is not hosting the skin anymore, that means: **the clean skin has a new home [2]** (namely my repository). of course, as it is open source now you can also host it on any other page. but i would welcome other modifications to be done collaboratively.
+
+**dear kevin hughes - thank you so much for that great skin!**
+
+
+# links
+
+* [1] <http://mediawiki2u.com/>
+* [2] <https://github.com/qknight/mediawiki-theme-clean>

@@ -1,0 +1,39 @@
+[[!summary chatGPT: The author proposes a method for automatically detecting dependencies in package managers by monitoring OPEN syscalls and using the 'ldd' command on the built binary. The goal is to have a common package manager for all Linux distributions, as well as other operating systems like macOS and Windows.]]
+[[!meta date="2010-02-14 17:26"]]
+[[!tag gentoo linux packagemanager technology usability]]
+
+[[!img media/debian_ubuntu_gentoo_package.png alt="" style="float: right" size=200x]]
+
+i've been into package managers for some time and i always wondered why developers have to define dependencies manually and not supported by a program using '**a syscall interface monitoring all OPEN calls**' in combination to something like **ldd **for the built binary.
+
+the idea is pretty simple:
+	
+  1. first** try to compile the program you want to packet**. if all compiles then you probably have installed all required libraries on the system. (i assume PATH and LD_LIBRARY_PATH wasn't altered).
+  2. **next create a package as an  ebuild** for instance.  the 'configure' and 'make' step can be called by 'emerge'. emerge could then monitor everything, as
+  3. **on 'build time' of the **package ********** all OPEN syscalls are monitored** and every single file which is opened (which in theory belongs to a different installed 'known' package) is checked for the owner package. a group of packages which the 'build step' belongs to is acquired, and
+  4. finally after the source has successfully compiled **the binary is processed by 'ldd'** which usually looks like:
+
+        # ldd `which htop`
+        linux-vdso.so.1 =>  (0x00007fffce0a7000)
+        libncursesw.so.5 => /lib/libncursesw.so.5 (0x00007f305f907000)
+        libm.so.6 => /lib/libm.so.6 (0x00007f305f684000)
+        libc.so.6 => /lib/libc.so.6 (0x00007f305f328000)
+        libdl.so.2 => /lib/libdl.so.2 (0x00007f305f124000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f305fb64000)
+        now every library the binary depends on is expected to be from a specific package (again - which in theory belongs to a different installed 'known' package)
+  5. finally **all this automatically detected dependencies are reported to the package maintainer **and one probably could also check the existing dependencies for the package to see if they match.
+  6. **another important point would be if a package**, NO read: if a upstream package is removing support for something which requires an external library, **does include a dependency which is not used anymore it could be dropped automatically as well**.
+
+i did not test if that would actually work but i can't think of any issue why it should not.
+
+i've had some other ideas as well, if you are curious you can read the article in my wiki [1]. if you want to contribute please don't use the comment field, just write me an email or ask me for a wiki account and you can change it directly.
+
+my goal is to evaluate a mixture of the concept of ebuilds - everything built from source - with having binary packages combined to a p2p network in both hosting 'already compiled packages' as well as a distributed compile farm. currently it's a mixture of german and english but i might fix that soon. another important goal is to merge package management at some yet unknown point to remove redundant work and to have a common package manager for all linux distribution as well as all other distributaions as mac os x and windows.
+
+spoken in analogies: the same process for building a cross platform package manager is  'cmake' for cross platform build system generation which was (or currently is) replacing  'autotools'.
+
+
+## links
+
+
+* [1] <http://lastlog.de/wiki/index.php/Verteiltes_Paketsystem>

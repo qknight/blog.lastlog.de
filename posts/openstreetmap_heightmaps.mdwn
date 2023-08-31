@@ -1,0 +1,22 @@
+[[!summary chatGPT: The problem of visualizing height differences in maps is discussed, with examples of different rendering methods shown. The idea of creating an OpenStreetMap renderer using the Spring RTS 'colorful heightmap' renderer or an overlay with local rendering is suggested.]]
+[[!meta date="2009-07-07 14:36"]]
+[[!tag openmoko usability visualization]]
+
+a **problem** in visualizing maps is **how to render the height differences**. the spring rts has a very nice solution to this issue, see yourself:
+
+[[!img media/hill1.jpg alt=""]]
+[[!img media/hill2.jpg alt=""]]
+
+the **next** two pictures are **ordinary renderings**. this kind of rendering is commonly used on printouts. this is nice when having a big map in your hand and if the detail level is as low as in the first picture below.
+
+[[!img media/hill3.jpg alt=""]]
+
+however if the detail level increases as in the next picture (opencyclemap.org renderer)  the usability gets lost. at least on very small displays as handhelds having sunlight and reflections on the display.
+
+[[!img media/hill4.jpg alt=""]]
+
+i don't like using the opencyclemap renderer for biking tours. i've tested this quite some times with my openmoko device with the program called: tangoGPS
+
+i would love to have an osm renderer using the spring rts 'colorful heightmap' renderer. i could think of a switch between normal osm maps and the heightfield renderer of spring. or even an overlay with local rendering would be cool.
+
+maybe we can come up with such a renderer...

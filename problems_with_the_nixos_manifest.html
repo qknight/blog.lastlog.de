@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!-- this document is auto-generated from pankat document editor -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head data-article-dst-filename="problems_with_the_nixos_manifest.html">
+
+<meta charset="utf-8" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>problems with the nixos manifest</title>
+
+<script src="js/jquery.min.js"></script>
+
+<script src="js/jquery-ui-1.9.1.custom.min.js"></script>
+<script src="js/jquery.tocify.min.js"></script>
+
+<link type="text/css" rel="stylesheet" href="css/jquery.tocify.css" />
+
+
+
+<script src="js/reconnecting-websocket.min.js"></script>
+<script src="js/pankat-websocket.js"></script>
+<script src="js/diffDOM.js"></script>
+
+
+<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/anchor.min.js"></script>
+
+<link rel="icon" href="media/favicon.ico" type="image/x-icon" />
+
+
+<!--[if lt IE 9]>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" href="css/pandoc-kate.css" type="text/css" />
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+
+</head>
+<body>
+
+<div id="toc"></div>
+
+<!-- menu begins -->
+<div class="container">
+  <nav class="navbar navbar-default">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">lastlog.de/blog</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="timeline.html"><span class="glyphicon glyphicon-list" aria-hidden="true"></span> timeline</a></li>
+        <li><a href="about.html"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> about</a></li>
+        <li><a href="/draft" id="draft" style="display: none"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> draft</a></li>
+        <li><a href="/draft?article=posts/roadmap.mdwn" id="roadmap" style="display: none"><span class="glyphicon glyphicon glyphicon-road" aria-hidden="true"></span> roadmap</a></li>
+
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a title="live updates of article updates on posts/problems_with_the_nixos_manifest.mdwn" id="websocket" style="display: none"><span id="websocketStatus" class="glyphicon glyphicon-remove" aria-hidden="true"></span> websocket</a></li>
+        <!-- <li><a href="#">Login</a></li> -->
+      </ul>
+
+      <!--<div id="right">
+        <form class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+      </div>-->
+    </div><!-- /.navbar-collapse -->
+  </nav>
+
+<div id="headerAndArticle">
+
+
+  <div id="headerContainer">
+    <header class="header"><span id="articleNavLeft"> <a href="svn_meld_on_nixos.html"> 
+      <span class="glyphiconLink glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous article"> </span> prev. article
+    </a> </span><span id="articleNavRight"><a href="bonding_eth0_wlan0_together_to_get_an_active_backup_link.html"> 
+        next article <span class="glyphiconLink glyphicon glyphicon-chevron-right" aria-hidden="true" title="next article"></span>
+    </a> </span></header>
+  </div>
+  
+
+  <div class="article">
+    <h1 id="SiteTitle">problems with the nixos manifest</h1>
+    <div id="date"><p><span id="lastupdated">6 jun 2012</span></p></div><div id="tags"><p><a href="timeline.html?filter=tag::nixos" class="tagbtn btn btn-primary">nixos</a><a href="timeline.html?filter=tag::packagemanager" class="tagbtn btn btn-primary">packagemanager</a></p></div>
+    <p><a href="media/nixos-lores.png"><img src=media/nixos-lores.png alt="" style="float: right"></a></p>
+<h2 data-number="1" id="what-is-this">what is this?</h2>
+<p>lately nix-channel stopped working with this error message:</p>
+<pre><code># nix-channel --update
+fetching list of Nix archives at `http://nixos.org/releases/nixos/channels/nixos-unstable/MANIFEST.bz2&#39;...
+ % Total % Received % Xferd Average Speed Time Time Time Current
+ Dload Upload Total Spent Left Speed
+100 421 100 421 0 0 5212 0 --:--:-- --:--:-- --:--:-- 10023
+ 0 0 0 0 0 0 0 0 --:--:-- --:--:-- --:--:-- 0
+caching /nix/store/2n6ifd0gyw3cg4v780yxdl307sfi4mmv-MANIFEST.bz2...
+bzip2: (stdin) is not a bzip2 file.
+you have an old-style or corrupt manifest `/nix/var/nix/manifests/nixos-unstable nixos-d8b23fa7b687df69ca99c50a659cb9b7.nixmanifest&#39;; please delete it at /nix/store/gq4mqkg155jbpdzs44s6nc6ys1q3aqmh-nix-1.0pre2614_005d1e4/lib/perl5/site_perl/5.14.2/x86_64-linux-thread-multi/Nix/Manifest.pm line 346.
+cannot pull cache manifest from `http://nixos.org/releases/nixos/channels/nixos-unstable&#39; at /var/run/current-system/sw/bin/nix-channel line 88.</code></pre>
+<h2 data-number="2" id="the-fix">the fix</h2>
+<pre><code># ls -la /nix/var/nix/manifests/
+
+total 28
+drwxr-xr-x 2 root root 4096 Jun 6 20:19 ./
+drwxr-xr-x 11 root root 4096 Jun 4 12:36 ../
+-rw-r--r-- 1 root root 0 Jun 6 19:44 cache.lock
+-rw-r--r-- 1 root root 10240 Jun 6 19:44 cache.sqlite
+-rw-r--r-- 1 root root 0 Jun 6 20:19 cache.sqlite-journal
+lrwxrwxrwx 1 root root 56 Jun 6 20:19 nixos-unstable-1b76fe40b585f44b15266540562d24b5.nixmanifest -&gt; /nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2
+-rw-r--r-- 1 root root 64 Jun 6 20:19 nixos-unstable-1b76fe40b585f44b15266540562d24b5.url
+lrwxrwxrwx 1 root root 56 Jun 6 19:44 nixos-unstable\ nixos-d8b23fa7b687df69ca99c50a659cb9b7.nixmanifest -&gt; /nix/store/2n6ifd0gyw3cg4v780yxdl307sfi4mmv-MANIFEST.bz2
+-rw-r--r-- 1 root root 70 Jun 6 19:44 nixos-unstable\ nixos-d8b23fa7b687df69ca99c50a659cb9b7.url</code></pre>
+<h3 data-number="2.1" id="first-remove-all-the-manifests">first, remove
+all the manifests</h3>
+<pre><code># rm /nix/var/nix/manifests/*</code></pre>
+<h3 data-number="2.2" id="then-we-can-remove-the-store-entry">then we
+can remove the store entry:</h3>
+<pre><code># nix-store --delete /nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2 1 888 3 pts/17 /nix/var/nix/manifests root@eliteBook-8530w 12-06-06 21:35:59
+finding garbage collector roots...
+removing stale link from `/nix/var/nix/gcroots/auto/v6aa8ai44dd10ypv8vg6shf8b5mzkhfn&#39; to `/nix/var/nix/gcroots/per-user/root/channels.tmp&#39;
+deleting `/nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2&#39;
+1 store paths deleted, 6557759 bytes (6.25 MiB, 12840 blocks) freed</code></pre>
+<h3 data-number="2.3"
+id="afterwards-nix-channel-update-works">afterwards nix-channel –update
+works</h3>
+<pre><code># nix-channel --update
+fetching list of Nix archives at `http://nixos.org/releases/nixos/channels/nixos-unstable/MANIFEST.bz2&#39;...
+ % Total % Received % Xferd Average Speed Time Time Time Current
+ Dload Upload Total Spent Left Speed
+100 421 100 421 0 0 5191 0 --:--:-- --:--:-- --:--:-- 10023
+ 0 0 0 0 0 0 0 0 --:--:-- --:--:-- --:--:-- 0
+cached contents of ‘http://nixos.org/releases/nixos/channels/nixos-unstable/MANIFEST.bz2’ disappeared, redownloading...
+ % Total % Received % Xferd Average Speed Time Time Time Current
+ Dload Upload Total Spent Left Speed
+100 421 100 421 0 0 5221 0 --:--:-- --:--:-- --:--:-- 10268
+100 6404k 100 6404k 0 0 1499k 0 0:00:04 0:00:04 --:--:-- 1705k
+caching /nix/store/xrl4xmx6jz3zvcqwfy3k2qfycdh2454n-MANIFEST.bz2...
+downloading Nix expressions from `http://nixos.org/releases/nixos/channels/nixos-unstable/nixexprs.tar.bz2&#39;...
+ % Total % Received % Xferd Average Speed Time Time Time Current
+ Dload Upload Total Spent Left Speed
+100 425 100 425 0 0 5417 0 --:--:-- --:--:-- --:--:-- 10365
+100 3701k 100 3701k 0 0 1404k 0 0:00:02 0:00:02 --:--:-- 1627k
+unpacking channel Nix expressions...
+these derivations will be built:
+ /nix/store/4yd4l79h2nifm56rjpxq7hx10q57yz48-channels.drv
+building path(s) `/nix/store/r3i2m2by6hcsa3ic99nyhjdb7p551izl-channels&#39;
+unpacking channel nixos-unstable</code></pre>
+<h2 data-number="3" id="summary">summary</h2>
+<p>i don’t know why it stopped working. maybe i did checkout the wrong
+channel by mistake? but maybe someone else might find himself in the
+same situation and this posting might help to get things going
+quickly.</p>
+<p>thanks to niksnut@freenode#nixos</p>
+
+  </div>
+
+</div>
+
+<div id="ArticleSourceCode">
+
+<a href="posts/problems_with_the_nixos_manifest.mdwn" title="posts\problems_with_the_nixos_manifest.mdwn">article source</a>
+</div>
+
+</div>
+
+<div id="scrollUp">
+<span id="scrollUpBtn" class="glyphiconLink glyphicon glyphicon-chevron-up" aria-hidden="true" title="scroll up"></span>
+</div>
+
+<script>
+$("#scrollUpBtn").click(function() {
+  $("html, body").animate({ scrollTop: 0 }, "slow");
+  return false;
+});
+</script>
+
+
+<script>
+window.onload = function(e){
+  anchors.add('h1')
+  anchors.add('h2')
+  anchors.add('h3')
+  anchors.add('h4')
+  anchors.add('h5')
+}
+</script>
+
+
+
+
+<script>
+$(document).ready(function() {
+  //Calls the tocify method on your HTML div.
+  $("#toc").tocify();
+});
+$("#toc").hover(function() {
+  $("#toc").css("z-index", "111")
+}, function() {
+  $("#toc").css("z-index", "1")
+});
+</script>
+
+
+
+<script>
+
+var shifted = false;
+
+$(window).keyup(function(event) {
+    shifted = event.shiftKey;
+});
+
+$(window).keydown(function(event) {
+  if(event.keyCode == 16){
+    shifted = event.shiftKey;
+  }
+  if (shifted == false) {
+      if(event.keyCode == 37){
+        $('.glyphicon-chevron-left')[0].click()
+      }
+      if(event.keyCode == 39){
+        $('.glyphicon-chevron-right')[0].click()
+      }
+  }
+});
+</script>
+
+
+<script>
+// check if we got served from pankat-server
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function() {
+if (xhr.readyState == XMLHttpRequest.DONE) {
+  if (xhr.status == 200) {
+    console.log("request to /pankat-server returned status: " + xhr.status + ", so yes we got served from pankat-server");
+    $('#draft').css("display", "block");
+    $('#roadmap').css("display", "block");
+  }
+}
+}
+xhr.open('GET', "/pankat-server", false);
+xhr.send(null);
+</script>
+</body>
+</html>

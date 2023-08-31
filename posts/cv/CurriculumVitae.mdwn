@@ -1,0 +1,173 @@
+[[!summary chatGPT: joachim schiele, a full stack software developer with a strong background in linux systems, programming and software distribution.]]
+[[!SpecialPage]]
+
+[[!title curriculum vitae]]
+
+## about me
+
+[[!img posts/cv/joachim.jpeg width="200px"  style="float: right"]]
+
+joachim schiele, a _full stack software developer_ with a strong background in _linux systems, programming and software distribution_.
+
+by embracing new knowledge and adapting to emerging trends, i strive to remain ahead of the curve and deliver outstanding results in any endeavor i undertake.
+successfully led the nixcloud company as CEO for 2 years, utilizing my exceptional people skills to foster a positive and collaborative work environment.
+
+location: EMEA, Germany
+
+# activities
+
+* [lastlog.de/blog](https://lastlog.de/blog)
+* <https://github.com/qknight> and <https://github.com/nixcloud>
+* [stackoverflow](https://stackoverflow.com/users/1630083/qknight)
+* [twitter](https://twitter.com/joschelboschel)
+* [linkedin](https://de.linkedin.com/in/joachim-schiele-9626a6147)
+* [printables](https://www.printables.com/de/@joshel_170093/models)
+* [email](mailto:js@lastlog.de)
+
+## languages
+
+languages **i know well**:
+
+<style>
+th, td {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+</style>
+ <table>
+  <tr>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/nix-snowflake.svg width="40px" class="noFancy" alt="" title="nix"]]</td>
+    <td>[nix](https://nixos.org/manual/nix/stable/language/index.html) - nixcloud, need i say more?</td>
+  </tr>  <tr>
+    <td>[[!img posts/cv/1200px-Go_Logo_Blue.svg.png width="50px" class="noFancy" alt="" title="golang"]]</td>
+    <td>[golang](https://go.dev/) - pankat, lots of REST/websocket backends</td>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/Emscripten_logo.svg width="40px" class="noFancy" alt="" title="emscripten"]]</td>
+    <td>[emscripten](https://emscripten.org/) - porting c/cpp for the webbrowser</td>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/ISO_C++_Logo.svg.png width="40px" class="noFancy" alt="" title="isocpp"]]</td>
+    <td>[c++](https://en.wikipedia.org/wiki/C%2B%2B) - legacy projects, i love cmake</td>
+  </tr>
+</table>
+
+languages **i'm interested in**:
+
+ <table>
+  <tr>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/elm-f838b474.svg width="40px" class="noFancy" alt="" title="elm"]]</td>
+    <td>[elm](https://elm-lang.org/) - functional UI programming</td>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/Rustacean-orig-noshadow.svg width="40px" class="noFancy" alt="" title="rust"]]</td>
+    <td>[rust](https://www.rust-lang.org/) - preparing the future</td>
+  </tr>
+</table>
+
+## container solutions / operating systems
+
+in these areas i have a lot of experience:
+
+ <table>
+  <tr>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/nix-snowflake.svg width="40px" class="noFancy" alt="" title="nix"]]</td>
+    <td>[nixos](https://nixos.org/) - a linux distribution, basis of nixcloud</td>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/Docker_(container_engine)_logo.svg width="50px" class="noFancy" alt="" title="docker"]]</td>
+    <td>[docker](https://www.docker.com/) - development and deployment</td>
+  </tr>
+  <tr>
+    <td>[[!img posts/cv/Amazon_Web_Services_Logo.svg width="40px" class="noFancy" alt="" title="aws"]]</td>
+    <td>[aws](https://aws.amazon.com/) - nixops for cloud deployment</td>
+  </tr>
+</table>
+
+## milestones
+
+### freelancer `08/2023 - present`
+
+ * looking into rust/elm
+ * nixcloud-webservices extension of nixcloud.monitoring
+
+### full stack developer - TeamSpeak Systems GmbH `04/2022 - 07/2023`
+
+ * C++ backend development (Visual Studio)
+   * integrated websocket support
+ * Golang backend development (Goland)
+ * Docker/Docker compose architecture development
+
+### c++ embedded developer - TK Elevator `08/2020 – 03/2022`
+
+ * Extended C++ elevator framework / simulation
+ * Reworked CMake build system
+ * Extended UI from Gnuplot to Plotly.js / used emscripten and HTML/CSS/JS
+ * Worked on Gtest upstream
+ * Massive GIT reworks with submodules and build server
+
+### qt/c++ developer - Struktur AG `04/2020 – 07/2020`
+
+ * Migrated bare webrtc to libwebrtc
+ * Ported build system from QMake to CMake both on Linux and Win7 using Vagrant and VirtualBox
+ * Mapped REST to Qt UI elements / webrtc interface
+
+### linux system consultant - Robert Bosch GmbH `03/2019 – 03/2020`
+
+ * Managed 5000 RHEL installations with Satellite
+ * Established Ansible / Ansible Tower solution to obsolete SC-Venus
+ * Wrote Ansible Playbooks/Roles, established workflows & automations
+
+### founder - nixcloud GmbH (Start-up) `02/2017 – 04/2020`
+
+ * CEO & CTO <https://nixcloud.io> - Company creation
+ * Created <https://github.com/nixcloud/nixcloud-webservices>
+ * Collaborated with NLNET
+
+### freelancer `01/2015 – 01/2017`
+
+ * Qt/OpenCV parabolic trough collector QA-management for Solera GmbH
+ * Qt5 port to ppc64 / Yocto Linux for IDS Imaging Development Systems GmbH
+ * LiHas – extended RT with kanban: <https://lastlog.de/blog/request_tracker_kanban_extension.html>
+ * Rust deployment on NixOS
+
+###  R'n'D & doctorate - daimler AG `04/2012 – 12/2014`
+
+ * Research Distributed deployment with Nix/NixOS
+ * Embedded-development C/C++ using i.MX6 controllers
+ * Manged infrastructure: DSL/i.MX6/DNS/GitLab servers
+ * Lead in „ÖG Projekt ARAMiS“
+
+### development engineer - MBtech Group `09/2011 – 02/2012`
+
+ * RT-Development using XENOMAI Linux with Eberspächer
+ * Implemented the FlexRay driver on XENOMAI Linux in Linux virtualized Autosar stack
+ * Created a Linux-installer (debootstrap)
+
+### system consultant - AMARAS AG
+
+ * Developed a monitoring system
+ * Developed a DRBD cluster
+
+<!--
+## projects
+
+ * [nixcloud-webservices](https://github.com/nixcloud/nixcloud-webservices)
+ * [lastlog.de/blog](https://lastlog.de/blog)
+ * [pankat](https://github.com/nixcloud/pankat)
+
+-->
+
+note: icons shown for programming languages are (c) from their respective projects.

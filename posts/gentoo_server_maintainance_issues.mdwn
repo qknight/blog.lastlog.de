@@ -1,0 +1,55 @@
+[[!summary chatGPT: Two Gentoo systems experienced issues after updates, with one failing due to glibcxx/gcc update and the other failing to start a service after an update, highlighting the challenges of updating systems and the importance of using compatible software versions.]]
+[[!meta date="2011-01-12 21:22"]]
+[[!tag gentoo linux packagemanager usability]]
+
+[[!img media/200px-gentoo_linux_logo_matte-svg.png size=100x alt="" style="float: right"]]
+
+# motivation
+
+
+this is the essence of the recent findings when doing server updates (on my two gentoo boxes).
+
+in general: this is about: '**emerge -uDN world**' and '**emerge --depclean**'.
+
+
+# system 1:
+
+	
+  * i had **serious problems with a failed glibcxx/gcc update**.
+emerging qt-core failed with: /var/tmp/portage/x11-libs/qt-core-4.6.3/work/qt-everywhere-opensource-src-4.6.3/bin/qmake: /lib/libstdc++.so.6: version `GLIBCXX_3.4.11' not found (required by /var/tmp/portage/x11-libs/qt-core-4.6.3/work/qt-everywhere-opensource-src-4.6.3/bin/qmake)
+**FIX:** the solution to this problem was quite adventurous: i applied a temporary hack from [1]: using **libssp_simple.so** and **ld.so.preload**. i was then able to recompile system (emerge -e system) and afterwards i could remove the preloaded library again.
+
+
+
+
+# system 2:
+
+
+this update went pretty well compared to system 1 but it also failed horribly:
+
+
+
+	
+  * after the '**emerge -uDN world**' update the system **wasn't able to start the /etc/init.d/net.eth0 **service on reboot.
+this is because i used etc-update improperly and then /etc/modules.autoload.d/kernel-2.6 did not include the one kernelmodule i needed to be loaded.
+**FIX:** to avoid further module issues i decided to switch to genkernel using 'make oldconfig'
+
+	
+  * as a result of using genkernel there were no **/dev/hda** or **/dev/sda** device nodes.
+i was able to added them manually using: mknod but after the reboot they were gone.
+**FIX:** see [2], a missing kernel configuration setting: CONFIG_SYSFS_DEPRECATED_V2=y but it should be disabled with =n, after a genkernel recompile & reboot it worked!
+
+
+# summary
+
+
+two updates made two systems fail. that is why i hate to update in general. this isn't an gentoo specific issue but a more general issue of the nature of updates. i always do my security updates but from time to time it is a good thing to do complete system updates. because **services seem to degrade** when they leave the '**time window'* **they were designed for.
+
+*the **time window of a software** (i define it) **is a consequence of upstream/downstream using certain tools to build software**. as the development cycle continues with more recent libraries/softwares, which is used by upstream, more recent components (dependencies) are pulled into the system.  as a consequence: it is a good thing to use old programs with old libraries and recent programs with recent libraries. most often a mixture of both, old and new, leads to service degradation.
+
+
+# links
+
+
+* [1] <http://bugs.gentoo.org/125988>
+* [2] <http://forums.gentoo.org/viewtopic-t-832584.html>

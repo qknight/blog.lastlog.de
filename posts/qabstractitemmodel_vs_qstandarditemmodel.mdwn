@@ -1,0 +1,77 @@
+[[!summary chatGPT: Discusses the difference between using a QAbstractItemModel and a QStandardItemModel for implementing a torrent client in Qt, and concludes that using a QStandardItemModel is easier and more convenient.]]
+[[!meta date="2010-09-20 20:35"]]
+[[!tag qt usability visualization QAbstractItemModel]]
+
+# motivation
+
+lately i started working on a torrent implementation for the evopedia project [1]. that will include the qt torrent example [2] but this posting won't be about any torrent related stuff.
+
+first i thought about implementing a QAbstractItemModel but reading various examples i discovered the QStandardItemModel.
+
+
+# what i want to do
+
+[[!img media/screenshot-20100920-223057.png size=450x alt="" style="float: right"]]
+
+i have an item, represented via a Model and visualized by a a QTreeView. the model basically hosts the item(s) and several views could display that item(s) in different layouts but using exactly the same data.
+
+when a user clicks an item a torrent client will start downloading it. the torrent client will update the state of the download by using the item's textfield via the model.
+
+this can be implemented either by using a QAbstractItemModel or a QStandardItemModel, so let's see which one is easier to be used:
+
+
+# discussion: QAbstractItemModel
+
+
+i've been using this model quite some times now and i really love it but it has one big limitation: every time you want to change an item (which is an item of the model) you have to use the model to do that. that means if an item want's to change itself, you have to query the representative QModelIndex and then use this with the model:
+
+
+    // query the first row and column and a top level item, by using a invalid QModelIndex
+    QModelIndex* m = index(0,0,QModelIndex()); 
+    // here we set the data
+    m->setData(...); 
+
+
+QModelIndex'es are used by views to access the data by using the model interface. this is all about MVC and abstraction.
+
+CONCEPT: most of the time there is no need for items to be able to change themselves BUT in this case it is a very handy thing.
+
+two ways of implementing this:
+
+  * either the item holds the torrent client object as well but the torrent client object will update the text of the item using the model
+  * or one could also have a Model and a list of torrent clients and then the torrent client accesses the item also via the QModelIndex but this would mean having another lists to take care of
+
+i think either case is error prone, so let's see how this could be done using a QStandardItemModel instead:
+
+# discussion: QStandardItemModel
+
+in contrast using this model you don't use QModelIndex'es at all. instead you use an abstraction: the QStandardItem. the fun part about a QStandardItem is that it is holding data which is accessed by all views BUT it can also be used to change itself.
+
+this code has been taken from the Qt QStandardItemModel manual (but slightly extended):
+
+
+    QStandardItemModel model;
+    QStandardItem *parentItem = model.invisibleRootItem();
+    for (int i = 0; i < 4; ++i) {
+      QStandardItem *item = new QStandardItem(QString("item %0").arg(i));
+      parentItem->appendRow(item);
+      parentItem = item;
+      item->setText("foobar");
+    }
+
+therefore it is very easy to extend a QStandardItem by inheriting from it. let's call this new item a QExtendedStandardItem. within that class one can have a torrent client object which does all the work. if the state of the download changes from download started to download finished, the torrent client can simply use setText("finished");
+
+another point worth mentioning is that the torrent object could also expand the QStandardItems with additional childs which could be used to list up/down rates as well as peers/seeders and other valuable parameters (can be seen in the above image).
+
+
+# summary
+
+
+using a QStandardItem makes it very easy to implement the torrent client.
+
+
+# links
+
+
+* [1] <http://evopedia.info/>
+* [2] <http://doc.qt.nokia.com/4.6/network-torrent.html>

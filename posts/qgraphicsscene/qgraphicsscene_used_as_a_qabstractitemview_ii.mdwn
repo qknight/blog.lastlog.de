@@ -1,0 +1,61 @@
+[[!summary chatGPT: This article discusses the use of QGraphicsItem as a base class and the implementation of the class GraphicsItemModelExtension to query data from a QAbstractItemModel. It also touches on the use of properties and the need for a solution in displaying properties in a top-down manner.]]
+[[!meta date="2010-02-02 02:22"]]
+[[!tag qt technology usability]]
+[[!series qgraphicsscene]]
+
+# motivation
+
+Again some thoughts about this complex topic, but this time with content not as last time when i accidentally published an unfinished article - i'm very sorry for that.
+
+# updated diagram illustrating the QGraphicsScene used as a QAbstractItemModel
+
+
+the primary difference to the last one i published is that there is the other view i've integrated into the automate project - the 'TreeView'
+
+[[!img media/graphicssceneasabstractitemview.png size=800x]]
+
+# extending QGraphicsItem to be used with a QAbstractItemModel
+
+
+**Q:** what is this section about (in a few words)?
+
+**A:** now as **QGraphicsItem** is used to represent **QModelIndex**'es they need a way to query data from the Model, this is how it can be done
+
+in qt4 there are a few **different classes using QGraphicsItem as a base class**. originally i wanted to extend the items with **virtual  inheritance** [1] but then the '**dreaded diamond**' problem showed me that it can't be done since i could NOT change the way a **QGraphicsTextItem** would inherit from **QGraphicsItem** (read: i couldn't add the keyword virtual between
+
+
+    'public **_here_ **QGraphicsItem'
+
+
+and if that can't be done the virtual inheritance can't be used). of course one could now change the _qt core library_ but that would be wrong 'in concept' since my application should be able to be used with any version (for example qt 4.4) not just one single version i've changed.
+
+so after hours of figuring i came up with the **class GraphicsItemModelExtension** [2], it makes use of pure virtual functions and since **QGraphicsItem**(s) do have a **data**() and **setData**() function which is exactly the same function name used with the Model i had to rethink the function calls. now data() and setData() for the Model used from a QModelIndex via GraphicsItemModelExtension are named **modelData**()/**setModelData**() instead.
+
+**but what makes you want to use the GraphicsitemModelExtension class?** in contrast to my previous attempt it stores the QPersistentModelIndex and you don't have to rely on an existing scene() which is then **casted from a QGraphicsScene into a GraphicsScene** which then would provide a **Model*** which finally would be used to query data.
+
+the basic concept after adding an item to the QGraphicsScene is that one needs to query data right in the constructor, for instance you need various properties as 'label' or 'color'. since the normal item now has index() it can instantly (even when not  added into a scene() yet) query the Model for data. **NOTE:** right after an item is added to a QGraphicsScene it does NOT have a scene() yet, if you try to query scene() from a **constructor** of a QGraphicsItem you **WILL get NULL** which was a big flaw in my previous implmenetaions. but now that problem is gone and because of the nature of pure virtual functions (yes QGraphicsItemModelExtenstion is actually an abstract base class) it helps to design new custom GraphicItems.
+
+
+# again 'why i used properties instead of another hierarchy layer'
+
+
+in the automate [3] project i had a TreeView which does have several columns and one can display one property per column, this is done by the data(..) implementation and is quite easy, just see my code. however in the spring random map generator project [4] i need the properties not in one row per column but instead all properties should be top down with:
+
+    module name
+    propertyName propertyValue (displayed by a delegate)
+    propertyName propertyValue (displayed by a delegate)
+    propertyName propertyValue (displayed by a delegate)
+    ...
+
+
+[[!img media/treeview.png size=400x]]
+
+
+so i can't use the data(..) function as i did last time. now i need one QModelIndex per row but my model currently does not have properties as QModelIndex'es at all. so what should i do? i'm still not sure about this... but as soon as i found a nice solution i will write about it.
+
+# links
+
+* [1] <http://www.parashift.com/c++-faq-lite/multiple-inheritance.html>
+* [2] <http://github.com/qknight/springrts.com-random-map-generator/blob/master/src/frontend/GraphicsItemModelExtension.cpp>
+* [3] <http://github.com/qknight/automate>
+* [4] <http://github.com/qknight/springrts.com-random-map-generator>

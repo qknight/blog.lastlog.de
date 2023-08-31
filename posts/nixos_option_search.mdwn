@@ -1,0 +1,52 @@
+[[!meta date="2014-09-11 00:54"]]
+[[!tag linux usability nixos]]
+[[!summary nixos option search]]
+
+# motivation
+
+at the kiberpipa sprint 2014, nicolas pierron an me decided it would be cool to have a 'nixos option search' and here it is [1]! [1] is still a preview but will soon be found on the nixos.org homepage [2].
+
+# how it works
+
+1. **nix can export to JSON** but that used to be broken as there was some serialization issue breaking it. as nicolas wrote the 'nixos options backend' he was able to fix the serialization, so now we can export all the option configuration which are available.
+
+2. next we were **using javascript to display all these elements** in a single webpage 
+
+3. finally **we filter these** based on the words given
+
+4. the **option.JSON file will be automatically updated** from time to time, so it will always reflect the most recent **nixos stable** options
+
+it is quite fast and hopefully everyone will like it, **here is how it looks**:
+
+[[!img media/nixos_option_search1.jpg alt="" size=500x caption="nixos option search with 1915 entries"]]
+
+the screenshot below shows we do have **248 nixos services** in nixpkgs which is pretty awesome!
+
+[[!img media/nixos_option_search2.jpg alt="" size=500x caption="statistics: we have 248 services in nixos!"]]
+
+# summary
+
+the **nixos option search will be live in a few days**, niksnut has to review the stuff, fix the Makefile and merge it with the nixos-manual 'master branch' [2].  
+
+also documentation related: if you want to contribute to the documentation, please feel free to use the new '**page source**' or '**edit**' link, which will be one all nixos.org webpages (except the wiki) from now on! i think this feature was an idea of garbas and it works like this:
+
+1. you click the link
+
+2. you fork the nixos-manual repository to your github.com account
+
+3. finally you make the changes and click 'pull request' (if you need a preview of your changes, which will be 90% of your changes, you rather want a clone to your harddrive and a 'nix-shell --command make' first and a review with your browser second)
+
+4. after a review of your changes from niksnut, they might get into the nixos-homepage
+
+here is a screenshot of the new links:
+
+[[!img media/nixos_option_search3.jpg alt="" size=400x caption="nixos.org's new page source/edit links"]]
+
+the **kiberpipa sprint was really awesome** - thanks to domen and all the others! i'm already looking forward to the **next sprint, which will probably take place during FOSDEM15**.
+
+
+# links
+
+* [1] <https://nixcloud.io/nixos-homepage/nixos/options.html>
+* [2] <https://nixos.org/nixos/options.html>
+
