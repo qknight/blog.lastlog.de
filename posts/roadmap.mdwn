@@ -4,6 +4,15 @@ this is a list of things i'd love to implement in pankat
 [[!draft]]
 [[!SpecialPage]]
 
+# css/UX
+
+<https://elmprogramming.com/why-elm.html> has these nice '#' paragraphcs, i should copy that
+
+used here:
+
+<https://elmprogramming.com/who-this-book-is-for.html#how-to-read-this-book>
+
+i also like how disqus is integrated
 
 # bug1 watcher: gets stuck
 

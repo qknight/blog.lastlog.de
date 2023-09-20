@@ -23,6 +23,7 @@ i would love to reimplement this in rust using websockets, a persistent service 
   * team answers
   * their scores
   * course schedule (start/end/reminders)
+  * reopen/close labs
   * comments
 
   probably implemented using:
