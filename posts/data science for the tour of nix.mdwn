@@ -1,0 +1,254 @@
+[[!meta date="2023-09-23 20:53"]]
+[[!tag tour nixos]]
+[[!series nixcloud]]
+[[!summary creating a world map of tour of nix users using grafana]]
+# motivation
+
+wanted to see where the [tour of nix](https://nixcloud.io/tour/?id=1) is used in the world using the IP addresses from the nginx logs.
+for this i picked <https://github.com/gilbN/lsio-docker-mods/tree/master/letsencrypt/geoip2-nginx-stats> which is a cool project!
+
+[tour of nix](https://nixcloud.io/tour/?id=1) usage between **may 2019 - sep 2023**:
+
+[[!img media/tour-of-nix-grafana-world.jpg label="asdf" caption="tour of nix usage from may 2019 - sep 2023"]]
+
+if the numbers are to be believed then nix is popular in europe and usa. it also seems that every second person in paris is using it - awesome!
+
+## adaptions
+
+i had some problems with:
+
+* `geoip2-nginx-stats` expects a different `nginx` logging format which i did not have
+* `geoip2-nginx-stats` did not come with a *compose.yaml* so had to reverse-engineer how this works...
+
+given that the grafana live view of nginx visits was not important i wrote my own importer and made a screenshot in the end.
+
+### nginx log format
+
+i had this format:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+81.31.16.1 - - [18/Sep/2023:13:13:01 +0000] "GET /tour/favicon.ico HTTP/1.1" 200 1406 "https://nixcloud.io/tour/?id=1" "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
+81.31.16.1 - - [18/Sep/2023:13:13:05 +0000] "GET /tour/nix-instantiate.data HTTP/1.1" 200 24260426 "https://nixcloud.io/tour/?id=1" "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0"
+2a02:2a02:2a02:2a02:2a02:2a02:2a02:2a02 - - [10/May/2019:05:15:12 +0000] "GET /tour/nix-instantiate.js HTTP/1.1" 200 4783086 "https://nixcloud.io/tour/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+but instead this was expected:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+for line in log_lines:
+    if re_ipv4.match(line):
+        regex = compile(r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - (?P<remote_user>.+) \[(?P<dateandtime>\d{2}\/[A-Z]{1}[a-z]{2}\/\d{4}:\d{2}:\d{2}:\d{2} ((\+|\-)\d{4}))\](["](?P<method>.+)) (?P<referrer>.+) ((?P<http_version>HTTP\/[1-3]\.[0-9])["]) (?P<status_code>\d{3}) (?P<bytes_sent>\d{1,99})(["](?P<url>(\-)|(.+))["]) (?P<host>.+) (["](?P<user_agent>.+)["])(["](?P<request_time>.+)["]) (["](?P<connect_time>.+)["])(["](?P<city>.+)["]) (["](?P<country_code>.+)["])', IGNORECASE) # NOQA
+        if regex.match(line):
+            logging.debug(f'Regex is matching {log_path} continuing...')
+            return True
+    if re_ipv6.match(line):
+        regex = compile(r'(?P<ipaddress>(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))) - (?P<remote_user>.+) \[(?P<dateandtime>\d{2}\/[A-Z]{1}[a-z]{2}\/\d{4}:\d{2}:\d{2}:\d{2} ((\+|\-)\d{4}))\](["](?P<method>.+)) (?P<referrer>.+) ((?P<http_version>HTTP\/[1-3]\.[0-9])["]) (?P<status_code>\d{3}) (?P<bytes_sent>\d{1,99})(["](?P<url>(\-)|(.+))["]) (?P<host>.+) (["](?P<user_agent>.+)["])(["](?P<request_time>.+)["]) (["](?P<connect_time>.+)["])(["](?P<city>.+)["]) (["](?P<country_code>.+)["])', IGNORECASE) # NOQA
+        if regex.match(line):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### python3 data importer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.python}
+#! /usr/bin/env python3
+from os.path import exists, isfile
+from os import environ as env, stat
+from platform import uname
+from re import compile, match, search, IGNORECASE
+from sys import path, exit
+from time import sleep, time
+from datetime import datetime
+import logging
+
+from geoip2.database import Reader
+from geohash2 import encode
+from influxdb import InfluxDBClient
+from requests.exceptions import ConnectionError
+from influxdb.exceptions import InfluxDBServerError, InfluxDBClientError
+from IPy import IP as ipadd
+
+geoip_db_path = '/config/geoip2db/GeoLite2-City.mmdb'
+log_path = env.get('NGINX_LOG_PATH', '/config/log/nginx/access.log')
+influxdb_host = env.get('INFLUX_HOST', 'localhost')
+influxdb_port = env.get('INFLUX_HOST_PORT', '8086')
+influxdb_database = env.get('INFLUX_DATABASE', 'geoip2influx')
+influxdb_user = env.get('INFLUX_USER', 'root')
+influxdb_user_pass = env.get('INFLUX_PASS', 'root')
+influxdb_retention = env.get('INFLUX_RETENTION','7d')
+influxdb_shard = env.get('INFLUX_SHARD', '1d')
+geo_measurement = env.get('GEO_MEASUREMENT', 'geoip2influx')
+log_measurement = env.get('LOG_MEASUREMENT', 'nginx_access_logs')
+send_nginx_logs = env.get('SEND_NGINX_LOGS','true')
+log_level = env.get('GEOIP2INFLUX_LOG_LEVEL', 'info').upper()
+g2i_log_path = env.get('GEOIP2INFLUX_LOG_PATH','/config/log/geoip2influx/geoip2influx.log')
+
+logging.basicConfig(level=log_level,format='GEOIP2INFLUX %(asctime)s :: %(levelname)s :: %(message)s',datefmt='%d/%b/%Y %H:%M:%S',handlers=[logging.StreamHandler(),logging.FileHandler(g2i_log_path)])
+
+monitored_ip_types = ['PUBLIC', 'ALLOCATED APNIC', 'ALLOCATED ARIN', 'ALLOCATED RIPE NCC', 'ALLOCATED LACNIC', 'ALLOCATED AFRINIC']
+
+def main():
+    logging.info('Starting query')
+
+    client = InfluxDBClient(
+        host="influxdb", port=8086, username="geoip2influx", password="geoip2influx", database="geoip2influx")
+
+    try:
+        logging.info('Testing InfluxDB connection')
+        version = client.request('ping', expected_response_code=204).headers['X-Influxdb-Version']
+        logging.info(f'Influxdb version: {version}')
+    except ConnectionError as e:
+        logging.critical('Error testing connection to InfluxDB. Please check your url/hostname.\n'
+                         f'Error: {e}'
+                        )
+        exit(1)
+
+    try:
+        databases = [db['name'] for db in client.get_list_database()]
+        if influxdb_database in databases:
+            logging.info(f'Found database: {influxdb_database}')
+    except InfluxDBClientError as e:
+        logging.critical('Error getting database list! Please check your InfluxDB configuration.\n'
+                         f'Error: {e}'
+                        )
+        exit(1)
+
+    gi = Reader(geoip_db_path)
+
+    re_ipv4 = compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+    re_ipv6 = compile(r'(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))') # NOQA
+
+    with open(log_path, 'r') as log_file:
+        lines = log_file.readlines()
+        for line in lines:
+            if re_ipv4.match(line):
+                m = re_ipv4.match(line)
+                ip = m.group(1)
+            elif re_ipv6.match(line):
+                m = re_ipv6.match(line)
+                ip = m.group(1)
+            else:
+                logging.warning('Failed to match regex that previously matched!? Skipping this line!\n'
+                                'If you think the regex should have mathed the line, please share the log line below on https://discord.gg/HSPa4cz or Github: https://github.com/gilbN/geoip2influx\n'
+                                f'Line: {line}'
+                            )
+                continue
+
+            info = gi.city(ip)
+
+            ips = {}
+            geohash_fields = {}
+            geohash_tags = {}
+            hostname = ""
+            geo_metrics = []
+
+            if info:
+                logging.info("info was generated, preparing data point")
+                geohash = encode(info.location.latitude, info.location.longitude)
+                geohash_fields['count'] = 1
+                geohash_tags['geohash'] = geohash
+                geohash_tags['ip'] = ip
+                geohash_tags['host'] = hostname
+                geohash_tags['country_code'] = info.country.iso_code
+                geohash_tags['country_name'] = info.country.name
+                geohash_tags['state'] = info.subdivisions.most_specific.name if info.subdivisions.most_specific.name else "-"
+                geohash_tags['state_code'] = info.subdivisions.most_specific.iso_code if info.subdivisions.most_specific.iso_code else "-"
+                geohash_tags['city'] = info.city.name if info.city.name else "-"
+                geohash_tags['postal_code'] = info.postal.code if info.postal.code else "-"
+                geohash_tags['latitude'] = info.location.latitude if info.location.latitude else "-"
+                geohash_tags['longitude'] = info.location.longitude if info.location.longitude else "-"
+                ips['fields'] = geohash_fields
+                ips['tags'] = geohash_tags
+                ips['measurement'] = geo_measurement
+                geo_metrics.append(ips)
+                logging.debug(f'Geo metrics: {geo_metrics}')
+                try:
+                    client.write_points(geo_metrics)
+                    logging.info("write worked")
+
+                except (InfluxDBServerError, ConnectionError) as e:
+                    logging.error('Error writing data to InfluxDB! Check your database!\n'
+                                    f'Error: {e}'
+                    )
+
+
+    # query = 'select * from geoip2influx;'
+    # result = client.query(query)
+    # logging.info(f'Influxdb query result: {result}')
+
+    logging.debug(f'Done')
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit(0)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### docker-compose.yaml
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.yaml}
+
+version: "2.1"
+services:
+  # root / rootroot
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+  geoip2influx:
+    image: ghcr.io/gilbn/geoip2influx
+    container_name: geoip2influx
+    networks:
+      - default
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Germany
+      - INFLUX_HOST=influxdb
+      - INFLUX_HOST_PORT=8086
+      - INFLUX_USER="root"
+      - INFLUX_PASS="rootroot"
+      - INFLUX_DATABASE="influxdb"
+      - SEND_NGINX_LOGS=true
+      - MAXMINDDB_LICENSE_KEY=3BTWajgOYusKxWXxuN_mmk3BTWajgOYusKxWXxuN_mmk
+      - LOG_MEASUREMENT="nginx_access_logs"
+      - GEOIP2INFLUX_LOG_LEVEL=debug
+      - GEOIP2INFLUX_LOG_PATH=/config/log/geoip2influx/geoip2influx.log
+    volumes:
+      - ./appdata/geoip2influx:/config
+      - ./logs:/config/log/nginx/
+      - ./hacking:/hacking
+    restart: unless-stopped
+  influxdb:
+    image: influxdb:1.8
+    environment:
+      - INFLUXDB_DATA_ENGINE=tsm1
+      - INFLUXDB_ADMIN_USER="root"
+      - INFLUXDB_ADMIN_PASSWORD="rootroot"
+      - INFLUXDB_DB="geoip2influx"
+      - INFLUXDB_USER="geoip2influx"
+      - INFLUXDB_USER_PASSWORD="geoip2influx"
+      - INFLUXDB_HTTP_LOG_ENABLED=false
+      - INFLUXDB_META_LOGGING_ENABLED=false
+      - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
+      - INFLUXDB_LOGGING_LEVEL=warn
+    container_name: influxdb
+    networks:
+      - default
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# summary
+
+for this project i used `docker compose` but would love to reimplement it using pure `nix`.
+
+<https://grafana.com/grafana/dashboards/12268-nginx-logs-geo-map/> has 'request count cumulative' which seems interesting but, due to my import, was broken.
