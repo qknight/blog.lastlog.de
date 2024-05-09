@@ -1,0 +1,174 @@
+[[!meta date="2023-10-31 10:58"]]
+[[!summary tour of nix - updating dependencies, reworking build, making it more developer friendly]]
+[[!tag tourofnix nix]]
+
+[[!draft]]
+
+# motivation
+
+the nix port to emscripten needs to be updated:
+
+* nix 2.18 (from 1.9)
+* emscripten 3.1.17 (from 1.29.10)
+* nixpkgs nixos-22.11-small (from xxx)
+
+mentioned in <https://lastlog.de/blog/tour_of_nix.html>, which was done in 2017.
+
+this also requires:
+
+* nix error messages rewrite in json mode so we can get a list of errors with respective line numbers
+* rewrite the build system so the nix libraries (in the js form) are written to the output of the derivation so that a second derivation can be used to create the final target with nixpkgs checkout and custom code. the motivation is simple: not to have to recompile nix every time one wants to have some simple js code changed
+* create a nix expression which creates the tour
+
+# nix rework
+
+in 2017 i built my own build system in parallel to what nix came with. since https://github.com/tomberek from flox
+started https://github.com/flox/nix/tree/wasm, which is a WASM port of nix, i needed to adapt the tour to use that.
+
+the new toolchain looks like this:
+
+    nix + custom make + autotools + emscripten
+
+  --preload-file nix/derivation.nix \
+  --preload-file nixpkgs \
+  --preload-file test.nix \
+
+## test.nix
+
+{ helloworld = "Hello World"; }
+
+## pre-js.js
+
+```javascript
+Module["setStatus"] = (function(text) {
+    var statusElement = document.getElementById("status");
+    var progressElement = document.getElementById("progress");
+    var spinnerElement = document.getElementById("spinner");
+    if (!Module.setStatus.last) Module.setStatus.last = {
+        time: Date.now(),
+        text: ""
+    };
+    if (text === Module.setStatus.text) return;
+    var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+    var now = Date.now();
+    if (m && now - Date.now() < 30) return;
+    if (m) {
+        text = m[1];
+        progressElement.value = parseInt(m[2]) * 100;
+        progressElement.max = parseInt(m[4]) * 100;
+        progressElement.hidden = false;
+        spinnerElement.hidden = false
+    } else {
+        progressElement.value = null;
+        progressElement.max = null;
+        progressElement.hidden = true;
+        if (!text) spinnerElement.style.display = "none"
+    }
+    statusElement.innerHTML = text
+});
+console.log("Hello from preRun");
+```
+
+managed to recover this from nix-instantiate.js by searching for spinner.
+
+## nix/derivation.nix
+
+i don't exactly know what this is, probably need a nixpkgs version where this file was there. i think my hack is kinda overriding the one coming with nixpkgs at that time.
+
+however, i've recovered the nix/derivation.nix this using:
+
+
+```sh
+# code goes here
+{
+  v=builtins.readDir ./nix;
+  z=builtins.readFile ./nix/derivation.nix;
+}
+
+```
+
+and here is the fil1e:
+
+```nix
+/* This is the implementation of the ‘derivation’ builtin function.
+   It's actually a wrapper around the ‘derivationStrict’ primop. */
+   drvAttrs @ { outputs ? [ \"out\" ], ... }:
+
+   let
+     strict = derivationStrict drvAttrs;
+     commonAttrs = drvAttrs // (builtins.listToAttrs outputsList) //
+         { all = map (x: x.value) outputsList;
+               inherit drvAttrs;
+         };
+
+     outputToAttrListElement = outputName:
+       { name = outputName;
+         value = commonAttrs // {
+         outPath = builtins.getAttr outputName strict;
+         drvPath = strict.drvPath;
+         type = \"derivation\";
+         inherit outputName;
+       };
+     };
+
+     = map outputToAttrListElement outputs;
+
+     in (builtins.head outputsList).value
+   "; }
+```
+
+# rewired diff
+
+```diff
+diff --git a/flake.nix b/flake.nix
+index 71cca20c5..b686b7289 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -586,6 +586,21 @@
+       '';
+     });
+
++      nixpkgs2211 = stdenv.mkDerivation {
++        name = "nixpkgs-nixos-22.11-small";
++        src = fetchgit {
++          url = "https://github.com/nixos/nixpkgs.git";
++          rev = "380be19fbd2d9079f677978361792cb25e8a3635";
++          sha256 = "sha256-Zffu01pONhs/pqH07cjlF10NnMDLok8ix5Uk4rhOnZQ=";
++        };
++        phases = [ "installPhase" ];
++        installPhase = ''
++          mkdir -p $out
++          cp -R $src/* $out
++          du -sh $out
++        '';
++      };
+@@ -640,12 +655,14 @@
+           export EMCC_CFLAGS="$NIX_CFLAGS_COMPILE"
+         '';
+         buildPhase = ''
++          mkdir -p nixpkgs
++          cp -R ${nixpkgs2211}/* ./nixpkgs/
+           make src/libexpr/eval.o
+           make -j6 src/nix-instantiate/nix-instantiate.html
+         '';
+         installPhase = ''
+           mkdir $out
+-          cp src/nix-instantiate/*.{wasm,js,html} $out
++          cp src/nix-instantiate/*.{wasm,js,html,data} $out
+         '';
+         checkPhase = ''
+
+diff --git a/src/nix-instantiate/local.mk b/src/nix-instantiate/local.mk
+index 85096e14f..f14da09d2 100644
+--- a/src/nix-instantiate/local.mk
++++ b/src/nix-instantiate/local.mk
+@@ -37,7 +37,8 @@ nix-instantiate.html_LDFLAGS = \
+          -sALLOW_MEMORY_GROWTH=1 \
+          -sEXPORTED_RUNTIME_METHODS=cwrap,ccall,UTF8ToString,ptrToString,allocateUTF8,UTF32ToString \
+          -sEXPORTED_FUNCTIONS=_processExpr,_main_nix_instantiate2 \
+-         -sEXPORT_EXCEPTION_HANDLING_HELPERS
++         -sEXPORT_EXCEPTION_HANDLING_HELPERS \
++         --preload-file nixpkgs
+```
+
+# summary

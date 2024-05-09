@@ -1,3 +1,0 @@
-[[!draft]]
-fsWriter test
- 12

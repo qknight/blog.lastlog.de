@@ -1,5 +1,5 @@
 [[!meta date="2015-11-14 22:15"]]
-[[!tag javascript html5 emscripten nixcloud nixos]]
+[[!tag emscripten nixcloud nix tourofnix]]
 
 [[!img media/Emscripten_logo_full.png width="250px" class="noFancy" style="float: right"]]
 [[!summary a tour of nix is an educational purpose project on teaching the Nix programming language. It is also an introduction on how to use LLVM and emscripten to convert C++ programs to run in the browser.]]

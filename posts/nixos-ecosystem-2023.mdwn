@@ -1,0 +1,100 @@
+[[!meta date="2023-10-07 23:37"]]
+[[!tag nix nixos]]
+[[!draft]]
+[[!img media/nixos-lores.png alt="" style="float: right" class="noFancy"]]
+
+<link
+    type="text/css"
+    rel="stylesheet"
+    href="//cdn.jsdelivr.net/npm/jsmind/style/jsmind.css"
+/>
+<style type="text/css">
+    #jsmind_container {
+        width: 100%;
+        height: 700px;
+        border: solid 1px #ccc;
+        #background: #f4f4f4;
+    }
+</style>
+
+<script src="//cdn.jsdelivr.net/npm/jsmind/es6/jsmind.js"></script>
+<script src="//cdn.jsdelivr.net/npm/jsmind/es6/jsmind.draggable-node.js"></script>
+
+# motivation
+
+welcome to the tour of **nix**. if you're new to **nix**, don't worry - i'll guide you through ~35 hands-on exercises to make learning **nix** learning a breeze.
+whether you're a coding pro or just curious, get ready to have some fun!
+
+# nix strengths
+
+the state of the **nix** tooling 2023
+
+<div id="jsmind_container"></div>
+
+<script type="text/javascript">
+    function load_jsmind() {
+        var mind = {
+            meta: {
+                name: 'nix projects',
+                author: 'js@lastlog.de',
+                version: '0.1',
+            },
+            format: 'node_array',
+            data: [
+                { id: 'root', isroot: true, topic: 'Nix', 'background-color': 'blue', },
+                { id: 'CI', parentid: 'root', topic: 'CI' , direction: 'left', 'background-color': 'green', },
+                    { 'id': 'Hydra', 'parentid': 'CI', 'topic': 'Hydra', 'background-color': 'green', },
+                    { 'id': 'HerkulesCI', 'parentid': 'CI', 'topic': 'HerkulesCI', 'background-color': 'green', },
+                { id: 'posix', parentid: 'root', topic: 'POSIX', 'background-color': 'red', },
+                    { id: 'nix-linux', parentid: 'posix', topic: 'nix-linux', 'background-color': 'red', },
+                    { id: 'nix-darwin', parentid: 'posix', topic: 'nix-darwin', 'background-color': 'red', },
+                    { id: 'nix-emscripten', parentid: 'posix', topic: 'nix-emscripten', 'background-color': 'red', },
+                { id: 'systemd', parentid: 'root', topic: 'linux/systemd/<br>module system', 'background-color': 'Gold' },
+                    { 'id': 'NixOS', 'parentid': 'systemd', 'topic': 'NixOS', 'background-color': 'Gold', },
+                    { id: 'nixos-wsl', parentid: 'systemd', topic: 'nixos-wsl', 'background-color': 'Gold' },
+                    { 'id': 'kvm-tests', 'parentid': 'systemd', 'topic': 'kvm-tests', 'background-color': 'Gold', },
+                { id: 'development', parentid: 'root', topic: 'development', 'background-color': 'orange', },
+                    { id: 'nix', parentid: 'development', topic: 'nix', 'background-color': 'orange', },
+                    { id: 'nix-shell', parentid: 'development', topic: 'nix-shell', 'background-color': 'orange', },
+                { id: 'container', parentid: 'root', topic: 'container', 'background-color': 'DarkCyan ', direction: 'left' },
+                    { id: 'docker', parentid: 'container', topic: 'docker', 'background-color': 'DarkCyan ' },
+                    { id: 'podman', parentid: 'container', topic: 'podman', 'background-color': 'DarkCyan ' },
+                    { id: 'lxc/lxd', parentid: 'container', topic: 'lxc/lxd', 'background-color': 'DarkCyan' },
+                { id: 'partition', parentid: 'root', topic: 'filesystem', direction: 'left'},
+                    { id: 'raspberryPI', parentid: 'partition', topic: 'raspberry PI' },
+                    { id: 'virtualbox/vmware', parentid: 'partition', topic: 'virtualbox/vmware' },
+                    { id: 'ISO/PXEinstaller', parentid: 'partition', topic: 'live media/ISO' },
+                { id: 'PM', parentid: 'root', topic: 'PM', direction: 'left' , 'background-color': 'SlateBlue' },
+                    { id: 'npm2nix', parentid: 'PM', topic: 'npm2nix', 'background-color': 'SlateBlue' },
+                    { id: 'go2nix', parentid: 'PM', topic: 'go2nix', 'background-color': 'SlateBlue' },
+                    { id: 'anything2nix', parentid: 'PM', topic: '...', 'background-color': 'SlateBlue' },
+            ],
+        };
+        var options = {
+            container: 'jsmind_container',
+            editable: true,
+            theme: 'primary',
+        };
+        var jm = new jsMind(options);
+        jm.show(mind);
+        // jm.set_readonly(true);
+        // var mind_data = jm.get_data();
+        // alert(mind_data);
+        //jm.add_node('sub2', 'sub23', 'new node', { 'background-color': 'red' });
+        //jm.set_node_color('sub21', 'green', '#ccc');
+    }
+
+    load_jsmind();
+</script>
+
+# nix weaknesses
+
+* harsh learning curve
+   * git workflows
+
+* weak documentation
+* weak nix IDE support
+* weak nix typing system
+
+* language specific PM wrappers
+* no native nix on windows

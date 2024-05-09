@@ -1,0 +1,393 @@
+[[!meta date="2024-03-21 20:53"]]
+[[!tag rust leptos wasm vscode]]
+[[!summary my experiences using leptos with rust to create klimabilanzklaeranlage.de]]
+
+# motivation
+
+wanted to share my experiences using [leptos](https://leptos.dev/) with [rust](https://www.rust-lang.org/) to create [klimabilanzklaeranlage.de](https://klimabilanzklaeranlage.de/).
+
+# rust
+
+rust is challenging, especially with leptos / tailwind when all of this is 'new' technology. the only thing i'm quite familiar with is running using wasm coming from emscripten.
+
+## language
+
+i love the syntax, the strong typing and the error messages. for instance this code:
+
+```rust
+#[component]
+pub fn Tool(
+    api: Signal<Option<AuthorizedApi>>,
+    current_project: RwSignal<Option<Project>>,
+    current_section: RwSignal<PageSection>,
+) -> impl IntoView {
+    // -----   ----- //
+    //    Signals    //
+    // -----   ----- //
+
+    let form_data = RwSignal::new(FormData::default());
+    let is_logged_in = Signal::derive(move || api.get().is_some());
+    let save_result_message = RwSignal::new(None);
+
+    let outcome = create_memo(move |_| calculate(form_data.get()));
+
+    let show_side_stream_controls = Signal::derive(move || {
+        form_data.with(|d| {
+            d.plant_profile
+                .side_stream_treatment
+                .total_nitrogen
+                .map(|v| v > 0.0)
+                .unwrap_or(false)
+        })
+    });
+```
+already shows quite some interesting concepts: RwSignal, Option<Project>, create_memo(), lambdas, unwrap_or(false) as well as strong typing seen in the Tool signature.
+
+## cargo
+
+as a c/c++ developer and nix packager `cargo` is a huge contrast to other PMs as it is easy to use, for instance one does not need `git submodules` which is a huge productivity boost. integrating libraries or writing your own is easy.
+
+the crate versioning is nothing less than ingenious and with c/cpp/go/node/java/python/perl and nix - i've seen lots.
+
+## tests
+
+i love that rust comes with a test framework out of the box. for instance this test:
+
+```rust
+#[test]
+fn calculate_oil_gas_savings_test() {
+    assert_eq!(
+        calculate_oil_gas_savings(Tons::new(40.15), Tons::new(20.0), Percent::new(20.0)),
+        Tons::new(14.03)
+    );
+}
+```
+
+and then running the test
+
+```bash
+cargo run test
+...
+failures:
+
+---- calculation::tests::calculate_oil_gas_savings_test stdout ----
+thread 'calculation::tests::calculate_oil_gas_savings_test' panicked at crates/domain/src/calculation/tests.rs:906:5:
+assertion `left == right` failed
+  left: Tons(12.03)
+ right: Tons(14.03)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+i like the error syntax as it is easy to know what is left and right which is so much better than gunit or pythons unittests.
+
+the copilot integration was very helpful, particular in writing the test generator. this function can be called where the tests later will be pasted and it will generate the tests for you.
+
+```rust
+// a helper to update the tests
+// cargo test  -- --nocapture
+#[allow(dead_code)]
+fn create_test_results_on_changes_co2_equivalents_emission_factors(
+    emission_factors: CalculatedEmissionFactors,
+) {
+    let CalculatedEmissionFactors { n2o, ch4 } = emission_factors;
+    println!("assert_eq!(f64::from(n2o), {:?});", f64::from(n2o));
+    println!("assert_eq!(f64::from(ch4), {:?});", f64::from(ch4));
+}
+```
+
+after running the test `cargo test  -- --nocapture` i copied the output into the same file and had working tests. this was helpful during huge changes (50+ entries changed).
+
+# IDEs
+
+## rustrover
+
+i also tried [rustrover](https://www.jetbrains.com/rust/) but since i was using WSL2 with nixos and not compiling inside the windows environment the source code completion didn't work well.
+
+so in order to compile inside nixos it was important to use /home/nixos and not the WSL2 instgration is it is so darn slow. hence i came up with this script:
+
+```bat
+@echo on
+rsync -e 'c:\cygwin64\bin\ssh.exe -o UserKnownHostsFile=/dev/null -i C:\Users\joschie\.ssh\nixos-wsl-clion -o StrictHostKeyChecking=no' --exclude target -avz ../klick nixos@172.28.165.91:/tmp
+```
+
+i'm happy to leave this experiment behind and go for vscode. that said i did not check https://search.nixos.org/packages?channel=23.11&show=jetbrains.gateway&from=0&size=50&sort=relevance&type=packages&query=gateway
+which might have potential.
+
+## vscode
+
+for a different `rust` project i use [vscode](https://code.visualstudio.com/) with the [nixos-vscode-server](https://github.com/nix-community/nixos-vscode-server) which connects via SSH and has full source
+code completion - amazing!
+
+# leptos
+
+the leptos book provides a good introduction to the language <https://book.leptos.dev/> and the language is well designed. since leptos implements https://docs.rs/leptos/latest/leptos/html/index.html it provides
+with syntax checking even the html code. in other languages one would need to use a linter or a separate tool.
+
+i found it easy to use once the basic concepts were understood. for instance the following code:
+
+```rust
+use leptos::*;
+
+use crate::pages::tool::{Card, Cite, InfoBox, DWA_MERKBLATT_URL};
+use klick_boundary::FormData;
+
+#[component]
+pub fn CH4EmissionsOpenSludgeStorage(form_data: RwSignal<FormData>) -> impl IntoView {
+    let show_dialog = Signal::derive(move || {
+        let digester_count = form_data.with(|d| {
+            d.plant_profile
+                .sewage_sludge_treatment
+                .digester_count
+                .unwrap_or(0)
+        });
+        let sewage_gas_produced = form_data.with(|d| {
+            d.plant_profile
+                .energy_consumption
+                .sewage_gas_produced
+                .unwrap_or(0.0)
+        });
+        sewage_gas_produced < 0.001 || digester_count == 0
+    });
+    view! {
+      <div class = move || { if show_dialog.get() { None } else { Some("hidden") } } >
+      <Card title = "Methanemissionen aus der Schlammlagerung" bg_color="bg-blue">
+        <InfoBox text = " Emissionen aus der Schlammlagerung aerob-stabilisierter Schlämme weisen ein deutliches Emissionspotenzial auf">
+          <Cite source = "Auszug aus dem DWA-Merkblatt 230-1 (2022, S. 24-25)" url = DWA_MERKBLATT_URL>
+            "Auch bei ordnungsgemäßem Betrieb enthalten gemeinsam aerob stabilisierte Schlämme mit ca.
+            11 g oTM/(E·d) mehr leicht abbaubare Stoffe im Vergleich zu Faulschlämmen (ca. 4 g oTM/(E·d) im
+            Faulschlamm), es sei denn, das aerobe Schlammalter beträgt weit über 30 d (DWA 2020). Werden
+            die Schlämme über einen längeren Zeitraum gelagert bzw. gespeichert, so kann sich ein anaerobes
+            Milieu einstellen, welches Methanbildung begünstigt. Bei der Lagerung bzw. Speicherung von
+            aerob stabilisierten Schlämmen kann so Methan entstehen und emittieren. Das Emissionspotenzial
+            liegt daher deutlich über den aus dem Betrieb einer ordnungsgemäß betriebenen Faulungsanlage
+            zu erwartenden Methan-Emissionen. Aus der Lagerung nur ungenügend stabilisierter
+            Schlämme können entsprechend dem höheren Anteil an Organik, höhere Methan-Emissionen entstehen.
+            Zur Reduzierung dieser Emissionen ist die Bildung eines für die Methanbildung notwendigen
+            Milieus zu vermeiden."
+          </Cite>
+        </InfoBox>
+      </Card>
+      </div>
+    }
+}
+```
+
+shows the use of html inside the source code and it is not only a template but instead a part of the rust language abstraction.
+it also shows how signals affect the view being shown. not advertising this as best practice but rather as works for me.
+
+## SVG diagrams
+
+we created this diagram which is also an input selector (radio button like):
+
+[[!img posts/rust-leptos/leptos-svg-view.jpg size=300x ]]
+
+and for visualization of the flows we implemented our own sankey diagram:
+
+[[!img posts/rust-leptos/sankey-svg-view.jpg size=300x ]]
+
+if you are fluent in SVG this is an amazing journey!
+
+# jenkins CI
+
+we wanted our own CI system and tried jenkins:
+
+```yaml
+pipeline {
+    agent any
+    environment {
+        PATH="/run/current-system/sw/bin"
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building..'
+                sh 'nix-shell --command "just build-release"'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+                sh 'nix-shell --command "just test"'
+            }
+        }
+        stage('Check fmt') {
+            steps {
+                echo 'Checking fmt..'
+                  sh 'nix-shell --command "cargo fmt --check"'
+                  sh 'nix-shell --command "cd frontend; cargo fmt --check"'
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (currentBuild.currentResult == 'FAILURE') {
+                    emailext subject: '$DEFAULT_SUBJECT',
+                        body: "FAILURE: Project: ${env.JOB_NAME} - Build Number: ${env.BUILD_NUMBER} - URL de build: ${env.BUILD_URL}",
+                        recipientProviders: [
+                            [$class: 'CulpritsRecipientProvider'],
+                            [$class: 'DevelopersRecipientProvider'],
+                            [$class: 'RequesterRecipientProvider']
+                        ],
+                        replyTo: '$DEFAULT_REPLYTO',
+                        to: '$DEFAULT_RECIPIENTS'
+                }
+            }
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
+        }
+    }
+}
+```
+
+but our system was not powerful enough (cpu/storage) and jenkins configuration and GC was quite tricky so we had to let go.
+since our code can't be compiled by nix, due to the node and cargo usage quirks, jenkins seemd a good option as it supports stateful evaluation.
+
+# nix
+
+i was using nixos-wsl on windows with this flake.nix to get a similar environment compared to markus who was using nixos on his laptop:
+
+```nix
+{
+  description = "The klick project flake";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+  };
+  outputs =
+  { self, nixpkgs, flake-utils, rust-overlay }:
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          overlays = [ (import rust-overlay) ];
+          pkgs = import nixpkgs {
+            inherit system overlays;
+          };
+          rust = pkgs.rust-bin.stable.latest.default.override {
+            extensions = [ "rustfmt" "clippy" ];
+            targets = [
+              "x86_64-unknown-linux-musl" # used for the backend
+              "wasm32-unknown-unknown"    # used for the frontend
+            ];
+          };
+          platform_packages =
+            if pkgs.stdenv.isLinux then
+              with pkgs; [ ]
+            else if pkgs.stdenv.isDarwin then
+              with pkgs.darwin.apple_sdk.frameworks; [
+                CoreFoundation
+                Security
+                SystemConfiguration
+              ]
+            else
+              throw "unsupported platform";
+        in
+        with pkgs;
+        rec {
+          packages.mytrunk = pkgs.callPackage ./trunk/default.nix {
+            inherit (darwin.apple_sdk.frameworks) CoreServices Security SystemConfiguration;
+          };
+          devShells.default = mkShell {
+            buildInputs = [
+              rust
+              cargo-zigbuild           # required for static musl builds
+              packages.mytrunk
+              git
+              tig
+              pkg-config
+              just                     # task runner
+              nodePackages.tailwindcss # build CSS files
+              nodejs                   # required to install tailwind plugins
+              pandoc                   # required to process markdown files
+              texliveMedium            # required to generate PDF reports
+              librsvg                  # required to render SVG image
+              openssl                  # required for cargo-edit
+            ] ++ platform_packages;
+          };
+        }
+      );
+}
+```
+
+so a simple `nix develop` inside the nixos-wsl was enough to get rust into the environment.
+
+# hosting
+
+we are using nixos on hetzner.cloud and we basically have a container like workflow where we copy the generated binary to a folder and start it using systemd. we use nginx as a reverse proxy for it.
+
+## configuration.nix
+
+```nix
+  users.users = {
+   joachim = {
+    isNormalUser  = true;
+    home  = "/home/joachim";
+    description  = "Joachim Schiele";
+    extraGroups  = [ "docker" ];
+    openssh.authorizedKeys.keys  = [ "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC0svB8tzBRVIciuEbuor7yf3AQE7xUKIS+k/55ljOca1pqZDzHGDVRTJ4jqIbO6WRBH09Bbm4hEslhFwmuF2HsT6tLLPTLgkhAJTlnYYPXZkjkY8QbSkd5wvNzSStGu+OcYTg3o04HmMdBVKt/v898Eci1twJFUTtCx4r3WSoGBUMP3gMHXL6WeCl7Pdgd7NV3KCvHCOVRWpGK4SBZAc4p6Dkq0IcV8k0J/r9GyKNw15W54xJlZ3CSw86JzcFvat2wvk4fJf6B1gYcd/byQxIimiJjmqQSub4LCoEHLqrnyreAbgNF3yXQP5hqqtUaVzvkzezDHswi0txoiOfzjHAvIrFm/Hi4V1F9/B5etiNVn4/qU8TYBcThOxRcJQNEehXBS2YwmiUTCPzSsL/5vh+KO+eHlED3k+9kNEzoL9wD1ovEw56QQQSQPyWuS5CUVOyp3VUY95wKyiDz6JrYKAb97gQSzfKhA9JwxQXbx+COUQfR7VYd65a2atu+tyMdh3E= joschie@DESKTOP-3TCT8U0" ];
+   };
+   klick-app = {
+    isSystemUser = true;
+    home = "/home/klick-app";
+    group = "klick-app";
+    description  = "klick app users";
+   };
+  };
+ users.groups.klick-app = {};
+
+   users = {
+     defaultUserShell= pkgs.nushell;
+   };
+     services.nginx = {
+       enable = true;
+       recommendedGzipSettings = true;
+       recommendedOptimisation = true;
+       virtualHosts = {
+         klimabilanzklaeranlage = {
+           serverName = "klimabilanzklaeranlage.de";
+           forceSSL = true;
+           enableACME = true;
+           locations = {
+             "/" = {
+               proxyPass = "http://127.0.0.1:3000/";
+               #root = /srv/klick;
+               #tryFiles = "$uri $uri/ /index.html";
+             };
+           };
+         };
+         klimabilanzklaeranlagen = {
+           serverName = "klimabilanzklaeranlagen.de";
+           forceSSL = true;
+           enableACME = true;
+           globalRedirect = "klimabilanzklaeranlage.de";
+         };
+       };
+     };
+       systemd.services.klick-app = {
+           wantedBy = [ "multi-user.target" ];
+           after = [ "network.target" ];
+           description = "Start the klick server backend";
+           environment = {
+             RUST_LOG = "info";
+           };
+           path = with pkgs; [ pandoc texliveMedium librsvg ];
+           serviceConfig = {
+             Restart="always";
+             Type = "simple";
+             User = "klick-app";
+             ExecStart = ''/home/klick-app/klick'';
+             WorkingDirectory = "/home/klick-app";
+           };
+        };
+```
+
+# summary
+
+rust and laptos is amazing and i'm looking forward doing more projects with that.
+
+if you have a similar project and need help, feel free to contact me, i'm a freelancer.

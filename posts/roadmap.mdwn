@@ -82,3 +82,7 @@ this feature needs a complete restructuring of the html/css and is more work tha
 <https://wiki.shackspace.de/#dokuwiki__top>
 
 https://afeld.github.io/bootstrap-toc/
+
+# design ideas
+
+https://www.felixsanz.dev/articles/how-to-implement-stable-diffusion

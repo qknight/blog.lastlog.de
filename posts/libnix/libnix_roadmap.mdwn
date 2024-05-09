@@ -1,0 +1,227 @@
+[[!meta date="2024-04-19 20:53"]]
+[[!tag nix nixos libnix]]
+[[!series libnix]]
+[[!summary libnix roadmap]]
+[[!draft]]
+
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# motivation
+
+status of **native windows nix using MinGW** from my series [libnix](https://lastlog.de/blog/timeline.html?filter=series::libnix)
+
+we also cover these topics:
+
+* libnix: MinGW vs. other solutions
+* GSoC
+
+# libnix: MinGW vs. other solutions
+
+making **nix work native on windows** there are a few options, here are a few updates reaching out to these communities:
+
+## Tvix
+
+[tvix](https://tvix.dev/) is a rust reimplementation of the c++ nix implementation, recent news:
+
+* **store implementation** since [last update](https://tvl.fyi/blog/tvix-update-february-24)
+* **nix evaluation** comes close to upstream c++ nix, however, still effort to get to 100%
+* not all **builtins** are supported yet
+* no builders yet
+* could be used to **replace the tour of nix emscripten based backend** but not much more
+
+<div class="alert alert-warning" role="alert">
+**too early for considering tvix to 'building software using nix' on windows**. tvix is amazing, i hope one day this code base replaces the c++ one.
+</div>
+
+## cosmopolitan
+
+[cosmopolitan](https://justine.lol/cosmopolitan/) developers on discord mentioned to me that they had tried porting nix with cosmopolitan:
+
+> ariel nunez: Bash on windows was only possible last year, after a lot of work by jart and contributors, and now Windows Terminal Preview can use it.
+
+but more important:
+
+> ariel nunez: I read my logs and last attempt to compile Nix was on August 2023, at that point in time we found out Nix used Boost and that was a blocker at the time.
+
+<div class="alert alert-warning" role="alert">
+the **cosmopolitan idea** has a lot of potential. i'm uncertain of OS specific traits and how well they map to this POSIX generalization. for instance, when normalizing paths with
+std::filesystem it is decided on compile time for which platform the paths resolve. cosmopolitan runs on all systems, so std::filesystem would have to make this choice a runtime resolution instead.
+
+i would love to see this happen first: <https://www.reddit.com/r/rust/comments/wa2cnv/actually_portable_executables_with_rust_and/>, a true **x86_64-unknown-all-cosmo**.
+
+**but for now i probably follow the john ericson / volth path with MinGW.**
+</div>
+
+## MinGW
+
+[MinGW](https://en.wikipedia.org/wiki/MinGW) cross compiler setup:
+
+* using `mingw cross compiler from nixos-wsl` to build nix for windows
+* john ericson's MinGW contributions are ongoing and promising ~early 2024
+
+<div class="alert alert-warning" role="alert">
+given the analysis of this post, this is the most likely route to get nix on windows working.
+</div>
+
+
+# roadmap for windows nix development
+
+* https://github.com/NixOS/nix/issues/9205 needs to be done with windows in mind
+
+* nix windows development
+
+  * native nix hacking: a shared directory during nix development
+  * native nix hacking: msi installer for windows
+  * nixos-wsl: ln -s symlinks from linux don't work on /mnt/c/nix from WSL2, so this needs a different solution or native nix
+
+    reading https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/ i think we should not enable developer mode but instead
+    add a setup routine, during initial nix installation, which will create the symlinks. for hacking on nix one could just ignore the symlinks and create real copies...
+
+  * for windows native nix build we have to figure out how to use autotools on windows: <https://github.com/NixOS/nix/issues/2503>
+
+* windows specific tests
+
+  * store protection with read only path (works)
+  * check max path length on windows, see also https://stackoverflow.com/questions/71590689/how-to-properly-handle-windows-paths-with-the-long-path-prefix-with-stdfilesys
+  * windows case sensitivity https://learn.microsoft.com/en-us/windows/wsl/case-sensitivity#differences-between-windows-and-linux-case-sensitivity
+  * powershell: maximum string length: https://learn.microsoft.com/en-us/cpp/c-language/maximum-string-length?view=msvc-170
+
+      $env:PATH = $env:PATH + ";C:\Path\To\Your\Directory"
+      Write-Host "Current PATH: $env:PATH"
+
+* fix all tests libstore, libutil, libexpr and libfetchers
+* build nix for windows on hydra using mingw cross compiler
+  * create the nix expression to run nix on windows tests using wine
+
+* review tickets in <https://github.com/NixOS/nix/labels/windows>
+
+* nix mode
+  * single user mode -> requires https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/ developer mode,
+    during nix development this is highly recommended, for normal operations later on i'm not sure if nix-daemon will make the
+    results symlink or if the normal users needs these permissions
+  * multi user mode -> can be executed without developer mode but elevated nix-daemon privileges or SeCreateSymbolicLinkPrivilege permission
+
+* create `windows nix store implementation` -> c:\nix\store
+
+* runProgram requires bundled helper programs:
+  * git.exe for fetchGit/fetchFromGithub -> https://github.com/NixOS/nixpkgs/blob/nixos-23.11/pkgs/applications/version-management/git/default.nix#L389
+  * ssh.exe -> https://github.com/NixOS/nixpkgs/blob/nixos-23.11/pkgs/tools/networking/openssh/common.nix#L174
+  * hg.exe
+
+* manage to build helper programs on native windows (and cross compiler)
+
+* write nix expression to build windows nix with helper programs and install scripts (msi)
+
+    https://nixos.org/manual/nix/stable/installation/upgrading
+
+* engineer an update cycle for the native windows toolchain using the store, will require a services.systemd equivalent on windows in nix
+
+* make `nix build` work on native windows -> socket support but not fork
+  * `nix daemon` support with unix domain sockets and dedicated windows user/group
+  * isolated `nix build` process
+
+* make `nix channel` work
+  * create a channel for windows
+
+* support `nix repl`
+
+* add man page support
+
+* store abstraction c:\nix\store
+
+  * store interoperability with /nix/store vs. c:\nix\store
+
+    * https://github.com/NixOS/nix/issues/9205 - Use std::filesystem::path for Path
+    * https://github.com/NixOS/nix/issues/3197 - Encoding store Paths on Windows and Unix
+    * maybe the default location could assume that /nix/store is c:\nix\store somehow
+
+  * minimal nix expression to be evaluated by nix-instantiate to write to the store
+
+        # nix-instantiate --eval -A a default.nix
+        {
+         a = builtins.toFile "builder.sh" "
+            if this text is in the store, builds.toFile worked!
+          ";
+        }
+
+* nix-build
+
+  * how to make it work?
+  * process isolation in windows, for sandboxing nix-build, this is a nice to have
+
+* nix-daemon
+
+  * calls nix-build (with different UID/GID)
+  * there is unix domain socket support in recent windows versions
+
+* minimal nixpkgs like abstraction
+
+  * instead of using nixpkgs we can create our own stdenv with mingw to show how to use it, later migrate this with nixpkgs. the motivation is to not 'also' have to adapt bash and unix favoring build systems into a windows world while also building the native nix tools on windows
+  * get this to build nix on windows, and from there we have a self contained system which can do updates
+  * early goal is to get git/hg for windows working and to be able to build nix
+
+* create patchpe, a patchelf equivalent, for rpath support on windows using dll location rewrite
+
+* libnix
+
+  * once nix runs on windows natively we can pick a PM like cargo and extend it to work with nix as backend, see https://github.com/NixOS/nix/pull/8699 for this
+
+# detailed status on the current tests on native windows 10
+
+```
+libnixexpr-tests.exe       28 fail,   330 pass
+libnixstore-tests.exe     145 fail,    97 pass
+libnixutil-tests.exe       13 fail,   261 pass
+libnixfetchers-tests.exe    0 fail,     2 pass
+```
+
+
+# mingw dev dev shell
+
+what is this and how to use it?
+
+https://github.com/NixOS/nix/pull/9519
+
+# motivation
+
+status of **native windows nix using minGW** from my series [libnix](https://lastlog.de/blog/timeline.html?filter=series::libnix)
+
+## pure powershell environment
+
+source $HOME/.nix-profile/etc/profile.d/nix.sh
+
+## store internals
+
+https://stackoverflow.com/questions/31490262/what-is-the-purpose-of-nix-instantiate-what-is-a-store-derivation
+
+## process isolation (nix-build)
+
+https://learn.microsoft.com/de-de/virtualization/windowscontainers/manage-containers/hyperv-container#process-isolation
+
+
+## libnix c api
+
+https://github.com/NixOS/nix/pull/8699
+
+# patchPE
+
+* https://nibblestew.blogspot.com/2019/05/emulating-rpath-on-windows-via-binary.html
+* https://stackoverflow.com/questions/107888/is-there-a-windows-msvc-equivalent-to-the-rpath-linker-flag
+
+# GSoC
+
+<https://summerofcode.withgoogle.com/programs/2024/projects/cjYv6pZN> which starts with 'Use `std::filesystem::path` for `Path`'.
+
+The GH [ticket is 9205](https://github.com/NixOS/nix/issues/9205).
+
+
+The `std::filesystem` abstracts both POSIX and Windows path concepts and was inspired by `boost::filesystem`. This will make `libnix` work much easier.
+
+# IDE support
+
+ talking IDE support, with the current state i can't use:
+
+    * [nix hacking editor-integration](https://nixos.org/manual/nix/unstable/contributing/hacking#editor-integration) nor
+    * `make compile_commands.json`
+
+    as my visual studio code (ssh) workspace, in nixos-wsl with the MinGW cross compiler setup, won't support it.

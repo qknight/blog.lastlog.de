@@ -1,5 +1,5 @@
 [[!meta date="2023-09-23 20:53"]]
-[[!tag tour nixos]]
+[[!tag nix tourofnix]]
 [[!series nixcloud]]
 [[!summary creating a world map of tour of nix users using grafana]]
 # motivation

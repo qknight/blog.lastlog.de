@@ -1,0 +1,17 @@
+[[!meta date="2023-10-31 10:58"]]
+[[!tag rust cpp]]
+[[!draft]]
+# motivation
+
+i think that rust will replace cpp in the long run.
+
+## no headers/includes
+
+## more consistent dependency management
+
+## elegant syntax
+
+## documentation
+
+in cpp i'd use doxygen, rust has this built-in
+

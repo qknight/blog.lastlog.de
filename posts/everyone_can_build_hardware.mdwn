@@ -1,9 +1,0 @@
-[[!meta date="2023-08-05 10:58"]]
-[[!tag hardware]]
-[[!summary building a CPU/GPU was very exclusive until recently]]
-[[!draft]]
-
-# motivation
-
-The apple M1 is a impressing milestone, as before it no bigger company would build the OS and the hardware inhouse.
-

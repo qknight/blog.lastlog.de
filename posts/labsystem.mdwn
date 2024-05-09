@@ -40,6 +40,7 @@ i would love to reimplement this in rust using websockets, a persistent service 
   * <https://ankiweb.net/>
 
 * **ui** using [elm](https://elm-lang.org/)
+  * fixed URL paths i.e. https://nixcloud.io/tour/lists-2
 
 * **live preview**
    * once content was change it is updated live for everyone

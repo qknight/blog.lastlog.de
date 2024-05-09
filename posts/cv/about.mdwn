@@ -6,7 +6,7 @@
 [pankat](https://github.com/nixcloud/pankat) is used for content creation
 and all articles are written using markdown syntax with custom extensions.
 
-for me it is important to not depend on a third party for hosting or content creation.
+for me it is important to not depend on a third party tools for hosting nor for my content creation.
 
 ## author
 

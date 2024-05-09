@@ -64,8 +64,8 @@ languages **i'm interested in**:
     <th></th>
   </tr>
   <tr>
-    <td>[[!img posts/cv/elm-f838b474.svg width="40px" class="noFancy" alt="" title="elm"]]</td>
-    <td>[elm](https://elm-lang.org/) - functional UI programming</td>
+    <td>[[!img posts/cv/leptos.svg width="40px" class="noFancy" alt="" title="elm"]]</td>
+    <td>[leptos](https://github.com/leptos-rs/leptos) - UI programming</td>
   </tr>
   <tr>
     <td>[[!img posts/cv/Rustacean-orig-noshadow.svg width="40px" class="noFancy" alt="" title="rust"]]</td>
@@ -100,8 +100,8 @@ in these areas i have a lot of experience:
 
 ### freelancer `08/2023 - present`
 
- * looking into rust/elm
- * nixcloud-webservices extension of nixcloud.monitoring
+ * <https://codeberg.org/slowtec/klick> with rust/leptos
+ * <https://nlnet.nl/project/libnix/> nix/mingw/c++
 
 ### full stack developer - TeamSpeak Systems GmbH `04/2022 - 07/2023`
 

@@ -328,10 +328,24 @@ div#tags a {
     }
 }
 
-blockquote {
-    font-size: 14px
-}
-
 ol ol, ol ul, ul ol, ul ul {
     margin-bottom: 10px;
 }
+
+blockquote {
+    font-size: 14px;
+    margin: 0 0 0 0;
+}
+
+.task-list {
+    padding-left: 25px;
+}
+
+.task-list li {
+    list-style-type: none;
+}
+
+.task-list li input {
+    margin: 0 5px 0 0;
+}
+
