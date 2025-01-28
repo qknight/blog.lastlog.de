@@ -4,6 +4,14 @@ this is a list of things i'd love to implement in pankat
 [[!draft]]
 [[!SpecialPage]]
 
+# opengraph/oembed support
+
+linkedin / discourse can't summarize a link on the blog using pankat as single articles don't support opengraph/oembed
+
+discourse said:
+
+Sorry, we were unable to generate a preview for this web page, because the following oEmbed / OpenGraph tags could not be found: description, image
+
 # css/UX
 
 <https://elmprogramming.com/why-elm.html> has these nice '#' paragraphcs, i should copy that
@@ -86,3 +94,15 @@ https://afeld.github.io/bootstrap-toc/
 # design ideas
 
 https://www.felixsanz.dev/articles/how-to-implement-stable-diffusion
+
+# tray icon
+
+using the system tray with pankat would let you:
+
+* see the program is running,
+* access status log
+* upload article function
+* open up editor
+
+https://stackoverflow.com/questions/49126294/add-icon-tray-on-windows-using-native-golang-api
+

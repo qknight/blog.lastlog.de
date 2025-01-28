@@ -9,8 +9,7 @@
 
 joachim schiele, a _full stack software developer_ with a strong background in _linux systems, programming and software distribution_.
 
-by embracing new knowledge and adapting to emerging trends, i strive to remain ahead of the curve and deliver outstanding results in any endeavor i undertake.
-successfully led the nixcloud company as CEO for 2 years, utilizing my exceptional people skills to foster a positive and collaborative work environment.
+i focus on learning new skills and adapting to emerging trends to stay current and deliver quality results. as ceo of nixcloud for 2 years, i successfully led the company, using strong interpersonal skills to create a collaborative and supportive work environment.
 
 location: EMEA, Germany
 
@@ -26,7 +25,7 @@ location: EMEA, Germany
 
 ## languages
 
-languages **i know well**:
+languages **i work a lot in**:
 
 <style>
 th, td {
@@ -35,9 +34,14 @@ th, td {
 }
 </style>
  <table>
+    </tr>
+    <tr>
+    <td>[[!img posts/cv/leptos.svg width="40px" class="noFancy" alt="" title="elm"]]</td>
+    <td>[leptos](https://github.com/leptos-rs/leptos) - UI programming</td>
+  </tr>
   <tr>
-    <th></th>
-    <th></th>
+    <td>[[!img posts/cv/Rustacean-orig-noshadow.svg width="40px" class="noFancy" alt="" title="rust"]]</td>
+    <td>[rust](https://www.rust-lang.org/) - preparing the future</td>
   </tr>
   <tr>
     <td>[[!img posts/cv/nix-snowflake.svg width="40px" class="noFancy" alt="" title="nix"]]</td>
@@ -53,24 +57,6 @@ th, td {
   <tr>
     <td>[[!img posts/cv/ISO_C++_Logo.svg.png width="40px" class="noFancy" alt="" title="isocpp"]]</td>
     <td>[c++](https://en.wikipedia.org/wiki/C%2B%2B) - legacy projects, i love cmake</td>
-  </tr>
-</table>
-
-languages **i'm interested in**:
-
- <table>
-  <tr>
-    <th></th>
-    <th></th>
-  </tr>
-  <tr>
-    <td>[[!img posts/cv/leptos.svg width="40px" class="noFancy" alt="" title="elm"]]</td>
-    <td>[leptos](https://github.com/leptos-rs/leptos) - UI programming</td>
-  </tr>
-  <tr>
-    <td>[[!img posts/cv/Rustacean-orig-noshadow.svg width="40px" class="noFancy" alt="" title="rust"]]</td>
-    <td>[rust](https://www.rust-lang.org/) - preparing the future</td>
-  </tr>
 </table>
 
 ## container solutions / operating systems
@@ -100,8 +86,9 @@ in these areas i have a lot of experience:
 
 ### freelancer `08/2023 - present`
 
- * <https://codeberg.org/slowtec/klick> with rust/leptos
  * <https://nlnet.nl/project/libnix/> nix/mingw/c++
+ * <https://codeberg.org/slowtec/klick> with rust/leptos
+ * <https://codeberg.org/slowtec/fairsync> distributed map sync with rust/leptos
 
 ### full stack developer - TeamSpeak Systems GmbH `04/2022 - 07/2023`
 

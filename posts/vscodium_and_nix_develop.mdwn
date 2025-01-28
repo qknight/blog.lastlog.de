@@ -1,0 +1,289 @@
+[[!meta date="2024-06-25 23:43"]]
+[[!tag nix nixos-wsl vscodium]]
+[[!summary using vscodium to develop code remotely via ssh using nix develop]]
+
+[[!img media/vscodium.png class="noFancy" style="float: right"]]
+
+# motivation
+
+this post is about how to **connect visual studio code with proper language support and code completion for rust** to a nix based toolchain inside nixos-wsl.
+this setup let's me surf the code like a html document!
+
+the open source edition of microsoft **visual studio code** called [vscodium](https://vscodium.com/) is being used. it features an implementation for remote code
+access via ssh, which is also open source, and is called [open-remote-ssh](https://github.com/jeanp413/open-remote-ssh/).
+
+**note:** for visual studio code this plugin called [ms-vscode-remote.remote-ssh](https://github.com/Microsoft/vscode-remote-release) is closed source but should work for
+this setup, too.
+
+# what is needed
+
+* host: windows 10
+  * vscodium on windows
+  * [vscode-rust-extension-pack](https://open-vsx.org/extension/franneck94/vscode-rust-extension-pack)
+
+* guest: nixos-wsl installation
+  * working ssh configuration from host
+  * setup nixos-vscode-server properly: [vscodium](https://nixos.wiki/wiki/VSCodium)
+  * [klick](https://codeberg.org/slowtec/klick), an example rust project
+
+## supported nix development environments
+
+there are several popular similar concepts:
+
+* [flakes](https://nixos.wiki/wiki/Flakes)
+* [devenv](https://devenv.sh/)
+* [direnv](https://direnv.net/)
+* [nix-shell](https://nix.dev/manual/nix/2.22/command-ref/nix-shell)
+* [flox](https://github.com/flox/flox)
+
+# experimental setup
+
+to learn about the vscodium implementation of ssh remote work i've created this shell-wrapper on the nixos-wsl instance.
+
+## nixos-wsl configuration
+
+```nix
+{ config, lib, pkgs, fetchurl, fetchFromGitHub, ... }:
+
+let
+  rust_overlay = import (fetchTarball "https://github.com/oxalica/rust-overlay/archive/master.tar.gz");
+  pkgs = import <nixpkgs> { overlays = [ rust_overlay ]; };
+  rust = pkgs.rust-bin.stable.latest.default.override {
+    extensions = [ "rustfmt" "clippy" ];
+    targets = [
+      "wasm32-unknown-unknown"
+    ];
+  };
+in
+
+{
+  imports = [
+    # include NixOS-WSL modules
+    <nixos-wsl/modules>
+    (fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master")
+  ];
+  users.users.nixos.shell = /home/nixos/klick/bash-wrapper.sh;
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  wsl.enable = true;
+  services.vscode-server.enable = true;
+  environment.systemPackages = with pkgs; [ vim git tig dfc wineWowPackages.base jq direnv htop ];
+  services.openssh = {
+    enable = true;
+  };
+  system.stateVersion = "23.05"; # Did you read the comment?
+}
+```
+
+## /home/nixos/klick/bash-wrapper.sh
+
+```bash
+#!/run/current-system/sw/bin/bash
+# NOTE: each change requires a 'nixos-rebuild switch' run to become active
+
+export PATH="/run/current-system/sw/bin"
+
+cd /home/nixos/klick
+
+is_interactive() {
+    # A shell is considered interactive if it has a terminal associated with standard input
+    if [ -t 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Main execution starts here
+# Check if the shell is interactive
+if is_interactive; then
+    # If the shell is interactive, call bash in interactive mode
+    #exec /run/current-system/sw/bin/bash
+    echo "interactive"
+    exec /run/current-system/sw/bin/nix develop --command /run/current-system/sw/bin/bash
+else
+    # If the shell is non-interactive, pass all arguments to bash
+    #exec /run/current-system/sw/bin/bash "$@"
+    echo "none interactive"
+    exec /run/current-system/sw/bin/nix develop --command /run/current-system/sw/bin/bash -c "$@"
+fi
+```
+
+# how to use
+
+once everything is installed, do a `ssh nixos` and check that you are inside the nix develop environment:
+
+```bash
+[nixos@nixos:~/klick]$ rustc --version
+rustc 1.79.0 (129f3b996 2024-06-10)
+```
+
+then add this ssh remote into vscodium's remote extension and load the project.
+
+inside the development console to the same `rustc --version` check.
+
+[[!img media/vscodium-klick.JPG class="noFancy"]]
+
+[[!img media/vscodium-klick-ssh-shell.JPG class="noFancy"]]
+
+
+# future potential
+
+using `vscodium` we _could create a way to automatically load the **nix development environment**_, if detected.
+if in [restricted mode](https://code.visualstudio.com/docs/editor/workspace-trust) no such shell should be started.
+
+## how SHELL is detected
+
+on **nixos** this is set as default:
+
+```bash
+declare -x SHELL="/nix/store/agkxax48k35wdmkhmmija2i2sxg8i7ny-bash-5.2p26/bin/bash"
+```
+
+and resolved using this:
+
+* vscode does the shell resolution internally at [microsoft/vscode](https://github.com/microsoft/vscode/blob/4580ba51fe1914ca29916f829adb35930089b013/src/vs/platform/shell/node/shellEnv.ts#L102)
+* by default it will use the shell from `$SHELL` but if that's unset it will use node's `userInfo().shell` which will read `/etc/passwd`, see [microsoft/vscode](https://github.com/microsoft/vscode/blob/4580ba51fe1914ca29916f829adb35930089b013/src/vs/base/node/shell.ts#L40-L48).
+
+see also discussion at <https://github.com/jeanp413/open-remote-ssh/issues/159>
+
+## proposal
+
+using a `.vscode-nix.toml` file in the source directory we could help vscode to use the correct shell environment:
+
+* modify the vscode resolver to check for a file named `.vscode-nix.toml`, and if found, use that command inside the SHELL
+* if that 'nix develop' like shell bails out with an error, don't clutter the user with an infinite reconnect loop and bogus error messages
+
+## example `.vscode-nix.toml`
+
+```toml
+# .vscode-nix.toml
+# This configuration file helps Visual Studio Code determine the shell to use for different Nix environments.
+
+# Specify the shell to use for Nix Flake's 'nix develop'
+[shell]
+name = "nix flake"
+command = "nix develop"
+
+# Specify the shell to use for Devenv
+#[shell]
+#name = "devenv"
+#command = "devenv shell"
+
+# Specify the shell to use for Direnv
+#[shell]
+#name = "direnv"
+#command = "direnv allow && direnv exec . $SHELL"
+
+# Specify the shell to use for Nix Shell
+#[shell]
+#name = "nix-shell"
+#command = "nix-shell"
+
+# Specify the shell to use for flox.dev
+#[shell]
+#name = "flox"
+#command = "flox activate"
+```
+
+so when vscode wants to start a shell, it will call the `command` instead of `/nix/store/agkxax48k35wdmkhmmija2i2sxg8i7ny-bash-5.2p26/bin/bash`.
+
+## `nix shell` error handling UX
+
+if 'nix develop' fails for **whatever reason** using the `/home/nixos/klick/bash-wrapper.sh` hack, we see it like:
+
+this is from `wsl -d nixos`:
+
+[[!img media/vscodium-klick-ssh-shell-error-wsl-shell.jpg class="noFancy"]]
+
+vscodium gets into a infinite error recursion loop and on top of this, it does not _clearly outline the actual error_:
+
+[[!img media/vscodium-klick-ssh-shell-error.jpg class="noFancy"]]
+
+now keep in mind, that if vscodium handles the `nix develop` (not using my `/home/nixos/klick/bash-wrapper.sh` hack), then
+we already have a working ssh shell but only the `nix develop` command will fail.
+
+**that said, the normal login shell then acts as a 'rescue development environment' and this needs to be implemented in vscodium,
+so it can be used to repair the nix expression.
+and once the nix code is repaired, say on a manual trigger or a manual project reload, vscodium will re-attach properly.**
+
+# update: direnv experiments
+
+[direnv](https://direnv.net/) has flake support and for my local interactive shell this works great. however,
+i couldn't get this to work with a none-interactive (ssh shell) nor could i get it to work with [open-remote-ssh](https://github.com/jeanp413/open-remote-ssh/).
+
+## configuration.nix
+
+```nix
+  users.users.nixos.shell = /home/nixos/klick/bash-wrapper.sh;
+  programs.bash.shellInit = ''
+    trap 'source /home/nixos/klick/trap.sh' DEBUG
+  '';
+```
+
+## trap.sh
+```bash
+echo "Command executed: $BASH_COMMAND" >> /tmp/command_log.txt
+eval $(direnv export bash)
+```
+
+## bash-wrapper.sh
+```bash
+export PATH="/run/current-system/sw/bin"
+echo "PWD: $PWD"
+
+is_interactive() {
+    # A shell is considered interactive if it has a terminal associated with standard input
+    if [ -t 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Main execution starts here
+# Check if the shell is interactive
+if is_interactive; then
+    # If the shell is interactive, call bash in interactive mode
+    echo "interactive"
+    exec direnv exec $PWD /run/current-system/sw/bin/bash
+else
+    # If the shell is non-interactive, pass all arguments to bash
+    echo "none interactive"
+    exec direnv exec $PWD /run/current-system/sw/bin/bash -c "$@"
+fi
+```
+
+the result:
+
+* the vscodium built-in console could find cargo correctly but inside an interactive shell
+
+    ```
+    ssh nixos@nixos "cd ~/klick; cargo --version"
+    PWD: /home/nixos
+    none interactive
+    direnv: loading ~/klick/.envrc
+    direnv: using flake
+    direnv: nix-direnv: using cached dev shell
+    direnv: export +AR +AR_FOR_TARGET +AS +AS_FOR_TARGET +CC +CC_FOR_TARGET +CONFIG_SHELL +CXX +CXX_FOR_TARGET +GDK_PIXBUF_MODULE_FILE +GETTEXTDATADIRS +HOST_PATH +IN_NIX_SHELL +LD +LD_FOR_TARGET +NIX_BINTOOLS +NIX_BINTOOLS_FOR_TARGET +NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_BINTOOLS_WRAPPER_TARGET_TARGET_x86_64_unknown_linux_gnu +NIX_BUILD_CORES +NIX_CC +NIX_CC_FOR_TARGET +NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_CC_WRAPPER_TARGET_TARGET_x86_64_unknown_linux_gnu +NIX_CFLAGS_COMPILE +NIX_CFLAGS_COMPILE_FOR_TARGET +NIX_ENFORCE_NO_NATIVE +NIX_HARDENING_ENABLE +NIX_LDFLAGS +NIX_LDFLAGS_FOR_TARGET +NIX_PKG_CONFIG_WRAPPER_TARGET_TARGET_x86_64_unknown_linux_gnu +NIX_STORE +NM +NM_FOR_TARGET +NODE_PATH +OBJCOPY +OBJCOPY_FOR_TARGET +OBJDUMP +OBJDUMP_FOR_TARGET +PKG_CONFIG_FOR_TARGET +PKG_CONFIG_PATH_FOR_TARGET +RANLIB +RANLIB_FOR_TARGET +READELF +READELF_FOR_TARGET +SIZE +SIZE_FOR_TARGET +SOURCE_DATE_EPOCH +STRINGS +STRINGS_FOR_TARGET +STRIP +STRIP_FOR_TARGET +__structuredAttrs +buildInputs +buildPhase +builder +cmakeFlags +configureFlags +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +dontAddDisableDepTrack +mesonFlags +name +nativeBuildInputs +out +outputs +patches +phases +preferLocalBuild +propagatedBuildInputs +propagatedNativeBuildInputs +shell +shellHook +stdenv +strictDeps +system ~PATH ~XDG_DATA_DIRS
+    cargo 1.79.0 (ffa9cf99a 2024-06-03)
+    ```
+
+* **rust-analzyer** couldn't be found by vscodium
+
+    ```log
+    2024-07-09T23:42:19.180018Z ERROR rust_analyzer::main_loop: FetchWorkspaceError:
+    rust-analyzer failed to load workspace: Failed to load the project at /home/nixos/klick/Cargo.toml: Failed to query rust toolchain version at /home/nixos/klick, is your toolchain setup correctly?: cd "/home/nixos/klick" && "cargo" "--version" failed: No such file or directory (os error 2)
+    rust-analyzer failed to load workspace: Failed to load the project at /home/nixos/klick/frontend/Cargo.toml: Failed to query rust toolchain version at /home/nixos/klick/frontend, is your toolchain setup correctly?: cd "/home/nixos/klick/frontend" && "cargo" "--version" failed: No such file or directory (os error 2)
+    ```
+
+according to the `tail -f /tmp/command_log.txt` vscodium's remote server is only started from the shell but internally seems to ignore direnv. htop shows two bash instances of which one was the interactive shell (used strace to check) but the other did not show any sign of activity.
+
+# summary
+
+this hack shows the huge potential of using `nix develop` in combination to powerful remote IDEs.
+
+in fact, the proposed idea here is very similar to [direnv-in-vscode](https://fasterthanli.me/series/building-a-rust-service-with-nix/part-10#setting-up-direnv-in-vscode),
+except it does not require a specific program to be running on the destination host or a specific vscode plugin as [direnv-vscode](https://github.com/direnv/direnv-vscode).
+
+i created a feature request for vscode: <https://github.com/microsoft/vscode/issues/218361>.

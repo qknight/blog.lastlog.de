@@ -1,0 +1,369 @@
+[[!meta date="2024-12-07 23:37"]]
+[[!tag rust rust-canarias-25]]
+[[!specialpage]]
+
+[[!img posts/rust-leptos-canarias-workshop-2025/rust-canarias.jpg alt="" style="width:200px; float: right" class="noFancy"]]
+
+# introduction
+
+this is the morning program of the <a href="rust-leptos-workshop.html">rust leptos canarias 2025 workshop</a>
+
+# contents 
+
+* <a href="rust-leptos-workshop.html">main page</a>
+* <a href="rust-leptos-canarias-workshop-2025-morning.html">morning program</a>
+* <a href="rust-leptos-canarias-workshop-2025-afternoon.html">afternoon program</a>
+
+# morning
+
+solving programming puzzles with rust
+
+* lifetimes, borrow checker, types, control flow
+
+<https://google.github.io/comprehensive-rust/welcome-day-1.html>
+
+# optional
+
+you can also use <https://open-vsx.org/extension/Continue/continue> with 100% open source / local models using
+
+* https://ollama.com/ models like 
+* [llama3](https://ollama.com/library/llama3) and 
+* [codestral](https://ollama.com/library/codestral)
+
+or you can use a cloud provider with an api key (not free) to access models remotely
+
+# puzzles
+
+## puzzle 1
+
+Write hello world rust program in <https://play.rust-lang.org>
+
+## puzzle 2
+
+Write hello world rust program in <https://replit.com> 
+
+## puzzle 3
+
+Use <https://chat.openai.com/> to generate a hello world program and execute it in either replit or rust playground
+
+## puzzle 4
+
+Paste this source code into replit and let it explain to you:
+
+```rust
+fn main() {
+let n: String = “2”.to_string();
+Let v = n+2;
+// float pi = 3.16;
+;// c code 
+// auto i = 1.0 * (2.0 * pi;
+  let n = |x: u32| x+1;
+  println!("Hello, {} 🦀", n(3));
+}
+```
+
+## puzzle 5
+
+Find out what the name of our friend 🦀 is!
+
+## puzzle 6
+
+Theory: What is the difference between &str and String?
+
+Fix this program in replit.com, it must print the first name and nothing else:
+
+```rust
+fn main() {
+  println!("Hello, world!");
+  let _ = second("".to_string());
+  let z = split("Flux tux".to_string());
+  println!("{}", z);
+}
+fn split(a: string) -> string {
+	let n: Vec<String>= a.split_whitespace().map(|s| s.to_string()).collect();
+	n[0].clone()
+}
+```
+
+Use the replit mouse over to see ideas.
+Note: The first name is `Flux` in this case.
+
+## puzzle 7 
+
+Add a test to the last exercise, the form is this:
+
+```rust
+#[test]
+fn it_works() {
+  let result = 2 + 2;
+  assert_eq!(result, 4);
+}
+```
+
+To run it, use this 'shell' command:
+
+```bash
+cargo test
+```
+
+It should test the implementation with these test names:
+
+```
+let n1 = “Flux van Tuxus”; -> Flux
+let n2 = “Robert Redford” -> Robert
+```
+
+Do this using replit and execute it using shell.
+
+## puzzle 8
+
+Ask chatGPT to explain the difference between:
+
+* `String` and `&str`
+* `Vector` and `array`
+
+Also:
+
+* Normal fn() function vs closure
+
+## puzzle 9
+
+```rust
+fn main() {
+let n = r#"
+  "John Doe" - Email: john.doe@email.com - Notes: Met at a coffee shop, loves hiking.
+  "Alice Smith" - Email: alice.smith@email.com - Notes: Co-worker, passionate about photography.
+  "Michael Johnson" - Email: michael.j@email.com - Notes: Childhood friend, into DIY projects.
+  "Emily Brown" - Email: emily.b@email.com - Notes: Yoga partner, vegan enthusiast.
+  "Daniel White" - Email: daniel.white@email.com - Notes: Neighbor, avid book collector.
+  "Sophie Taylor" - Email: sophie.t@email.com - Notes: College buddy, computer science major.
+  "Oliver Miller" - Email: oliver.m@email.com - Notes: Tennis partner, always upbeat.
+  "Mia Garcia" - Email: mia.g@email.com - Notes: Gym buddy, aspiring chef.
+  "Benjamin Clark" - Email: ben.clark@email.com - Notes: Cousin, movie buff.
+  "Ava Wilson" - Email: ava.w@email.com - Notes: Travel companion, speaks four languages.
+  "Ethan Anderson" - Email: ethan.a@email.com - Notes: Childhood friend, video game geek.
+  "Grace Turner" - Email: grace.t@email.com - Notes: Co-volunteer, loves rescue animals.
+  "Ryan Bennett" - Email: ryan.b@email.com - Notes: College roommate, musician.
+  "Zoe Martinez" - Email: zoe.m@email.com - Notes: Art class friend, aspiring painter.
+  "Connor Reed" - Email: connor.r@email.com - Notes: Colleague, weekend cyclist.
+  "Lily Foster" - Email: lily.f@email.com - Notes: High school friend, fashionista.
+  "Isaac Ramirez" - Email: isaac.r@email.com - Notes: Soccer teammate, software developer.
+  "Hannah Ward" - Email: hannah.w@email.com - Notes: Book club member, history buff.
+  "Jackson Lewis" - Email: jackson.l@email.com - Notes: Childhood playmate, astronomy enthusiast.
+  "Ella Coleman" - Email: ella.c@email.com - Notes: Study group partner, coffee addict.
+"#;
+ // your input here
+ 
+}
+```
+
+You should use a regular expression to extract all the email addresses into a Vector<String>.
+
+Then print all the values to the shell.
+
+## puzzle 10
+
+fix this program some beginner wrote who clearly didn't know what he was doing [tm]:
+
+```rust
+fn main() {
+  let myset: HashSet<String> = HashSet::new();
+  myset.insert("foo");
+  myset.insert("bar");
+  myset.insert("foo");
+
+  println!("a list of all entries of myset: ")
+  myset.iter().map(|m| {
+      println!(" - {}", m);
+  });
+
+  println!("myset contains {} elements", m.size(0));
+}
+```
+
+after you get it running, rewrite the container from `HashSet` to `Vec` but make sure it still mentiones every element just once (unique).
+
+## puzzle 11
+
+fix this program below so that you create `myvec` from the `myset`.
+
+```rust
+fn main() {
+  let myset: HashSet<String> = HashSet::new();
+  myset.insert("foo");
+  myset.insert("bar");
+
+  let myvec: Vec<String> = myset.iter()....?....collect?
+}
+```
+
+## puzzle 12
+
+The `match` pattern is very mighty and rust helps you to handle all cases
+
+```rust
+enum WindturbineType {
+  OnShore,
+  OffShore,
+  //Flying
+}
+
+fn print_type (turbine: WindturbineType) -> String {
+  xxx {
+    OnShore => {"on".to_string()},
+    WindturbineType::Offshore => {"off".to_string()},
+    _ => {"".to_string()}
+  }
+}
+
+fn main() {
+  let t1 = WindturbineType::OnShore;
+  println!("t1 is of type: {}-shore", print_type(t1));
+  
+  let t2 = WindturbineType::OffShore;
+  println!("t1 is of type: {}-shore", print_type(t2));
+}
+```
+So do this:
+
+* get the code below working, again, stupid errors were made!
+* since there are also flying turbines, so add support for this in the enum
+* finally, add a t3 of type Flying and also print it
+
+## puzzle 13
+
+Next we'll have a look at `crates`, in particular the `tokio` crate, see:
+
+* <https://docs.rs/tokio/latest/tokio/sync/struct.Notify.html>
+* <https://crates.io/crates/tokio>
+
+Get this code working in replit:
+
+* create new rust project
+* paste it instead of the main.rs
+* run `cargo fmt` ... since we are lazy and still want beauty
+
+```rust
+use std::sync::Arc
+;
+use 
+tokio::sync::Notify;
+use tokio::time::
+{sleep, Duration};
+
+#[tokio::main]
+async fn main() {
+         // Shared Notify instance between tasks
+    let notify = 
+  Arc::new(Notify::new());
+
+    // Clone for the consumer
+    let notify_consumer = 
+    notify.clone();
+
+    // Producer task
+    let producer = tokio::spawn(
+      async 
+      move 
+    {
+        println!("Producer: Doing some work...");
+
+          sleep(Duration::from_secs(2)).await;
+          println!("Producer: Notifying consumer...");
+        notify.notify_one(); // Notify the consumer
+    });
+
+    // Consumer task
+    let consumer = tokio::spawn(
+      async 
+    move {
+          println!("Consumer: Waiting for notification...");
+        notify_consumer.notified().await; // Wait for notification
+          println!("Consumer: Received notification!");
+    });
+
+    // Wait for both tasks to complete
+    let _ = tokio::join!(
+               producer, 
+  consumer);
+}
+```
+
+So the default Cargo.toml needs some extensions, either add the tokio dependency manually or using the shell:
+
+`cargo depadd something`
+
+You need to figure out the command, as I don't remember it exactly 🤯.
+
+## puzzle 14
+
+```rust
+// Define the trait
+trait Printable {
+    fn print(&self);
+}
+
+// Implement the trait for a struct
+struct Book {
+    title: String,
+    author: String,
+}
+
+impl Printable for Book {
+    fn print(&self) {
+        println!("Book: '{}' by {}", self.title, self.author);
+    }
+}
+
+// Implement the trait for another struct
+struct Article {
+    headline: String,
+    editor: String,
+}
+
+impl Printable for Article {
+    fn print(&self) {
+        println!("Article: '{}' edited by {}", self.headline, self.editor);
+    }
+}
+
+fn main() {
+    let my_book = Book {
+        title: String::from("The Rust Programming Language"),
+        author: String::from("Steve Klabnik and Carol Nichols"),
+    };
+
+    let my_article = Article {
+        headline: String::from("Exploring Traits in Rust"),
+        editor: String::from("John Doe"),
+    };
+
+    // Use the trait methods
+    my_book.print();
+    my_article.print();
+}
+```
+
+now: 
+
+* extend the trait with another function print_all() and make the program work again
+
+```diff
+// Define the trait
+trait Printable {
+    fn print(&self);
++   fn print_all(&self); 
+}
+```
+
+## puzzle N
+
+* error handling: <https://google.github.io/comprehensive-rust/error-handling.html>
+* iterators: <https://google.github.io/comprehensive-rust/iterators.html>
+* discuss: rust shared libraries and implications (ld) compared to C
+
+# the end
+
+we made it!
+
+thanks for your time! <font color="red">❤🦀❤</font>

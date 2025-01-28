@@ -8,9 +8,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="414.01578mm"
+   width="367.91586mm"
    height="122.80627mm"
-   viewBox="0 0 1466.985 435.14031"
+   viewBox="0 0 1303.6389 435.14031"
    id="svg2"
    version="1.1"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
@@ -229,7 +229,7 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.46594253"
+     inkscape:zoom="0.45362451"
      inkscape:cx="934.64641"
      inkscape:cy="230.20561"
      inkscape:document-units="px"
@@ -249,15 +249,15 @@
      showguides="true"
      inkscape:guide-bbox="true">
     <sodipodi:guide
-       position="505.38551,435.1403"
+       position="505.38553,435.14032"
        orientation="0,-1"
        id="guide94" />
     <sodipodi:guide
-       position="613.12272,-1.6851495"
+       position="613.12275,-1.6851496"
        orientation="0,-1"
        id="guide96" />
     <sodipodi:guide
-       position="1100.8786,527.20664"
+       position="1100.8786,527.20666"
        orientation="1,0"
        id="guide98" />
   </sodipodi:namedview>
@@ -269,7 +269,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

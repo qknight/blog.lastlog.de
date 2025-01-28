@@ -1,0 +1,58 @@
+[[!meta date="2024-12-07 23:37"]]
+[[!tag rust leptos rust-canarias-25]]
+[[!specialpage]]
+
+[[!img posts/rust-leptos-canarias-workshop-2025/rust-canarias.jpg alt="" style="width:200px; float: right" class="noFancy"]]
+
+# introduction
+
+the [rust](https://www.rust-lang.org/)/[leptos](https://leptos.dev/) canarias course will feature a 'hands on' introduction to the rust programming language with modern AI workflows. 
+
+* the morning is for rust
+* the afternoon for leptos
+
+# date + time + location
+
+* 23 jan 2025 
+* 16:30-20:00 o'clock, 20:00 is pizza break
+* [at kreitek hacker space](https://kreitek.org/)
+
+# contents
+
+* <a href="rust-leptos-workshop.html">main page</a>
+* <a href="rust-leptos-canarias-workshop-2025-morning.html">morning program</a>
+* <a href="rust-leptos-canarias-workshop-2025-afternoon.html">afternoon program</a>
+
+# requirements
+
+* `MUST`: bring a laptop
+* `MUST`: create a <https://replit.com/> account and fire up your first repl with rust and evaluate hello world
+* `MUST`: create a <https://chatgpt.com/> account and check it works by making a hello world query
+* `MUST`: become familiar with <https://play.rust-lang.org/?version=stable&mode=debug&edition=2021>
+* `MUST`: read chapter 1 + 2 from <https://tourofrust.com/>
+* you have **some experience with programming in general, no prior rust knowledge required** for this course
+* course is in english
+
+## optional
+
+for more insights, finish this course <https://tourofrust.com/> before this workshop
+
+# registration
+
+if interested in participating in the workshop, please join this telegram channel:
+
+* [rust-leptos-canarias-workshop-2025](https://t.me/+9y9Kgt-6dncwZjUy)
+* write one message with your programming experience level in general / and rust experience in particular and what expectation of the course you have
+
+# my background
+
+i'm [joachim schiele](https://lastlog.de/blog/CurriculumVitae.html) and i've been doing rust/leptos fulltime for a year now. 
+
+* <https://klimabilanzklaeranlage.de/tool> is a WASM based rust/leptos base for CO2/N2O/CH4 management [source code](https://codeberg.org/slowtec/klick)
+* i held a similar workshop already and it was pretty popular
+
+# contact
+
+* <https://x.com/joschelboschel>
+* <mailto:js@lastlog.de>
+* <https://replit.com/@qknight>

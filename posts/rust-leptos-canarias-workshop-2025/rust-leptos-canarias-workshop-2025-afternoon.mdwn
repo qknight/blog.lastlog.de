@@ -1,0 +1,326 @@
+[[!meta date="2024-12-07 23:37"]]
+[[!tag rust rust-canarias-25]]
+[[!specialpage]]
+
+[[!img posts/rust-leptos-canarias-workshop-2025/leptos-canarias-in-signals-we-trust.jpg alt="" style="width:200px; float: right" class="noFancy"]]
+
+# introduction
+
+this is the afternoon program of the <a href="rust-leptos-workshop.html">rust leptos canarias 2025 workshop</a>
+
+# contents 
+
+* <a href="rust-leptos-workshop.html">main page</a>
+* <a href="rust-leptos-canarias-workshop-2025-morning.html">morning program</a>
+* <a href="rust-leptos-canarias-workshop-2025-afternoon.html">afternoon program</a>
+rust-leptos-canarias-workshop-2025-morning.mdwn
+
+# afternoon
+
+introduction to leptos
+
+1. <https://replit.com/@qknight/leptos-hello-world-template> fork this into your repl
+2. open `Shell` tab and type `trunk serve --release` (OR) use the `|>` play button
+3. open the `Networking` tab and click the Dev URL: https://81c3a177-xxx.spock.replit.dev/ to connect your browser to the trunk service
+
+   [[!img posts/rust-leptos-canarias-workshop-2025/replit-leptos-settings.JPG alt="" style="width:200px; " class="noFancy"]]
+
+4. in the browser, it should something like this, click the "Click me" button
+
+   [[!img posts/rust-leptos-canarias-workshop-2025/replit-leptos-main.JPG alt="" style="width:200px; " class="noFancy"]]
+
+note:
+
+* sadly we can't use the rust playground for leptos
+* <https://codesandbox.io/p/devbox/playground-j23dz7?file=%2Fsrc%2Fmain.rs> (warning: very slow)
+
+we also need to make sure we don't use a debug build because then the wasm build will be 40mb instead of 500kb which works nicely with a local toolchain but not with replit.com:
+
+## Cargo.toml
+
+```toml
+[package]
+name = "my-project"
+version = "0.1.0"
+authors = ["runner"]
+edition = "2021"
+
+[dependencies]
+leptos = { version = "0.7.0", features = ["csr"] }
+console_error_panic_hook = "0.1.7"
+web-sys = {version = "*", features = ["HtmlElement", "Element"]}
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+
+[package.metadata.leptos]
+lib-profile-release = "wasm-release"
+```
+
+## .replit
+
+```toml
+hidden = ["target", ".cargo"]
+
+entrypoint = "src/main.rs"
+modules = ["rust-stable"]
+
+[nix]
+channel = "stable-24_05"
+
+[gitHubImport]
+requiredFiles = [".replit"]
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+exposeLocalhost = true
+
+[run]
+args = ["trunk", "serve", "--release"]
+```
+
+# puzzles
+
+use this documentation as a basis <https://book.leptos.dev/getting_started/leptos_dx.html>
+
+
+## inspiration
+
+1. open <https://klimabilanzklaeranlage.de/tool>
+2. scroll up and change language to english or press shortcut `F2` instead 
+3. use the `Project` menu and click `Load example`
+4. play with the inuts, graphs and ui-controls -> this is all done in leptos!
+
+## puzzle 1
+
+using the aforementioned <https://replit.com/@qknight/leptos-hello-world-template> playground:
+
+hello world leptos
+
+0. 🐔 check 'los pollos', it should 3!
+1. check that the webpage can be loaded and shows the chickens
+2. open `main.rs` and change the text "Click me" into something else and see that the other tab loads this change automatically as `trunk` will autoreload the webpage
+3. open `index.html` and make it 9 chickens instead of 3 and, again, see that the other tab loads this change automatically
+
+now that everything works, let's get to work!
+
+## puzzle 2
+
+now we create our own first component, see <https://book.leptos.dev/view/03_components.html>
+
+```rust
+#[component]
+fn Greeter(
+    name: RwSignal<String>
+) -> impl IntoView {
+    view! {
+        <div>
+        <p>Dear {name}, we hope the chicken is with you!</p>
+        </div>
+    }
+}
+```
+
+### main.rs diff
+```diff
+#[component]
+fn App() -> impl IntoView {
+    let name: RwSignal<String> = RwSignal::new("unset".to_string);
+    view! {
+        <button on:click=move |_| *set_count.write() += 1>
+            "Click me"
+        </button>
++        <Greeter ?=?/> // name needs to be passed
+    }
+}
+```
+
+your job:
+
+* integrate the code and make it work, it has bugs....
+* the leptos manual is a bit outdated, please use the `RwSignal` syntax instead of the `Signal(0)` thing
+
+note:
+
+the pattern `move || {}` is a lamda function, with no argument, and leptos but also rust use it lots!
+
+## puzzle 3
+
+Now that we have a "greeter", we also need a `NameInput` component, so we'll create one. Learn from <https://book.leptos.dev/view/05_forms.html>!
+
+1. below the greeter, add the `<NameInput ?=?/>`
+2. create a component similar to the Greeter, also pass the RwSignal<String> `name`
+3. each time the input value changes, the Greeter should get updated, see `on:input:target` and `prop:value` input parameters to make this happen
+
+    ```rust
+    #[component]
+    fn NameInput(
+        ?
+    ) -> impl IntoView {
+        view! {
+            <input >
+        }
+    }
+    ```
+
+## puzzle 4
+
+The chicken test:
+
+For each name which starts with a "C", like "Charles" we add the conditional text:
+
+```rust
+<p>You are a 🐔CHICKEN🐔!</p>
+```
+
+```diff
+#[component]
+fn Greeter(
+    name: RwSignal<String>
+) -> impl IntoView {
+    view! {
+        <div>
+        <p>Dear {name}, we hope the chicken is with you!</p>
++        // here
+        </div>
+    }
+}
+```
+
+note: make sure that the chick text is added or removed for every entered word/letter in the input field.
+note: use `<Show ...>`, see <https://book.leptos.dev/view/06_control_flow.html>
+
+## puzzle 5
+
+now we create a view for a list of Users!
+
+1. add this to the global scope
+
+    ```rust
+    struct User {
+        name: String,
+        age: u8,
+    };
+    ```
+
+2. add this to the main function `fn App() -> impl IntoView {`
+
+    ```rust
+    let users: RwSignal<Vec<User>> = RwSignal::new(vec![User{name: "Linus".to_string(), age: 99}]);
+    ```
+
+3. add the UsersList component
+
+    ```rust
+    #[component]
+    fn UsersList(
+        ?
+    ) -> impl IntoView {
+        view! {
+            <For ...
+        }
+    }
+    ```
+
+    note: we need to use `For`, see:
+    * <https://book.leptos.dev/view/04_iteration.html>
+    * <https://docs.rs/leptos/latest/leptos/control_flow/fn.For.html>
+
+    the `For` consists of the elements: `each` `key` `children` and since `key` must be unique we need to add an id field of some integer type
+
+    ```rust
+    // a unique key for each item
+    key=|user| user.id
+    ```
+    extend the `struct User` by `id: integer type` and create unique keys for the sample data
+
+## puzzle 6
+
+next we add more sample data
+
+this is empty but we need sample data, ask chatgpt or replit for help, we don't do such things manually anmore!
+
+```rust
+let users: RwSignal<Vec<User>> = RwSignal::new(vec![User{name: "Linus".to_string(), age: 99}]);
+```
+
+so instead we write:
+
+```rust
+let users: RwSignal<Vec<User>> = RwSignal::new(gendata());
+```
+
+## puzzle 7
+
+filter the UserList by Age so that only Users are selected which are smaller than the age filter
+
+* create a signal `AgeFilter`: `RwSignal<u8>`
+* create an <input ... /> which writes to the `AgeFilter` and has a default value of 40
+* each time the filter is changes, the data should be updated automatically
+
+use `Signal::derive` and create a new signal based on the original data and the filter
+
+```rust
+let button_is_disabled: Signal<bool> = Signal::derive(move || {
+    disabled.get() || password.get().is_empty() || email.get().is_empty()
+});
+```
+
+ask chatgpt with a prompot like: `create rust/leptos example for Signal::derive with a Vec<User> where the users get filtered based on the age in the User record`
+
+see documentation on `Signal::derive`:
+
+* <https://book.leptos.dev/view/03_components.html>
+* <https://book.leptos.dev/reactivity/working_with_signals.html>
+
+## puzzle 8
+
+filter the UserList by Name (ignoring the case, i.e. "S" and "s" are the same)
+
+note: you can use `Signal::derive(move || {}); // here as well!`
+
+## puzzle 9
+
+sort the list by `SortBy`, this value can be hardcoded
+
+```rust
+#[derive(Clone)]
+enum SortBy {
+    None,
+    Age,
+    Name,
+    Id,
+}
+
+#[component]
+fn ShowUsers(data: RwSignal<Vec<User>>) -> impl IntoView {
+    let sort_by: RwSignal<SortBy> = RwSignal::new(SortBy::None);
+```
+
+note: you can use `Signal::derive(move || {}); // here as well!`
+
+## puzzle 10
+
+theory question: what we've been doing was WASM, so the app runs in the webbrowser. But what is SSR for then? See <https://book.leptos.dev/ssr/23_ssr_modes.html>
+
+## puzzle 11
+
+theory question: we've been using `trunk`, what was the motivation for doing so?
+
+## open discussion
+
+please provide feedback on:
+
+* how you liked the replit workflow and how well the assistant was working
+* have you been using AI for writing software yet? what did you think could have been done better?
+* how did you like the workshop
+
+# the end
+
+we made it!
+
+thanks for your time! <font color="red">❤🦀❤</font>
