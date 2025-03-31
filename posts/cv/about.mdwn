@@ -2,7 +2,7 @@
 [[!SpecialPage]]
 [[!img media/pepper-der-letzte-schliff.png width="400px" class="noFancy" alt="" style="float: right" title="http://peppercarrot.com/"]]
 
-[lastlog.de/blog](https://lastlog.de/blog) is a collection of articles/experiments from **joachim schiele**. articles are written using [pankat](https://github.com/nixcloud/pankat), a content creation
+[lastlog.de/blog](https://lastlog.de/blog) is a collection of articles/experiments from **joachim schiele**. articles are written using [pankat-rs](https://github.com/nixcloud/pankat-rs), a content creation
 solution using markdown syntax with a custom extension.
 
 ## author
@@ -21,7 +21,7 @@ joachim schiele, see [curriculum vitae](CurriculumVitae.html)
 
 ## about pankat
 
-[pankat](https://github.com/nixcloud/pankat) is a static blog generator written in go used for this blog:
+[pankat-rs](https://github.com/nixcloud/pankat-rs) is a static blog generator written in go used for this blog:
 
 ### navigating the articles
 
