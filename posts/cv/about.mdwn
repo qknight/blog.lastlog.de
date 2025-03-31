@@ -21,7 +21,7 @@ joachim schiele, see [curriculum vitae](CurriculumVitae.html)
 
 ## about pankat
 
-[pankat-rs](https://github.com/nixcloud/pankat-rs) is a static blog generator written in go used for this blog:
+[pankat-rs](https://github.com/nixcloud/pankat-rs) is a static blog generator written in go used for this blog
 
 ### navigating the articles
 
