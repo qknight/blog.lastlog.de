@@ -146,6 +146,6 @@ these items need to be done outside of the [libnix](https://nlnet.nl/project/lib
 
 # summary
 
-this is a **short summary of libnix topics what we are aiming for till the end of 2024**.
+this concludes the **goals in libnix** for which we are aiming for till the end of 2025.
 
 additional we think that **llvm-mingw** is a potent toolchain for windows which enables us to use [fixPath](https://github.com/nixcloud/fixPath).
