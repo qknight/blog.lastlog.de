@@ -7,9 +7,9 @@
 
 [[!img posts/cv/joachim.jpeg width="200px"  style="float: right"]]
 
-joachim schiele, a software developer experienced in linux systems, programming, and software distribution.
+> joachim schiele, a software developer experienced in linux systems, programming, and software distribution.
 
-i am dedicated to acquiring new skills and embracing emerging trends to remain relevant and achieve high-quality outcomes. during my time as CEO of nixcloud for 2 years, i worked collaboratively to create a supportive work environment.
+i am dedicated to acquiring new skills and embracing emerging trends to remain relevant and achieve high-quality outcomes. 
 
 location: EMEA, germany
 

@@ -3,11 +3,11 @@
 [[!img media/pepper-der-letzte-schliff.png width="400px" class="noFancy" alt="" style="float: right" title="http://peppercarrot.com/"]]
 
 [lastlog.de/blog](https://lastlog.de/blog) is a collection of articles/experiments from **joachim schiele**. articles are written using [pankat-rs](https://github.com/nixcloud/pankat-rs), a content creation
-solution using markdown syntax with a custom extension.
+solution using markdown syntax.
 
 ## author
 
-joachim schiele, see [curriculum vitae](CurriculumVitae.html)
+joachim schiele. for details, see [curriculum vitae](CurriculumVitae.html).
 
 ## language advice
 
@@ -19,11 +19,7 @@ joachim schiele, see [curriculum vitae](CurriculumVitae.html)
 * all text is under the terms of the [GNU Free Documentation License 1.2](https://www.gnu.org/licenses/old-licenses/fdl-1.2.en.html)
 * individual articles or elements used in an article might be licensed differently
 
-## about pankat
-
-[pankat-rs](https://github.com/nixcloud/pankat-rs) is a static blog generator written in go used for this blog
-
-### navigating the articles
+## navigating the articles
 
  * use the `left` and `right` key on the keyboard to go back and forth in the articles.
  * [most recent article](index.html) link
