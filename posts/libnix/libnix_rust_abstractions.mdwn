@@ -9,7 +9,7 @@
 
 # motivation
 
-status quo of rust support in nixpkgs!
+status quo of rust support in nixpkgs **24.05.20241104.d063c1d (Uakari)**!
 
 <!--
 considerations:
@@ -21,7 +21,6 @@ considerations:
 * wrapping `cargo` vs. reimplementing it
 * **rust-toolchain.toml** support
 * managing **-sys** dependencies like **openssl** or **llm** for example
-* nixpkgs **24.05.20241104.d063c1d (Uakari)**
 
 https://excalidraw.com/#room=cargo-rustc-nixpkgs
 -->
