@@ -273,7 +273,22 @@ this is like [rustup](https://nixos.wiki/wiki/Rust): these projects bring `rustc
 
 ## experiments
 
-to verify the toolchains use <https://github.com/qknight/rust-nix-abstraction-tests> and then:
+the experiments are at <https://github.com/qknight/rust-nix-abstraction-tests>
+
+see:
+
+* [cargo2nix](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/cargo2nix/flake.nix)
+* [crate2nix](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/crate2nix/flake.nix)
+* [naersk](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/naersk/flake.nix)
+* [crane](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/crane/flake.nix)
+
+to reproduce and play with the abstractions do:
+
+* clone the repo
+
+  ```bash
+  git clone https://github.com/qknight/rust-nix-abstraction-tests
+  ```
 
 * list all related store activity:
 
