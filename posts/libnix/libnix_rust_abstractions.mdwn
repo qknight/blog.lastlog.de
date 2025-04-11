@@ -112,7 +112,7 @@ when installing trunk, this abstraction:
 
 `buildRustCrate` replaces `cargo` and is used by [crate2nix](https://github.com/nix-community/crate2nix) but not very much from nixpkgs itself.
 
-See [buildRustCrate implementation](https://github.com/NixOS/nixpkgs/blob/4ad504735ad405c619b5889ca645bae9ff455c7a/pkgs/build-support/rust/build-rust-package/default.nix).
+See [buildRustPackage implementation](https://github.com/NixOS/nixpkgs/blob/4ad504735ad405c619b5889ca645bae9ff455c7a/pkgs/build-support/rust/build-rust-package/default.nix).
 
 ## summary of nixpkgs support
 
