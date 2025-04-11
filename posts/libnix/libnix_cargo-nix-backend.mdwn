@@ -1,196 +1,35 @@
-[[!meta date="2024-04-12 20:53"]]
+
+[[!meta date="2025-05-02 20:53"]]
 [[!tag nix nixos libnix]]
 [[!series libnix]]
-[[!summary libnix motivation, the future of cross platform nix]]
-
-[[!Draft]]
-[[SpecialPage]]
+[[!summary libnix integration into cargo and a discussion of crates wrapping legacy]]
 
 [[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
 [[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
-
+[[!draft]]
 # motivation
 
-first we look at the legacy support of the rust interaction with nix tooling. next we'll look at the changes coming with the libnix based workflow.
+an **insightful dive into the new concepts introduced by the libnix-based workflow**.
+
+# rust with libnix
+
+
+
+## cargo workflow (with libnix)
 
 libnix: make `cargo` use nix internally as a backend using the [nix c interface](https://github.com/NixOS/nix/pull/8699) on top of cross-platform nix.
+
+[[!img posts/libnix/cargo_rustc_nixpkgs3.svg class="noFancy" width="100%"]]
+
+in principle: replace **Cargo.lock** with a **Cargo.nix**
 
 why?
 
 * calling `nix-build` from `cargo`/`Cargo.toml` let's you **describe system dependencies cross platform (new)**
-* **better GC**: no more `rm ~/.cargo`, no more artifacts in `rm ./target/` as it is moved into `/nix/store` and `nix-collect-garbage` is used for cleanups
-* **binary substitutes**: `crate` compilation gets more fine grained, so faster development loop from development to deployment
+* build sandboxing (new)
 * **sharing crate sources** and related **builds between different rust projects (new)**
-* free of [import from derivation (IFD)](https://nixos.org/manual/nix/unstable/language/import-from-derivation), as this is disallowed in nixpkgs
-* sandbox builds (new)
-
-
-# traditional rust support using nix
-
-historically rust support was developed inside nixpkgs. rust applications are packaged by using the `buildRustPackage` helper from `rustPlatform`:
-
-```nix
-{ lib, fetchFromGitHub, rustPlatform }:
-
-rustPlatform.buildRustPackage rec {
-  pname = "ripgrep";
-  version = "12.1.1";
-
-  src = fetchFromGitHub {
-    owner = "BurntSushi";
-    repo = pname;
-    rev = version;
-    hash = "sha256-+s5RBC3XSgb8omTbUNLywZnP6jSxZBKSS1BmXOjRF8M=";
-  };
-
-  cargoHash = "sha256-jtBw4ahSl88L0iuCXxQgZVm1EcboWRJMNtjxLVTtzts=";
-
-  meta = {
-    description = "Fast line-oriented regex search tool, similar to ag and ack";
-    homepage = "https://github.com/BurntSushi/ripgrep";
-    license = lib.licenses.unlicense;
-    maintainers = [];
-  };
-}
-```
-
-most development nowadays happens in external flakes. because of
-[import from derivation (IFD)](https://nixos.org/manual/nix/unstable/language/import-from-derivation) these external implementations are not
-used from nixpkgs.
-
-## traditional nixpkgs extensions
-
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">name</th>
-      <th scope="col">stars</th>
-      <th scope="col">commits</th>
-      <th scope="col">issues</th>
-      <th scope="col">notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>[oxalica/rust-overlay](https://github.com/oxalica/rust-overlay)</td>
-      <td>830</td>
-      <td>1469</td>
-      <td>6/120</td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>[crane](https://github.com/ipetkov/crane)</td>
-      <td>819</td>
-      <td>601</td>
-      <td>21/202</td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>[fenix](https://github.com/nix-community/fenix)</td>
-      <td>620</td>
-      <td>1949</td>
-      <td>24/50</td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">4</th>
-      <td>[naersk](https://github.com/nix-community/naersk)</td>
-      <td>677</td>
-      <td>345</td>
-      <td>45</td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">5</th>
-      <td>[cargo2nix](https://github.com/cargo2nix/cargo2nix)</td>
-      <td>344</td>
-      <td>633</td>
-      <td>59/111</td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">6</th>
-      <td>[create2nix](https://github.com/nix-community/crate2nix)</td>
-      <td>338</td>
-      <td>1336</td>
-      <td>80/110</td>
-      <td>crate-by-crate</td>
-    </tr>
-  </tbody>
-</table>
-
-
-
-> Oxalica and fenix: both projects provides a similar set of packages and overlays under different APIs.
-
-> * Oxalica’s overlay allows you to select a particular Rust version without you providing a hash or a flake input, but comes with a larger git repository than fenix.
-* Fenix also provides rust-analyzer nightly in addition to the Rust toolchains.
-
-> Both oxalica’s overlay and fenix better integrate with nix and cache optimizations. Because of this and ergonomics, either of those community projects should be preferred to the Mozilla’s Rust overlay (nixpkgs-mozilla).
-
-A set of differences between nipxkgs and the overlays:
-
-* nixpkgs supports only a few rust versions while oxalica/rust-overlay maintains many
-
-## traditional nixpkgs extensions (obsolete)
-
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">name</th>
-      <th scope="col">stars</th>
-      <th scope="col">commits</th>
-      <th scope="col">issues</th>
-      <th scope="col">notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>[nixpkgs-mozilla](https://github.com/mozilla/nixpkgs-mozilla)</td>
-      <td>511</td>
-      <td>264</td>
-      <td>49/88</td>
-      <td>xxx</td>
-    <tr>
-      <th scope="row">2</th>
-      <td>[rust2nix](https://github.com/anirudhb/rust2nix)</td>
-      <td>8</td>
-      <td>12</td>
-      <td>0/1</td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>[carnix](https://github.com/nix-community/carnix)</td>
-      <td>10</td>
-      <td>43</td>
-      <td></td>
-      <td>xxx</td>
-    </tr>
-    <tr>
-      <th scope="row">4</th>
-      <td>[nixcrates](https://github.com/nixcloud/nixcrates)</td>
-      <td>15</td>
-      <td>63</td>
-      <td>0/1</td>
-      <td>xxx</td>
-    </tr>
-  </tbody>
-</table>
-
-# cargo workflow (no libnix)
-
-1. `cargo build` checks the Cargo.toml/Cargo.lock
-2. creates a target/ folder to work in
-3. creates a local crates.io registry copy
-4. builds all dependencies
-5. builds the program & links it
+* **binary substitutes**: `crate` compilation gets more fine grained, so faster development loop from development to deployment
+* **better GC**: no more `rm ~/.cargo`, no more artifacts in `rm ./target/` as it is moved into `/nix/store` and `nix-collect-garbage` is used for cleanups
 
 # cargo workflow (with libnix)
 
@@ -307,21 +146,24 @@ The same set of tools will be used by cargo when spawning a build, this gives us
 
 See also:
 
-* https://lastlog.de/blog/libnix_roadmap.html#cargo-with-nix-support
-* https://github.com/NixOS/nix/pull/8699
-* https://github.com/Anillc/nixrs/pull/1
+* <https://lastlog.de/blog/libnix_roadmap.html#cargo-with-nix-support>
+* <https://github.com/NixOS/nix/pull/8699>
+* <https://github.com/Anillc/nixrs/pull/1>
 
 # Example usages of cargo/crates
 
 Rust only crate:
-* https://doc.rust-lang.org/rust-by-example/crates.html
+
+* <https://doc.rust-lang.org/rust-by-example/crates.html>
 
 Rust+C: Bundling c code in the create:
-* https://github.com/stainless-steel/sqlite3-sys
+
+* <https://github.com/stainless-steel/sqlite3-sys>
 
 Rust+C: External dependencies from the system:
-* https://doc.rust-lang.org/cargo/reference/manifest.html#the-links-field
-* https://github.com/rust-lang/git2-rs/tree/master/libgit2-sys
+
+* <https://doc.rust-lang.org/cargo/reference/manifest.html#the-links-field>
+* <https://github.com/rust-lang/git2-rs/tree/master/libgit2-sys>
 
 # Build creates using nix abstractions
 
@@ -460,3 +302,7 @@ With Rust nightly we can see build plan:
 ```shell
 cargo build -Z unstable-options --build-plan | jq
 ```
+
+https://github.com/DeterminateSystems/nix-wasm-example/blob/main/flake.nix
+
+
