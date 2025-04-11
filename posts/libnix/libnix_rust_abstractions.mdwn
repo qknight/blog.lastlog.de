@@ -1,0 +1,345 @@
+[[!meta date="2025-04-11 13:53"]]
+[[!tag nix nixos libnix]]
+[[!series libnix]]
+[[!title libnix - rust abstractions]]
+[[!summary libnix integration into cargo and a discussion of crates wrapping legacy]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# motivation
+
+status quo of rust support in nixpkgs!
+
+<!--
+considerations:
+
+* rust abstractions in nixpkgs vs. third party tooling (via flakes or overlays)
+* [import from derivation (IFD)](https://nixos.org/manual/nix/unstable/language/import-from-derivation) implications
+* built on hydra and published via nixpkgs
+* custom registry & vendoring
+* wrapping `cargo` vs. reimplementing it
+* **rust-toolchain.toml** support
+* managing **-sys** dependencies like **openssl** or **llm** for example
+* nixpkgs **24.05.20241104.d063c1d (Uakari)**
+
+https://excalidraw.com/#room=cargo-rustc-nixpkgs
+-->
+
+but first we recap how **vanilla cargo workflow (no abstracted for nix)** works:
+
+1. `rustup` installs the toolchain
+2. `cargo build` checks the Cargo.toml/Cargo.lock
+3. creates a **target/** folder to work in
+4. creates a local crates.io registry copy in **~/.cargo/registry/**
+5. builds all dependencies in **target/debug/deps**
+6. builds the program in **target/debug/myprogram**
+
+the programmer has to take care of the **target/** and **~/.cargo/** folder and there is no crates build artifacts sharing between different projects, let alone users.
+
+# rust support in nixpkgs
+
+<div class="alert alert-info" role="alert">
+nixpkgs features:
+
+* **one version of rust stable, 1.84**, at time of writing
+* shipping **2159** rust applications using the `buildRustPackage` function from `rustPlatform` by **wrapping** `cargo`/`rustc`
+* a `buildRustCrate` implementation
+
+</div>
+
+this way [nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md) supports **2159** rust applications, at time of this writing.
+
+```bash
+nixpkgs> git grep buildRustPackage *.nix | wc -l
+2159
+```
+
+## using `buildRustPackage`
+
+`buildRustPackage` calls `cargo` which then calls `rustc`.
+
+```nix
+{ lib, stdenv, rustPlatform, fetchFromGitHub, pkg-config, openssl, libiconv,
+  CoreServices, Security, SystemConfiguration
+}:
+
+rustPlatform.buildRustPackage rec {
+  pname = "trunk";
+  version = "0.21.1";
+
+  src = fetchFromGitHub {
+    owner = "trunk-rs";
+    repo = "trunk";
+    rev = "v${version}";
+    sha256 = "sha256-6EuSz7bFlL49l5gjoKCyRTfAWiwIHFdG0t+StvGj7f8=";
+  };
+
+  nativeBuildInputs = [ pkg-config ];
+  buildInputs = if stdenv.isDarwin
+    then [ libiconv CoreServices Security SystemConfiguration]
+    else [ openssl ];
+
+  # requires network
+  checkFlags = [ "--skip=tools::tests::download_and_install_binaries" ];
+
+  cargoHash = "sha256-NfGDra5xHVY04CofTriCUspLY3f4Tiq6Wm9ON0K8jwY=";
+
+  postConfigure = ''
+    cargo metadata --offline
+  '';
+
+  meta = with lib; {
+    homepage = "https://github.com/trunk-rs/trunk";
+    description = "Build, bundle & ship your Rust WASM application to the web";
+    maintainers = with maintainers; [ freezeboy flosse ];
+    license = with licenses; [ asl20 ];
+  };
+}
+```
+
+<div class="alert alert-warning" role="alert">
+when installing trunk, this abstraction:
+
+* creates a **trunk-0.21.1-vendor.tar.gz** with all the cargo libraries contained in this one file and
+* on each **failing crate dependency** it has to recompile all crate dependencies again.
+
+[[!img posts/libnix/cargo_rustc_nixpkgs.svg class="noFancy" width="70%"]]
+
+</div>
+
+## using `buildRustCrate`
+
+`buildRustCrate` replaces `cargo` and is used by [crate2nix](https://github.com/nix-community/crate2nix) but not very much from nixpkgs itself.
+
+See [buildRustCrate implementation](https://github.com/NixOS/nixpkgs/blob/4ad504735ad405c619b5889ca645bae9ff455c7a/pkgs/build-support/rust/build-rust-package/default.nix).
+
+## summary of nixpkgs support
+
+the `buildRustPackage`, works remarkably well but there are many aspects where it lacks and motivates for projects like: **crane**, **naersk**, **cargo2nix** and **crate2nix** as well as drop-in toolchain replacements like **oxalica/rust-overlay** and **fenix**.
+
+# installing cargo/rustc toolchain(s)
+
+<div class="alert alert-info" role="alert">
+this is like [rustup](https://nixos.wiki/wiki/Rust): these projects bring `rustc`/`cargo` to your system so you can start developing 'imperatively' pretty similar to windows, linux and mac or you can use `buildRustPackage`!
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">name</th>
+      <th scope="col">stars</th>
+      <th scope="col">toolchains</th>
+      <th scope="col">commits</th>
+      <th scope="col">open issues</th>
+      <th scope="col">closed issues</th>
+<th scope="col">notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>[nixpkgs](https://github.com/NixOS/nixpkgs/blob/master/doc/languages-frameworks/rust.section.md)</td>
+      <td>?</td>
+      <td>stable</td>
+      <td>?</td>
+      <td style="color: red;">?</td>
+      <td style="color: green;">?</td>
+      <td>**nixpkgs built-in toolchain** (using cargo), <br>built on hydra, also wraps `cargo`</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>[oxalica/rust-overlay](https://github.com/oxalica/rust-overlay)</td>
+      <td>830</td>
+      <td>stable, beta, nightly</td>
+      <td>1469</td>
+      <td style="color: red;">6</td>
+      <td style="color: green;">120</td>
+      <td>drop-in replacement to install different rust versions</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>[fenix](https://github.com/nix-community/fenix)</td>
+      <td>620</td>
+      <td>stable, beta, nightly</td>
+      <td>1949</td>
+      <td style="color: red;">24</td>
+      <td style="color: green;">50</td>
+      <td>drop-in replacement to install different rust versions</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td>[nixpkgs-mozilla](https://github.com/mozilla/nixpkgs-mozilla)</td>
+      <td>511</td>
+      <td>?</td>
+      <td>264</td>
+      <td style="color: red;">49</td>
+      <td style="color: green;">88</td>
+      <td><font color="red">obsolete</font>,<br>drop-in replacement to install different rust versions</td>
+    </tr>
+  </tbody>
+</table>
+
+> Oxalica and fenix: both projects provides a similar set of packages and overlays under different APIs.
+>
+> * Oxalica’s overlay allows you to select a particular Rust version without you providing a hash or a flake input, but comes with a larger git repository than fenix.
+* Fenix also provides rust-analyzer nightly in addition to the Rust toolchains.
+
+> Both oxalica’s overlay and fenix better integrate with nix and cache optimizations. Because of this and ergonomics, either of those community projects should be preferred to the Mozilla’s Rust overlay (nixpkgs-mozilla).
+
+# drop-in replacements for `buildRustPackage`
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">name</th>
+      <th scope="col">stars</th>
+      <th scope="col">tagged<br>releases</th>
+      <th scope="col">commits</th>
+      <th scope="col">open<br>issues</th>
+      <th scope="col">closed<br>issues</th>
+      <th scope="col">evaluator</th>
+      <th scope="col">store entry<br>per crate<br>download</th>
+      <th scope="col">store entry <br>per crate<br>build</th>
+      <th scope="col">custom<br>registry<br>support</th>
+      <th scope="col">[IFD](https://nix.dev/manual/nix/2.26/language/import-from-derivation)<br>implications</th>
+      <th scope="col">support tool</th>
+</tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>[crane](https://github.com/ipetkov/crane)</td>
+      <td>819</td>
+      <td>52</td>
+      <td>601</td>
+      <td style="color: red;">21</td>
+      <td style="color: green;">202</td>
+      <td>`craneLib.mkDummySrc`</td>
+      <td>yes</td>
+      <td>yes</td>
+      <td>yes</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>[naersk](https://github.com/nix-community/naersk)</td>
+      <td>677</td>      
+      <td>0</td>
+      <td>345</td>
+      <td style="color: red;">50</td>
+      <td style="color: green;">110</td>
+      <td>`naersk.buildPackage`</td>
+      <td>yes</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+      <td>no</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>[cargo2nix](https://github.com/cargo2nix/cargo2nix)</td>
+      <td>407</td>
+      <td>14</td>
+      <td>633</td>
+      <td style="color: red;">62</td>
+      <td style="color: green;">118</td>
+      <td>`rustBuilder.makePackageSet`</td>
+      <td>yes</td>
+      <td>yes</td>
+      <td>yes</td>
+      <td>no</td>
+      <td>`cargo2nix` creates _Crates.nix_</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td>[create2nix](https://github.com/nix-community/crate2nix)</td>
+      <td>338</td>
+      <td>10</td>
+      <td>1336</td>
+      <td style="color: red;">80</td>
+      <td style="color: green;">110</td>
+      <td>`buildRustCrate` (from nixpkgs)</td>
+      <td>yes</td>
+      <td>yes</td>
+      <td>no</td>
+      <td>yes in fallback mode, otherwise no</td>
+      <td>`crate2nix` creates _Cargo.nix_</td>
+    </tr>
+  </tbody>
+</table>
+
+## experiments
+
+to verify the toolchains use <https://github.com/qknight/rust-nix-abstraction-tests> and then:
+
+* list all related store activity:
+
+  ```bash 
+  cd cargo2nix
+  nix path-info --derivation --recursive .#default
+  ```
+
+* hiearchically browse the store
+
+  ```bash
+  cd cargo2nix
+  nix path-info --derivation --recursive .#default | grep trunk
+  ... use the output to learn the exact store path ...
+  nix-tree --derivation /nix/store/6ibmcbvb5wccaf2gpjpxlnhzja4r3qp0-trunk-0.21.4.drv
+  ```
+
+# drop-in replacements for `buildRustPackage` (obsolete)
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">name</th>
+      <th scope="col">stars</th>
+      <th scope="col">commits</th>
+      <th scope="col">language</th>
+      <th scope="col">notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>[rust2nix](https://github.com/anirudhb/rust2nix)</td>
+      <td>8</td>
+      <td>12</td>
+      <td>rust</td>
+      <td><font color="red">obsolete</font></td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>[carnix](https://github.com/nix-community/carnix)</td>
+      <td>10</td>
+      <td>43</td>
+      <td>pure nix</td>
+      <td><font color="red">obsolete</font>,</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>[nixcrates](https://github.com/nixcloud/nixcrates)</td>
+      <td>15</td>
+      <td>63</td>
+      <td>rust</td>
+      <td><font color="red">obsolete</font>, build crates (with custom cargo reimplementation written in rust),<br> lacks proper semver dependencies</td>
+    </tr>
+  </tbody>
+</table>
+
+# summary
+
+rust/cargo support in nix has come a long way and while there are over 2k rust-projects in nixpkgs, the **nixpkgs abstraction is fairly limited and favours ease of deployment** over a good developer experience.
+
+* tools like `crane` and `naersk` can be used like `buildRustCrate`. 
+* `cargo2nix` and `crate2nix` try to replace later calls to `cargo` by creating a pure nix build system.
+
+all in all, these abstractions require deep nix knowledge if something goes wrong and at times require lots of extra work from the developers and potentially lock-in into Nix and NixOS.
+
+**it sets the stage for a different concept: using nix directly from cargo. that will be the focus of the next article** in the libnix series.
