@@ -1,49 +1,406 @@
 
-[[!meta date="2025-05-02 20:53"]]
+[[!meta date="2025-04-24 20:53"]]
 [[!tag nix nixos libnix]]
 [[!series libnix]]
 [[!summary libnix integration into cargo and a discussion of crates wrapping legacy]]
 
 [[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
 [[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
-[[!draft]]
+
+# cool stuff
+
+nix build --file /tmp/nix 
+nix build --file /tmp/nix --json
+nix build --file /tmp/nix --log-format internal-json
+
+json-logging?!
+
+https://determinate.systems/posts/changelog-determinate-nix-331/
+https://github.com/NixOS/nix/pull/13251
+
+sandbox = mixed
+in /etc/nix/nix.conf
+
+# hacking
+
+alias cargo=/home/nixos/cargo/target/debug/cargo
+strace -e execve -s 200 -f cargo build
+
+# tasks
+
+cargo documentation: <https://doc.rust-lang.org/nightly/nightly-rustc/cargo/>
+
+* [x] build cargo-1.87 from source in `wsl -d nixos` in ~/cargo
+* [x] create minimal rust applications with 1 dependency to test the new cargo-1.87' nix features
+* [x] call `nix build` from `cargo` prototype
+* [x] implement a nix argument 'skeleton' with subcommands:
+  * [x] generate --path output/
+  * [x] show-graph
+* [x] nix-build experiments
+  * [x] create minimal nix implementation to build cargo-nix-build-test-environment via nix-build. see `cargo-nix-build-test-environment-declarative`
+  * [x] create build with sandbox disabled, i.e. read from /home/nixos/myproject as $src: `nix-build -option sandbox false bwrap.nix`
+  * [x] create pkgs.bubblewrap / bwrap using prototype to work with sandbox off but still have some safety measures
+  * [x] use `crane` to clone from registry & build only 'all' deps, see **cargo-nix-build-test-environment**
+  * [x] use `buildRustCrate` to build a main program (~/cargo-buildRustCrate)
+* [x] callouts
+  * [x] identify the code which calls the fs-fingerprint checks
+      * [x] fresh vs. dirty
+  * [x] identify the code which calls the build for a crate
+  * [x] identify the code which calls the build for a workspace/crate
+* [x] cargo 2 /tmp/nix/ converter prototype
+  * [x] add termcolor-1_4_1 as root crate dependency, also add it to buildInputs
+  * [x] add buildInputs support
+  * [x] src = ../.; as absolute path
+  * [x] CARGO_MANIFEST_DIR = "/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1";
+        pkg.manifest_path()
+        Package->PackageInner->manifest_path: PathBuf
+
+        impl Package {
+        /// Creates a package from a manifest and its location.
+        pub fn new(manifest: Manifest, manifest_path: &Path) -> Package {
+            println!("manifest_path: {:#?}", manifest_path); // "/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1/Cargo.toml"
+            Package {
+                inner: Rc::new(PackageInner {
+                    manifest,
+                    manifest_path: manifest_path.to_path_buf(),
+                }),
+            }
+        }
+   * [x] CARGO_MANIFEST_PATH = "/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1/Cargo.toml";
+       pkg.root() -> manifest_path().parent()
+   * [x] ${rustc}/bin/rustc --crate-name termcolor --edition=2018 /home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1/src/lib.rs
+  * [x] fix --check-cfg cfg(docsrs,test) | --check-cfg cfg(feature, values()) from the build
+  * [x] --out-dir $OUT_DIR
+  * [x] -C incremental=$INC_DIR
+  * [x] this should be `--extern termcolor=${termcolor-1_4_1}/libtermcolor-78d6a6b6a8a8b71f.rlib` instead
+  
+        -L dependency=/home/nixos/cargo-nix-build-test-environment-declarative/target/debug/deps \
+        --extern termcolor=/home/nixos/cargo-nix-build-test-environment-declarative/target/debug/deps/libtermcolor-78d6a6b6a8a8b71f
+
+* [x] add CARGO_NIX_BUILDER variable support to cargo: example CARGO_TARGET_DIR in /home/nixos/cargo/src/cargo/util/context/mod.rs 
+* [x] add `cargo -Znix --config build.nix=\"fast\" build` support to cargo, see https://github.com/rust-lang/cargo/pull/14388/files#diff-1bb13388b11cda48b2c1b15d745c7c631253224e9295b633f793d6df9ed031cd
+* [x] remove **WARNING HACK** notices and get legacy `cargo` working again
+* [x] provide a way to use from flake.nix and override cargo/rust with specific version
+* [x] implement proper -L handling, i need propagatedBuildInputs so that -L can be set correctly. correction: i need `passthru.requiredInputs`
+* [x] switch from `nix-build` to `nix build` with less confusing logs
+* [x] compile `rphtml` with nix-build
+* [x] build-script-build for serde misses:
+
+      CARGO_CFG_FEATURE
+      CARGO_CFG_PANIC
+      CARGO_CFG_TARGET_ABI
+      CARGO_CFG_TARGET_ARCH
+      CARGO_CFG_TARGET_ENDIAN
+      CARGO_CFG_TARGET_ENV
+      CARGO_CFG_TARGET_FAMILY
+      CARGO_CFG_TARGET_FEATURE
+      CARGO_CFG_TARGET_HAS_ATOMIC
+      CARGO_CFG_TARGET_OS
+      CARGO_CFG_TARGET_POINTER_WIDTH
+      CARGO_CFG_TARGET_VENDOR
+      CARGO_CFG_UNIX
+      CARGO_ENCODED_RUSTFLAGS
+      CARGO_FEATURE_DEFAULT         - cargo/compiler/custom_build.rs
+      CARGO_FEATURE_STD             - cargo/compiler/custom_build.rs   i.e. cmd.env(&format!("CARGO_FEATURE_{}", super::envify(feat)), "1");
+      CARGO_MAKEFLAGS
+      DEBUG
+      HOST
+      NUM_JOBS
+      OPT_LEVEL
+      PROFILE
+      RUSTC_WORKSPACE_WRAPPER
+      RUSTC_WRAPPER
+      RUSTDOC
+      RUSTFLAGS
+      TARGET
+
+  <https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts>
+
+* [x] CWD / CARGO_MANIFEST_DIR / CARGO_MANIFEST_PATH rework
+
+      CARGO_MANIFEST_DIR = "./markup5ever";
+      CARGO_MANIFEST_PATH = "./markup5ever/Cargo.toml";
+      buildPhase = ''
+        ...
+        export CARGO_MANIFEST_DIR="$PWD/$CARGO_MANIFEST_DIR"
+
+* [x] figure out how to handle build.rs from nix-build perspective
+
+      cargo:rerun-if-changed=build/probe.rs
+      cargo:rerun-if-env-changed=RUSTC_BOOTSTRAP
+      cargo:rustc-cfg=std_backtrace
+      cargo:rustc-cfg=anyhow_no_core_error
+
+      passthru.rustc_library_paths = [];
+      passthru.rustc_arguments = "";
+      passthru.environment_variables = [];
+
+* [x] crates with build-script-build parent need to copy all files from the parent: `cp -r ${markup5ever-0_14_2-custom_build-run_custom_build}/* $OUT_DIR/`
+   * [x] markup5ever: `nix build .#xml5ever-0_20_0 --impure -L` > error: couldn't read `/build/tmp.htFBdG0l0s/generated.rs`: No such file or directory (os error 2)
+
+* [x] compile `html5ever` with nix-build
+* [x] properly handle ENVIRONMENT variables from build-script-build
+  * [x] cargo environment variables support: https://stackoverflow.com/questions/57017066/how-do-i-set-environment-variables-with-cargo
+* [x] crate changes 
+  * [x] add support for multiple variants of a crate dependency, basically add the -02rf029093 crate-hash to the name
+  * [x] nix 'name=' fields should also contain -build_script and -build_script_run so one can distinguish them on build errors 
+  * [x] support crates with names like `proc-macro-hack-0_5_20+deprecated-script_build_run-92f7ea519d1c2d73`, the '+' sign
+  * [x] git support
+    * [x] add nix fetchGit support with templates and such
+    * [x] automate fetchGit sha256 sum for given GIT repo
+      * [x] use nix-prefetch-scripts for git downloads...
+      nix-prefetch-git --url https://github.com/slowtec/rust-embed --branch-name update-to-axum-v0.8 --sparse-checkout | jq '.sha256'
+
+* [x] check that there is only programs like `rustc` vs. `build-script-build` or if we have to support others as well
+* [x] integrate https://github.com/nixcloud/cargo-nix-build-test-environment-declarative into cargo subcommand
+  * [x] create prototype: `cargo nix parse-build-script-build rustc_arguments
+  * [x] add filter for "cargo:" when parsing build-script-build output. see ring-0_17_11: it puts all kind of environment variable debugs and stuff into the output which should be *illegal*
+  * [ ] using cargo nix extension from nix:
+    * [ ] add flake.nix which compiles this custom cargo so it can be used in nix  * [ ] implement `rustc-link-lib` handling 
+  * [ ] extend buildInputs overrides for specific crates to inject pkg-config and sqlite3
+  * [ ] print 'warning' in yellow, like cargo does
+  * [ ] in general: extend these concepts as well:
+    * [ ] cargo::rustc-link-lib=LIB — Adds a library to link.
+    * [ ] cargo::rustc-link-arg=FLAG — Passes custom flags to a linker for benchmarks, binaries, cdylib crates, examples, and tests.
+    * [ ] cargo::rustc-link-arg-cdylib=FLAG — Passes custom flags to a linker for cdylib crates.
+    * [ ] cargo::rustc-link-arg-bin=BIN=FLAG — Passes custom flags to a linker for the binary BIN.
+    * [ ] cargo::rustc-link-arg-bins=FLAG — Passes custom flags to a linker for binaries.
+    * [ ] cargo::rustc-link-arg-tests=FLAG — Passes custom flags to a linker for tests.
+    * [ ] cargo::rustc-link-arg-examples=FLAG — Passes custom flags to a linker for examples.
+    * [ ] cargo::rustc-link-arg-benches=FLAG — Passes custom flags to a linker for benchmarks.
+    * [ ] cargo::rustc-link-search=[KIND=]PATH — Adds to the library search path.
+    * [ ] cargo::rustc-flags=FLAGS — Passes certain flags to the compiler.
+    * [ ] cargo::error=MESSAGE — Displays an error on the terminal.
+    * [ ] cargo::warning=MESSAGE — Displays a warning on the terminal.
+    * [ ] cargo::metadata=KEY=VALUE — Metadata, used by links scripts.
+
+* [ ] add `cargo nix generate --path /tmp/nix` support to cargo
+* [ ] on successful build, add the generated nix files into target/nix (aka the result)
+
+* [ ] downloads
+  * [ ] prevent 'crate downloads' by 'cargo' (not the nix part) with nix as build backend
+  * [ ] nix-prefetch-git downloads every time, see 'Starting git download to extract the sha256'
+
+* [ ] compile `klick` with `nix build`
+* [ ] compile `cargo` with `nix build`
+
+* [ ] smooth drop-in integration of the nix toolchain into cargo
+  * [ ] call nix-build from cargo and also link resulting binaries to `target/debug/binaryname` after compile using `link_targets()` into target/debug/XXX
+  * [ ] check that `cargo run foo` works
+  * [ ] support `cargo dry run` with nix-backend
+  * [ ] cargo test
+  * [ ] cargo doc
+  * [ ] cargo install
+  * [ ] cargo clean
+
+* [ ] update the build queue output of nix, similar to cargo build output
+
+* [ ] give instructions how to use my custom `cargo` from nix/nixos
+* [ ] major refactor, one commit & cleanup of code base; rebase on most recent cargo?
+* [ ] create tests to ensure most 'edge' cases can be built properly with the nix backend
+* [ ] publish work, ask for feedback and plan PR for cargo contribution
+
+# future work
+
+* [ ] match cargo's .fingerprint concept, i.e. what file change trigger rebuilds, to a pure nix build concept. we don't want to rebuild all of the src (not the dependencies) when a README.md is updated which is not used via `const README: &str = include_str!("../README.md");` which can only be detected by a `rustc` run
+  * [ ] consider <https://github.com/flox/flox-experimental-plugins/blob/master/pkgs/flox-build-incremental/build.nix#L37>
+* [ ] use dynamic derivations: https://fzakaria.com/2025/03/10/an-early-look-at-nix-dynamic-derivations
+
+# other
+
+`cargo tree --all-targets`
+
+note: nix in general should be more fine-grained and there should be an option to keep intermediate artifacts in phases and in regards to libnix it should also keep intermediate rust build artifacts. this would greatly increase iterative builds during development and make nix a feasible alternative to impure builds common in todays build systems.
+
+```bash
+cargo build
+real    1m4.114s
+user    5m50.464s
+sys     0m46.272s
+
+with 372 calls to rustc, assuming each nix-build call adds 0.3ms this means an additional 111 seconds build time. so the alternative would be to create all the build jobs in one nix-build call.
+```
+
+# architecture concept
+
+* or DX similar to
+  ```bash
+  export CARGO_NIX_BUILDER
+  cargo build                    # would use fast
+  cargo build --release          # would use sandbox
+  
+  # CARGO_NIX_BUILDER can be overriden
+  cargo -Znix --config build.nix=\"fast\" build
+  cargo -Znix --config build.nix=\"sandbox\" build
+
+  cargo test                     # would run on host
+  export CARGO_NIX_TESTER
+  cargo test                     # would run in sandbox
+  # CARGO_NIX_TESTER can be overriden
+  cargo --nix-tester=fast test     # would run on host
+  cargo --nix-tester=sandbox test  # would run in sandbox
+ 
+  # creates a default.nix for 'nix build' to be IFD free
+  cargo nix generate --path /tmp/nix
+  ```
+
+* index/registry
+* crate downloads
+  * move into /nix/store
+  * manage downloads via nix
+* dependency crates
+  * extend cargo job scheduler to use nix build scheduler for crate dependencies
+  * move ~/target/deps to /nix/store
+* incremental build
+  * support cargo's **incremental build artifacts** using nix-build
+  * also put incremental build artifacts inside the the /nix/store
+* introduce per crate system dependencies (openssl / pkg-config is only seen by openssl-sys)
+* sandboxed tests
+
+# downsides of 'nix wrappers for cargo'
+
+* slower than direct cargo usage (when used in iterative DX loop)
+  * they rely on hashes of the download, so even a README.md update triggers rebuilds where `cargo` would not trigger a rebuild
+  * `cargo` has a sophisticated fingerprint mechanism which knows which files would trigger a rebuild and which not
+
+* different implementation than vanilla cargo
+  * complicated to debug
+  * focus on deployment, not development
+* require nix, doesn't work with other environments for instance `crane`
+
+# downsides of 'vanilla cargo'
+
+* no reproducible builds, impure
+* no sandboxing
+* hard to wrap using nix
+
+# libnix cargo workflow considerations/ideas/questions
+
+* we can have distributed builders if we already have nix-build support and caching as well
+* nix-copy-closure distribution
+* nix anywhere / vendor like archive
+
+* how to pin crate builds so they don't get GC'ed? symlink each from the target/ folder?
+
+* does using 'nix build' require to copy the source code anew for each compile?! in flakes it uses git somehow...
+
+* introduce nix support via:
+
+  * [config file](
+https://web.mit.edu/rust-lang_v1.25/arch/amd64_ubuntu1404/share/doc/rust/html/cargo/reference/config.html#:~:text=Cargo%20allows%20local%20configuration%20for,foo%2Fbar%2Fbaz%2F.)
+  * should we do "cargo nix build" or integrate into "cargo build" with a nix mode?
+
+* do cargo crates need to be exposed as nix attributes like `openssl` for c or is it good enough to have only the target program 'myprogram' as attribute in nix? (similar to buildRustPackage from nixpkgs)
+
+* managing the build jobs:
+  * should nix or cargo manage the queue? both can do parallel builds? if cargo manages them, how would binary-substitutions work when building 200 crates? one call per crate?
+
+* to become IFD free, cargo could build a nix-script. some IFD motivation can be found [nix-evaluation-blocking/](https://jade.fyi/blog/nix-evaluation-blocking/).
+* we need symlink support on the fs
+* cargo/nix needs to know if it was called by cargo interactively (then it will create target/ symlinks) or via traditional nix-build where one might only want to extract the final binary and skip the rest.
+* once cargo build is called, does it ever call cargo again or is it just tools like rustc & misc?
+* where to place the toolchain knowledge to build, should be inside Cargo.toml?
+* flake
+  * should every rust project become a nix flake?
+  * should every crate using a c-library from nixpkgs become a flake?
+* are c compilers global per rust project or only available inside a crate?
+* crates which require sqlite3 system libraries will fail to compile if said dependency is not given, however, if it is given other crates are not recompiled. in the nix world this would mean we have to recompile everything...
+* do two different crates with native bundled c use two different c compilers?
+
 # motivation
 
-an **insightful dive into the new concepts introduced by the libnix-based workflow**.
+this followup on the **rust abstractions** post discusses the direct integration of nix into cargo. instead of rewriting cargo for deployment, as done by `cargo2nix` and `crate2nix` or rewriting cargo for development as done by `crane` and `naersk` why not use `cargo` calling nix instead?
+
+so that begs the question: what is `cargo` actually?
+
+* tool to parse the crates.io index of crate(s) and using semver with Cargo.toml to compute dependencies
+* a dependency downloader implementing http(s)/git/ssh protocol(s)
+* a translation unit: from dependency graph into a set of build steps (i.e. it creates something like Makefiles with dependencies)
+* a job scheduler to execute the build in parallel
+* a toolchain: `cargo` comes with `rustc` but still requires external tools for linking (ld/lld)
+* a testing framework
 
 # rust with libnix
 
+<https://github.com/nixcloud/cargo/tree/rust-1.87.0-libnix>
 
+parts of **~/.cargo** and **target/** have been moved into the **nix store**.
 
-## cargo workflow (with libnix)
+let's see what is in them!
+
+## `cargo build` with libnix usage advantages
 
 libnix: make `cargo` use nix internally as a backend using the [nix c interface](https://github.com/NixOS/nix/pull/8699) on top of cross-platform nix.
 
-[[!img posts/libnix/cargo_rustc_nixpkgs3.svg class="noFancy" width="100%"]]
+benefits:
 
-in principle: replace **Cargo.lock** with a **Cargo.nix**
-
-why?
-
-* calling `nix-build` from `cargo`/`Cargo.toml` let's you **describe system dependencies cross platform (new)**
-* build sandboxing (new)
+* **merges development and deployment, uses same artifacts, no forgotten dependencies (new)**
+* **sandbox builds (new)**
 * **sharing crate sources** and related **builds between different rust projects (new)**
-* **binary substitutes**: `crate` compilation gets more fine grained, so faster development loop from development to deployment
+* **sharing crate builds** via binary substitutes: `crate` compilation gets more fine grained, so CI can also serve intermediate artifacts
+* more **fine grained** build dependencies via `nix`, i.e. only the crates with **-sys** need to have custom libraries and compilers exposed to them
 * **better GC**: no more `rm ~/.cargo`, no more artifacts in `rm ./target/` as it is moved into `/nix/store` and `nix-collect-garbage` is used for cleanups
 
-# cargo workflow (with libnix)
+## cargo workflow (with libnix)
 
-* to become IFD free, cargo needs a generator for build scripts. some IFD motivation can be found [nix-evaluation-blocking/](https://jade.fyi/blog/nix-evaluation-blocking/). does
-cargo know all build targets ahead of time or are they created on demand?
-* cargo/nix needs to know if it was called by cargo interactively (then it will create target/ symlinks) or via traditional nix-build where one might only want to extract the final binary and skip the rest.
-* once cargo build is called, does it ever call cargo again or is it just tools like rustc & misc?
-* where to place the toolchain knowledge to build, should be inside Cargo.toml
+[[!img posts/libnix/cargo-nix-backend3.svg class="noFancy" width="100%"]]
 
-* should every rust project become a nix flake?
-* are c compilers global per rust project or only available inside a crate?
-* do two different crates with native bundled c use two different c compilers?
+[[!img posts/libnix/cargo-nix-backend.svg class="noFancy" width="100%"]]
 
-# libnix: interesting tests
+[[!img posts/libnix/cargo-nix-backend2.svg class="noFancy" width="100%"]]
+
+say we have a rust-project **myproject** and a user **nixos**, then we end up with these locations used:
+
+* ~/myproject
+
+  the projects source code
+
+* ~/myproject/target
+
+  the build artifacts maintained by `cargo`
+
+* ~/.cargo
+
+  **registry/index related assets** like the index used for semver dependency calculations and the **source code of used crates**
+
+### folder: ~/.cargo
+
+we find these:
+
+* ~/.cargo/registry/cache/index.crates.io-6f17d22bba15001f/pkcs8-0.10.2.crate
+
+  **gzip compressed source code of pkcs8 dependency**
+  
+* ~/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pkcs8-0.10.2/
+
+  **uncompressed source code so cargo can compile it**
+  
+* ~/.cargo/registry/index/index.crates.io-6f17d22bba15001f/.cache/
+
+  **a copy of crates.io index**
+
+### folder: myproject/target
+
+the example is the cargo project itself, the tool coming with the rust toolchain, since we hack on it.
+
+### summary
+
+to be reproducible we need:
+
+* the **registry/index clone for a given revision must be reproducible** (already a given)
+* your rust-project can have a **flake.nix** which defines:
+
+  * a nixpkgs revision to be used
+  * a rust toolchain to be used (when cargo builds)
+    * `rustc`, linker `ld`
+    * third party libraries: sqlite3, openssl and pkg-config
+
+* a crate can use a **Cargo-Environment.nix** which adds additional libraries as sqlite3, openssl and pkg-config to the `cargo build` using `nix build`.
+* the main program must collect all the custom libraries (openssl and so) from the crates and put it into the final linker command (similar to what is available with nixpkgs based toolchains already)
+
+# tests
+
+## interesting third-party tests
 
 we should reuse these tests:
 
@@ -53,6 +410,22 @@ we should reuse these tests:
 * <https://github.com/cargo2nix/cargo2nix/tree/release-0.11.0/examples>
 * <https://github.com/nix-community/crate2nix/tree/master/sample_projects>
 * <https://github.com/nix-community/crate2nix/tree/master/sample_workspace>
+
+## example usages of cargo/crates
+
+Rust only crate:
+
+* <https://doc.rust-lang.org/rust-by-example/crates.html>
+
+Rust+C: Bundling c code in the create:
+
+* <https://github.com/stainless-steel/sqlite3-sys>
+
+Rust+C: External dependencies from the system:
+
+* <https://doc.rust-lang.org/cargo/reference/manifest.html#the-links-field>
+* <https://github.com/rust-lang/git2-rs/tree/master/libgit2-sys>
+
 
 ## understanding 'cargo build'
 
@@ -66,9 +439,16 @@ rm -Rf target
 strace -e execve -f -s 4000 cargo build 2>&1 | grep -v ENOENT | grep -v 'strace: Process .* attached' | grep -v '.*pid.*exited with.*' | grep -v SIGCHLD | grep -v SIGUSR.* > f
 ```
 
+```bash
+
+[pid 100910] execve("/nix/store/q3sm4x963a996qc3d6baw54609ryifak-binutils-2.41/bin/ld", ["/nix/store/q3sm4x963a996qc3d6baw54609ryifak-binutils-2.41/bin/ld", "-z", "relro", "-z", "now", "-plugin", "/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/libexec/gcc/x86_64-unknown-linux-gnu/13.2.0/liblto_plugin.so", "-plugin-opt=/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/libexec/gcc/x86_64-unknown-linux-gnu/13.2.0/lto-wrapper", "-plugin-opt=-fresolution=/tmp/cc80aOOt.res", "--eh-frame-hdr", "-m", "elf_x86_64", "-dynamic-linker", "/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib64/ld-linux-x86-64.so.2", "-pie", "-o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7", "/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib/Scrt1.o", "/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib/crti.o", "/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/lib/gcc/x86_64-unknown-linux-gnu/13.2.0/crtbeginS.o", "-L/home/nixos/cargo/target/debug/build/blake3-8ab41975a65dd36f/out", "-L/home/nixos/cargo/target/debug/build/blake3-8ab41975a65dd36f/out", "-L/home/nixos/cargo/target/debug/build/curl-sys-861e0a168db9107b/out/build", "-L/home/nixos/cargo/target/debug/build/libnghttp2-sys-8dbfe894414d9e8f/out/i/lib", "-L/home/nixos/cargo/target/debug/build/libz-sys-f3c39c014a67c1fe/out/lib", "-L/home/nixos/cargo/target/debug/build/libz-sys-f3c39c014a67c1fe/out/lib", "-L/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-L/home/nixos/cargo/target/debug/build/libgit2-sys-f386612726614822/out/build", "-L/home/nixos/cargo/target/debug/build/libssh2-sys-a489b7139f5ecc1f/out/build", "-L/home/nixos/cargo/target/debug/build/libsqlite3-sys-38b0ddb890950d44/out", "-L/nix/store/vj9fghl4zm36mg1mj2dlb3hda4809r9j-rust-default-1.86.0/lib/rustlib/x86_64-unknown-linux-gnu/lib", "-L/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-L/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-L/nix/store/vj9fghl4zm36mg1mj2dlb3hda4809r9j-rust-default-1.86.0/lib", "-L/nix/store/vj9fghl4zm36mg1mj2dlb3hda4809r9j-rust-default-1.86.0/lib", "-L/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-L/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-L/nix/store/vj9fghl4zm36mg1mj2dlb3hda4809r9j-rust-default-1.86.0/lib", "-L/nix/store/vj9fghl4zm36mg1mj2dlb3hda4809r9j-rust-default-1.86.0/lib", "-L/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-L/nix/store/vj9fghl4zm36mg1mj2dlb3hda4809r9j-rust-default-1.86.0/lib", "-L/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib", "-L/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/lib/gcc/x86_64-unknown-linux-gnu/13.2.0", "-L/nix/store/swcl0ynnia5c57i6qfdcrqa72j7877mg-gcc-13.2.0-lib/lib", "-L/nix/store/swcl0ynnia5c57i6qfdcrqa72j7877mg-gcc-13.2.0-lib/lib", "-L/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib", "-L/nix/store/swcl0ynnia5c57i6qfdcrqa72j7877mg-gcc-13.2.0-lib/lib", "-L/nix/store/r6k305g2rn0qqkvdxfvzqg7mhh7rw679-gcc-wrapper-13.2.0/bin", "-L/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/lib/gcc/x86_64-unknown-linux-gnu/13.2.0", "-L/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/lib/gcc/x86_64-unknown-linux-gnu/13.2.0/../../../../lib64", "-L/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/lib/gcc/x86_64-unknown-linux-gnu/13.2.0/../../..", "-dynamic-linker=/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib/ld-linux-x86-64.so.2", "/tmp/rustcPKZjZ9/symbols.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.014xiowitpe7ifp19j10r45fj.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.02rlumg7l060w2fjuur4u3jbq.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.02zm1ii5wzlu83sx8s5uamucs.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.03j7cfz5n6q66poxjmtwww1gr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.04wsmhxfip7pq9yyat3o9zvsv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.07n0by3psjhsv7nswc22jgwu6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.09my0247zjzyxdmnl9nlbtwkh.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0eew3hlf38jdz6umyehtry91r.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0fgydv2vo6a8j1wv3prfprnk4.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0fmmwyrh25x4mzhe0nedtojwu.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0g84q0gcjc2ximsr0wqmtszsr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0k4gdrcbtwgt3py3aw7mvpddf.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0o3grrioez3p8o6r5pmprsguv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0odrq7bu8b5bjuifc0zdo70qu.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0oi85ur283zv8jslipm59uk61.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0q11h17s5burdz4l3zmrfqvy8.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0tyafupgk0z3u1gpnnom8rlt7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0x4xo5sncq7artxzk56a44zcr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0xhk5c97arp67milbe8axpuzd.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.0zhga7a26matbfstc8aieg04i.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.11xi6fxtnf7ib5f44cq2xlrvb.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.14fs09vc7xvuutrt2o3qahta6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1553uj0j3gje1a51lv0d71htd.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.160zugjhg3k1gjn8uyatg5iex.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.16vhjig5zyx5jqjac9vo4hufv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.17f120btlxl3uhau9yywglv3h.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.18tnutu110tq5csoz56gdqd09.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.193hki3iamty15imnl3hd5qnd.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.19esw5slhsrlk0k4k5dg4aa6h.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1ae4yb8sgvuv7tpeiaiiawbm7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1eizf28ikp8z11amhyoyl3e7l.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1ggsbjghwqputc8zkcbvp5ooh.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1i35stiwn0lebu30jy6149c4x.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1jxo9ntpjyviwekgem4bm3mxj.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1lz0jbk9vymz7wbgw492mcdk4.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1uf5xadn74bld17y5cpbhytk4.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1x0icoj1frhulmzihgp9ahknv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1z1d11g7915c6f2izbjnc8icg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1z8jwg749gzqiwwmcxerlpld2.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.1zbqad1dut4kv3qe04h03aqqu.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2158srwai6azil5xwdmnv531g.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.217f51qofb5iye241ltsox8gq.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.235q40d4n7e27qakjz96s0ooz.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.23acri7e2hxnqiuom5hvqil7f.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.24pykjn2c2ii2ko0jgknd8ojr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.25ggg6az3in3k6txf5y9zu933.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.29jizs7q0m85m89aut2ol5sfa.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.29yu1gxy3kfp2tkmb3m6yj6k7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2b7j4lray6m788bqjq657nwty.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2gden2lvrwxkr4fuy1sdhw356.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2ijulhm2h32ubgrvydlrjfrac.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2j9362dundjjh8lv86qfw8an0.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2kdmnoj9f43tt38l6vunan0e6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2nws2ddfmayyja0fczepsoy2i.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2o1uq2tw0l8jq6kya8iwn6ic8.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2ofi4m5ou2lxigued5s67ihcv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2ps5q2dwh716ektlbn1lhanc8.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2pujy8u6l54ari2hom8yi9bxu.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2r5ur0dq9jzr3upvqswiy71vh.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2vk0b7gz1v5wa83xz225d1jrr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2xhkkdkb2rr2p39mdzt1ecxnz.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.31jib3uo03cyicc434uhjhrui.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.32ffics1objteym7wc5h9xswg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.32mdxtciy9xsf3swa25o4aolv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.34gcc95lezrac6nl6d0ja8gbp.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.39i27sm9vyvkny7ix6ybu30u8.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.39mt0961c2v8eeykek7dk9e9x.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.39n6btyz97lm995qlj4nooo9v.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3blzv2do7kp1ur8bi0eo4oygt.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3erlmd07cti8ufgy2dfvadimw.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3es2waoacqmxdcyvd8skde99y.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3het3sb3ap24y8o602jv4hevw.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3hz484crf7jesimt3ymdqfec6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3tm5jeavcgtzndjaigext5tgl.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3ugly6s7herznt37yjmzkg0lj.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3wcpb7pmhgxz6j9j91mknlkp9.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3z8ex3lohm371b549eizglxs9.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.3zesfo4d2xv4cz7d0m9y1m74j.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.40xwctb3mxnhiumi3otctjeca.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.43ddcd7bhfp6r48lcbdsv2nsy.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.446nff4jelulnclrdk3e2yu83.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.447qaarv3qibpncd1rckgbyj7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.45aap2f4umnw0y0jtojt3oxen.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.48xjz15zeyfi54ik26j86dhtf.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.4la42g5o8be16eqyq7qnch5sx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.4lc57lzvt96headtrwfi582ya.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.4pgi5gdjvc0i5xbzr3n8i3bjx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.4w038zcyfqjgps8a89a0k0bkx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.53md18f04ad4qytw2yfk57vzj.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.55aqq85ludqv3gud8bpnqiwkc.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.58m7amtnsx3pp23fr7p8nv2ow.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5cae8flhw4jse2fnbs0lmvmu7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5dlbr48p1pv5jdpw6e3vqus3r.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5jyo9ufxe8f2pgnm6a4m5gvju.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5krkpdfcrq2eqenit7ehf1p1q.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5l9ynm105u1oxtlzpuvpuc7yr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5p8jwh4uyfyif27cie3d2wm3u.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5snyn8zy8q88v1kj2h829v6gf.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5vzrdk1gba52nwfkqz115zty9.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.5zbb1i0g720tzxffqdf6v61hv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.612tb14s7ntjq3akxhd5nhjhq.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.69wp8vfleciigz0o3mf7bzuuw.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6c84w34uaul8jl4g1bjqn0ti6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6dy92n2o9ahpn0n03hm0jgh83.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6mf1j767kcolxorrhq18vyqz6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6omqo7zuqy4jvsng02siatr9r.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6r7x2ocxdxj3e89oihdhn17ds.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6tzl0cxsrnp5vy26n1l5oce4w.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6v9yktx9sa62rocoi8c9wh2h2.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.6ww6jca7kpjaumlm4sis5gix7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.70xa3qc993cp06awdjsrlri3y.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.75mz4ji9lyp3m0l9pfdb5qweo.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.77512w2k66mmnz1da87jfkqja.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7d8ep2eno10detzobk36y6ohn.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7eplmgq3xkcwmwxhs8q0mmp7n.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7f92m7srgkrkbewa4ahu06k8a.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7jlr3nj9echpc18dch1m1t9az.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7ko6alrs5lmrph7goy32tz9ow.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7q680usmujw07q4u05yoq67uk.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7uw7nm8i5nrjzig4zby1egr13.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7xo3ipnw0ftbaxsl5t0sabmvx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.7yyq8zyf62fz19vr90dwe9f48.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.811o2m6sc3m274enz537mm8l1.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.81cr2rdxk9vlibgcc1vzyjk4j.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.831eeoq6srw4dw34sbtc84j25.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.834x33mypsl9dmx2oyphbf53e.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.874gkh5mf5dss5zvehj9vwukk.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.881230f0y5hgpa18paryet0u5.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8b9qhxozs2pu1qp8gib6mf2h5.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8cfllm2q2h3je12sjkbeh4s8x.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8cukwp4ava672tqt5g0dpuumo.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8e1pdamaa7cxihqnowrydhh3k.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8ftjis6gwt2o4qyk5uz3l83tg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8g238p4mtebefvxli7uxtwbvx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8k7zwvgaaj8r8r1buw9rm43gs.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8l7xb9t0rg25s9h8c7rrslfjw.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8prteqf2fmho5058o8ceqs9wn.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8rmc23ehg7qe0cqb1rstectas.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.8tj45qee3yxwtfsatvyj4a6o5.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.91mmbois8d0es4fkol45paxqm.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.91shsf88txc009r9ler3spp2w.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.95gf1m3g2ts1mfn62fo1kefdn.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.99c76q7imknocjiaf0tb8grax.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9a3ii7oczuen9oq8q77obga5g.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9b758ksenl0fxiumf1i6vxfso.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9d8kol6yjtlj8sur7xv0pr2c7.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9db9hcyw7ug2kxfq7732ujug8.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9gkynbw3qf6wkydo9y3wswmg0.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9j3qv9w6uk4dxddfl1w7qtw8o.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9j51dc5vswk0p676agtr1bqzb.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9r3fk1x9vgqsz8xb6g8at0e8l.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9vs29ka96djyxvj5xzjoqbeyi.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.9zc70swx4l4svx3fvc7vx7q3r.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.a7y7g44uieaypgh5edvehwwcy.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.aar7hpr3y4fvlkfuv8g7atxml.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.ace00gotsgrrb4tv7c8kiiq5p.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.acl940a24ftn8mkr06zt5sjvo.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.adjm5mwja9jr8tocffcl6f7e4.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.ag5gugk0g64ywgjqbg9371n01.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.algpcxnntaujwbhh5hlqjbygl.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.amyt8thu2n9w4k12r1dy1kaqc.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.an04q23txp8e5nzq7e9e2ckzy.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.anlgpuz62lv7wtobu8cjd38kp.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.auhjsu3ss0bgn408p9aa8x6tg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.avx4snt0rij5w7adi24ei8yfc.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.az17w0xdvp9s9k1x7pjc2tk13.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.az9ekwsjlcv97c0fbq456vhci.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.b02vsks9uyirsyfwmt37cnidb.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.b2i6tpxdw4dk76dlmnszq5y2a.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.b38i142w7in12q4kwl84s8pof.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.b3bq9kn8gyv9u13hcwulha6be.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.b868nka21dckj2cim96ybzmd3.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.b89sg8sbfxst7p3ke46fb892r.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.baia560e7mxaybrr4uowsm1bg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bdk7hmbgrbl336v53cxkc9mm9.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bgs16nq46p52y8vqr122ixpg2.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bhetws4g7f93exbj10ynd5iuy.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bi489kq7paddhzqfb2eebtdvj.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bmg7ybt2w3zbz166aq28xkvim.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bmnc386htkwohfeke35ziull5.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bmw2qgn0271lkldyxvzc55h1x.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bo1fi1m3i175ilfg29t7dgb6y.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.boi66j26k01zj75btg6eg57yx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bpj08m0lxto7rbtso3focfza3.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bqiklq062t6moi7t97u1c6rv2.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bqqawjye805kbzoid03kha5xi.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.brbvzkftig773nix8f550gx1k.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.brhl00dure40pyvexhdxpgs26.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bu13v6m4fitz5mcqm059xxgmg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bwwmwh4qd7sp9dcx3n88zjsjg.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bx1sss8mul8k7jf6vb37nf5my.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.bxos7z955m27cgz78dpb0rpun.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c04zkqonnwdvh6ax7cr7rb40o.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c0hulq35jlhn8c76xxi2ac1ev.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c1ii93pp3zhp2md9aqg6wdm5y.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c2wca21drjhr4mh3igeq2k7ke.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c3k87yppw6e5ok5qoqv07bbks.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c4239iyiit45f5fwm6gnea49a.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c4b7mgh2kpvkhyi6qw5qs7gkf.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c5cu8aqlgsbcvbypz9odufnyv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c5fespalhg9nhlltsrdne6mkv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c6goa0fa9rlbji9pc1lmmo0vx.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c84fu8z3rkiq4k3jo95lnncmd.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.c9uz6g5zm0weg7t2y0asf94iv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cb4edgotu3b78uijz6czanvr5.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cbbgd1ooyh7xsmfnpdz1spkg6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cfbwfojbh2mmscjaq0xhfpaqh.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cg3q13hawabivs0066vju0wwk.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cguzlqvp4ch48xk79om53ex9s.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cm6h6hwts1le04llsls4klcvv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cma6tuh97lai3u7aphq2m0wdb.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.csaeeutj8fkz3cqhk7eo37h1y.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cuk9jigwc38hceb0x0cnuwnp2.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cv6h8rd0qihsi3y0euz5g94jw.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cw4t5akn86mihahebbaoxduzk.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.cx7lkevheaqsnkw875eameuow.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.d0yyo7d62sdis37ta19j067tq.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.d17yzp92zz7fyfc4fpy7us111.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.d2nx3lyybjwargll8kicda5eq.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.d7g05ab36entt3mkd9ype9s1g.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.d9fam6wcfr19z4al9rur5nl3g.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.daforte3ygok2no9csrdlc9nv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.daylhfpqdpu9h4rz820g4l2zo.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dbn4c7geordbpsjqsxv31tqmm.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dcake3asbilwjjbyrxifhspr2.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.ddubnd6jl9dp2pdfooscgv1sv.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dejpvps2oimdsusoxf5uf18j3.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.denaed1r711kiv9bi2bt3mqky.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.df595r8rxpua92y3z1vr4u3kt.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dsvt86uvjrx9dk91ud5aou5zf.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.du0k0346q7gqdyl09fs5o0pq4.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.duyfhoywjfsicdoz0bll78y9e.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dx1ayj2k27ypfl9xacb16uwpn.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dxtxcitv91b62o8cxt8jk1hs4.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dz1x3ul2b5xb9130ofqakxmsr.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.dzsy747mn6148l1hmx18a73pp.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.e5dj28ixtg0oop7vbgjklt2o8.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.eb0ua0pjmmky6hgrnza7c15su.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.eb72mcdmos23tmhvqysynngv1.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.ee3xoml5ldedmjvtnl00z4haf.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.eehkay82peawgssht2d84az2b.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.egf9d1b9cqnz8nfghtukkl678.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.egor4soivs38l77lo5v37xnv6.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.ehoyvo044zjz3linfv2niv82o.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.eia00y1bh9gzyez178gmm5iav.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.eihmay1mnp3bo91bmxt39scga.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.eykzq08fqvgm837go44kgkfq3.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.ezf7all02edyybj8fd33oln6y.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f0pcbcaghljq9zyeljvjapbyn.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f0u6lrn005lvv2rpyzvtg3fwz.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f1t37m03h6da0u8hed720dgav.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f3hamuijj1gw3gy2jxch5bj7c.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f3ipt19xe1awlh610f5ab1n8e.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f3z1sn7woixdv1wvj56wi6wbp.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f43dtxqb7lc5q7gwkpuzovpgn.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.f4fw4n8yw1ysgb1k8zqudfq1t.rcgu.o", "/home/nixos/cargo/target/debug/deps/cargo-c49e65d404bfb6f7.2ksnsm47l1qklh6xndypcvgz9.rcgu.o", "--as-needed", "-Bstatic", "/home/nixos/cargo/target/debug/deps/libgit2_curl-fd34f6498e70bd14.rlib", "/home/nixos/cargo/target/debug/deps/libtracing_chrome-3cbd0f1794ca2b25.rlib", "/home/nixos/cargo/target/debug/deps/libos_info-740697e4a9b03dcb.rlib", "/home/nixos/cargo/target/debug/deps/libtracing_subscriber-0a7c6f146b27659d.rlib", "/home/nixos/cargo/target/debug/deps/libsharded_slab-ba1993aa8bed492e.rlib", "/home/nixos/cargo/target/debug/deps/liblazy_static-56fe2bd04ed1ed5a.rlib", "/home/nixos/cargo/target/debug/deps/libmatchers-f723fbef582b4076.rlib", "/home/nixos/cargo/target/debug/deps/libregex_automata-2ad9bcd427ac4dc6.rlib", "/home/nixos/cargo/target/debug/deps/libregex_syntax-413a7ffa906edb90.rlib", "/home/nixos/cargo/target/debug/deps/libnu_ansi_term-aebcc3536b725304.rlib", "/home/nixos/cargo/target/debug/deps/liboverload-402ce105e1f122f8.rlib", "/home/nixos/cargo/target/debug/deps/libthread_local-e0126c081beede7d.rlib", "/home/nixos/cargo/target/debug/deps/libtracing_log-fc6e33d483574f5f.rlib", "/home/nixos/cargo/target/debug/deps/libcargo-3c6f461ee1ac8556.rlib", "/home/nixos/cargo/target/debug/deps/libclap_complete-b9a6ffcd4267a193.rlib", "/home/nixos/cargo/target/debug/deps/libshlex-52cb9e546948c6ac.rlib", "/home/nixos/cargo/target/debug/deps/libis_executable-36f8b46ed4417209.rlib", "/home/nixos/cargo/target/debug/deps/libcargo_credential_libsecret-5e855336e57adb47.rlib", "/home/nixos/cargo/target/debug/deps/liblibloading-dea1eb131e1f1230.rlib", "/home/nixos/cargo/target/debug/deps/libhttp_auth-42ba61c96ba8e74b.rlib", "/home/nixos/cargo/target/debug/deps/libsha1-5565de2250f4a0c9.rlib", "/home/nixos/cargo/target/debug/deps/libopener-62c87bc3c189265b.rlib", "/home/nixos/cargo/target/debug/deps/libsupports_hyperlinks-7fb8feb5113d54bc.rlib", "/home/nixos/cargo/target/debug/deps/libsupports_unicode-d0d41db7056a8c8a.rlib", "/home/nixos/cargo/target/debug/deps/libim_rc-b79847d9f2c98542.rlib", "/home/nixos/cargo/target/debug/deps/librand_xoshiro-44f6738347a3b55b.rlib", "/home/nixos/cargo/target/debug/deps/libsized_chunks-4161cb6c056d4b61.rlib", "/home/nixos/cargo/target/debug/deps/libbitmaps-34b104456045c128.rlib", "/home/nixos/cargo/target/debug/deps/libjiff-55330887f7036b7a.rlib", "/home/nixos/cargo/target/debug/deps/libblake3-c2a0936ae865157e.rlib", "/home/nixos/cargo/target/debug/deps/libconstant_time_eq-d143995f49aecef3.rlib", "/home/nixos/cargo/target/debug/deps/libarrayvec-09139da729dfc177.rlib", "/home/nixos/cargo/target/debug/deps/libarrayref-ac36cf551a6d851d.rlib", "/home/nixos/cargo/target/debug/deps/libcolor_print-b0f6880dd8db0128.rlib", "/home/nixos/cargo/target/debug/deps/libserde_ignored-e22b64ddcba9e030.rlib", "/home/nixos/cargo/target/debug/deps/librand-c013350ac42a701c.rlib", "/home/nixos/cargo/target/debug/deps/librand_chacha-b6ec57128a748280.rlib", "/home/nixos/cargo/target/debug/deps/libppv_lite86-232bc4e981e6b2df.rlib", "/home/nixos/cargo/target/debug/deps/librand_core-758ac4a243387ca8.rlib", "/home/nixos/cargo/target/debug/deps/libzerocopy-2ad2a7c0287ce0b9.rlib", "/home/nixos/cargo/target/debug/deps/librustc_stable_hash-9bceefdd794cdb10.rlib", "/home/nixos/cargo/target/debug/deps/libpasetors-279cb4e70b92f852.rlib", "/home/nixos/cargo/target/debug/deps/libed25519_compact-9b0675ce81218022.rlib", "/home/nixos/cargo/target/debug/deps/libp384-0a68b828354cfc12.rlib", "/home/nixos/cargo/target/debug/deps/libecdsa-dd070e75940c1dce.rlib", "/home/nixos/cargo/target/debug/deps/librfc6979-1f82e0d7843af37d.rlib", "/home/nixos/cargo/target/debug/deps/libsignature-216b6002faaf5ec5.rlib", "/home/nixos/cargo/target/debug/deps/libprimeorder-6cb5fcf1a1108e65.rlib", "/home/nixos/cargo/target/debug/deps/libelliptic_curve-c538ed1d8121a3bf.rlib", "/home/nixos/cargo/target/debug/deps/libsec1-9338b77f5cda2fae.rlib", "/home/nixos/cargo/target/debug/deps/libpkcs8-89b35dc98a90ca9c.rlib", "/home/nixos/cargo/target/debug/deps/libspki-c16e9a80282587bc.rlib", "/home/nixos/cargo/target/debug/deps/libder-a4b62f3d00b3e3be.rlib", "/home/nixos/cargo/target/debug/deps/libpem_rfc7468-e7eb99c24c3bfd4d.rlib", "/home/nixos/cargo/target/debug/deps/libbase64ct-53a45d34fba89581.rlib", "/home/nixos/cargo/target/debug/deps/libhkdf-5eea3e2d92d265ae.rlib", "/home/nixos/cargo/target/debug/deps/libcrypto_bigint-b9a965b412611e05.rlib", "/home/nixos/cargo/target/debug/deps/libbase16ct-c39159fdcb62dd4a.rlib", "/home/nixos/cargo/target/debug/deps/libgroup-c65cb384cb4d7856.rlib", "/home/nixos/cargo/target/debug/deps/libff-f4fd8c5142123c14.rlib", "/home/nixos/cargo/target/debug/deps/librand_core-06030f74e870da39.rlib", "/home/nixos/cargo/target/debug/deps/libgetrandom-b7804fc19a818a8d.rlib", "/home/nixos/cargo/target/debug/deps/liborion-566cc7a1f084fdb0.rlib", "/home/nixos/cargo/target/debug/deps/libfiat_crypto-416b4ce6f03115ed.rlib", "/home/nixos/cargo/target/debug/deps/libct_codecs-59267c4624e30ac8.rlib", "/home/nixos/cargo/target/debug/deps/libregex-1cf9c6d6604dece2.rlib", "/home/nixos/cargo/target/debug/deps/libclap-fdd071b034cae901.rlib", "/home/nixos/cargo/target/debug/deps/libclap_builder-a90c591a0a426465.rlib", "/home/nixos/cargo/target/debug/deps/libterminal_size-2ff9ec6837469f8e.rlib", "/home/nixos/cargo/target/debug/deps/libstrsim-47247f90d363b00f.rlib", "/home/nixos/cargo/target/debug/deps/libclap_lex-daa19dd158061c48.rlib", "/home/nixos/cargo/target/debug/deps/libgix-44a846d486395188.rlib", "/home/nixos/cargo/target/debug/deps/libgix_filter-c41f860afa248fc3.rlib", "/home/nixos/cargo/target/debug/deps/libgix_packetline_blocking-e790ca7c0f467693.rlib", "/home/nixos/cargo/target/debug/deps/libencoding_rs-219ba55a211f9fe3.rlib", "/home/nixos/cargo/target/debug/deps/libgix_diff-8c4fa383215cc586.rlib", "/home/nixos/cargo/target/debug/deps/libgix_submodule-612838528cf163b5.rlib", "/home/nixos/cargo/target/debug/deps/libgix_config-0b49207e960da563.rlib", "/home/nixos/cargo/target/debug/deps/libgix_protocol-d7c3ebd0b5106bcf.rlib", "/home/nixos/cargo/target/debug/deps/libgix_refspec-d871251e85896c23.rlib", "/home/nixos/cargo/target/debug/deps/libgix_revision-16d2c573f63fc465.rlib", "/home/nixos/cargo/target/debug/deps/libgix_shallow-2f9ae201f4d8e96e.rlib", "/home/nixos/cargo/target/debug/deps/libgix_transport-c8f477b9aa39530e.rlib", "/home/nixos/cargo/target/debug/deps/libgix_packetline-45c8ab6286914808.rlib", "/home/nixos/cargo/target/debug/deps/libgix_odb-5183229012c4f9f6.rlib", "/home/nixos/cargo/target/debug/deps/libgix_pack-c9d203b23a5e66ad.rlib", "/home/nixos/cargo/target/debug/deps/libclru-cb63bbfe94bbc6cb.rlib", "/home/nixos/cargo/target/debug/deps/libarc_swap-9eb2b0547b786bd5.rlib", "/home/nixos/cargo/target/debug/deps/libgix_negotiate-73cf28439da3116d.rlib", "/home/nixos/cargo/target/debug/deps/libgix_dir-3b9bbffbcec196a6.rlib", "/home/nixos/cargo/target/debug/deps/libgix_worktree-1bcc553cc9844949.rlib", "/home/nixos/cargo/target/debug/deps/libgix_pathspec-0cbd9d4100dfa83d.rlib", "/home/nixos/cargo/target/debug/deps/libgix_index-5f6adebffcca4d91.rlib", "/home/nixos/cargo/target/debug/deps/libfnv-71fc6b195d346bd0.rlib", "/home/nixos/cargo/target/debug/deps/libgix_bitmap-0e33e044657a9dbc.rlib", "/home/nixos/cargo/target/debug/deps/libgix_traverse-3e2b93589a233a10.rlib", "/home/nixos/cargo/target/debug/deps/libgix_revwalk-9a4b6817e72c55b3.rlib", "/home/nixos/cargo/target/debug/deps/libgix_hashtable-a6acea2ba2a67a65.rlib", "/home/nixos/cargo/target/debug/deps/libhashbrown-41c2b83007eeeeef.rlib", "/home/nixos/cargo/target/debug/deps/libahash-c664a8569e32a815.rlib", "/home/nixos/cargo/target/debug/deps/libzerocopy-7e7794a5fa0253c1.rlib", "/home/nixos/cargo/target/debug/deps/libbyteorder-4e79b5ef07f8a509.rlib", "/home/nixos/cargo/target/debug/deps/liballocator_api2-66f9ad675af3a149.rlib", "/home/nixos/cargo/target/debug/deps/libgix_ignore-81568ea94dc20b75.rlib", "/home/nixos/cargo/target/debug/deps/libgix_discover-91007e0ff68aea40.rlib", "/home/nixos/cargo/target/debug/deps/libgix_ref-b76999046353c271.rlib", "/home/nixos/cargo/target/debug/deps/libgix_lock-0306f6ca09d1a020.rlib", "/home/nixos/cargo/target/debug/deps/libgix_tempfile-46c96e41f2ccfe7e.rlib", "/home/nixos/cargo/target/debug/deps/libgix_fs-f79c30b719f26821.rlib", "/home/nixos/cargo/target/debug/deps/libgix_object-9b3311fb315a2929.rlib", "/home/nixos/cargo/target/debug/deps/libgix_validate-6f90972f9bcc2257.rlib", "/home/nixos/cargo/target/debug/deps/libgix_credentials-16809f7c9c0a9080.rlib", "/home/nixos/cargo/target/debug/deps/libgix_url-ec8e184e1224c960.rlib", "/home/nixos/cargo/target/debug/deps/libgix_prompt-808ec70743bbd36a.rlib", "/home/nixos/cargo/target/debug/deps/libgix_config_value-9745757d8008d66c.rlib", "/home/nixos/cargo/target/debug/deps/libgix_sec-1be034f81e3777c6.rlib", "/home/nixos/cargo/target/debug/deps/libgix_commitgraph-4f014b17cb0d1cf9.rlib", "/home/nixos/cargo/target/debug/deps/libgix_chunk-7699553d17dc99d5.rlib", "/home/nixos/cargo/target/debug/deps/libmemmap2-860edbd0ade9af3c.rlib", "/home/nixos/cargo/target/debug/deps/libgix_command-9462fbf9298112f4.rlib", "/home/nixos/cargo/target/debug/deps/libshell_words-a923d29869f0895e.rlib", "/home/nixos/cargo/target/debug/deps/libgix_attributes-225fcd419d3992ea.rlib", "/home/nixos/cargo/target/debug/deps/libunicode_bom-93ae7b3d59b2aac1.rlib", "/home/nixos/cargo/target/debug/deps/libgix_quote-3cf9e7aba166799a.rlib", "/home/nixos/cargo/target/debug/deps/libkstring-1cffb0cdb85b67c9.rlib", "/home/nixos/cargo/target/debug/deps/libstatic_assertions-23f5d2ee964ffe02.rlib", "/home/nixos/cargo/target/debug/deps/libgix_glob-1095032246ead047.rlib", "/home/nixos/cargo/target/debug/deps/libgix_path-ab5386bb756d5e6e.rlib", "/home/nixos/cargo/target/debug/deps/libhome-b3372c8e3cd15a46.rlib", "/home/nixos/cargo/target/debug/deps/libgix_features-8ff64c93cea65b5e.rlib", "/home/nixos/cargo/target/debug/deps/libcrossbeam_channel-fd4625968b751083.rlib", "/home/nixos/cargo/target/debug/deps/libgix_hash-e175e37d2d414e8c.rlib", "/home/nixos/cargo/target/debug/deps/libfaster_hex-333acabee9e4e681.rlib", "/home/nixos/cargo/target/debug/deps/libsha1_smol-74cc61fdaad93021.rlib", "/home/nixos/cargo/target/debug/deps/libgix_trace-fb3acec5f6425479.rlib", "/home/nixos/cargo/target/debug/deps/libprodash-abb101a3bd8e9e23.rlib", "/home/nixos/cargo/target/debug/deps/libparking_lot-a41493e72abc4e28.rlib", "/home/nixos/cargo/target/debug/deps/libparking_lot_core-f98a4a840ac231da.rlib", "/home/nixos/cargo/target/debug/deps/liblock_api-5446635aac5ff34d.rlib", "/home/nixos/cargo/target/debug/deps/libscopeguard-faaabf9a734bce39.rlib", "/home/nixos/cargo/target/debug/deps/libbytes-9b977e14bdbcb241.rlib", "/home/nixos/cargo/target/debug/deps/libgix_actor-2b07693e7f620826.rlib", "/home/nixos/cargo/target/debug/deps/libgix_utils-555ba2e1fe7af060.rlib", "/home/nixos/cargo/target/debug/deps/libunicode_normalization-f3ad0a7ddab6601c.rlib", "/home/nixos/cargo/target/debug/deps/libtinyvec-eb1b418461297307.rlib", "/home/nixos/cargo/target/debug/deps/libtinyvec_macros-70acbbddddceb387.rlib", "/home/nixos/cargo/target/debug/deps/libwinnow-7fec3bc3d2ea65ce.rlib", "/home/nixos/cargo/target/debug/deps/libgix_date-a4b2ac4b18c1c4fb.rlib", "/home/nixos/cargo/target/debug/deps/libjiff-41c9b3534d33c35f.rlib", "/home/nixos/cargo/target/debug/deps/libhmac-96279aea32c4ffce.rlib", "/home/nixos/cargo/target/debug/deps/libgit2-043fd787f1b53fb8.rlib", "/home/nixos/cargo/target/debug/deps/liblibgit2_sys-bcff64725609863a.rlib", "/home/nixos/cargo/target/debug/deps/liblibssh2_sys-e5c56bf6f95b356d.rlib", "/home/nixos/cargo/target/debug/deps/libbase64-70a16982e7098fb8.rlib", "/home/nixos/cargo/target/debug/deps/libcrates_io-a34d60006662f8ae.rlib", "/home/nixos/cargo/target/debug/deps/libcargo_credential-5614ec7aeef71849.rlib", "/home/nixos/cargo/target/debug/deps/libtime-171150096b850463.rlib", "/home/nixos/cargo/target/debug/deps/libtime_core-17f679383596f461.rlib", "/home/nixos/cargo/target/debug/deps/libnum_conv-32d6eac4a4ee2854.rlib", "/home/nixos/cargo/target/debug/deps/libderanged-d098efaa123cf9c4.rlib", "/home/nixos/cargo/target/debug/deps/libpowerfmt-d1ada82b8dc0c228.rlib", "/home/nixos/cargo/target/debug/deps/libunicase-d4007ac466f01c2f.rlib", "/home/nixos/cargo/target/debug/deps/libtar-8a00b0283ffe9fbc.rlib", "/home/nixos/cargo/target/debug/deps/libflate2-023a2fd55accc5b1.rlib", "/home/nixos/cargo/target/debug/deps/libminiz_oxide-a4708460dc32c96b.rlib", "/home/nixos/cargo/target/debug/deps/libadler2-aea47f2f8fa09124.rlib", "/home/nixos/cargo/target/debug/deps/libcrc32fast-9a9ced6b9f93f980.rlib", "/home/nixos/cargo/target/debug/deps/libpathdiff-8d8ddef0a22ae66f.rlib", "/home/nixos/cargo/target/debug/deps/libglob-8d94388a27908205.rlib", "/home/nixos/cargo/target/debug/deps/libanstream-799eb8440122bfd2.rlib", "/home/nixos/cargo/target/debug/deps/libanstyle_query-acf70214a49697bf.rlib", "/home/nixos/cargo/target/debug/deps/libis_terminal_polyfill-1f8ede2ef97b3967.rlib", "/home/nixos/cargo/target/debug/deps/libcolorchoice-6a0f3764a098d9d1.rlib", "/home/nixos/cargo/target/debug/deps/libanstyle_parse-858223a5b5a383d6.rlib", "/home/nixos/cargo/target/debug/deps/libutf8parse-db98ea13684760d7.rlib", "/home/nixos/cargo/target/debug/deps/libannotate_snippets-46a015d848f04dd8.rlib", "/home/nixos/cargo/target/debug/deps/libunicode_width-42cd12d0ed0e078f.rlib", "/home/nixos/cargo/target/debug/deps/libanstyle-bbe90d891e91cf0b.rlib", "/home/nixos/cargo/target/debug/deps/librustc_hash-98b8e8b75f3a5195.rlib", "/home/nixos/cargo/target/debug/deps/libcurl-ba36fb70c75acdd4.rlib", "/home/nixos/cargo/target/debug/deps/libopenssl_probe-8baf43b58e99bc70.rlib", "/home/nixos/cargo/target/debug/deps/libcurl_sys-08c6bbd2a9a6ec6c.rlib", "/home/nixos/cargo/target/debug/deps/libopenssl_sys-4ed5ad5f2afbfeda.rlib", "/home/nixos/cargo/target/debug/deps/liblibz_sys-2b251e9b7a5c6fd2.rlib", "/home/nixos/cargo/target/debug/deps/liblibnghttp2_sys-7ac5633bc9c2d992.rlib", "/home/nixos/cargo/target/debug/deps/libsocket2-93600744611e0697.rlib", "/home/nixos/cargo/target/debug/deps/librusqlite-9868ee2b926d59a2.rlib", "/home/nixos/cargo/target/debug/deps/libhashlink-039c5c0328f726e4.rlib", "/home/nixos/cargo/target/debug/deps/liblibsqlite3_sys-c039cd64e7818eaa.rlib", "/home/nixos/cargo/target/debug/deps/libfallible_streaming_iterator-42a32a6bb477cea9.rlib", "/home/nixos/cargo/target/debug/deps/libfallible_iterator-6651e742d8c54ea6.rlib", "/home/nixos/cargo/target/debug/deps/librustfix-a0627987f8fa4a79.rlib", "/home/nixos/cargo/target/debug/deps/libserde_json-81e8ad81bf072fd8.rlib", "/home/nixos/cargo/target/debug/deps/libitoa-0bc38d01b737debf.rlib", "/home/nixos/cargo/target/debug/deps/libryu-46e04c66358273ca.rlib", "/home/nixos/cargo/target/debug/deps/liblazycell-aae4a4bdf1fc44a0.rlib", "/home/nixos/cargo/target/debug/deps/libitertools-ebbef31fd6266ffa.rlib", "/home/nixos/cargo/target/debug/deps/libeither-eafde9225c659741.rlib", "/home/nixos/cargo/target/debug/deps/libcargo_platform-e3683ba8e4ae27ea.rlib", "/home/nixos/cargo/target/debug/deps/libcargo_util-cb5955bd7f3f2735.rlib", "/home/nixos/cargo/target/debug/deps/libhex-02a2ba3051b1f016.rlib", "/home/nixos/cargo/target/debug/deps/libsha2-a52a1043948726ab.rlib", "/home/nixos/cargo/target/debug/deps/libcpufeatures-6c9ff56478c3457e.rlib", "/home/nixos/cargo/target/debug/deps/libdigest-41018202faae1deb.rlib", "/home/nixos/cargo/target/debug/deps/libsubtle-0ee334d1c4be2997.rlib", "/home/nixos/cargo/target/debug/deps/libconst_oid-7f449c0434a8bb8c.rlib", "/home/nixos/cargo/target/debug/deps/libblock_buffer-a6ad17055748c8bf.rlib", "/home/nixos/cargo/target/debug/deps/libcrypto_common-6fc6d544e4d04736.rlib", "/home/nixos/cargo/target/debug/deps/libgeneric_array-55f40e226055e037.rlib", "/home/nixos/cargo/target/debug/deps/libtypenum-0f55bbf6b7673ced.rlib", "/home/nixos/cargo/target/debug/deps/libzeroize-d60a6a5e370d05ae.rlib", "/home/nixos/cargo/target/debug/deps/libshell_escape-92b4e2bb91a80763.rlib", "/home/nixos/cargo/target/debug/deps/libjobserver-2e46b8b8cd98a2c1.rlib", "/home/nixos/cargo/target/debug/deps/libtempfile-d2a2000086598da9.rlib", "/home/nixos/cargo/target/debug/deps/libgetrandom-af4d436510942e19.rlib", "/home/nixos/cargo/target/debug/deps/libfastrand-42a46c8c5925b9d5.rlib", "/home/nixos/cargo/target/debug/deps/librustix-0aefe4eac03998a4.rlib", "/home/nixos/cargo/target/debug/deps/libbitflags-a25998d041cbff68.rlib", "/home/nixos/cargo/target/debug/deps/liblinux_raw_sys-ece15d688a788172.rlib", "/home/nixos/cargo/target/debug/deps/libfiletime-22d179b07fe4175f.rlib", "/home/nixos/cargo/target/debug/deps/liblibc-0c3f17427ebb6109.rlib", "/home/nixos/cargo/target/debug/deps/libcfg_if-2b1095f2195c1f61.rlib", "/home/nixos/cargo/target/debug/deps/libignore-bd1cae6fbf376b09.rlib", "/home/nixos/cargo/target/debug/deps/libwalkdir-81ddc7a3542fb472.rlib", "/home/nixos/cargo/target/debug/deps/libsame_file-a73a73387281a9c0.rlib", "/home/nixos/cargo/target/debug/deps/libcrossbeam_deque-1b104c3478e474d7.rlib", "/home/nixos/cargo/target/debug/deps/libcrossbeam_epoch-4e8f618ac57e4b96.rlib", "/home/nixos/cargo/target/debug/deps/libcrossbeam_utils-0978e1064883f498.rlib", "/home/nixos/cargo/target/debug/deps/libglobset-d15f5e3eb654d71b.rlib", "/home/nixos/cargo/target/debug/deps/liblog-4e3d9f5dc7d7682f.rlib", "/home/nixos/cargo/target/debug/deps/libbstr-74347b1efb2edca3.rlib", "/home/nixos/cargo/target/debug/deps/libregex_automata-2108964fea9c55eb.rlib", "/home/nixos/cargo/target/debug/deps/libregex_syntax-1a5ce5882ad201ee.rlib", "/home/nixos/cargo/target/debug/deps/libaho_corasick-4642444586bf12ce.rlib", "/home/nixos/cargo/target/debug/deps/libmemchr-5cd0840582d585b1.rlib", "/home/nixos/cargo/target/debug/deps/libcargo_util_schemas-96215f82f4955ca0.rlib", "/home/nixos/cargo/target/debug/deps/libunicode_xid-bb62e1e5367b6b5b.rlib", "/home/nixos/cargo/target/debug/deps/libserde_value-47ae81b61371e953.rlib", "/home/nixos/cargo/target/debug/deps/libordered_float-608bd6170e98f0ee.rlib", "/home/nixos/cargo/target/debug/deps/libnum_traits-edff73b3acf5de18.rlib", "/home/nixos/cargo/target/debug/deps/libtoml-f1f6a0fc54f6f4cd.rlib", "/home/nixos/cargo/target/debug/deps/libtoml_edit-c43e37ad74856242.rlib", "/home/nixos/cargo/target/debug/deps/libserde_spanned-087681129f00bd82.rlib", "/home/nixos/cargo/target/debug/deps/libindexmap-d6b35109176a0fe7.rlib", "/home/nixos/cargo/target/debug/deps/libequivalent-f14e16ac1338b83e.rlib", "/home/nixos/cargo/target/debug/deps/libhashbrown-d694e2b6e9b2f32b.rlib", "/home/nixos/cargo/target/debug/deps/libfoldhash-6eda4fa92e928543.rlib", "/home/nixos/cargo/target/debug/deps/libwinnow-2e6085656148997b.rlib", "/home/nixos/cargo/target/debug/deps/libtoml_datetime-19c38c54eff76e75.rlib", "/home/nixos/cargo/target/debug/deps/libthiserror-17a76fbfb53b2370.rlib", "/home/nixos/cargo/target/debug/deps/libserde_untagged-6c92168771cf4c73.rlib", "/home/nixos/cargo/target/debug/deps/liberased_serde-d6a8722439214227.rlib", "/home/nixos/cargo/target/debug/deps/libtypeid-19df8185e7b12d43.rlib", "/home/nixos/cargo/target/debug/deps/liburl-ab4afe1e84cc0fa5.rlib", "/home/nixos/cargo/target/debug/deps/libidna-8e2b6d5341dd5f4f.rlib", "/home/nixos/cargo/target/debug/deps/libidna_adapter-12eb9eb40e663555.rlib", "/home/nixos/cargo/target/debug/deps/libicu_normalizer-faf8d3b863af6d7a.rlib", "/home/nixos/cargo/target/debug/deps/libicu_normalizer_data-f72686f751c3ad4d.rlib", "/home/nixos/cargo/target/debug/deps/libwrite16-880bdd04af877ae8.rlib", "/home/nixos/cargo/target/debug/deps/libutf8_iter-1646c222d18795bc.rlib", "/home/nixos/cargo/target/debug/deps/libutf16_iter-143d35fae43f1135.rlib", "/home/nixos/cargo/target/debug/deps/libsmallvec-40c63ca9ba7dbf4a.rlib", "/home/nixos/cargo/target/debug/deps/libicu_properties-06c11bfb7b311ad2.rlib", "/home/nixos/cargo/target/debug/deps/libicu_properties_data-133345826d124096.rlib", "/home/nixos/cargo/target/debug/deps/libicu_locid_transform-78dc70e6aa4a359a.rlib", "/home/nixos/cargo/target/debug/deps/libicu_locid_transform_data-68f7fadc54e36834.rlib", "/home/nixos/cargo/target/debug/deps/libicu_collections-0310974dac4ef59c.rlib", "/home/nixos/cargo/target/debug/deps/libicu_provider-e54111cf6c1f06c7.rlib", "/home/nixos/cargo/target/debug/deps/libicu_locid-633d1796fe81e436.rlib", "/home/nixos/cargo/target/debug/deps/liblitemap-a9feb50da92b5390.rlib", "/home/nixos/cargo/target/debug/deps/libtinystr-66ae7712efa4fdf7.rlib", "/home/nixos/cargo/target/debug/deps/libzerovec-eafaa5deb6dc080b.rlib", "/home/nixos/cargo/target/debug/deps/libwriteable-6fd897e310c8f3a8.rlib", "/home/nixos/cargo/target/debug/deps/libyoke-cb2311469eba112d.rlib", "/home/nixos/cargo/target/debug/deps/libzerofrom-f26270109172bf0e.rlib", "/home/nixos/cargo/target/debug/deps/libstable_deref_trait-d03fa0dc12ac0c52.rlib", "/home/nixos/cargo/target/debug/deps/libform_urlencoded-f060b02a097ae68c.rlib", "/home/nixos/cargo/target/debug/deps/libpercent_encoding-6932a5a7c201d455.rlib", "/home/nixos/cargo/target/debug/deps/libsemver-4d39cc86985c0d91.rlib", "/home/nixos/cargo/target/debug/deps/libserde-e3bfeb76b99ef3d2.rlib", "/home/nixos/cargo/target/debug/deps/libtracing-371d507d9a7d5ffd.rlib", "/home/nixos/cargo/target/debug/deps/libpin_project_lite-3786854cc47c19bc.rlib", "/home/nixos/cargo/target/debug/deps/libtracing_core-5c08e327fd2603ee.rlib", "/home/nixos/cargo/target/debug/deps/libonce_cell-f232cfe40719ee2f.rlib", "/home/nixos/cargo/target/debug/deps/libanyhow-16af0a4616b2ad4e.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-f6265b21db1f990f.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-8ce3a70abd6a88e8.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-07d1981fc698c677.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-54c112ba14290bf7.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-c494935c56a6518a.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-feaffba60805f631.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-2a593b8e7756da8d.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-de1086e0b879d219.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-48621906ff1bdb6b.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-2003c47ed5dd7b8d.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-19b210802dff98c6.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-14ce453623f8f9b8.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-366453c7550071f8.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-e9b6dd26c5efa091.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-cce3d7e1d2dfef14.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-f51c91a777c2aaf5.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-bfa26ceed9d2a637.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-a88b4ab71963f9fd.rlib", "/nix/store/r76kkwgqisimf2dpaa1ii4j0q8w8211q-rust-std-1.86.0-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-18a70055b0fa6d09.rlib", "-Bdynamic", "-ldl", "-lssl", "-lcrypto", "-lgcc_s", "-lutil", "-lrt", "-lpthread", "-lm", "-ldl", "-lc", "--eh-frame-hdr", "-z", "noexecstack", "--gc-sections", "-z", "relro", "-z", "now", "-rpath", "/home/nixos/cargo/outputs/out/lib", "/nix/store/6g5fhxv0bdm7236ixdwq1izzawbc7grm-gcc-13.2.0/lib/gcc/x86_64-unknown-linux-gnu/13.2.0/crtendS.o", "/nix/store/c10zhkbp6jmyh0xc5kd123ga8yy2p4hk-glibc-2.39-52/lib/crtn.o", "-rpath", "/nix/store/0d6qbqbgq8vl0nb3fy6wi9gfn6j3023d-openssl-3.0.14/lib", "-rpath", "/nix/store/c10zhkbp6jmyh0xc5kd123
+```
+
 https://doc.rust-lang.org/nightly/nightly-rustc/cargo/index.html
 
+# cargo source code callouts
 
+this sections documents where `cargo` calls `execve`-like syscalls to execute builds with `rustc` or `llvm` or `ld`.
 
 ### src/cargo/core/compiler/compilation.rs
 
@@ -81,17 +461,31 @@ https://doc.rust-lang.org/nightly/nightly-rustc/cargo/index.html
     ) -> CargoResult<ProcessBuilder> {
 ```
 
-<hr><hr><hr>
+### cargo/ops/cargo_compile/mod.rs (create_bcx) 
 
-# old
+BuildContext: Some fields that might be interesting.
 
-since the toolchain is a fixpoint and we benefit if that is small (having only the bare minimum needed to compile/link the crates/program) we need to have a **crate-env.nix** in the project's project dir. This **crate-env.nix** is similar to a callPackage file, a nix function which is passed in a rust toolchain and basically pkgs so it can use nix to access the compiler and c-libraries.
+```rust
+let bcx : BuildContext = create_bcx(ws, options, &interner)? // Line 153 in cargo/ops/cargo_compile/mod.rs
+bcx.ws.gctx.home_path;
+bcx.ws.gctx.cwd;
+bcx.ws.gctx.ws_roots;
+bcx.ws.current_manifest;
+bcx.ws.packages.gctx;
+bcx.ws.packages.packages; // HashMap<PackageId, LazyCell<Package>>
+```
+
+## flake.nix / Cargo-Environment.nix
+
+since the toolchain itself is a fixpoint we benefit if that is small (having only the bare minimum needed to compile/link the crates/program).
+
+we archive this by having a **Cargo-Environment.nix** in the crate's source. this **Cargo-Environment.nix** is similar to a callPackage file, a nix function which is passed in a rust toolchain and basically pkgs so it can use nix to access the compiler and c-libraries.
 
 A central `flake.nix` can use _overrides_ to change the _rust toolchain_ for all crates in a single project.
 
-A rust project can have a **crate-env.nix** for individual toolchain overrides, which are uniformly used for all crates in the same project.
+A rust project can have a **Cargo-Environment.nix** for individual toolchain overrides, which are uniformly used for all crates in the same project.
 
-So every crate could have a `crate-env.nix` like `pkgs/build-support/rust/build-rust-crate/default.nix`:
+So every crate could have a `Cargo-Environment.nix` like `pkgs/build-support/rust/build-rust-crate/default.nix`:
 
 ```nix
 buildCrateEnv = import ./build-crate.nix {
@@ -121,13 +515,48 @@ let
 
 
 A `flake.nix` can:
+```nix
+{
+  description = "The cargo project flake";
+  inputs = {
+    rust-overlay.url = "github:oxalica/rust-overlay";
+  };
+  outputs =
+  { self, nixpkgs, flake-utils, rust-overlay }:
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          overlays = [ (import rust-overlay) ];
+          pkgs = import nixpkgs {
+            inherit system overlays;
+          };
+          rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+          platform_packages =
+            if pkgs.stdenv.isLinux then
+              with pkgs; [ ]
+            else if pkgs.stdenv.isDarwin then
+              with pkgs.darwin.apple_sdk.frameworks; [
+                CoreFoundation
+                Security
+                SystemConfiguration
+              ]
+            else
+              throw "unsupported platform";
+        in
+        with pkgs;
+        rec {
+          devShells.default = mkShell {
+            buildInputs = [
+              openssl
+              pkg-config
+              nushell
+              rust-bin.stable."1.86.0".default
+            ] ++ platform_packages;
+          };
+        }
+      );
+}
 ```
-
-
-
-
-```
-
 
 When you enter the directory `/home/joachim/myrustproject` you will see the rust tools like: `cargo-clippy` / `cargo-fmt` / `cargo` / `rust-analyzer` / `rust-gdb` / `rust-lldb` / `rustc` / `rustdoc` / `rustfmt`. When you leave this directory the tools won't be in the shell anymore.
 
@@ -150,62 +579,14 @@ See also:
 * <https://github.com/NixOS/nix/pull/8699>
 * <https://github.com/Anillc/nixrs/pull/1>
 
-# Example usages of cargo/crates
-
-Rust only crate:
-
-* <https://doc.rust-lang.org/rust-by-example/crates.html>
-
-Rust+C: Bundling c code in the create:
-
-* <https://github.com/stainless-steel/sqlite3-sys>
-
-Rust+C: External dependencies from the system:
-
-* <https://doc.rust-lang.org/cargo/reference/manifest.html#the-links-field>
-* <https://github.com/rust-lang/git2-rs/tree/master/libgit2-sys>
-
-# Build creates using nix abstractions
 
 
 
-# Working branch
 
-https://github.com/nixcloud/cargo/tree/libnix-0.79.0
 
-parts of both folders `~/.cargo` and `target` have been replaced by the nix store.
 
-Let's see what is in them!
 
-## ~/.cargo
-
-```
-[nixos@nixos:~/cargo]$ du -sh ~/.cargo
-239M    /home/nixos/.cargo
-
-[nixos@nixos:~/cargo]$ ls ~/.cargo/
-registry
-
-[nixos@nixos:~/cargo]$ ls ~/.cargo/registry/
-cache  CACHEDIR.TAG  index  src
-```
-
-## cargo/target
-
-The example is the cargo project itself, the tool coming with the rust toolchain, since we hack on it.
-
-```
-[nixos@nixos:~/cargo]$ du -sh target/
-2.3G    target/
-
-[nixos@nixos:~/cargo]$ ls target/
-CACHEDIR.TAG  debug
-
-[nixos@nixos:~/cargo]$ ls target/debug/
-build  cargo  cargo.d  deps  examples  incremental  libcargo.d  libcargo.rlib
-```
-
-# Plan
+# plan
 
 libnix backend in cargo needs to get these things working:
 
@@ -216,6 +597,7 @@ libnix backend in cargo needs to get these things working:
 figure out what these are:
 
 * target/debug/build
+* target/debug/incremental
 
 ## .fingerprint
 
@@ -278,18 +660,7 @@ finally:
 * get one with nested dependencies
 * get one with c library usage (like cargo itself)
 
-## BuildContext
-Some fields that might be interesting:
 
-```rust
-let bcx : BuildContext = create_bcx(ws, options, &interner)? // Line 153 in cargo/ops/cargo_compile/mod.rs
-bcx.ws.gctx.home_path;
-bcx.ws.gctx.cwd;
-bcx.ws.gctx.ws_roots;
-bcx.ws.current_manifest;
-bcx.ws.packages.gctx;
-bcx.ws.packages.packages; // HashMap<PackageId, LazyCell<Package>>
-```
 ## Compilation outcomes
 
 Where do we need to grab the compilation results that we want to move into the nix store?
@@ -305,4 +676,57 @@ cargo build -Z unstable-options --build-plan | jq
 
 https://github.com/DeterminateSystems/nix-wasm-example/blob/main/flake.nix
 
+## nice to have
 
+DX: impure mode where a project like trunk or cargo (when hacking on it) can be a drop-in replacement for toolchain, this means binaries can also live outside /nix/store like /home/joachim/cargo/target/debug/cargo
+
+### bwrap
+
+for builds with sandboxing all the source code has to be copied, `bwrap` implements ways to access the
+source without copying but still maintains some safety with 'read only' filters.
+
+`$ nix-build --option sandbox false --impure bwrap.nix`
+
+```nix
+# example.nix
+let
+  pkgs = import <nixpkgs> {};
+in
+pkgs.stdenv.mkDerivation {
+  name = "bwrap-sandboxed-job";
+  src = ./.;
+
+  buildInputs = [ pkgs.bubblewrap pkgs.bash ];
+
+  buildPhase = ''
+    mkdir -p output
+    touch "asdf" output/asdf
+    echo "Running inside Bubblewrap sandbox..."
+
+    bwrap \
+      --ro-bind $src /src \
+      --ro-bind /nix /nix \
+      --bind output /output \
+      --dev /dev \
+      --proc /proc \
+      --unshare-all \
+      --die-with-parent \
+      --chdir /src \
+      ${pkgs.bash}/bin/bash -c '
+        echo "This should fail:" && touch somefile 2>/dev/null || echo "Read-only OK"
+        echo "This should succeed:" && touch /build/hello.txt
+        echo "this is some file content" > /output/a-result.md
+        ls -la /output
+      '
+  '';
+
+  installPhase = ''
+    mkdir -p $out
+    cp -r output/* $out
+  '';
+}
+
+}
+```
+
+builtins.compareVersions "2.

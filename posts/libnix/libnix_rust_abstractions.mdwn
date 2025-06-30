@@ -187,6 +187,10 @@ this is like [rustup](https://nixos.wiki/wiki/Rust): these projects bring `rustc
 
 > Both oxalica’s overlay and fenix better integrate with nix and cache optimizations. Because of this and ergonomics, either of those community projects should be preferred to the Mozilla’s Rust overlay (nixpkgs-mozilla).
 
+Also worth mentioning:
+* **oxalica** / **fenix** does not compile any rustc or cargo binary but instead downloads pre-built executables from <https://static.rust-lang.org>
+* **nixpkgs** compiles `rustc` and `cargo` from source but notably also requires a binary download of these tools as a bootstrapping toolchain
+
 # drop-in replacements for `buildRustPackage`
 
 <table class="table">
@@ -277,10 +281,10 @@ the experiments are at <https://github.com/qknight/rust-nix-abstraction-tests>
 
 see:
 
+* [crane](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/crane/flake.nix)
+* [naersk](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/naersk/flake.nix)
 * [cargo2nix](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/cargo2nix/flake.nix)
 * [crate2nix](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/crate2nix/flake.nix)
-* [naersk](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/naersk/flake.nix)
-* [crane](https://github.com/qknight/rust-nix-abstraction-tests/blob/master/crane/flake.nix)
 
 to reproduce and play with the abstractions do:
 
@@ -343,6 +347,14 @@ to reproduce and play with the abstractions do:
       <td>63</td>
       <td>rust</td>
       <td><font color="red">obsolete</font>, build crates (with custom cargo reimplementation written in rust),<br> lacks proper semver dependencies</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td>[cargo nix](https://github.com/pandaman64/cargo-nix)</td>
+      <td>?</td>
+      <td>?</td>
+      <td>rust</td>
+      <td><font color="red">obsolete</font>, given a crate name, downloads the latest version from crates.io & extracts it and pipes it through crate2nix and finally builds this with nix-build</td>
     </tr>
   </tbody>
 </table>
