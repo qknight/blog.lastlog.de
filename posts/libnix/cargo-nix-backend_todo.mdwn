@@ -1,0 +1,804 @@
+
+[[!meta date="2025-04-24 20:53"]]
+[[!tag nix nixos libnix]]
+[[!series libnix]]
+[[!summary libnix integration into cargo and a discussion of crates wrapping legacy]]
+[[!draft]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# cool stuff
+
+nix build --file /tmp/nix 
+nix build --file /tmp/nix --json
+nix build --file /tmp/nix --log-format internal-json
+
+json-logging?!
+
+https://determinate.systems/posts/changelog-determinate-nix-331/
+https://github.com/NixOS/nix/pull/13251
+
+sandbox = mixed
+in /etc/nix/nix.conf
+
+https://devenv.sh/blog/2025/08/22/closing-the-nix-gap-from-environments-to-packaged-applications-for-rust/
+
+# nix hacking tool
+
+properties of the tool:
+
+* can build software using nix in impure (just copy all files, maybe filtered) or pure (use a git commit as base)
+* builds must be reproducible for the same input
+* a tool like cargo uses .finterprint and not sha256 of files/directories/archives to know changes which should cause a rebuild
+* nix develop (a dev shell)
+* input/ouput concepts like in a flake
+* must support a lock file to nail dependencies
+* must support build files generated on the fly living in arbitrary fs locations like /tmp or project root
+
+# hacking
+
+alias cargo=/home/nixos/cargo/target/debug/cargo
+strace -e execve -s 200 -f cargo build
+
+# tasks
+
+cargo documentation: <https://doc.rust-lang.org/nightly/nightly-rustc/cargo/>
+
+* [x] build cargo-1.87 from source in `wsl -d nixos` in ~/cargo
+* [x] create minimal rust applications with 1 dependency to test the new cargo-1.87' nix features
+* [x] call `nix build` from `cargo` prototype
+* [x] implement a nix argument 'skeleton' with subcommands:
+  * [x] generate --path output/
+  * [x] show-graph
+* [x] nix-build experiments
+  * [x] create minimal nix implementation to build cargo-nix-build-test-environment via nix-build. see `cargo-nix-build-test-environment-declarative`
+  * [x] create build with sandbox disabled, i.e. read from /home/nixos/myproject as $src: `nix-build -option sandbox false bwrap.nix`
+  * [x] create pkgs.bubblewrap / bwrap using prototype to work with sandbox off but still have some safety measures
+  * [x] use `crane` to clone from registry & build only 'all' deps, see **cargo-nix-build-test-environment**
+  * [x] use `buildRustCrate` to build a main program (~/cargo-buildRustCrate)
+* [x] callouts
+  * [x] identify the code which calls the fs-fingerprint checks
+      * [x] fresh vs. dirty
+  * [x] identify the code which calls the build for a crate
+  * [x] identify the code which calls the build for a workspace/crate
+* [x] cargo 2 /tmp/nix/ converter prototype
+  * [x] add termcolor-1_4_1 as root crate dependency, also add it to buildInputs
+  * [x] add buildInputs support
+  * [x] src = ../.; as absolute path
+  * [x] CARGO_MANIFEST_DIR = "/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1";
+        pkg.manifest_path()
+        Package->PackageInner->manifest_path: PathBuf
+
+        impl Package {
+        /// Creates a package from a manifest and its location.
+        pub fn new(manifest: Manifest, manifest_path: &Path) -> Package {
+            println!("manifest_path: {:#?}", manifest_path); // "/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1/Cargo.toml"
+            Package {
+                inner: Rc::new(PackageInner {
+                    manifest,
+                    manifest_path: manifest_path.to_path_buf(),
+                }),
+            }
+        }
+   * [x] CARGO_MANIFEST_PATH = "/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1/Cargo.toml";
+       pkg.root() -> manifest_path().parent()
+   * [x] ${rustc}/bin/rustc --crate-name termcolor --edition=2018 /home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/termcolor-1.4.1/src/lib.rs
+  * [x] fix --check-cfg cfg(docsrs,test) | --check-cfg cfg(feature, values()) from the build
+  * [x] --out-dir $OUT_DIR
+  * [x] -C incremental=$INC_DIR
+  * [x] this should be `--extern termcolor=${termcolor-1_4_1}/libtermcolor-78d6a6b6a8a8b71f.rlib` instead
+  
+        -L dependency=/home/nixos/cargo-nix-build-test-environment-declarative/target/debug/deps \
+        --extern termcolor=/home/nixos/cargo-nix-build-test-environment-declarative/target/debug/deps/libtermcolor-78d6a6b6a8a8b71f
+
+* [x] add CARGO_NIX_BUILDER variable support to cargo: example CARGO_TARGET_DIR in /home/nixos/cargo/src/cargo/util/context/mod.rs 
+* [x] add `cargo -Znix --config build.nix=\"fast\" build` support to cargo, see https://github.com/rust-lang/cargo/pull/14388/files#diff-1bb13388b11cda48b2c1b15d745c7c631253224e9295b633f793d6df9ed031cd
+* [x] remove **WARNING HACK** notices and get legacy `cargo` working again
+* [x] provide a way to use from flake.nix and override cargo/rust with specific version
+* [x] implement proper -L handling, i need propagatedBuildInputs so that -L can be set correctly. correction: i need `passthru.requiredInputs`
+* [x] switch from `nix-build` to `nix build` with less confusing logs
+* [x] compile `rphtml` with nix-build
+* [x] build-script-build for serde misses:
+
+      CARGO_CFG_FEATURE
+      CARGO_CFG_PANIC
+      CARGO_CFG_TARGET_ABI
+      CARGO_CFG_TARGET_ARCH
+      CARGO_CFG_TARGET_ENDIAN
+      CARGO_CFG_TARGET_ENV
+      CARGO_CFG_TARGET_FAMILY
+      CARGO_CFG_TARGET_FEATURE
+      CARGO_CFG_TARGET_HAS_ATOMIC
+      CARGO_CFG_TARGET_OS
+      CARGO_CFG_TARGET_POINTER_WIDTH
+      CARGO_CFG_TARGET_VENDOR
+      CARGO_CFG_UNIX
+      CARGO_ENCODED_RUSTFLAGS
+      CARGO_FEATURE_DEFAULT         - cargo/compiler/custom_build.rs
+      CARGO_FEATURE_STD             - cargo/compiler/custom_build.rs   i.e. cmd.env(&format!("CARGO_FEATURE_{}", super::envify(feat)), "1");
+      CARGO_MAKEFLAGS
+      DEBUG
+      HOST
+      NUM_JOBS
+      OPT_LEVEL
+      PROFILE
+      RUSTC_WORKSPACE_WRAPPER
+      RUSTC_WRAPPER
+      RUSTDOC
+      RUSTFLAGS
+      TARGET
+
+  <https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-build-scripts>
+
+* [x] CWD / CARGO_MANIFEST_DIR / CARGO_MANIFEST_PATH rework
+
+      CARGO_MANIFEST_DIR = "./markup5ever";
+      CARGO_MANIFEST_PATH = "./markup5ever/Cargo.toml";
+      buildPhase = ''
+        ...
+        export CARGO_MANIFEST_DIR="$PWD/$CARGO_MANIFEST_DIR"
+
+* [x] figure out how to handle build.rs from nix-build perspective
+
+      cargo:rerun-if-changed=build/probe.rs
+      cargo:rerun-if-env-changed=RUSTC_BOOTSTRAP
+      cargo:rustc-cfg=std_backtrace
+      cargo:rustc-cfg=anyhow_no_core_error
+
+      passthru.rustc_library_paths = [];
+      passthru.rustc_arguments = "";
+      passthru.environment_variables = [];
+
+* [x] crates with build-script-build parent need to copy all files from the parent: `cp -r ${markup5ever-0_14_2-custom_build-run_custom_build}/* $OUT_DIR/`
+   * [x] markup5ever: `nix build .#xml5ever-0_20_0 --impure -L` > error: couldn't read `/build/tmp.htFBdG0l0s/generated.rs`: No such file or directory (os error 2)
+
+* [x] compile `html5ever` with nix-build
+* [x] properly handle ENVIRONMENT variables from build-script-build
+  * [x] cargo environment variables support: https://stackoverflow.com/questions/57017066/how-do-i-set-environment-variables-with-cargo
+* [x] crate changes 
+  * [x] add support for multiple variants of a crate dependency, basically add the -02rf029093 crate-hash to the name
+  * [x] nix 'name=' fields should also contain -build_script and -build_script_run so one can distinguish them on build errors 
+  * [x] support crates with names like `proc-macro-hack-0_5_20+deprecated-script_build_run-92f7ea519d1c2d73`, the '+' sign
+  * [x] git support
+    * [x] add nix fetchGit support with templates and such
+    * [x] automate fetchGit sha256 sum for given GIT repo
+      * [x] use nix-prefetch-scripts for git downloads...
+      nix-prefetch-git --url https://github.com/slowtec/rust-embed --branch-name update-to-axum-v0.8 --sparse-checkout | jq '.sha256'
+
+* [x] check that there is only programs like `rustc` vs. `build-script-build` or if we have to support others as well
+* [x] indentation updates for generated nix code
+
+* [x] fixed build-script-build rustc-argument inheritance by using builtins.readFile and nix basically
+* [x] src: pkgs.fetchgit using crates don't know how the unpackPhase works correctly:
+
+      utbw-i18n-0_1_0-013270d7798eb3d6 -> cd $src/crates/i18n
+      utbw-units-0_1_0-6abe5b86d8e2f9fd -> cd $src/crates/units
+
+* [x] extend https://github.com/nixcloud/cargo-nix-build-test-environment-declarative
+  * [x] create prototype: `cargo nix parse-build-script-build rustc_arguments
+  * [x] add filter for "cargo:" when parsing build-script-build output. see ring-0_17_11: it puts all kind of environment variable debugs and stuff into the output which should be *illegal*
+  * [x] print 'warning' in yellow, like cargo does
+  * [x] print 'error' in red, supposedly like cargo does
+  * [x] in general: extend these concepts as well:
+    * [x] cargo::error=MESSAGE — Displays an error on the terminal.
+    * [x] cargo::warning=MESSAGE — Displays a warning on the terminal.
+    * [x] cargo::rustc-link-lib — Adds a library to link.
+    * [x] cargo:lib_dir
+    * [x] cargo:include
+
+          cargo:rustc-link-search=native=/build/tmp.kwmOX2Oq1c
+            where /build/tmp.kwmOX2Oq1c is the build-dir of libsqlite3-sys-0_31_0-script_build_run-071b7684535064f8
+          cargo:lib_dir=/build/tmp.kwmOX2Oq1c
+          cargo:include=/build/libsqlite3-sys-0.31.0/sqlite3
+            where libsqlite3-sys-0.31.0/sqlite3 contains .c / .h files, see https://github.com/rusqlite/rusqlite/tree/v0.31.0/libsqlite3-sys/sqlite3
+          idea:
+            * $out contains the correct directory name /nix/store/02340239-blah of the derivation so we can reference 'self' during buildPhase
+
+* [x] compile `klick` with `nix build`
+* [x] typenum-1_17_0-script_build-bada06ad8d32b9c4 in cargo names the build-script-build by CARGO_CRATE_NAME so build_script_main-foo
+  * [x] write a function which `ln -s $OUT_DIR/$CARGO_CRATE_NAME-${HASH} $OUT_DIR/build-script-build`
+
+* [x] refactor passthru
+        
+      pkgs.stdenv.mkDerivation rec {
+        name = "curl-sys-0_4_80_plus_curl-8_12_1-script_build_run-2bd25bf7f874b161";
+        buildInputs = [openssl.dev]; # nghttp2.dev
+        passthru.rust_crate_libraries = [];
+        passthru.rust_crate_parent = [ curl-sys-0_4_80_plus_curl-8_12_1-script_build-b7ded91cd9455987 ];
+        passthru.rust_script_build_run = [ libnghttp2-sys-0_1_11_plus_1_64_0-script_build_run-a7a473a2bc3c4265 libz-sys-1_1_21-script_build_run-9964415cd6446950 openssl-sys-0_9_106-script_build_run-bf6c2c38618f44c9 ];
+        phases = "unpackPhase buildPhase";
+
+* [x] buildInputs overrides for specific crates to inject `pkg-config` and `sqlite`
+  * [x] cargo: libz-sys (this can use `pkg-config zlib` OR if not found it will use the bundled one)
+  * [x] cargo: openssl-sys: [ pkg-config openssl ] does not have a fallback, so the patch is required
+  * [x] cargo: curl-sys [ pkg-config curl ] does not have a fallback, so the patch is required
+  * [x] cargo: libssh2-sys zlib should come from libz-sys (pkg-config not needed)
+  * [x] cargo libgit2-sys zlib comes from libz-sys (pkg-config not needed)
+
+* [x] properly escape all string inputs to cargo nix, i.e. base16ct-0.2.0-...
+
+    CARGO_PKG_DESCRIPTION = "Pure Rust implementation of Base16 a.k.a hexadecimal (RFC 4648) which avoids
+      any usages of data-dependent branches/LUTs and thereby provides portable
+      "best effort" constant-time operation and embedded-friendly no_std support
+    ";  
+
+* [x] extend https://github.com/nixcloud/cargo-nix-build-test-environment-declarative for openssl-sys
+src/doc/src/reference/build-script-examples.md metions them
+  * [x] cargo:include
+  * [x] cargo:conf
+  * [x] cargo:version_number
+  * [x] cargo:root
+
+* [x] compile `cargo` with `nix build`
+  * [x] openssl-sys-0_9_106-f58fbd59ff8ffe86 (no gcc call)
+  * [x] libz-sys-1_1_21-205a06d961374cd1 (no gcc call)
+  * [x] libssh2-sys-0_3_1-5c1ea63618a6b90c ->
+      gcc ... "-o" "/nix/store/g4bxiq8pgz0l52773pb3yx1q9hf7wkwx-libssh2-sys-0_3_1-script_build_run-1a392f869e3961cc/build/f89bd02e425f6856-userauth_kbd_packet.o" 
+  * [x] curl-sys-0_4_80_plus_curl-8_12_1-script_build_run-2bd25bf7f874b161 ->
+      error occurred in cc-rs: command did not execute successfully (status code exit status: 1): LC_ALL="C" "gcc" ... "-o" "/nix/store/ak5lgm8cc60k4k1wcway69scx60jqs63-curl
+  
+      let mut cfg = cc::Build::new();
+      cfg.out_dir(&build)
+  
+      https://github.com/rust-lang/cc-rs/blob/c3190115acb149ff110266610c2f81e5e28b7d1b/src/lib.rs#L420
+  
+      { fn, pkgs, rustc, cargo, curl-sys-0_4_80_plus_curl-8_12_1-script_build-b7ded91cd9455987, libnghttp2-sys-0_1_11_plus_1_64_0-script_build_run-a7a473a2bc3c4265, libz-sys-1_1_21-script_build_run-9964415cd6446950, openssl-sys-0_9_106-script_build_run-bf6c2c38618f44c9, nghttp2, openssl}:
+      buildInputs = [curl-sys-0_4_80_plus_curl-8_12_1-script_build-b7ded91cd9455987 libnghttp2-sys-0_1_11_plus_1_64_0-script_build_run-a7a473a2bc3c4265 libz-sys-1_1_21-script_build_run-9964415cd6446950 openssl-sys-0_9_106-script_build_run-bf6c2c38618f44c9 nghttp2.dev openssl.dev];
+
+* [x] environment variables
+
+      DEP_${LINKS}_${TYPE} original implementation: only visible in build-script-build executions
+      nix build adaption: think they also need to be in the lib build in addition to build-script-build executions
+      
+      DEP_OPENSSL_INCLUDE = "/nix/store/k0699a27nkj4c2xn67bjcpfa08nqn9l4-openssl-3.4.1-dev/include";
+      DEP_OPENSSL_VERSION_NUMBER = "30400010";
+      DEP_Z_INCLUDE="/home/nixos/cargo/target/debug/build/libz-sys-9964415cd6446950/out/include";
+      DEP_Z_ROOT="/home/nixos/cargo/target/debug/build/libz-sys-9964415cd6446950/out";
+      DEP_OPENSSL_CONF="OPENSSL_NO_SSL3_METHOD";
+      DEP_CURL_STATIC="1"
+      
+* [x] automate buildInput extensions (openssl, pkg-config)
+  * [x] create a CargoNativeDependencies.nix next to Cargo.lock / Cargo.toml
+  * [x] create native-crate-deps.nix implementation which uses (name / version / cargo-hash) for overrides
+    * [x] if a crate / version / hash is wrong, break execution and prompt the line (nix evaluation)
+    * [x] add a crate / version / hash field for each crate
+
+* [x] rewrite to not include script_build_run but the actual product
+
+    passthru.rust_script_build_run = [curl-sys-0_4_80_plus_curl-8_12_1-script_build_run-2bd25bf7f874b161 libgit2-sys-0_18_0_plus_1_9_0-script_build_run-f9c81e389c530995];
+
+  * [x] nix build -L .#cargo-0_88_0-bin-fafc14832178210d --impure --keep-going
+  
+      = note: some arguments are omitted. use `--verbose` to show all linker arguments
+      = note: /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lgit2: No such file or directory
+              /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lssl: No such file or directory
+              /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lcrypto: No such file or directory
+              /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lcurl: No such file or directory
+              collect2: error: ld returned 1 exit status
+  
+      after latest ${fn.environment_propagated_variables passthru.rust_script_build_run} current patch
+  
+      = note: /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lcrypto: No such file or directory
+              /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lssl: No such file or directory
+              /nix/store/z3za8hfc24wb117s50p8b10agjkgm039-binutils-2.44/bin/ld: cannot find -lcurl: No such file or directory
+  
+      ssl+crypto: openssl
+      curl: curl
+
+* [x] cargo-0.88-bin
+  * [x] rustc_arguments = "" is missing
+  * [x] rust_script_build_run is present with a dep but the output is not used
+
+
+* [x] cargo compiled via (vanilla cargo) requires openssl+pkg-config as deps but seems to use a bundled curl, why does the nix-build backend require curl as a system lib?
+
+* [x] cargo: final linker call seems wrong:
+
+    "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib" "
+
+    sysroot should be /nix/store/f293vck2j3zf8rb8phc5zb08lsvihsff-rust-default-1.87.0
+
+    rustc --print sysroot
+
+* [x] rework "rustc-env" => environment_variables.push(format!("{}", arg)),
+  * [x] foo="bar" vs. foo=bar, make the argument escaped with '' similar to the others
+
+* [x] cargo: fix missing "RUST_HOST_TARGET": "x86_64-unknown-linux-gnu"
+    
+        // this is set from `build.rs` from cargo
+        fn main() {
+            commit_info();
+            compress_man();
+            windows_manifest();
+            // ALLOWED: Accessing environment during build time shouldn't be prohibited.
+            #[allow(clippy::disallowed_methods)]
+            let target = std::env::var("TARGET").unwrap();
+            println!("cargo:rustc-env=RUST_HOST_TARGET={target}");
+        }
+
+* [x] environment variables concept
+  * [x] all dynamically added environment variables should be printed in ORANGE
+  * [x] DEP_CURL_STATIC seems to be absent in nix build but can be found in out/* sometimes
+  * [x] which variables are 'inherited' downstream and which are only local? 
+
+* [x] environment variables refactorings
+  * [x] environment variables -> sort | uniq (with no console printing)
+  * [x] refactor: place environment-variables / rustc-arguments / ... into folder ./nix-suppport/ or ./nix/ so there is no accidential collision with other build artifacts
+  * [x] no empty newlines on empty input
+
+* [x] in default.nix, add deps to none root folders so that only top level are actually shown on the code completion when typing: `nix build .#<tab>`
+
+    self = {
+      deps = {
+        adler2-2_0_0-eda9a489aa60b7f0 = callPackage' ./deps/adler2-2.0.0-eda9a489aa60b7f0.nix { inherit fn; };
+      };
+
+* [x] manage nix build system in target/debug/nix, also delte old files if new build system is created
+
+* [x] install binaries
+  * [x] link_or_copy: consider install_phase for bin/lib
+
+    link_or_copy from: "/home/nixos/cargo/target/debug/deps/cargo-fafc14832178210d" -> "/home/nixos/cargo/target/debug/cargo"
+
+    installPhase = ''
+      mkdir $out/bin
+      ln -s $out/cargo-fafc14832178210d $out/bin/cargo
+    '';
+
+    with a filter on: /home/nixos/cargo/target/debug it is only two files:
+    * libcargo.rlib
+    * cargo
+
+    fn link_targets(
+        build_runner: &mut BuildRunner<'_, '_>,
+        unit: &Unit,
+        fresh: bool,
+    ) -> CargoResult<Work> {
+
+
+    link_or_copy from: "/home/nixos/cargo/target/debug/deps/libcargo-65d2bdc7864c917a.rlib" -> "/home/nixos/cargo/target/debug/libcargo.rlib"
+    link_or_copy from: "/home/nixos/cargo/target/debug/deps/cargo-9448b8bba6ed4f6b" -> "/home/nixos/cargo/target/debug/cargo"
+    UnitOutput: "/home/nixos/cargo/target/debug/cargo"
+
+
+    /// Returns the executable for the specified unit (if any).
+    pub fn get_executable(&mut self, unit: &Unit) -> CargoResult<Option<PathBuf>> {
+        let is_binary = unit.target.is_executable();
+        let is_test = unit.mode.is_any_test();
+        if !unit.mode.generates_executable() || !(is_binary || is_test) {
+            return Ok(None);
+        }
+        Ok(self
+            .outputs(unit)?
+            .iter()
+            .find(|o| o.flavor == FileFlavor::Normal)
+            .map(|output| output.bin_dst().clone()))
+    }
+  * [x] consider a 'installPhase' equivalent to 'cargo install' when doing a nix build `nix build .#cargo-0_88_0-bin-fafc14832178210d --impure -L`
+  * [x] create a target.nix files in nix/target.nix which creates a script to be executed by cargo once the nix compile is done, this will
+        create a symlinks in the target/debug directory and compile the required things
+
+* [x] inform user when a Cargo.dependency.nix file was used
+
+* [x] rework environment variables
+  * [x] CARGO_BUILD_BACKEND=legacy|nix
+
+* [x] make 'cargo build' install the symlinks automatically into targets/debug/cargo & friends
+
+* [x] make 'cargo build' use json logs
+  * [x] logging using internal-json from nix
+  * [x] echo "@nix { \"action\":\"msg\",\"level\": 4, \"msg\": \"Compiling sources...\" }"
+
+the prompt:
+
+create a rust project to parses the nix output --log-format json-internal.
+
+structure the source files like this:
+
+* main.rs parses the stdin input line by line and calls parse in parse.rs for each
+* parse.rs checks if it is a status line or a build log and if valid calls into
+* status.rs: keeps a state machine for status updates and a set of mut variables with done, expected, running, failed and an update() function which takes a parsed json struct
+* logs.rs: keeps logs based on id using a HashMap<id, LogData> with LogData: Vec<NixMessage>. final error messages: action:msg with file: null or file: "some nix file" also get passed in and using the drv name we try to match it to the correct queue based on a map id->drv which is created by the first incoming message with action:start type:105. there is a function to query logs by id and it returns a pointer to LogData so it can be rendered
+* display.rs: for each status or log update this update() gets called and a new command line status message is formatted. it updates the old status message by rewriting it similar to nix
+* misc.rs: all messages which are not log or status messages will go here which basically is an empty handler and ignores them for now
+
+
+
+
+# a short snippet of the json format used
+@nix {"action":"stop","id":166206644420730}
+@nix {"action":"stop","id":166206644420729}
+@nix {"action":"stop","id":166206644420728}
+@nix {"action":"start","id":166206644420732,"level":0,"parent":0,"text":"","type":102}
+@nix {"action":"start","id":166206644420733,"level":0,"parent":0,"text":"","type":104}
+@nix {"action":"start","id":166206644420734,"level":0,"parent":0,"text":"","type":103}
+@nix {"action":"result","fields":[0,1,0,0],"id":166206644420733,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":166206644420734,"type":105}
+@nix {"action":"result","fields":[101,0],"id":166206644420732,"type":106}
+@nix {"action":"result","fields":[100,0],"id":166206644420732,"type":106}
+@nix {"action":"start","id":166206644420735,"level":6,"parent":0,"text":"querying info about missing paths","type":0}
+@nix {"action":"stop","id":166206644420733}
+
+# example 5
+@nix {"action":"start","id":7059835312930816,"level":6,"parent":0,"text":"querying info about missing paths","type":0}
+@nix {"action":"stop","id":7059835312930816}
+@nix {"action":"start","id":7059835312930817,"level":0,"parent":0,"text":"","type":102}
+@nix {"action":"start","id":7059835312930818,"level":0,"parent":0,"text":"","type":104}
+@nix {"action":"start","id":7059835312930819,"level":0,"parent":0,"text":"","type":103}
+@nix {"action":"start","id":7059835312930820,"level":6,"parent":0,"text":"querying info about missing paths","type":0}
+@nix {"action":"stop","id":7059835312930820}
+@nix {"action":"stop","id":7059835312930819}
+@nix {"action":"stop","id":7059835312930818}
+@nix {"action":"stop","id":7059835312930817}
+
+# json spec
+
+* read and parse stdin json messages line by line
+
+1. parse into fuzzy json, with no fixed structs but enforce that each has a "action" section
+2. after the check is final, process the line and match both "action" and try "type" as well
+3. STATUS
+   keep a total of [done, expected, running, failed].
+   write a handler for the status line message processing, the sequence is always like this
+   * @nix {"action":"start","id":166206644420733,"level":0,"parent":0,"text":"","type":104}
+   * @nix {"action":"result","fields":[0,1,0,0],"id":166206644420733,"type":105}
+     there can be one or more message like this, always just extract the fields values and update [done, expected, running, failed]
+   * @nix {"action":"stop","id":166206644420733}
+5. LOGGING
+   write a handler for logging output of mkDerivations
+   * action:start with type:105 with id
+   * action:result with type:101 with id
+   * action:result with type:104 with id
+   * action:stop with id
+7. ERRORS, there are two types of errors
+   * nix code error
+   * errors within a mkDerivation, like a rust build which failed because of rust
+
+the internal structs are:
+
+the logging.hh says: 
+
+## ActivityType
+typedef enum { actUnknown = 0, actCopyPath = 100, actFileTransfer = 101, actRealise = 102, actCopyPaths = 103, actBuilds = 104, actBuild = 105, actOptimiseStore = 106, actVerifyPaths = 107, actSubstitute = 108, actQueryPathInfo = 109, actPostBuildHook = 110, actBuildWaiting = 111, actFetchTree = 112, } ActivityType; 
+
+## ResultType
+typedef enum { resFileLinked = 100, resBuildLogLine = 101, resUntrustedPath = 102, resCorruptedPath = 103, resSetPhase = 104, resProgress = 105, resSetExpected = 106, resPostBuildLogLine = 107, resFetchStatus = 108, } ResultType;
+
+## resProgress
+void progress(uint64_t done = 0, uint64_t expected = 0, uint64_t running = 0, uint64_t failed = 0) const { result(resProgress, done, expected, running, failed); }
+
+# STATUS data processing
+
+* keep a status line similar to modern nix output and nix-output-monitor which is updated continuously by the fields message by rewinding the cursor on the terminal and overwriting the previous status.
+
+   the sequence is this:
+
+   opening the sequence: @nix {"action":"start","id":166206644420733,"level":0,"parent":0,"text":"","type":104}
+   updates in absolute values: @nix {"action":"result","fields":[0,1,0,0],"id":166206644420733,"type":105}
+   finally this closes the updates: @nix {"action":"stop","id":166206644420733}
+
+  after the closing leave the values like before and only update them when the a new @nix {"action":"start", ... ,"type":104} is started
+
+* for the status line use a displaymanager and print it like this:
+
+  [ $done Done | $expected Expected | $running Running | $failed Failed ]
+
+  ignore uploads / downloads and replace $done by the respective value
+
+# LOGGING stdout/stderr of mkDerivations processing
+
+* support two modes of operation: verbose and not verbose
+
+in verbose mode:
+
+  log messages of type msg ignoring the level
+
+in normal mode:
+
+  log only 1,2 and 3
+
+make the verbose mode a bool switch arument in the DisplayManager::new(...) call
+
+* logging differences to nix and nix-output-monitor
+
+in normal and verbose mode logging output is keept in a buffer starting with a "action":"start","id":166206644420734 message, all updates to this id are added to the buffer and it is finally printed when the "action":"stop" is arrived in verbose mode but in one complete piece. normal mode also has the same buffered concept but it will only print ids which have stopped and hit an error.
+
+in normal mode the error message of the nix evaluation itself is not shown, only in debug mode.
+
+* nix evaluation error (nix code issues) vs. nix evaluates a program which errors out (rust compile error)
+
+@nix {"action":"msg","column":1,"file":"/home/nixos/cargo/target/debug/nix/derivations/target.nix:3:1","level":0,"line":3,"msg":"\u001b[31;1merror:\u001b[0m\n       … while evaluating a branch condition\n         \u001b[34;1mat \u001b[35;1m/nix/store/5j5y90a6m6jssvg2xyb
+f86xgkjfa4zab-source/lib/customisation.nix:305:5\u001b[0m:\n          304|     in\n          305|     if missingArgs == { } then\n             |     \u001b[31;1m^\u001b[0m\n          306|       makeOverridable f allArgs\n\n   
+
+caused by:
+at /home/nixos/cargo/target/debug/nix/derivations/target.nix:3:1:
+2| { pkgs, cargo-0_88_0-bin-9448b8bba6ed4f6b }:
+3| asfd
+ | ^
+4| pkgs.writeShellScriptBin "cargo-targets-symlinks" ''
+
+rust error:
+
+# program OUTPUT
+
+
+* @cargo messages, similar to @nix messages, are used to print: Compiling walkdir v2.5.0
+
+create demo with: https://docs.asciinema.org/manual/server/embedding/
+
+      echo "@nix { \"action\":\"msg\",\"level\":0,\"msg\":\"  \u001b[92mCompiling\u001b[0m {{{fullname}}}\" }"
+
+Format!
+
+{
+  pkgs ? import <nixpkgs> { },
+}:
+{
+
+  b = pkgs.stdenv.mkDerivation {
+    name = "asdf b";
+    src = ./in;
+    phases = [ "installPhase" ];
+    installPhase = ''
+          mkdir -p $out
+          echo "asdf1" > $out/asdf
+      exit 1
+    '';
+  };
+  a = pkgs.stdenv.mkDerivation {
+    name = "asdf a";
+    src = ./in;
+    phases = [ "installPhase" ];
+    installPhase = ''
+          mkdir -p $out
+          echo "asdf1" > $out/asdf
+      exit 1
+    '';
+  };
+}
+
+nix build --file default.nix --keep-going --log-format internal-json
+
+ CARGO_BACKEND=nix target/debug/cargo install ripgrep
+    > +++ /nix/store/h1c2imj0dpfyyfrd0i6195xznqxcar8x-rust-stable-2025-08-07/bin/rustc --crate-name build_script_build --edition=2021 /home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ripgrep-14.1.1/build.rs --crate-type bin --emit=dep-info,link -C embed-bitcode=no -C debug-assertions=off --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values("pcre2"))' -C metadata=1fbca2f82c8b2e38 -C extra-filename=-51314aa0a9564733 --out-dir /nix/store/gxvl0j7wihsssrpk9m74kmk102wddg2n-ripgrep-14_1_1-script_build-51314aa0a9564733 --cap-lints allow
+stderr:       
+   > error: couldn't read `/home/nixos/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ripgrep-14.1.1/build.rs`: No such file or directory (os error 2)
+
+
+* [x] pass-thru support for '--keep-going' and '-v' from 'cargo build'
+  * [x] '--keep-going' a simple pass thru to nix build
+  * [x] '-v' log everything to the shell, also the nix stack trace, the build command but unlinke nix, don't mix outputs
+
+* [x] fix example13 example where nix errors out and --level cargo does not display it at all
+    rewrote error handling for build_script_build and build-parser error handling with custom @cargo messages
+
+==============================================================================================================================================================
+
+
+
+
+* [ ] check exit codes when nix fails, when cargo fails
+* [ ] when nix evaluation goes wrong, show error
+
+
+
+* [ ] package 'cargo with nix backend'
+  * [ ] how to use 'cargo build' generated build system both from a git checkout and for local hacking? it needs relative paths or
+      the path must be an argument to the build call
+  * [ ] create a concept like a `rustPlatform = pkgs.makeRustPlatform` so people can use this cargo in their projects for testing
+        basically an overlay like oxalica
+  * [ ] add flake.nix which compiles this custom cargo so it can be used in nix
+  * [ ] integrate https://github.com/nixcloud/cargo-nix-build-test-environment-declarative into cargo subcommand or standalone binary
+  * [ ] create an overlay with cargo (with nix backend patches) with a vanialla rustc compiler which can be used directly
+
+
+
+
+
+
+* [ ] add `cargo nix generate --path /tmp/nix` or `cargo install --generate --path /tmp/nix` support to cargo
+  * [ ] two modes of operation:
+    * [ ] mode 1: local files
+      * [ ] consider absolute vs. relative paths when using local code
+      * [ ] what 'cargo build' command could be used to build using a local git commit instead of what is in the current work dir (i.e. create pure builds locally)
+    * [ ] mode 2: git hash
+      * [ ] cargo nix generate (build documents based on 'git hash' vs. local hacking)
+      * [ ] if git hash was used, it points to git remote repos
+      * [ ] use the Cargo.dependencies.nix from there
+
+
+
+
+
+
+
+
+* [ ] compatibility tests / benchmarks
+  * [x] cargo 1.87
+  * [x] rustpad v0.1.0
+  * [x] rphtml v0.5.10
+  * [x] ka4h2 v0.0.24
+  * [x] klick v0.5.7
+  * [x] html5ever (this is only a lib)
+  * [x] ripgrep v14.1.1
+  * [x] bat v0.25.0
+  * [x] sd v1.0.0
+  * [ ] atuin v18.8.0
+
+
+
+
+
+
+
+* [ ] major refactor, one commit & cleanup of code base; rebase on most recent cargo?
+* [ ] give instructions how to use my custom `cargo` from nix/nixos
+* [ ] add speed comparisons with real examples
+* [ ] approach rust community @cargo
+* [ ] publish work
+  * [ ] create blog post
+  * [ ] create video
+
+
+
+
+
+==============================================================================================================================================================
+
+
+# libnix rust requirements
+
+* [x] a. Support download & build of per crate in /nix/store [Joachim]
+* [x] b. 'cargo clean', result link, nix-collect-garbage prevention, nix-copy-closure explanation for build artifacts [Joachim]
+* [x] c. Reduce /target folder size by symlinks to store [Joachim]
+* [x] d. Use c library aka openssl via default.nix inside Cargo.toml [Joachim]
+* [x] e. Optimization: derive cargo/rustc from environment and use them as toolchain instead of environment tools [Joachim]
+
+# future work
+* [ ] environment variables override for individual crates
+* [ ] match cargo's .fingerprint concept, i.e. what file change trigger rebuilds, to a pure nix build concept. we don't want to rebuild all of the src (not the dependencies) when a README.md is updated which is not used via `const README: &str = include_str!("../README.md");` which can only be detected by a `rustc` run
+  * [ ] consider <https://github.com/flox/flox-experimental-plugins/blob/master/pkgs/flox-build-incremental/build.nix#L37>
+* [ ] use dynamic derivations: https://fzakaria.com/2025/03/10/an-early-look-at-nix-dynamic-derivations
+* [ ] attribute names are not human readable, what do we do about it?
+ nix build .#cargo-0_88_0-bin-fafc14832178210d --impure -L
+* [ ] automatic finding of dependencies pkg-config / openssl ...
+* [ ] better nix-shell support (for editors as well as for interactive experiments)
+* [ ] rework cargo code base to create a better abstraction for the two toolcains (legacy and nix based)
+
+* [ ] CARGO_TEST_BACKEND=legacy|sandbox
+* [ ] downloads
+  * [ ] prevent 'crate downloads' by 'vanilla cargo' (in nix mode) since nix does handle the downloads itself so we don't need it twice
+  * [ ] nix-prefetch-git downloads every time, so store the sha256 in Cargo.lock.nix and before downloading, alwasy check this first
+
+* [ ] gc considerations
+  * cargo build can be executed several times and it can 'install' more than one symlink
+    nix-store --add-root ~/.local/state/nix/gcroots/cargo-0_88_0-bin-9448b8bba6ed4f6b --indirect --realise /nix/store/bmbj0rq0slwd73498xdjz97g7hk8zwzr-cargo-0_88_0-bin-9448b8bba6ed4f6b
+  right now we use this:
+    .arg("--out-link")
+    .arg(format!("target/{}/nix/result_cargo_build", build_type))
+  the problem is that installing two different programs in two seperate builds will then make the first be affected by 'nix-collect-garbage' where it should now
+
+
+
+* [ ] smooth drop-in integration of the nix backend into cargo
+  * [ ] call nix build from cargo and also link resulting binaries to `target/debug/binaryname` after compile using `link_targets()` into target/debug/XXX
+  * [ ] cargo run foo
+  * [ ] cargo build
+  * [ ] cargo dry run
+  * [ ] cargo test
+  * [ ] cargo doc
+  * [ ] cargo install
+  * [ ] cargo clean
+    * [ ] propose to run 'nix-collect-garbage' manually
+
+* [ ] rewrok target.nix to contain the targets 'cargo build' would build by default
+  * [ ] cargo build -p
+  * [ ] --workspace
+  * [ ] --exclude
+  * [ ] --all
+  * [ ] --lib / --bins / --examples / --tests / ...
+
+
+
+# future: consider bwrap instead of copying
+
+for builds with sandboxing all the source code has to be copied, `bwrap` implements ways to access the
+source without copying but still maintains some safety with 'read only' filters.
+
+`$ nix-build --option sandbox false --impure bwrap.nix`
+
+```nix
+# example.nix
+let
+  pkgs = import <nixpkgs> {};
+in
+pkgs.stdenv.mkDerivation {
+  name = "bwrap-sandboxed-job";
+  src = ./.;
+
+  buildInputs = [ pkgs.bubblewrap pkgs.bash ];
+
+  buildPhase = ''
+    mkdir -p output
+    touch "asdf" output/asdf
+    echo "Running inside Bubblewrap sandbox..."
+
+    bwrap \
+      --ro-bind $src /src \
+      --ro-bind /nix /nix \
+      --bind output /output \
+      --dev /dev \
+      --proc /proc \
+      --unshare-all \
+      --die-with-parent \
+      --chdir /src \
+      ${pkgs.bash}/bin/bash -c '
+        echo "This should fail:" && touch somefile 2>/dev/null || echo "Read-only OK"
+        echo "This should succeed:" && touch /build/hello.txt
+        echo "this is some file content" > /output/a-result.md
+        ls -la /output
+      '
+  '';
+
+  installPhase = ''
+    mkdir -p $out
+    cp -r output/* $out
+  '';
+}
+
+}
+```
+
+builtins.compareVersions "2.
+
+
+
+### bwrap
+
+for builds with sandboxing all the source code has to be copied, `bwrap` implements ways to access the
+source without copying but still maintains some safety with 'read only' filters.
+
+`$ nix-build --option sandbox false --impure bwrap.nix`
+
+```nix
+# example.nix
+let
+  pkgs = import <nixpkgs> {};
+in
+pkgs.stdenv.mkDerivation {
+  name = "bwrap-sandboxed-job";
+  src = ./.;
+
+  buildInputs = [ pkgs.bubblewrap pkgs.bash ];
+
+  buildPhase = ''
+    mkdir -p output
+    touch "asdf" output/asdf
+    echo "Running inside Bubblewrap sandbox..."
+
+    bwrap \
+      --ro-bind $src /src \
+      --ro-bind /nix /nix \
+      --bind output /output \
+      --dev /dev \
+      --proc /proc \
+      --unshare-all \
+      --die-with-parent \
+      --chdir /src \
+      ${pkgs.bash}/bin/bash -c '
+        echo "This should fail:" && touch somefile 2>/dev/null || echo "Read-only OK"
+        echo "This should succeed:" && touch /build/hello.txt
+        echo "this is some file content" > /output/a-result.md
+        ls -la /output
+      '
+  '';
+
+  installPhase = ''
+    mkdir -p $out
+    cp -r output/* $out
+  '';
+}
+
+}
+```

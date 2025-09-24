@@ -87,8 +87,9 @@ th, td {
 ### freelancer `08/2023 - present`
 
  * <https://nlnet.nl/project/libnix/> nix (mingw/c++) and rust (cargo libnix extensions)
- * <https://codeberg.org/slowtec/klick> with rust/leptos, see [rust-leptos-webui](rust-leptos-webui.html)
- * <https://codeberg.org/fairsync/importer-prototype> distributed map sync with rust/leptos
+ * <https://codeberg.org/slowtec/ka4h2> rust/leptos webui
+ * <https://codeberg.org/slowtec/klick> rust/leptos, see [rust-leptos-webui](rust-leptos-webui.html)
+ * <https://codeberg.org/fairsync/importer-prototype> rust/leptos map sync
 
 ### full stack developer - TeamSpeak Systems GmbH `04/2022 - 07/2023`
 

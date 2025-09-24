@@ -1,0 +1,57 @@
+
+[[!meta date="2025-04-24 20:53"]]
+[[!tag nix nixos libnix]]
+[[!draft]]
+[[!series libnix]]
+[[!summary libnix integration into cargo and a discussion of crates wrapping legacy]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# motivation
+
+* Arduino Opta RS485
+  * 166euro
+  * https://store-usa.arduino.cc/products/opta-rs485
+  * https://www.kubii.com/de/entwicklungskits/4650-arduino-opta-lite-wi-fi-rs485-3272496323704.html
+* inverter: ODE-3-120023-1012 INVERTEK DRIVES-Vektor-Umrichter
+  * 190euro
+  * https://www.tme.eu/de/details/ode-3-120023-1012/einphaseninverter/invertek-drives/?brutto=1&currency=EUR&gad_campaignid=10626674532
+* chatgpt
+  * https://chatgpt.com/share/68ce97df-5404-800c-9b84-12f2dabe5b98
+
+* schloss
+  * 13 euro
+  * https://de.aliexpress.com/item/1005005932336596.html?spm=a2g0o.productlist.main.7.3f162890kA3JFu&algo_pvid=6a7153e1-a17a-455c-8d53-dc6532de8154&pdp_ext_f=%7B%22order%22%3A%2251%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A1005005932336596%7C_p_origin_prod%3A
+
+motor:
+
+Hersteller: OBERMOSER
+
+Typ: D74 K17/1 → interne Typbezeichnung
+
+Spannung: 220/380 V Δ/Y
+
+  Δ = Dreieckschaltung bei 220 V
+  Y = Sternschaltung bei 380 V
+  
+Stromaufnahme: 1,3 / 0,75 A
+
+  bei 220 V = 1,3 A
+  bei 380 V = 0,75 A
+  
+Leistung: 0,18 kW → Motorleistung (ca. 180 Watt)
+
+Frequenz: 50 Hz → Netzfrequenz
+
+Drehzahl: 1360 U/min → Nenndrehzahl bei Nennlast (passt zu einem 4-poligen Motor mit Schlupf)
+
+Betriebsart: S1 oder ähnlich (nicht klar lesbar, evtl. Dauerbetrieb)
+
+cos φ: 0,65 → Leistungsfaktor (Verhältnis Wirkleistung zu Scheinleistung)
+
+Schutzart: IP44 → Schutz gegen feste Fremdkörper >1 mm und gegen Spritzwasser
+
+Bauform: B5 → Motor mit Flanschbefestigung
+
+Isolationsklasse: B → max. Wicklungstemperatur 130 °C
