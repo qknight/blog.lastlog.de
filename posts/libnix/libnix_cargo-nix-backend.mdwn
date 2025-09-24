@@ -522,7 +522,7 @@ note: this concept clearly **focus more on the deployment side** and is very tim
 
 [[!img posts/libnix/cargo-nix-build-system-1.svg class="noFancy" width="50%"]]
 
-cargo rewrites like **crate2nix**/**cargo2nix** solve this **at the cost of being detached from the upsteam cargo implementation** often leading to unsupported edge-cases. 
+cargo rewrites like **crane**/**naersk** solve this **at the cost of being detached from the upsteam cargo implementation** often leading to unsupported edge-cases. 
 
 <div class="alert alert-warning" role="alert">
 **IMPORTANT, THE MAIN MOTIVATION MUST BE THIS**: 
