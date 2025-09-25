@@ -587,6 +587,7 @@ i would like to express my heartfelt thanks to:
 
 * [nlnet](https://nlnet.nl/) for the confidence in me with sponsoring this effort
 * <https://x.com/bereknyei> huge shoutout to thomas bereknyei, who inspired me with the @nix protocol and `--log-format internal-json` and other concepts
+* all on X and LinkedIn who occational drop a comment or like! this really motivates me! ♥♥♥
 
 and to these useful services (no sponsors):
 
