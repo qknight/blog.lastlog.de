@@ -8,7 +8,7 @@
 
 # motivation
 
-this post explores integrating nix directly into cargo as a continuation of the earlier **rust abstractions** post.
+this post explores integrating nix directly into `cargo` as a continuation of the earlier **rust abstractions** post.
 
 unlike previous attempts like `cargo2nix`, `crate2nix`, `crane`, and `naersk` to adapt cargo builds to nix tooling, this libnix initiative seeks to enhance `cargo` with an inherent nix backend.
 
@@ -62,7 +62,7 @@ this map is the result of weeks of reading the cargo source code and figuring ou
 * **better GC**: no more artifacts in `rm ./target/` as it is moved into `/nix/store` and `nix-collect-garbage` is used for cleanups (new)
 * **uses nix build scheduler** instead of the one inside cargo (new)
 * **massive logging DX improvement** over naersk, cargo2nix and other nix tools (new)
-* supports all features cargo (no reimplementation like cargo2nix & similar)
+* supports all cargo features (no reimplementation like cargo2nix & similar)
 
 ### cargo libnix downsides
 
