@@ -490,7 +490,7 @@ with pkgs;
 
 * both use a standalone program written in `rust` while using parts of the `cargo` source code as a library.
 * `cargo2nix` creates a `Crates.nix` while `crate2nix` creates a `Cargo.nix`.
-* both are using parts from cargo and does not attempt to reimplement it, which is good. 
+* both are using parts from cargo and do not attempt to reimplement it, which is good. 
 
 <div class="alert alert-warning" role="alert">
 i hate the resulting workflow as both need to be called explicitly after each Cargo.toml change and debugging is challenging once things start to fail.
