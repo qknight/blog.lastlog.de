@@ -8,6 +8,91 @@
 [[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
 [[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
 
+# nlnet contract
+
+Task 6: Cargo nix backend (next steps) (€ 11900)
+
+* [ ] a. Package cargo backend with nix, create a `cargo install` or `cargo nix --generate /foo/bar`	€ 2900
+  * [ ] extend function arguments
+    * [ ] `src` as function argument
+    * [ ] `rustc`/`cargo` as function arguments
+  * [ ] add Cargo.Dependencies.nix to release
+  * [ ] for the release create a flake.nix/flake.lock and a nix/* build system which is called from the flake
+  * [ ] consider create a fenix like overlay
+* [ ] b. Create a fenix-like overlay for cargo with nix backend	€ 1000
+* [ ] c. fingerprinting support, create a directory mask for `builtins.filterSource` for each root-target to reduce recompiles	€ 5000
+  * [ ] change target/debug/.fingerprint/ implementation, no write for deps,
+  * [x] can't use syn for parsing alone as it can't expand macros without calling 'cargo expand' and thus has an incomplete view on the files required for the build
+        let t = include_str!("../../README.md");
+        BUT README.md never shows up
+
+      [nixos@nixos:~/cargo]$ time nix build target --file /home/nixos/cargo/nix/cargo_build_caller.nix -L
+      trace: Using Cargo.dependencies.nix
+      
+      real    0m8.695s
+      user    0m3.777s
+      sys     0m0.837s
+      
+      [nixos@nixos:~/cargo]$ time nix build target --file /home/nixos/cargo/nix/cargo_build_caller.nix -L
+      trace: Using Cargo.dependencies.nix
+      
+      real    0m4.838s
+      user    0m3.677s
+      sys     0m0.487s
+
+      src = pkgs.lib.fileset.toSource {
+        root = /home/nixos/cargo;
+        fileset = pkgs.lib.fileset.unions [
+          /home/nixos/cargo/crates/crates-io/lib.rs
+        ];
+      };
+
+* [ ] d. Do a major refactor of the codebase for upstream PR	€ 3000
+
+Write a somewhat Rust-oriented blog post and submit to This Week in
+> Rust. You can send in a PR here:
+> https://github.com/rust-lang/this-week-in-rust?tab=readme-ov-file#prs-for-next-issue-are-now-being-accepted
+
+
+
+
+# libnix video
+
+
+## graph
+
+languge PM nix-backend
+
+- GC: no more /target, /node_packages ...
+- nix-copy-closure for
+  - intermediate build artefacts
+  - target binary
+- BOM for used libs
+- CI builds
+- sandbox builds
+  - more security as build.rs won't have access to whole FS (same for javascript)
+  - no more forgotten deps
+  - build time speedup (copying of the source code to the builder) possible with
+    - using git (like flakes do)
+    - copying with file masks
+    - using fuse (impure)
+- better logging (logone)
+- no more explicit/manual libs in nixpkgs, they get created on the fly and are commited with the binary
+
+
+what libnix makes possible:
+libnix is not merely an optimization of customary software development; it's a monumental leap forward. it enhances software development with the strenghts of nix.
+- nix breaks with FHS (https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html)
+- nix breaks dynamic linking (https://en.wikipedia.org/wiki/Dynamic_linker)
+- nix supports multiple versions of the same package installed/bulit simultaneously
+- nix provides atomic upgrades and easy rollbacks
+- nix can bundle glibc (similar to flatpak)
+
+# stuff to support
+
+https://github.com/DeterminateSystems/nix-installer
+atun shell
+
 # cool stuff
 
 nix build --file /tmp/nix 
@@ -573,14 +658,18 @@ stderr:
 * [x] fix example13 example where nix errors out and --level cargo does not display it at all
     rewrote error handling for build_script_build and build-parser error handling with custom @cargo messages
 
+* [x] add speed comparisons with real examples
+
 ==============================================================================================================================================================
 
 
-
+* [ ] check if `cargo leptos` works with the nix backend
+* [ ] check if `nixos-installer` works with the nix backend
+* [ ] add note to `cargo check` that it is not supported with nix backend
 
 * [ ] check exit codes when nix fails, when cargo fails
 * [ ] when nix evaluation goes wrong, show error
-
+  * [ ] 
 
 
 * [ ] package 'cargo with nix backend'
@@ -634,7 +723,7 @@ stderr:
 
 * [ ] major refactor, one commit & cleanup of code base; rebase on most recent cargo?
 * [ ] give instructions how to use my custom `cargo` from nix/nixos
-* [ ] add speed comparisons with real examples
+
 * [ ] approach rust community @cargo
 * [ ] publish work
   * [ ] create blog post
@@ -648,12 +737,6 @@ stderr:
 
 
 # libnix rust requirements
-
-* [x] a. Support download & build of per crate in /nix/store [Joachim]
-* [x] b. 'cargo clean', result link, nix-collect-garbage prevention, nix-copy-closure explanation for build artifacts [Joachim]
-* [x] c. Reduce /target folder size by symlinks to store [Joachim]
-* [x] d. Use c library aka openssl via default.nix inside Cargo.toml [Joachim]
-* [x] e. Optimization: derive cargo/rustc from environment and use them as toolchain instead of environment tools [Joachim]
 
 # future work
 * [ ] environment variables override for individual crates

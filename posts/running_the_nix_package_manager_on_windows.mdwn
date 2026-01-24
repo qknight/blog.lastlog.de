@@ -69,7 +69,7 @@ most of the software related to X did not work, as windows and mesa don't go alo
 
 # summary
 
-great to have nix on windows. no it's time to use it, here are a bunch of scenarios:
+great to have nix on windows. now it is time to use it, here are a bunch of scenarios:
 
   * use it to create windows software
   * use it to create installers (using NSIS)

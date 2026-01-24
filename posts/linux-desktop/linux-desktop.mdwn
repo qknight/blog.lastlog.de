@@ -1,0 +1,133 @@
+[[!meta date="2026-10-13 20:53"]]
+[[!tag linux windows]]
+[[!series linux-desktop]]
+
+[[!summary discussing the year of the linux desktop]]
+
+[[!draft]]
+
+https://data.firefox.com/dashboard/hardware
+
+# motivation
+
+waiting for the linux desktop all my life, what holds it back?
+
+# windows desktop use-cases
+
+* running native apps
+* developing applications (native, docker, remote development)
+* running applications in (automation, kiosk-mode)
+
+# what government/corporate wants
+
+prime feature for cooperate:
+
+* user access management
+* backup & recovery
+* helpdesk (remote control)
+* monitoring
+* legacy software support
+* software management  
+
+# what government/corporate actually need
+
+* moving from
+  * paper driven workflows
+  * moving from office tools to webforms
+* shift in IT work
+  * move from AD to oauth for webservices for authentication
+  * move away from windows centric lock-in tooling
+  * cloud first
+    * git workflows
+    * cooperative tools like google docs, https://excalidraw.com or replit.com
+    * reproducible tooling like nix
+  * we need more programmers creating simple frontends & database replacing paper driven workflows
+  * dynamic rights management, spin up servers with webapps & change parts in DNS
+
+
+
+most important in IT:
+* more risk taking, more failing & recovering
+
+# technical challenges
+
+* updates (windows)
+  * OS updates (triggerd by OS update scheduler)
+  * signal, brave, ... (apps detect that they need updates, either by scheduler or manual check button)
+    * note: only _that_ app updates
+* updates (nixos) - only console tools, horrible ux
+  * nixos-rebuild switch
+  * home-manager
+  * flatpak (foreign)
+* avoiding lock-in
+  * relevant
+    * office 365
+    * active directory
+    * .net
+    * exclusive contracts
+  * historically
+    * gaming platform: directx
+    * exclusive hardware support (3d drivers, power management, driver support in general)
+    * windows server
+    * internet exlorer
+* deployment
+  * source deployment
+  * binary deployment, aka closed source support
+    * cross linux support (all need libnix)
+      * snap packages (canonical)
+      * appimage (community-driven)
+      * flatpak (community-driven, some Red Hat fund)
+      * docker
+* running old stuff: backward compatibility
+  * glibc, docker, kernel
+  * linux "dll" hell
+* running windows programs
+  * proton
+* graphis drivers restarts on crashes: windows uses a unified driver model, like WDM for soundcards and WDDM for graphics cards
+* linux stability
+* hardware support
+  * cuda support
+* power management (mixed quality)
+* display management and hotplugging (works on steam deck)
+
+* ms office 
+  * "paper" forms to "webpage" REST forms
+
+* dedicated vendors
+  * valve: steam deck
+  * framework
+  * dell
+  * thinkpad
+
+# financial challenges
+
+## linux
+
+* redhat / ibm
+* canonical
+* valve
+
+## nix/nixos
+
+* Determinate Systems
+* numtide ltd
+* nixcademy
+* cachix.org
+
+## europe
+
+* 21.6 million euros https://nlnet.nl/press/20240109-NGI0-CommonsFund-unveiled.html
+
+## usa
+
+* docker.io
+  * march 2021: 23 million us dollars;
+  * march 2022: 105 million us dollars
+* replit.com: 250 million us dollars
+  * https://www.reuters.com/business/ai-software-developer-replit-raises-250-million-3-billion-valuation-2025-09-10/#:~:text=AI%20software%20developer%20Replit%20raises%20%24250%20million%20at%20%243%20billion%20valuation%20%7C%20Reuters
+* flox.dev
+  * 16.5 million us dollars, february 7, 2023
+  * 25 million us dollars, September 25, 2025
+
+# summary
+
