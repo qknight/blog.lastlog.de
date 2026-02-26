@@ -16,8 +16,9 @@ this is a status update covering the difference to the last blog post and the co
 
 # improvements
 
-
 ## release
+
+this **release is not upstream in cargo, for now it is only a fork intended for a PR**.
 
 it is **now easy to get cargo (libnix) mixed into your fenix setup**, see the README.md for instructions.
 
