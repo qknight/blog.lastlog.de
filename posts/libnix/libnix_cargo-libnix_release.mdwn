@@ -8,17 +8,18 @@
 
 # motivation
 
-unlike crane / naersk / crate2nix / cargo2nix this `cargo` (libnix) uses nix internally, making wrappers obsolete. this is a status update covering the difference to the last blog post.
+unlike `crane` / `naersk` / `crate2nix` / `cargo2nix` this `cargo (libnix)` uses nix internally, making wrappers obsolete. 
+
+this is a status update covering the difference to the last blog post and the code can be found here:
 
 <https://github.com/nixcloud/cargo/blob/master-libnix/README.md>
 
-# cargo (libnix) improvements
+# improvements
 
-this are the improvements:
 
 ## release
 
-it is now easy to get cargo (libnix) mixed into your fenix setup, see the README.md for instructions.
+it is **now easy to get cargo (libnix) mixed into your fenix setup**, see the README.md for instructions.
 
 see <https://github.com/nixcloud/cargo/blob/master-libnix/README.md#using-cargo-libnix>.
 
@@ -58,6 +59,8 @@ when starting this export it will rewrite the `src` attribute to download it fro
 
 ## Cargo.dependencies.nix env variables
 
+to build the **nix-installer** i needed environment variables, so here is how to add them:
+
 ```nix
  { pkgs }:
     with pkgs;
@@ -86,9 +89,9 @@ when starting this export it will rewrite the `src` attribute to download it fro
 ```
 ## logone improvements
   
-logone shows build type now, see:
+[logone](https://github.com/nixcloud/logone) shows the 'build type' now, see:
 
-```sh
+```
 Compiling proc-macro2 (build.rs run)
 Compiling quote (build.rs run)
 Compiling proc-macro2
@@ -106,7 +109,7 @@ Compiling starship (bin)
 
 ## incremental builds
 
-this is a hot topic of research and there are some promising results in the branch `master-libnix_3_incremental_compile`.
+still a hot topic of research but with some promising preliminary results in the branch [master-libnix_3_incremental_compile](https://github.com/nixcloud/cargo/blob/master-libnix_3_incremental_compile/README.md).
 
 to build, use one of the two commands:
 
