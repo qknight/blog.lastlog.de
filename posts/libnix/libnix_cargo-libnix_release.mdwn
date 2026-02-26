@@ -1,0 +1,238 @@
+[[!meta date="2026-02-26 22:52"]]
+[[!tag nix nixos libnix cargo rust]]
+[[!series libnix]]
+[[!summary cargo libnix integration to leverage nix]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# motivation
+
+unlike crane / naersk / crate2nix / cargo2nix this `cargo` (libnix) uses nix internally, making wrappers obsolete. this is a status update covering the difference to the last blog post.
+
+<https://github.com/nixcloud/cargo/blob/master-libnix/README.md>
+
+# cargo (libnix) improvements
+
+this are the improvements:
+
+## release
+
+it is now easy to get cargo (libnix) mixed into your fenix setup, see the README.md for instructions.
+
+see <https://github.com/nixcloud/cargo/blob/master-libnix/README.md#using-cargo-libnix>.
+
+## nix buildsystem export
+
+the buildsystem can be exported now:
+
+```bash
+cargo build --release write-nix-buildsystem \
+  --out-dir ./libnix-1.87.0+v1 \
+  --url https://github.com/nixcloud/cargo/archive/refs/tags/libnix-1.87.0+v1.tar.gz \
+  --hash 1blw87myixqdkxz9wv5dv8r0g9xxcdprwzrr1l0r7sj29shrzc8n
+```
+
+when starting this export it will rewrite the `src` attribute to download it from the given `url`+`hash` instead. this way no IFD is needed and the build system can be placed near the actual source code. the release for cargo (libnix) has been done this way, see <https://github.com/nixcloud/cargo/blob/c0a84a1a1978c1c65e0e4449b41c179319a99c76/flake.nix#L21> and <https://github.com/nixcloud/cargo/blob/master-libnix/README.md#release-workflow>.
+
+```
+   ┌─────────────────┐
+   │  flake.nix      │
+   └────────┬────────┘
+            │
+            ▼
+┌────────────────────────────┐
+│  Nix toolchain             │
+│  • cargo_build_caller.nix  │
+│  • derivations/default.nix │
+│  • derivations/ ...        │
+└───────────┬────────────────┘
+            │
+            ▼
+┌───────────────────────┐
+│  Project source code  │
+│  • src/               │
+│  • Cargo.toml / ...   │
+└───────────────────────┘
+```
+
+## Cargo.dependencies.nix env variables
+
+```nix
+ { pkgs }:
+    with pkgs;
+    {
+        deps = {
+            "markup5ever_rcdom" = {
+                "0.3.0" =
+                    [ pkg-config openssl ];
+            };
+            "unicode-ident" = [ pkg-config curl ];
+            "xml5ever" = {
+                "0.20.0" = [];
+            };
+        };
+        envs = {
+            "cargo" = {
+                "0.88.0" = {
+                    "RUST_BACKTRACE" = "1";
+                };
+            };
+            "cargo-platform" = {
+                "RUST_BACKTRACE" = "full";
+            };
+        };
+    }
+```
+## logone improvements
+  
+logone shows build type now, see:
+
+```sh
+Compiling proc-macro2 (build.rs run)
+Compiling quote (build.rs run)
+Compiling proc-macro2
+Compiling quote
+Compiling libc (build.rs run)
+Compiling tz-rs
+Compiling const_format_proc_macros
+Compiling itoa
+Compiling libc
+Compiling tzdb_data
+Compiling yaml-rust2
+Compiling starship
+Compiling starship (bin)
+```
+
+## incremental builds
+
+this is a hot topic of research and there are some promising results in the branch `master-libnix_3_incremental_compile`.
+
+to build, use one of the two commands:
+
+```bash
+time nix build target \
+  --file nix/cargo_build_caller.nix \
+  --out-link target/debug/nix/gc/result \
+  --option extra-sandbox-paths '/incremental-target=/cargo-incremental-target' \
+  -L'
+```
+
+```bash
+time nix build target \
+  --file nix/cargo_build_caller.nix \
+  --out-link target/debug/nix/gc/result \
+  --option extra-sandbox-paths '/incremental-target=/cargo-incremental-target' \
+  --json --log-format internal-json 2>&1 | ~/logone/target/debug/logone \
+  --json --level errors
+```
+
+notable changes:
+
+* the filepaths in **nix/cargo-0.88.0-b9aa49f38b781d3e.nix** and for the other root crates have been hardcoded with `pkgs.lib.fileset.toSource` (this speed things up a lot)
+* incremental builds require this host change
+
+      mkdir -p /cargo-incremental-target
+      chown root:nixbld /cargo-incremental-target
+
+* the `--out-dir` writes to `/tmp/out` (instead of `$out`) so incremental compiles work
+
+    ```nix
+    # excerpt of nix/cargo-0.88.0-b9aa49f38b781d3e.nix
+    \
+    mkdir -p /tmp/out
+    set -x +e
+
+    ${RUSTC} \
+            --crate-name cargo \
+            $(if [ -d /incremental-target ]; then echo "-C incremental=/incremental-target"; fi) \
+            --edition=2021 src/cargo/lib.rs \
+            --error-format=json \
+            --json=diagnostic-rendered-ansi,artifacts,future-incompat \
+            --crate-type lib \
+            ...
+            --out-dir /tmp/out \
+            ...
+
+    mkdir -p $out/
+    cp -r /tmp/out/* $out
+    ```
+
+issue with specification is <https://github.com/nixcloud/cargo/issues/3>
+
+## build.rs improvements
+
+<https://github.com/nixcloud/build-rs-libnix> is now integrated into the generated toolchain. i tried to have this integrated into cargo for a while but the bootstrapping was a nightmare and totally was not worth the effort. there is also a ton of small build.rs support improvements, both in the generated nix buildsystem and in the build-rs-libnix.
+
+# cargo (libnix) newly supported:
+
+<div class="alert alert-warning" role="alert">
+| Project          | Version              | Notes                                      |
+|------------------|----------------------|--------------------------------------------|
+| rust-analyzer    | —                    | LSP server for Rust (IDE-like features in editors) |
+| atuin            | v18.5.0              | Magical shell history with sync & search   |
+| nushell          | 0.102.0              | Modern shell with structured data pipelines |
+| fd               | v7.3.0               | Fast, user-friendly alternative to `find`  |
+| eza              | 58b98cfa             | Modern, colorful replacement for `ls` (exa fork) |
+| coreutils        | —                    | Rust reimplementation of GNU coreutils     |
+| synapse          | 1.0.0                | Synapse is a flexible and fast BitTorrent daemon. |
+| nix-installer    | 3.15.1               | Official Determinate Systems Nix installer |
+| delta            | v0.18.2              | Syntax-highlighting pager for git diff & grep |
+| sniffnet         | —                    | Cross-platform network monitor & sniffer   |
+| RustPython       | 2024-12-30-main-4    | Python interpreter written in Rust         |
+| axum / tokio / yew | —                  | Web server (axum) + async runtime (tokio) + frontend framework (yew) |
+| lightningcss     | —                    | Extremely fast CSS parser / minifier       |
+| trunk            | v0.21.14             | Zero-config WASM build tool & bundler for Rust web apps |
+| just             | v1.46                | Handy command runner (make alternative)    |
+| leptos           | —                    | Full-stack Rust web framework (signals + SSR) |
+| cargo-leptos     | —                    | Cargo integration & build tool for Leptos  |
+| vaultwarden      | —                    | Unofficial Bitwarden-compatible server (Rust) |
+| mdBook           | v0.5.2               | Modern online book generator from Markdown |
+| pankat-rs        | v0.1.1               | A static site generator or blog tool |
+| rustpad          | v0.1.0               | Collaborative real-time code editor (like etherpad) |
+| fuse-rs          | —                    | Rust FUSE (Filesystem in Userspace) bindings/library |
+| codex            | —                    | A coding agent from OpenAI that runs locally on your computer |
+| typst            | —                    | Modern, fast typesetting system (LaTeX alternative) |
+| starship         | ~v1.24.1             | Blazing-fast, customizable cross-shell prompt |
+</div>
+
+# outlook
+
+next steps could involve:
+
+* fix the 'parallel' execution bug <https://github.com/nixcloud/cargo/issues/11>
+* fully support incremental builds as described in <https://github.com/nixcloud/cargo/issues/3>
+* IFD support (so one calls cargo build from nix, skipping the write-nix-buildsystem call)
+* logone improvements 
+  * fix issues in nix upstream
+  * better error messages
+* GC improvements
+* full `x86_64-unknown-linux-musl` support
+* replace `bash` with `nushell`
+* `cargo test` & `cargo install` support
+* rework -C metadata=8abf83ef020a3059 / -C extra-filename=-27e7993d9cf32df7 as we might not need it in nix
+* support more projects
+
+there is a full list with ideas here:
+
+<https://github.com/nixcloud/cargo/blob/master-libnix/README-DEV.md>
+
+# thanks
+
+i would like to express my heartfelt thanks to:
+
+* [nlnet](https://nlnet.nl/) for sponsoring this effort
+
+# summary
+
+it is easy to use cargo (libnix) now! this is great, the next thing should be to make it fast.
+
+honestly, **for small projects this works already great** but for compiling "cargo" it is way too slow on iterative builds.
+
+<div class="alert alert-info" role="info">
+if you like this work, your support is needed!
+
+* **consider a star** at <https://github.com/nixcloud/cargo/stargazers> to show your support.
+* **comments** are welcome in <https://discourse.nixos.org/t/libnix-feedback/75193>
+* if you're interested in **supporting this development**, please reach out to me, see <https://lastlog.de/blog/CurriculumVitae.html> for details.
+</div>
