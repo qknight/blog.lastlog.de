@@ -1,0 +1,175 @@
+[[!meta date="2026-02-27 22:52"]]
+[[!SpecialPage]]
+[[!summary cargo libnix integration to leverage nix]]
+
+[[!img posts/git/git.png class="noFancy" style="float: right" width="200px"]]
+
+# Introduction
+
+This is a brief introduction into `git` and how to use it for daily work.
+
+A nice online resource: <https://git-scm.com/learn>.
+
+In this lecture I want to cover the most basic `git` usages like:
+
+* `git commit|pull|push|tag|log|rebase|stash|worktree`
+
+Workflows:
+
+* **fork** & **PRs** (Pull Requests), **issues** (markdown) and **documentation** (README.md)
+
+Tools:
+
+* `git`/`tig` and web tools
+
+## Initializes a new Git repository
+
+* `git init` - Initializes a new Git repository.
+* `git clone <repository-url>` - Clones a repository into a new directory.
+* `git svn clone <repository-url>` - Imports an SVN repository into a new directory.
+
+## Looking into existing git repositorries
+
+* `git status` - Displays the state of the working directory and staging area.
+* `git branch` - Lists all local branches.
+
+* `git log` - Shows the commit history. Options: `--oneline`, `--graph`, `--decorate`.
+* `tig` / `gitui` - command line tool, very handy
+
+* `cat .git/config`
+
+* `git diff` - Shows changes between commits, commit and working directory, etc.
+
+## hidden text example
+
+
+[[!hiddentext the answer is: <pre>asldkfjasldkfj</pre> ]]
+
+
+## First commit
+
+* `git add myfile`
+* `git status`
+* `git commit`
+
+Finally the upload:
+
+* `git push`
+
+## First commit undo
+
+```bash
+git add myfile1
+git commit
+git add myfile2
+git commit
+```
+
+In this example we want to undo the myfile2 commit and change it a little, we have a few options:
+
+a) we simply do change myfile2 and do the `git add myfile2` again, then use `git commit --amend`
+b) we add another commit and do a `git rebase -i 02303-hash-revision`
+
+## Restarting
+
+```bash
+git reset --hard HEAD
+```
+
+## Force push
+
+Sometimes we can 
+
+```bash
+git push -f
+```
+
+## History & rewrite
+
+Squashing **multiple commits** manually into **one commit**. This is nice when you merge one branch into `main`. But when is commit smashing safe?
+
+```bash
+git rebase
+```
+
+## Commits
+
+## `git add <file/path>`
+- Stages changes to be committed.
+
+## `git commit -m "commit message"`
+- Commits changes with a message.
+
+## `git push <remote> <branch>`
+- Pushes local branch commits to a remote repository.
+
+## `git pull <remote> <branch>`
+- Fetches and merges changes from a remote repository.
+
+## `git fetch <remote>`
+- Downloads objects and refs from another repository.
+
+
+
+## `git branch <branch-name>`
+- Creates a new branch.
+
+## `git checkout <branch-name>`
+- Switches to a different branch.
+
+## `git merge <branch-name>`
+- Merges a branch into the current branch.
+
+
+## `git reset <commit>`
+- Resets current HEAD to the specified state.
+  - Options: `--soft`, `--mixed`, `--hard`.
+
+## `git revert <commit>`
+- Creates a new commit that undoes changes from a previous commit.
+
+## `git stash`
+- Stashes changes in a dirty working directory.
+
+## `git rebase <branch>`
+- Re-applies commits on top of another base tip.
+
+## `git remote -v`
+- Shows all remotes with URLs.
+
+## `git tag`
+- Lists, creates, or deletes tags.
+
+## open topics
+
+```bash
+git submodule
+git authentication (tokens)
+creating a pull request on github for a project
+git bisect
+```
+
+# github training
+
+* Create a github account at [https://github.com/signup](https://github.com/signup)
+* The login using your new account
+
+## Organizations
+
+* Create an organization: `training-org-2026-yourname` where yourname is something unique like "qknight"
+
+## We make a PR
+
+* fork <https://github.com/nixcloud/git-training> into your organization
+* clone git-training to your local computer
+* create a branch "new_chick" from branch "main"
+* Add a 🐔 to the README.md and commit your change
+* Then push the branch "new_chick" to your forked git-training repository
+* Visit https://github.com/training-org-2026-yourname/git-training and do a PR to https://github.com/nixcloud/git-training
+
+# We create an issue
+
+<https://github.com/nixcloud/git-training/issues> is currently empty but we need to create a "Cucco storm"! 
+
+* **Create an issue** with proper markdown and ask for some ultra-stupid request, feel free to use your 'AI slop' generator of choice.
+* Wait for upstream to react to your request
