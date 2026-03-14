@@ -7,21 +7,18 @@
 
 [[!img posts/cv/joachim.jpeg width="200px"  style="float: right"]]
 
-> joachim schiele, a software developer experienced in linux systems, programming, and software distribution.
-
-i am dedicated to acquiring new skills and embracing emerging trends to remain relevant and achieve high-quality outcomes. 
-
-location: EMEA, germany
+> joachim schiele, a software developer experienced in linux systems, programming and software distribution.
+>
+> location: EMEA, germany
 
 # activities
 
-* [lastlog.de/blog](https://lastlog.de/blog)
-* <https://github.com/qknight> and <https://github.com/nixcloud>
-* [stackoverflow](https://stackoverflow.com/users/1630083/qknight)
-* [x](https://x.com/joschelboschel)
 * [linkedin](https://de.linkedin.com/in/joachim-schiele-9626a6147)
-* [printables](https://www.printables.com/de/@joshel_170093/models)
+* [x](https://x.com/joschelboschel)
+* [lastlog.de/blog](https://lastlog.de/blog)
 * [email](mailto:js@lastlog.de)
+* [printables](https://www.printables.com/de/@joshel_170093/models)
+* <https://github.com/qknight> and <https://github.com/nixcloud>
 
 ## languages
 
@@ -86,9 +83,12 @@ th, td {
 
 ### freelancer `08/2023 - present`
 
+ * <https://azure.microsoft.com/en-us/products/devops> linux toolchain, migration strategy from Jenkins
+ * <https://planicus.eu/> teacher schedule planner prototype
  * <https://nlnet.nl/project/libnix/> nix (mingw/c++) and rust (cargo libnix extensions)
- * <https://codeberg.org/slowtec/ka4h2> rust/leptos webui, see [h2wasserwende](https://h2wasserwende.de)
- * <https://codeberg.org/slowtec/klick> rust/leptos, see [rust-leptos-webui](rust-leptos-webui.html)
+ * <https://codeberg.org/fairsync/fairsync> rust/leptos webi for [kartevonmorgen](https://www.kartevonmorgen.org/)
+ * <https://codeberg.org/slowtec/ka4h2> rust/leptos webui, see [h2wasserwende](https://www.h2-wasserwende-bw.de/)
+ * <https://codeberg.org/slowtec/klick> rust/leptos, see [DWA Tool](https://klimabilanz.dwa.de/tool) and [rust-leptos-webui](rust-leptos-webui.html)
  * <https://codeberg.org/fairsync/importer-prototype> rust/leptos map sync
 
 ### full stack developer - TeamSpeak Systems GmbH `04/2022 - 07/2023`
