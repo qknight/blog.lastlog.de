@@ -5,9 +5,24 @@
 
 ## about me
 
-[[!img posts/cv/joachim.jpeg width="200px"  style="float: right"]]
+<style>
+.responsive-img {
+  width: 100%;
+  max-width: 200px; /* Adjusts maximum size */
+  height: auto;
+  float: right;
+}
 
-> joachim schiele, a software developer experienced in linux systems, programming and software distribution.
+@media (max-width: 600px) {
+  .responsive-img {
+    max-width: 100px; /* Smaller size on mobile */
+  }
+}
+</style>
+
+[[!img posts/cv/joachim.jpeg width="200px" class="responsive-img" style="float: right"]]
+
+> joachim schiele, a software developer experienced in linux systems, programming and software distribution and not afraid of ai.
 >
 > location: EMEA, germany
 
@@ -20,65 +35,98 @@
 * [printables](https://www.printables.com/de/@joshel_170093/models)
 * <https://github.com/qknight> and <https://github.com/nixcloud>
 
+
 ## languages
 
-**languages of expertise**:
+
 <style>
-  .icon-cell {
-    width: 50px;
-    height: 50px;
+  table.flex-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  /* Make each table row a flex container */
+  .flex-table tr {
     display: flex;
-    justify-content: center;
+    align-items: center; /* vertically center cells */
+  }
+
+  .flex-table td {
+    padding: 2px 12px;
+  }
+
+  /* Fixed-size icon column */
+  .flex-table td.icon {
+    flex: 0 0 70px; /* do not grow/shrink; fixed 50px x 50px */
+    width: 70px;
+    display: flex;
     align-items: center;
+    justify-content: center;
   }
 
-  .icon-img {
-    padding: 0;
-    margin: 0;
-    width: 40px;
+  /* Ensure any icon content fits exactly 50x50 */
+  .flex-table td.icon > img,
+  .flex-table td.icon > .icon-box {
+    width: 70px;
   }
 
-  .smaller-icon-img {
-    width: 32px;
+  /* Text column takes the remaining width */
+  .flex-table td.text {
+    flex: 1 1 auto;
+    min-width: 0; /* allows proper shrinking/truncation */
   }
 </style>
 
-<table style="width:100%; padding:0; margin:0;">
+**languages of expertise**:
+
+<table class="flex-table">
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/Rustacean-orig-noshadow.svg" class="icon-img noFancy" alt="" title="rust">
+    <td class="icon">
+      <img src="posts/cv/Rustacean-orig-noshadow.svg" class="noFancy" alt="" title="rust">
     </td>
-    <td>[rust](https://www.rust-lang.org/) - replacing c++</td>
+    <td class="text">
+      [rust](https://www.rust-lang.org/) - replacing c++
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/leptos.svg" class="icon-img noFancy" alt="" title="elm">
+    <td class="icon">
+      <img src="posts/cv/leptos.svg" class="noFancy" alt="" title="elm">
     </td>
-    <td>[leptos](https://github.com/leptos-rs/leptos) - wasm web-ui programming</td>
+    <td class="text">
+      [leptos](https://github.com/leptos-rs/leptos) - wasm web-ui programming
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/nix-snowflake.svg" class="icon-img noFancy" alt="" title="nix">
+    <td class="icon">
+      <img src="posts/cv/nix-snowflake.svg" class="noFancy" alt="" title="nix">
     </td>
-    <td>[nix](https://nixos.org/manual/nix/stable/language/index.html) - nixcloud, need I say more?</td>
+    <td class="text">
+      [nix](https://nixos.org/manual/nix/stable/language/index.html) - nixcloud, need I say more?
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/1200px-Go_Logo_Blue.svg.png" class="icon-img noFancy" alt="" title="golang">
+    <td class="icon">
+      <img src="posts/cv/1200px-Go_Logo_Blue.svg.png" class="noFancy" alt="" title="golang">
     </td>
-    <td>[golang](https://go.dev/) - pankat, lots of REST/websocket backends</td>
+    <td class="text">
+      [golang](https://go.dev/) - pankat, lots of REST/websocket backends
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/Emscripten_logo.svg" class="icon-img noFancy" alt="" title="emscripten">
+    <td class="icon">
+      <img src="posts/cv/Emscripten_logo.svg" class="noFancy" alt="" title="emscripten">
     </td>
-    <td>[emscripten](https://emscripten.org/) - porting c/cpp for the web browser</td>
+    <td class="text">
+      [emscripten](https://emscripten.org/) - porting c/cpp for the web browser
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/ISO_C++_Logo.svg.png" class="icon-img noFancy" alt="" title="isocpp">
+    <td class="icon">
+      <img src="posts/cv/ISO_C++_Logo.svg.png" class="noFancy" alt="" title="isocpp">
     </td>
-    <td>[c++](https://en.wikipedia.org/wiki/C%2B%2B) - legacy projects, I love cmake</td>
+    <td class="text">
+      [c++](https://en.wikipedia.org/wiki/C%2B%2B) - legacy projects, I love cmake
+    </td>
   </tr>
 </table>
 
@@ -86,36 +134,46 @@
 
 **areas of expertise:**
 
-<table style="width:100%; padding:0; margin:0;">
+<table class="flex-table">
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/nix-snowflake.svg" class="icon-img noFancy" alt="" title="nix">
+    <td class="icon">
+      <img src="posts/cv/nix-snowflake.svg" class="noFancy" alt="" title="nix">
     </td>
-    <td>[nixos](https://nixos.org/) - nixcloud.containers, systemd.nspawn @ nixcloud</td>
+    <td class="text">
+      [nixos](https://nixos.org/) - nixcloud.containers, systemd.nspawn @ nixcloud
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/hetzner-favicon-32x32.png" class="icon-img smaller-icon-img noFancy" alt="" title="hetzner">
+    <td class="icon">
+      <img src="posts/cv/hetzner-favicon-32x32.png" class="noFancy" alt="" title="hetzner" style="width:50px; height:50px;">
     </td>
-    <td>[hetzner](https://hetzner.de/)</td>
+    <td class="text">
+      [hetzner](https://hetzner.de/) - dedicated and virtual hosting
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/Docker_(container_engine)_logo.svg" class="icon-img noFancy" alt="" title="docker">
+    <td class="icon">
+      <img src="posts/cv/Docker_(container_engine)_logo.svg" class="noFancy" alt="" title="docker">
     </td>
-    <td>[docker](https://www.docker.com/) - development and deployment</td>
+    <td class="text">
+      [docker](https://www.docker.com/) - development and deployment
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/Amazon_Web_Services_Logo.svg" class="icon-img noFancy" alt="" title="aws">
+    <td class="icon">
+      <img src="posts/cv/Amazon_Web_Services_Logo.svg" class="noFancy" alt="" title="aws">
     </td>
-    <td>[aws](https://aws.amazon.com/) - nixops for cloud deployment</td>
+    <td class="text">
+      [aws](https://aws.amazon.com/) - nixops for cloud deployment
+    </td>
   </tr>
   <tr>
-    <td class="icon-cell">
-      <img src="posts/cv/Azure-Devops.svg" class="icon-img noFancy" alt="" title="azure">
+    <td class="icon">
+      <img src="posts/cv/Azure-Devops.svg" class="noFancy" alt="" title="azure">
     </td>
-    <td>[azure devops](https://azure.microsoft.com/en-us/products/devops)</td>
+    <td class="text">
+      [azure devops](https://azure.microsoft.com/en-us/products/devops)
+    </td>
   </tr>
 </table>
 
