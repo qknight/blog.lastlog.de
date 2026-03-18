@@ -1,9 +1,9 @@
 
-[[!meta date="2025-04-24 20:53"]]
+[[!meta date="2027-04-24 20:53"]]
 [[!tag nix nixos libnix]]
-[[!draft]]
 [[!series libnix]]
 [[!summary libnix integration into cargo and a discussion of crates wrapping legacy]]
+[[!SpecialPage]]
 
 [[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
 [[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
@@ -12,32 +12,34 @@ https://embassy.dev/
 
 # nixcloud umzug
 
+
+```bash
 - upload to github: /var/lib/gitolite
     
-    drwxr-x---  7 127 127 4096 Feb 13  2020 check_hydra.git
-    
-    drwxr-x---  7 127 127 4096 Feb 13  2020 go-mollie.git
-    drwxr-x---  7 127 127 4096 Sep 26  2017 hydra.nixcloud.io.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 mkEmail.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 check_hydra.git
 
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-backend.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-backup.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-container.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-deployment.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 go-mollie.git
+drwxr-x---  7 127 127 4096 Sep 26  2017 hydra.nixcloud.io.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 mkEmail.git
 
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-editor.git
-    drwxr-x---  7 127 127 4096 Mar 27  2017 nixcloud-ember.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-frontend.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-backend.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-backup.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-container.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-deployment.git
 
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-rehash.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-relais.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.space.webservice.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.stalker-backend.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.stalker-frontend.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.stalker.git
-    drwxr-x---  7 127 127 4096 May  7  2017 nixcloud-webservices-abstraction.git
-    drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-webservices.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-editor.git
+drwxr-x---  7 127 127 4096 Mar 27  2017 nixcloud-ember.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-frontend.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.git
+
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-rehash.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-relais.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.space.webservice.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.stalker-backend.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.stalker-frontend.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.stalker.git
+drwxr-x---  7 127 127 4096 May  7  2017 nixcloud-webservices-abstraction.git
+drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud-webservices.git
 
 drwxr-x---  7 127 127 4096 Feb 13  2020 auth.nixcloud.io.webservice.git
 drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.auth-lib.git
@@ -53,17 +55,17 @@ drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.monitoring-frontend.git
 drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.monitoring.git
 drwxr-x---  7 127 127 4096 Feb 13  2020 nixcloud.monitoring-server.git
 drwxr-x---  7 127 127 4096 Feb 13  2020 nixos-monitoring.git
-
+```
   
 # motivation
 
 * Arduino Opta RS485
   * EUR 166
-  * https://docs.arduino.cc/resources/datasheets/AFX00001-AFX00002-AFX00003-datasheet.pdf
-  * https://docs.arduino.cc/tutorials/opta/getting-started-with-modbus-rtu/
-  * https://docs.arduino.cc/tutorials/opta/getting-started-with-interrupts/
-  * https://docs.arduino.cc/tutorials/opta/getting-started-with-rs485/
-  * https://rehfuss.com/wp-content/uploads/2021/05/Operating_instructions_Optidrive_E3-IP66_en.pdf#45
+  * <https://docs.arduino.cc/resources/datasheets/AFX00001-AFX00002-AFX00003-datasheet.pdf>
+  * <https://docs.arduino.cc/tutorials/opta/getting-started-with-modbus-rtu/>
+  * <https://docs.arduino.cc/tutorials/opta/getting-started-with-interrupts/>
+  * <https://docs.arduino.cc/tutorials/opta/getting-started-with-rs485/>
+  * <https://rehfuss.com/wp-content/uploads/2021/05/Operating_instructions_Optidrive_E3-IP66_en.pdf#45>
 
 * inverter: ODE-3-120023-1f12 INVERTEK DRIVES-Vektor-Umrichter
   * EUR 188
