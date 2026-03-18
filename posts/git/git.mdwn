@@ -4,41 +4,139 @@
 
 [[!img posts/git/git.png class="noFancy" style="float: right" width="200px"]]
 
+# new ideas
+
+* rename of git repo (implications)
+* git bisect
+
 # Introduction
 
-This is a brief introduction into `git` and how to use it for daily work.
+Todays introduction into `git` features all you need for daily work.
 
-A nice online resource: <https://git-scm.com/learn>.
+This lecture covers the most basic `git` usages like:
 
-In this lecture I want to cover the most basic `git` usages like:
+* `clone` - copy a repository
+* `commit` - save changes
+* `push` - upload changes
+* `rebase` - integrate changes linearly
+* `reset` - undo changes
+* `pull` - fetch and merge
+* `stash` - save changes temporarily
+* `tag` - mark specific points
+* `worktree` - multiple working directories
+* `bisect` - find bugs via binary search
+* `branch` - create/manage branches
+* `rm` - remove files
+* `mv` - move/rename files
+* `svn` - interact with Subversion
+* `submodule` - use nested repositories
+* `revert` - undo commits
+* `blame` - show last change info
+* `diff` - show differences
 
-* `git commit|pull|push|tag|log|rebase|stash|worktree`
+See <https://git-scm.com/docs>
+
+Online resources: 
+
+* <https://git-scm.com/learn>
+* <>
 
 Workflows:
 
-* **fork** & **PRs** (Pull Requests), **issues** (markdown) and **documentation** (README.md)
+* **fork** & **PRs** (Pull Requests), 
+* **issues** (markdown) and 
+* **documentation** (README.md)
+
+* Gitflow|GitHub|GitLab Flow <https://nvie.com/posts/a-successful-git-branching-model/>
 
 Tools:
 
 * `git`/`tig` and web tools
 
-## Initializes a new Git repository
-
-* `git init` - Initializes a new Git repository.
-* `git clone <repository-url>` - Clones a repository into a new directory.
-* `git svn clone <repository-url>` - Imports an SVN repository into a new directory.
-
 ## Looking into existing git repositorries
 
-* `git status` - Displays the state of the working directory and staging area.
-* `git branch` - Lists all local branches.
+Call this command:
 
-* `git log` - Shows the commit history. Options: `--oneline`, `--graph`, `--decorate`.
+```sh
+git clone https://github.com/nixcloud/git-training
+```
+
+* `git status` - Displays the state of the working directory and staging area.
+
+  * What branch are you in? 
+    
+    [[!hiddentext You are in 'main', this is the default branch set in this repo. It could also be any other branch name... ]]
+
+* `git branch` 
+
+  * How to list remote branches?
+
+    [[!hiddentext `git branch -r` will show remote branches, sometimes it requires a `git fetch --all` to update the local knowledge about the remotes. ]]
+
+  * Change into branch **1_branch_with_many_commits**, what is the command to do so?
+
+    [[!hiddentext `git checkout 1_branch_with_many_commits`]]
+
+* `git log` - Shows the commit history. Options: `--oneline`!
+
+  * What is the commit hash of the commit with the message: **adding new_file**?
+
+    [[!hiddentext d22e0c8 adding new_file ]]
+
+* `git blame README.md`
+
+  * The README.md had many changes, identify the user who added the top most fox!
+
+    [[!hiddentext a1389ad9 (Foxhunt         2026-03-18 14:27:44 +0000  8) 🦊 U+1F98A Fox Face Unicode Character ]]
+
+* `git diff` - Shows changes between commits. 
+
+   * Figure out what happened between commit **1397c7** and **5c33c4**
+   
+     [[!hiddentext The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened! ]]
+
+## The `git bisect` command
+
+We have a branch with many commits but weeks later a fault was detected running `python main.py`. For some reason it stopped working but we don't know when nor why. **We need to find the commit which caused the issue!**
+
+1. checkout the branch: `git checkout 2_bisect`
+2. run the command: `python main.py` and see if it is working
+
+We use `git bisect` for this. It is controlled with a few helper commands `start`, `good`, `bad` and `reset`.
+
+Which commit introduced the issue? Verify the source code with `python main.py`, it must always show **Success**, then it is good. Otherwise it is bad!
+
+ [[!hiddentext The issue started with commit 49f23ea3df2bd04a4ff323c63a2849907c0a30bb ]]
+
+## todo
 * `tig` / `gitui` - command line tool, very handy
 
 * `cat .git/config`
 
-* `git diff` - Shows changes between commits, commit and working directory, etc.
+
+
+## Initializes a new Git repository
+
+There are a few ways to do this:
+
+1. You create a repository with a README.md on the server
+
+    ```bash
+    git clone https://...
+    ```
+
+2. when you already have a repo:
+
+    * `git init` - Initializes a new Git repository.
+    * `git clone <repository-url>` - Clones a repository into a new directory.
+    * `git svn clone <repository-url>` - Imports an SVN repository into a new directory.
+
+    Then create an 'empty' git repo on the server and:
+
+    ```bash
+    git remote add origin https://...
+    git push -u origin --all
+    ```
 
 ## hidden text example
 
@@ -70,6 +168,27 @@ In this example we want to undo the myfile2 commit and change it a little, we ha
 a) we simply do change myfile2 and do the `git add myfile2` again, then use `git commit --amend`
 b) we add another commit and do a `git rebase -i 02303-hash-revision`
 
+
+
+### git pull
+
+A traditional 'git pull' uses the merge strategy which works really well but makes the commit history hard to work with for reading and bisecting.
+
+No matter what branch you are in, you can issue these commands:
+
+```bash
+git fetch --all
+
+# then inside your branch
+git rebase origin/main
+```
+
+
+
+```bash
+git config --global pull.rebase true
+```
+
 ## Restarting
 
 ```bash
@@ -86,11 +205,33 @@ git push -f
 
 ## History & rewrite
 
+History in git can be rewritten for parts which have not been shared with others. That is: 
+
+* You work on your branch 'branchiii' which is on top of 'main'
+* You work on 'main' but everyone is on holidays or it is early in the morning
+* You are forced to do the change (legal) and the others have to adapt....
+
+### Changing a commit
+
+Challenge: We have a branch with 5 commits on top of 'main'. We need to modify commit 3 which has a file added we don't want and the commit messsage needs to be changed as well. Afterwards we force push the commit
+
+
+### Squashing commits
+
 Squashing **multiple commits** manually into **one commit**. This is nice when you merge one branch into `main`. But when is commit smashing safe?
 
 ```bash
-git rebase
+git rebase -i ...some-hash...
 ```
+
+Then use:
+
+```bash
+# s, squash <commit> = use commit, but meld into previous commit
+# f, fixup [-C | -c] 
+```
+
+Then select the commits
 
 ## Commits
 
@@ -143,7 +284,7 @@ git rebase
 ## open topics
 
 ```bash
-git submodule
+git submodule 
 git authentication (tokens)
 creating a pull request on github for a project
 git bisect
