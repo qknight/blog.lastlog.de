@@ -9,9 +9,9 @@
 * rename of git repo (implications)
 * worktree
 * revert
-* stash
 * tag
 * `git`/`tig` and web tools
+* git cherry-pick
 
 # What is this about?
 
@@ -37,6 +37,7 @@ This lecture covers the most basic `git` usages like:
 * `revert` - undo commits
 * `diff` - show differences
 * `submodule` - use nested repositories
+* `cherry-pick` - integrate a commit by commit hash
 
 See <https://git-scm.com/docs> for detailed description.
 
@@ -94,8 +95,6 @@ git clone https://github.com/nixcloud/git-training
    * Figure out what happened between commit **1397c7** and **5c33c4**
    
      [[!hiddentext The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened! ]]
-
-
 
 ## Lecture 2: Initializes a new Git repository
 
@@ -165,9 +164,13 @@ There are two options now:
 
   Find out how to do this, assume you made just one commit.
 
-  [[!hiddentext `git reset --hard HEAD^` and then `git log` and if happy `git push -f` ]]
+  [[!hiddentext `git reset --hard HEAD^` and then `git log` and if happy `git push -f`. YOU USUALLY NEVER WANT TO DO THAT ]]
 
 Finally figure out what the difference between `git reset HEAD --hard` vs. `git reset HEAD --soft`.
+
+Note: If you are smart, a better command than `git push -f` is `git push --force-with-lease`. Why?
+
+[[!hiddentext It force-pushes only if the remote branch hasn’t changed since you last fetched it, preventing you from accidentally overwriting others' work. If the remote was updated independently, the push is rejected, prompting you to fetch and reconcile changes before pushing again. ]]
 
 ### Command `git pull`
 
@@ -220,11 +223,19 @@ How to get the files back?
 
 Finally we'll have a look what local branches have which remotes using:
 
-`git remote -v`
+### Command `git remote -v`
 
 Also have a look at `cat .git/config`, which is usually a good source for such things as well.
 
-### `git tag`
+A fairly common problem is this: You forked a git repository, someone else did this also and now you need his work.
+
+1. visit https://github.com/qknight/git-training
+2. see the branch **4_a_new_feature**
+3. add the **github.com/qknight/git-training** as a new remote, what is the command?
+    [[!hiddentext git remote add qknight https://github.com/qknight/git-training.git; git fetch qknight; git checkout -b flu qknight/4_a_new_feature ]]
+4. finally you want this change in your "main" branch, how to do that?    
+    [[!hiddentext  ]]
+### Command `git tag`
 
 A git tag is applied to a commit and not a branch, so do this:
 
@@ -252,33 +263,111 @@ Which commit introduced the issue? Verify the source code with `python main.py`,
 
 ## Lecture 6: git history & rewrite
 
-History in git can be rewritten for parts which have not been shared with others. That is: 
+History in git can be rewritten when:
 
-* You work on your branch 'branchiii' which is on top of 'main'
-* You work on 'main' but everyone is on holidays or it is early in the morning
-* You are forced to do the change (legal) and the others have to adapt....
+* **The branch you work on belongs to you and you are the only one working with it**.
+* **You are forced to do the braking change for legal reasons**, like removing a cusomer name or a password which git into the repo somehow.
 
-### Changing a commit
+A change like this means that everyone else who works on the same base will have huge trouble pushing his changes later one so use with care.
 
-Challenge: We have a branch with 5 commits on top of 'main'. We need to modify commit 3 which has a file added we don't want and the commit messsage needs to be changed as well. Afterwards we force push the commit
+### Changing the top most commit
+
+  ```bash
+  git add next.py
+  git commit --amend
+  ```
+
+### Rearranging commits
+
+We need to cleanup a few things in this branch:
+
+* The LICENSE file has two commits, this should be merged
+* We leaked a password, nobody noticed it yet so we have to act fast!
+
+1. checkout branch: **3_rebase_commits**
+2. see the logs with `tig`
+
+    ```bash
+    [nix-shell:~/git-training]$ git log --oneline
+    00d29f0 (HEAD -> 3_rebase_commits, origin/3_rebase_commits) Updated sensitive_script.py to use environment variables
+    3f569e0 Adding sensitive_script.py
+    5b57df2 Adding LICENSE file to repo since i forgot it
+    3b4586e Updated legal README.md notice
+    e731eea (origin/main, origin/HEAD, main) Update README.md
+    5c33c42 Initial commit
+    ```
+
+3. call `git rebase -i e731ee`
+
+    What is **e731ee** and why does it make sense to call this?
+
+    [[!hiddentext **e731ee** is the commit on the main branch which is the common base to this branch ]]
+
+    * merge 5b57df2 and 3b4586e
+    * merge 00d29f0 and 3f569e0 (this will kill the secret from the file)
+
+4. final push
+
+    normally you would do a `git push -f` and be done with it
+
+    we just store the result like this:
+
+    ```
+    git checkout -b 3_rebase_commits_yourname
+    git push
+    ```
 
 ### Squashing commits
 
-Squashing **multiple commits** manually into **one commit**. This is nice when you merge one branch into `main`. But when is commit smashing safe?
+Squashing **multiple commits** into **one commit** can be very helpful. But when is commit smashing safe?
+
+**Yes, using `git rebase` we loose history but gain clearity!** 
 
 ```bash
 git rebase -i ...some-hash...
 ```
+So do this:
 
-Then use:
+1. checkout branch **3_wild_merges**
+2. check the content of the new branch!
 
-```bash
-# s, squash <commit> = use commit, but meld into previous commit
-# f, fixup [-C | -c] 
-```
+  * What do you see?
 
-Then select the commits
+    [[!hiddentext There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good! ]]
 
+3. First, we'll work on a copy on top of that branch so we can always go back easily, how to do this?
+
+    [[!hiddentext `git checkout 3_wild_merges; git checkout -b 3_wild_merges_rebase` ]]
+
+4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
+  
+    ```bash
+    # s, squash <commit> = use commit, but meld into previous commit
+    # f, fixup [-C | -c] 
+    ```
+
+    But you get an error, what is this error about?
+
+    [[!hiddentext `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8` returns a error. You can now do all these conflict resolution manually or use a different strategy. ]]
+
+5. This failed! But why?
+
+    See <https://www.reddit.com/r/git/comments/p9x33m/linearize_a_git_history_wo_merge_conflicts_to/>!
+
+    > GPT5: Short answer: rebase replays every commit one-by-one on a new base (and drops/linearizes merges), so conflicts that were previously resolved inside old merge commits reappear during the replay. merge --squash computes one combined tree diff from the branch tip (vs merge-base) and applies it once, so it often avoids those per-commit conflicts.
+    > 
+    > Ways to achieve your goal and avoid the pain:
+    > 
+    > If you just want “one commit that equals the branch’s final state on top of main”: git checkout main git merge --squash your-branch git commit -m "squash: your-branch"
+    > If you must rebase but want to auto-resolve conflicts by preferring the branch’s changes: git checkout your-branch git rebase -X theirs main
+    then merge or push as needed
+    > If merges matter and you want to preserve them during rebase: git rebase --rebase-merges -X theirs main
+    Enable rerere to auto-reuse recorded conflict resolutions across attempts: git config --global rerere.enabled true git config --global rerere.autoupdate true
+    Rule of thumb: for “final tree = tip-of-branch, single commit,” prefer merge --squash (or a soft-reset-based squash). Use rebase only if you need a linearized history of individual commits.
+
+6. So sometimes a simple `git checkout main; git checkout -b 3_wild_merges_rebase_squashed; git merge --squash 3_wild_merges_rebase` is the better option.
+
+**Main lecture: Don't use traditional merges, use rebases on pull.** It makes history reading easier, it makes git bisect easier. It sometimes makes merges harder though...
 
 ## Lecture 7: git submodule
 
@@ -322,12 +411,10 @@ So do this:
 * push the git-trainig repository there
 * create a branch `branchibranch` and do a PR, as a reviewer set someone from your team
 
-
 ## Lecture 10: git editors
 
 * `tig` / `gitui` - command line tool, very handy
 git authentication (tokens)
-
 
 ## Summary
 
