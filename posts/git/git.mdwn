@@ -140,8 +140,7 @@ Now do this:
 1. modify the README.md, add some section
 2. call `git add README.md`
 3. finally figure out how to undo this `git add` (sadly not `git unadd`)
-
-[[!hiddentext `git reset README.md`, afterwards check that `git status` still shows changes and that your lines edited are still there ]]
+    [[!hiddentext `git reset README.md`, afterwards check that `git status` still shows changes and that your lines edited are still there ]]
 
 ### Command `git push -f`
 
@@ -157,8 +156,7 @@ There are two options now:
 * you can make the change and use `git commit --amend` and `git push -f` afterwards
 
   When is this a good idea and when to not do it? Research using google or AI!
-
-  [[!hiddentext `git push -f` breaks history, if someone else already checked this out and work on top of it, his later push will fail - repaiable but bad. ]]
+    [[!hiddentext `git push -f` breaks history, if someone else already checked this out and work on top of it, his later push will fail - repaiable but bad. ]]
 
 * you can undo your commit and return to the previous commit
 
