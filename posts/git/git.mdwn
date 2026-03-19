@@ -131,7 +131,7 @@ There are a few ways to do this:
 
     [[!hiddentext the answer is: <pre>16</pre> ]]
 
-## Lecture 3: `git commit`, `git uncommit`, `push`, `push -f` and `git reset`
+## Lecture 3: `git commit`, `add`, `unadd`, `push`, `push -f` and `reset`
 
 `git add a_file` adds a file into the staging area. A following `git commit` converts it into **git object**, see [Git-Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects).
 
@@ -368,6 +368,31 @@ So do this:
 6. So sometimes a simple `git checkout main; git checkout -b 3_wild_merges_rebase_squashed; git merge --squash 3_wild_merges_rebase` is the better option.
 
 **Main lecture: Don't use traditional merges, use rebases on pull.** It makes history reading easier, it makes git bisect easier. It sometimes makes merges harder though...
+
+
+### Command `git cherry-pick`
+
+1. find out what commit **fb8cb9** is all about
+2. checkout the branch: **3_revert_cherry_pick**
+3. `git cherry-pick fb8cb9`
+
+    this resulted in an error. what is this error and how to resolve it?
+
+    [[!hiddentext we don't have a LICENSE file and the commit changes one so instead of a modificaton we have to add it. ]]
+  
+4. how to add it? `git status` shows we are still in a cherry-pick state, we could exit using `git cherry-pick --abort` but we don't want to! fix the cherry pick. what are the commands?
+
+    [[!hiddentext one has to do a `git add LICENSE` and `git cherry-pick --continue` ]]
+
+### Command `git revert` 
+
+ 1. git revert this commit 5c33c42438aca368464f9ebc47d607641d7cd19a   
+
+     [[!hiddentext The initial commit 5c33c4 added the README.md and running this command ends up in a problem where it gets modified later. So you have to decide what should happen. We just remove the REAME.md and `git rm README.md` and `git revert ...?` what? ]]
+
+ 2. Now that you have finished he revert, see the top most commit again. How to do that?
+
+     [[!hiddentext `git show HEAD` or `git show`. Are you happy now? ]]
 
 ## Lecture 7: git submodule
 
