@@ -372,24 +372,36 @@ Compare `git remote -v` with the content of `cat .git/config`. What do you see?
 `git remote -v` only lists remote branches while `.git/config` lists all branches and the repo configuration.  
 </details>
 
-A fairly common problem is this: You **forked a git repository**, someone else did the same and now you need his commits locally:
+A fairly common problem is this: 
 
-1. visit https://github.com/qknight/git-training
+You **forked a git repository**, someone else did the same and now you need his commits locally.
+
+1. visit <https://github.com/qknight/git-training> (note: this is a different url as before!)
 2. see the branch **4_a_new_feature**
 3. add the **github.com/qknight/git-training** as a new remote, what is the command?
     <details>
     <summary>Show solution</summary>
+
     ```
-     git remote add qknight https://github.com/qknight/git-training.git
-     git fetch qknight
-     git checkout -b flu qknight/4_a_new_feature
-     ```
+    git remote add qknight https://github.com/qknight/git-training.git
+    git fetch qknight
+    git checkout -b 4_a_new_feature_qknight qknight/4_a_new_feature
+    ```
     </details>
 4. finally you want this change in your "main" branch, how to do that?    
     <details>
     <summary>Show solution</summary>
-    to be done
+
+    ```
+    git rebase main
+    git checkout main
+    git merge --ff-only 4_a_new_feature_qknight
+    ```
+
+    The important bit is the `--ff-only` to prevent a merge commit. We hate merge commits, they are to be avoide like KFC 🐔! 
     </details>
+
+    There are many variants to get the same result. 
 
 ### Command `git tag`
 
@@ -527,7 +539,10 @@ So do this:
 
     <details>
     <summary>Show solution</summary>
-     `git checkout 3_wild_merges; git checkout -b 3_wild_merges_rebase`
+    ```
+    git checkout 3_wild_merges
+    git checkout -b 3_wild_merges_rebase
+    ```
 </details>
 
 4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
