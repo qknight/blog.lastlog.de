@@ -6,6 +6,7 @@
 
 # new ideas
 
+* README.md importance
 * rename of git repo (implications)
 * worktree
 * revert
@@ -44,6 +45,7 @@ See <https://git-scm.com/docs> for detailed description.
 Online resources: 
 
 * <https://git-scm.com/learn>
+* <gitimmersion.com/lab_12.html>
 * <https://learngitbranching.js.org/>
 
 ## Workflows
@@ -259,6 +261,10 @@ Which commit introduced the issue? Verify the source code with `python main.py`,
 
  [[!hiddentext The issue started with commit 49f23ea3df2bd04a4ff323c63a2849907c0a30bb ]]
 
+What happens if one of the commits does not compile and we can't decided if it is `good` or `bad`?
+
+[[!hiddentext We can use `git bisect skip` and this will select a commit next to the one we skipped so we can continue. ]]
+
 ## Lecture 6: git history & rewrite
 
 History in git can be rewritten when:
@@ -394,8 +400,68 @@ So do this:
 
 ## Lecture 7: git submodule
 
+The command "git submodule" is used for languages which don't have a package manager like c / c++ / qt. In modern languages like rust (cargo) this is not used anymore and modified dependencies are integrated using Cargo.toml instead on the source code level with 'git submodule'.
 
-git submodule 
+1. checkout branch **7_submodule**, type `git branch`, what does it show?
+
+    [[!hiddentext 7_submodule is green as you are in that branch ]]
+
+2. run the program: `python main.py`, what do you see?
+
+    [[!hiddentext Error: submodule/README.md does not exist ]]
+
+3. next we need to add the required submodule, please add [git-training](https://github.com/nixcloud/git-training) main branch into ./submodule! what is the command?
+
+    [[!hiddentext `git submodule add https://github.com/nixcloud/git-training submodule`]]
+
+4. after adding the submodule, run it again, what does it say now?    
+
+    [[!hiddentext Number of chickens: 1 ]]
+
+5. it added the branch **main** but we should have used **1_branch_with_many_commits**,
+
+    <details>
+    <summary style="color: blue; text-decoration: underline; cursor: pointer;">Show solution</summary>
+    ```bash
+    pushd submodule
+    git branch -r
+    git fetch --all
+    git checkout origin/1_branch_with_many_commits
+    popd
+    git add submodule
+
+    git status
+    [nix-shell:~/git-training]$ git status
+    On branch 7_submodule
+    Your branch is up to date with 'origin/7_submodule'.
+
+    Changes to be committed:
+    (use "git restore --staged <file>..." to unstage)
+            new file:   .gitmodules
+            new file:   submodule
+    ```
+    In essence we have a git repository inside a git repository where the outer manages the inner.
+    </details>
+
+6. observe the difference between `git status` in directory **git-training/** and **git-training/submodule**
+
+    <details style="background: #dfffdf;">
+    <summary style="color: blue; text-decoration: underline; cursor: pointer; ">Show solution</summary>
+    ```bash
+    [nix-shell:~/git-training]$ git status
+    On branch 7_submodule
+    Your branch is up to date with 'origin/7_submodule'.
+
+    Changes to be committed:
+    (use "git restore --staged <file>..." to unstage)
+            new file:   .gitmodules
+            new file:   submodule
+
+    [nix-shell:~/git-training/submodule]$ git status
+    HEAD detached at origin/1_branch_with_many_commits
+    nothing to commit, working tree clean
+    ```
+    </details>
 
 ## Lecture 8: github.com training
 
