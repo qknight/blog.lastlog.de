@@ -4,8 +4,77 @@
 
 [[!img posts/git/git.png class="noFancy" style="float: right" width="200px"]]
 
+<style>
+  details {
+    background: #f3f5f3; /* Background color when collapsed */
+    border: 1px solid #ccc; /* Add a border */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Add a soft shadow */
+    padding: 10px;
+  }
+  
+  details[open] {
+    background: #dfffdf; /* Background color when expanded */
+    padding: 10px;
+    border: 1px solid #ccc; /* Ensure border stays visible when expanded */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Ensure shadow stays visible */
+  }
+
+  summary {
+    color: blue; 
+    text-decoration: underline; 
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const simpleHash = (str) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0; // Convert to 32bit integer
+      }
+      return hash.toString();
+    }
+
+    const updateDetailsState = () => {
+      const detailsElements = document.querySelectorAll('details');
+
+      detailsElements.forEach((details) => {
+        let id = details.getAttribute('data-id');
+
+        // Avoid recomputing ID if it's already set
+        if (!id) {
+          const contentHash = simpleHash(details.innerHTML);
+          id = `details-${contentHash}`;
+          details.setAttribute('data-id', id);
+        }
+
+        // Retrieve and apply the stored state using the unique ID
+        const isOpen = localStorage.getItem(`details-open-${id}`) === 'true';
+        details.open = isOpen;
+
+        // Attach the event listener for state saving
+        details.addEventListener('toggle', () => {
+          localStorage.setItem(`details-open-${id}`, details.open);
+        });
+      });
+    };
+
+    // Initial state update
+    updateDetailsState();
+
+    // You might use MutationObserver if DOM updates do not trigger script execution, e.g., via JS:
+    const observer = new MutationObserver(updateDetailsState);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+  });
+</script>
+
 # new ideas
 
+* git authentication (tokens)
 * README.md importance
 * rename of git repo (implications)
 * worktree
@@ -45,7 +114,7 @@ See <https://git-scm.com/docs> for detailed description.
 Online resources: 
 
 * <https://git-scm.com/learn>
-* <gitimmersion.com/lab_12.html>
+* <https://gitimmersion.com/lab_12.html>
 * <https://learngitbranching.js.org/>
 
 ## Workflows
@@ -68,35 +137,53 @@ git clone https://github.com/nixcloud/git-training
 
   * What branch are you in? 
     
-    [[!hiddentext You are in 'main', this is the default branch set in this repo. It could also be any other branch name... ]]
+    <details>
+    <summary>Show solution</summary>
+     You are in 'main', this is the default branch set in this repo. It could also be any other branch name...
+    </details>
 
 * `git branch` 
 
   * How to list remote branches?
 
-    [[!hiddentext `git branch -r` will show remote branches, sometimes it requires a `git fetch --all` to update the local knowledge about the remotes. ]]
+    <details>
+    <summary>Show solution</summary>
+     `git branch -r` will show remote branches, sometimes it requires a `git fetch --all` to update the local knowledge about the remotes.
+    </details>
 
   * Change into branch **1_branch_with_many_commits**, what is the command to do so?
 
-    [[!hiddentext `git checkout 1_branch_with_many_commits`]]
+    <details>
+    <summary>Show solution</summary>
+    git checkout 1_branch_with_many_commits
+    </details>
 
 * `git log` - Shows the commit history. Options: `--oneline`!
 
   * What is the commit hash of the commit with the message: **adding new_file**?
 
-    [[!hiddentext d22e0c8 adding new_file ]]
+    <details>
+    <summary>Show solution</summary>
+     d22e0c8 adding new_file
+    </details>
 
 * `git blame README.md`
 
   * The README.md had many changes, identify the user who added the top most fox!
 
-    [[!hiddentext a1389ad9 (Foxhunt         2026-03-18 14:27:44 +0000  8) 🦊 U+1F98A Fox Face Unicode Character ]]
+    <details>
+    <summary>Show solution</summary>
+     a1389ad9 (Foxhunt         2026-03-18 14:27:44 +0000  8) 🦊 U+1F98A Fox Face Unicode Character
+    </details>
 
 * `git diff` - Shows changes between commits. 
 
    * Figure out what happened between commit **1397c7** and **5c33c4**
    
-     [[!hiddentext The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened! ]]
+    <details>
+    <summary>Show solution</summary>
+    The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened!
+    </details>
 
 ## Lecture 2: Initializes a new Git repository
 
@@ -131,7 +218,10 @@ There are a few ways to do this:
 
     Do this checkout now! How many commits does it have in git?
 
-    [[!hiddentext the answer is: <pre>16</pre> ]]
+    <details>
+    <summary>Show solution</summary>
+    the answer is: <pre>16</pre>
+    </details>
 
 ## Lecture 3: `git commit`, `add`, `unadd`, `push`, `push -f` and `reset`
 
@@ -142,7 +232,10 @@ Now do this:
 1. modify the README.md, add some section
 2. call `git add README.md`
 3. finally figure out how to undo this `git add` (sadly not `git unadd`)
-    [[!hiddentext `git reset README.md`, afterwards check that `git status` still shows changes and that your lines edited are still there ]]
+    <details>
+    <summary>Show solution</summary>
+     `git reset README.md`, afterwards check that `git status` still shows changes and that your lines edited are still there
+    </details>
 
 ### Command `git push -f`
 
@@ -158,19 +251,28 @@ There are two options now:
 * you can make the change and use `git commit --amend` and `git push -f` afterwards
 
   When is this a good idea and when to not do it? Research using google or AI!
-    [[!hiddentext `git push -f` breaks history, if someone else already checked this out and work on top of it, his later push will fail - repaiable but bad. ]]
+    <details>
+    <summary>Show solution</summary>
+     `git push -f` breaks history, if someone else already checked this out and work on top of it, his later push will fail - repaiable but bad.
+    </details>
 
 * you can undo your commit and return to the previous commit
 
   Find out how to do this, assume you made just one commit.
 
-  [[!hiddentext `git reset --hard HEAD^` and then `git log` and if happy `git push -f`. YOU USUALLY NEVER WANT TO DO THAT ]]
+  <details>
+    <summary>Show solution</summary>
+    `git reset --hard HEAD^` and then `git log` and if happy `git push -f`. YOU USUALLY NEVER WANT TO DO THAT
+    </details>
 
 Finally figure out what the difference between `git reset HEAD --hard` vs. `git reset HEAD --soft`.
 
 Note: If you are smart, a better command than `git push -f` is `git push --force-with-lease`. Why?
 
-[[!hiddentext It force-pushes only if the remote branch hasn’t changed since you last fetched it, preventing you from accidentally overwriting others' work. If the remote was updated independently, the push is rejected, prompting you to fetch and reconcile changes before pushing again. ]]
+<details>
+<summary>Show solution</summary>
+It force-pushes only if the remote branch hasn’t changed since you last fetched it, preventing you from accidentally overwriting others' work. If the remote was updated independently, the push is rejected, prompting you to fetch and reconcile changes before pushing again.
+</details>
 
 ### Command `git pull`
 
@@ -182,7 +284,10 @@ A traditional 'git pull' uses the merge strategy, which works remarkably well bu
 
   How many merge(s) do you see?
 
-  [[!hiddentext With top commit 38922f it should be 6 M merge commits ]]
+  <details>
+    <summary>Show solution</summary>
+     With top commit 38922f it should be 6 M merge commits
+</details>
 
 So a typical scenario: Two devs clone the same commit in `main` and start working. Dev A commits first with `git add files` and `git commit -m 'change'` and `git push`.
 
@@ -219,7 +324,10 @@ Sometimes we need to test something else but don't want to commit so:
 
 How to get the files back?
 
-[[!hiddentext `git stash apply` on a clean git repo will reapply the changes. ]]
+<details>
+    <summary>Show solution</summary>
+     `git stash apply` on a clean git repo will reapply the changes.
+</details>
 
 Finally we'll have a look what local branches have which remotes using:
 
@@ -232,9 +340,16 @@ A fairly common problem is this: You forked a git repository, someone else did t
 1. visit https://github.com/qknight/git-training
 2. see the branch **4_a_new_feature**
 3. add the **github.com/qknight/git-training** as a new remote, what is the command?
-    [[!hiddentext git remote add qknight https://github.com/qknight/git-training.git; git fetch qknight; git checkout -b flu qknight/4_a_new_feature ]]
+    <details>
+    <summary>Show solution</summary>
+     git remote add qknight https://github.com/qknight/git-training.git; git fetch qknight; git checkout -b flu qknight/4_a_new_feature
+    </details>
 4. finally you want this change in your "main" branch, how to do that?    
-    [[!hiddentext  ]]
+    <details>
+    <summary>Show solution</summary>
+    to be done
+    </details>
+
 ### Command `git tag`
 
 A git tag is applied to a commit and not a branch, so do this:
@@ -244,7 +359,10 @@ A git tag is applied to a commit and not a branch, so do this:
 
 How to upload the tags?
 
-[[!hiddentext `git push --tags`. ]]
+<details>
+    <summary>Show solution</summary>
+     `git push --tags`.
+</details>
 
 Note: If you ever set a tag, never, _NEVER_ change it, just add a new one with an increased version number.
 
@@ -259,11 +377,17 @@ We use `git bisect` for this. It is controlled with a few helper commands `start
 
 Which commit introduced the issue? Verify the source code with `python main.py`, it must always show **Success**, then it is good. Otherwise it is bad!
 
- [[!hiddentext The issue started with commit 49f23ea3df2bd04a4ff323c63a2849907c0a30bb ]]
+ <details>
+    <summary>Show solution</summary>
+     The issue started with commit 49f23ea3df2bd04a4ff323c63a2849907c0a30bb
+</details>
 
 What happens if one of the commits does not compile and we can't decided if it is `good` or `bad`?
 
-[[!hiddentext We can use `git bisect skip` and this will select a commit next to the one we skipped so we can continue. ]]
+<details>
+    <summary>Show solution</summary>
+     We can use `git bisect skip` and this will select a commit next to the one we skipped so we can continue.
+</details>
 
 ## Lecture 6: git history & rewrite
 
@@ -305,7 +429,10 @@ We need to cleanup a few things in this branch:
 
     What is **e731ee** and why does it make sense to call this?
 
-    [[!hiddentext **e731ee** is the commit on the main branch which is the common base to this branch ]]
+    <details>
+    <summary>Show solution</summary>
+     **e731ee** is the commit on the main branch which is the common base to this branch
+</details>
 
     * merge 5b57df2 and 3b4586e
     * merge 00d29f0 and 3f569e0 (this will kill the secret from the file)
@@ -337,11 +464,17 @@ So do this:
 
   * What do you see?
 
-    [[!hiddentext There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good! ]]
+    <details>
+    <summary>Show solution</summary>
+     There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good!
+</details>
 
 3. First, we'll work on a copy on top of that branch so we can always go back easily, how to do this?
 
-    [[!hiddentext `git checkout 3_wild_merges; git checkout -b 3_wild_merges_rebase` ]]
+    <details>
+    <summary>Show solution</summary>
+     `git checkout 3_wild_merges; git checkout -b 3_wild_merges_rebase`
+</details>
 
 4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
   
@@ -352,7 +485,10 @@ So do this:
 
     But you get an error, what is this error about?
 
-    [[!hiddentext `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8` returns a error. You can now do all these conflict resolution manually or use a different strategy. ]]
+    <details>
+    <summary>Show solution</summary>
+     `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8` returns a error. You can now do all these conflict resolution manually or use a different strategy.
+</details>
 
 5. This failed! But why?
 
@@ -382,21 +518,33 @@ So do this:
 
     this resulted in an error. what is this error and how to resolve it?
 
-    [[!hiddentext we don't have a LICENSE file and the commit changes one so instead of a modificaton we have to add it. ]]
+    <details>
+    <summary>Show solution</summary>
+     we don't have a LICENSE file and the commit changes one so instead of a modificaton we have to add it.
+</details>
   
 4. how to add it? `git status` shows we are still in a cherry-pick state, we could exit using `git cherry-pick --abort` but we don't want to! fix the cherry pick. what are the commands?
 
-    [[!hiddentext one has to do a `git add LICENSE` and `git cherry-pick --continue` ]]
+    <details>
+    <summary>Show solution</summary>
+     one has to do a `git add LICENSE` and `git cherry-pick --continue`
+</details>
 
 ### Command `git revert` 
 
  1. git revert this commit 5c33c42438aca368464f9ebc47d607641d7cd19a   
 
-     [[!hiddentext The initial commit 5c33c4 added the README.md and running this command ends up in a problem where it gets modified later. So you have to decide what should happen. We just remove the REAME.md and `git rm README.md` and `git revert ...?` what? ]]
+     <details>
+    <summary>Show solution</summary>
+     The initial commit 5c33c4 added the README.md and running this command ends up in a problem where it gets modified later. So you have to decide what should happen. We just remove the REAME.md and `git rm README.md` and `git revert ...?` what?
+</details>
 
  2. Now that you have finished he revert, see the top most commit again. How to do that?
 
-     [[!hiddentext `git show HEAD` or `git show`. Are you happy now? ]]
+     <details>
+    <summary>Show solution</summary>
+     `git show HEAD` or `git show`. Are you happy now?
+</details>
 
 ## Lecture 7: git submodule
 
@@ -404,19 +552,31 @@ The command "git submodule" is used for languages which don't have a package man
 
 1. checkout branch **7_submodule**, type `git branch`, what does it show?
 
-    [[!hiddentext 7_submodule is green as you are in that branch ]]
+    <details>
+    <summary>Show solution</summary>
+     7_submodule is green as you are in that branch
+    </details>
 
 2. run the program: `python main.py`, what do you see?
 
-    [[!hiddentext Error: submodule/README.md does not exist ]]
+    <details>
+    <summary>Show solution</summary>
+     Error: submodule/README.md does not exist
+    </details>
 
 3. next we need to add the required submodule, please add [git-training](https://github.com/nixcloud/git-training) main branch into ./submodule! what is the command?
 
-    [[!hiddentext `git submodule add https://github.com/nixcloud/git-training submodule`]]
+    <details>
+    <summary>Show solution</summary>
+    `git submodule add https://github.com/nixcloud/git-training submodule`
+    </details>
 
 4. after adding the submodule, run it again, what does it say now?    
 
-    [[!hiddentext Number of chickens: 1 ]]
+    <details>
+    <summary>Show solution</summary>
+     Number of chickens: 1
+    </details>
 
 5. it added the branch **main** but we should have used **1_branch_with_many_commits**,
 
@@ -445,8 +605,8 @@ The command "git submodule" is used for languages which don't have a package man
 
 6. observe the difference between `git status` in directory **git-training/** and **git-training/submodule**
 
-    <details style="background: #dfffdf;">
-    <summary style="color: blue; text-decoration: underline; cursor: pointer; ">Show solution</summary>
+    <details>
+    <summary>Show solution</summary>
     ```bash
     [nix-shell:~/git-training]$ git status
     On branch 7_submodule
@@ -502,8 +662,18 @@ So do this:
 
 ## Lecture 10: git editors
 
-* `tig` / `gitui` - command line tool, very handy
-git authentication (tokens)
+* `tig` execute the program in a 
+
+    <details>
+    <summary>Show solution</summary>
+    The commands are:
+
+        's' to get into staging area
+        'u' to toggle selected file between 'modified' and 'staged for commit'
+    </details>
+
+* `gitui` - command line tool, very handy
+* 
 
 ## Summary
 
