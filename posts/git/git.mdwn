@@ -524,26 +524,33 @@ git rebase -i ...some-hash...
 So do this:
 
 1. checkout branch **3_wild_merges**
-2. check the content of the new branch!
-
-  * What do you see?
 
     <details>
     <summary>Show solution</summary>
-     There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good!
+    ```
+    git checkout -b 3_wild_merges origin/3_wild_merges
+    ```
+    </details>
 
-     It looks ugly...
-</details>
+2. check the content of the new branch!
+
+    * What do you see?
+
+      <details>
+      <summary>Show solution</summary>
+      There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good!
+
+      It looks ugly...
+      </details>
 
 3. First, we'll work on a copy on top of that branch so we can always go back easily, how to do this?
 
     <details>
     <summary>Show solution</summary>
     ```
-    git checkout 3_wild_merges
     git checkout -b 3_wild_merges_rebase
     ```
-</details>
+    </details>
 
 4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
   
@@ -583,8 +590,9 @@ So do this:
 
     ```
     git checkout main
-    git checkout -b 3_wild_merges_rebase_squashed
-    git merge --squash 3_wild_merges_rebase
+    git checkout -b 3_wild_merges_squashed
+    git merge --squash 3_wild_merges
+    git commit -m "Squashed changes from 3_wild_merges"
     ```
     is the better option.
 
