@@ -6,10 +6,11 @@
 
 <style>
   details {
-    background: #f3f5f3; /* Background color when collapsed */
+    background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='128' viewBox='0 0 32 32'><text x='5' y='15' font-size='11' opacity='0.3'>?</text><text x='18' y='12' font-size='10' opacity='0.2'>?</text><text x='10' y='8' font-size='10' opacity='0.1'>?</text></svg>");
     border: 1px solid #ccc; /* Add a border */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Add a soft shadow */
     padding: 10px;
+    margin-bottom: 10px;
   }
   
   details[open] {
@@ -17,6 +18,7 @@
     padding: 10px;
     border: 1px solid #ccc; /* Ensure border stays visible when expanded */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Ensure shadow stays visible */
+    margin-bottom: 10px;
   }
 
   summary {
@@ -74,18 +76,20 @@
 
 # new ideas
 
+* Windows encoding vs. Linux
 * git authentication (tokens)
-* README.md importance
-* rename of git repo (implications)
 * worktree
-* revert
-* tag
-* `git`/`tig` and web tools
-* git cherry-pick
+* git view comparison
+* git merge tool (meld)
 
 # What is this about?
 
 Todays introduction into `git` features all you need for daily work.
+
+<details>
+<summary>Show solution</summary>
+If in doubt use AI to solve the questions or help you with context!
+</details>
 
 This lecture covers the most basic `git` usages like:
 
@@ -121,7 +125,9 @@ Online resources:
 
 * **fork** & **PRs** (Pull Requests), 
 * **issues** (markdown) and 
-* **documentation** (README.md)
+* **documentation** (README.md/LICENSE)
+
+* rename of git repo (implications)
 
 * Gitflow|GitHub|GitLab Flow <https://nvie.com/posts/a-successful-git-branching-model/>
 
@@ -139,7 +145,7 @@ git clone https://github.com/nixcloud/git-training
     
     <details>
     <summary>Show solution</summary>
-     You are in 'main', this is the default branch set in this repo. It could also be any other branch name...
+     You are in **main**, this is the default branch set in this repo. It could also be any other branch name...
     </details>
 
 * `git branch` 
@@ -155,7 +161,7 @@ git clone https://github.com/nixcloud/git-training
 
     <details>
     <summary>Show solution</summary>
-    git checkout 1_branch_with_many_commits
+    `git checkout 1_branch_with_many_commits`
     </details>
 
 * `git log` - Shows the commit history. Options: `--oneline`!
@@ -164,12 +170,14 @@ git clone https://github.com/nixcloud/git-training
 
     <details>
     <summary>Show solution</summary>
-     d22e0c8 adding new_file
+    ```
+    d22e0c8 adding new_file
+    ```
     </details>
 
 * `git blame README.md`
 
-  * The README.md had many changes, identify the user who added the top most fox!
+  * The **README.md** had many changes, identify the user who added the top most fox!
 
     <details>
     <summary>Show solution</summary>
@@ -178,11 +186,11 @@ git clone https://github.com/nixcloud/git-training
 
 * `git diff` - Shows changes between commits. 
 
-   * Figure out what happened between commit **1397c7** and **5c33c4**
-   
+  * Figure out what happened between commit **1397c7** and **5c33c4**
+
     <details>
     <summary>Show solution</summary>
-    The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened!
+     The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened!
     </details>
 
 ## Lecture 2: Initializes a new Git repository
@@ -213,14 +221,14 @@ There are a few ways to do this:
 3. From SVN: `git svn clone <repository-url>` - Imports an SVN repository into a new directory.
 
     ```bash
-    svn checkout https://svn.code.sf.net/p/svnexample/code/trunk svnexample
+    git svn clone https://svn.code.sf.net/p/svnexample/code/trunk svnexample
     ```
 
-    Do this checkout now! How many commits does it have in git?
+    Do this checkout now! How many **commits** does it have in git, also explain the number?
 
     <details>
     <summary>Show solution</summary>
-    the answer is: <pre>16</pre>
+    the answer is: it is **6** git commits and the other SVN revisions are probably used for SVN branches.
     </details>
 
 ## Lecture 3: `git commit`, `add`, `unadd`, `push`, `push -f` and `reset`
@@ -286,7 +294,7 @@ A traditional 'git pull' uses the merge strategy, which works remarkably well bu
 
   <details>
     <summary>Show solution</summary>
-     With top commit 38922f it should be 6 M merge commits
+     With top commit **38922f** it should be 6 M merge commits
 </details>
 
 So a typical scenario: Two devs clone the same commit in `main` and start working. Dev A commits first with `git add files` and `git commit -m 'change'` and `git push`.
@@ -309,40 +317,73 @@ And call `git pull` or even better, just always use:
 git rebase origin/main
 ```
 
-## Lecture 4: The `git branch` command
+## Lecture 4: git branches
 
-Switch to a different branch:
+Switch to a different local branch:
 
  `git checkout <branch-name>`
 
-Sometimes we need to test something else but don't want to commit so:
-
-1. `git status` shoould show it is an git branch with no modifications
-2. Modify a file like README.md, add a few lines
-3. `git stash`
-4. `git status` again, what changed?
-
-How to get the files back?
+How to list local branches?
 
 <details>
-    <summary>Show solution</summary>
-     `git stash apply` on a clean git repo will reapply the changes.
+<summary>Show solution</summary>
+`git branch -l`
 </details>
 
-Finally we'll have a look what local branches have which remotes using:
+### Command `git stash`
+
+Sometimes we made many changes but don't feel it is good enough for a commit YET we have to checkout something for a collegue.
+
+We similate this now:
+
+1. `git status` should show it is an git branch with no modifications
+2. Modify a file like README.md, add a few lines
+3. Now type `git status` to verify changed files!
+4. Next type `git stash`
+5. Again type `git status`, what changed?
+
+<details>
+<summary>Show solution</summary>
+`git stash` memorized the changes on a stack for later recovery but leaft a clean branch (no changes).
+</details>
+
+Next find out how to get the files back!
+
+<details>
+<summary>Show solution</summary>
+`git stash apply` on a clean git repo will reapply the changes.
+</details>
+
+Try the same command again but this time make a little change to README.md and then try to get your files back. What happened?
+
+<details>
+<summary>Show solution</summary>
+A `git stash apply` on a branch with changes errors out so you don't clutter your workspace.
+</details>
+
+Git stash is your friend, if in doubt you can also commit to a working branch and store it on the remote so in case you laptop gets stolen the code it still safe.
 
 ### Command `git remote -v`
 
-Also have a look at `cat .git/config`, which is usually a good source for such things as well.
+Compare `git remote -v` with the content of `cat .git/config`. What do you see?
 
-A fairly common problem is this: You forked a git repository, someone else did this also and now you need his work.
+<details>
+<summary>Show solution</summary>
+`git remote -v` only lists remote branches while `.git/config` lists all branches and the repo configuration.  
+</details>
+
+A fairly common problem is this: You **forked a git repository**, someone else did the same and now you need his commits locally:
 
 1. visit https://github.com/qknight/git-training
 2. see the branch **4_a_new_feature**
 3. add the **github.com/qknight/git-training** as a new remote, what is the command?
     <details>
     <summary>Show solution</summary>
-     git remote add qknight https://github.com/qknight/git-training.git; git fetch qknight; git checkout -b flu qknight/4_a_new_feature
+    ```
+     git remote add qknight https://github.com/qknight/git-training.git
+     git fetch qknight
+     git checkout -b flu qknight/4_a_new_feature
+     ```
     </details>
 4. finally you want this change in your "main" branch, how to do that?    
     <details>
@@ -379,10 +420,10 @@ Which commit introduced the issue? Verify the source code with `python main.py`,
 
  <details>
     <summary>Show solution</summary>
-     The issue started with commit 49f23ea3df2bd04a4ff323c63a2849907c0a30bb
+     The problem started with commit **49f23ea3df2bd04a4ff323c63a2849907c0a30bb**
 </details>
 
-What happens if one of the commits does not compile and we can't decided if it is `good` or `bad`?
+What needs to be done if one of the commits does not compile and we can't decided if it is `good` or `bad`?
 
 <details>
     <summary>Show solution</summary>
@@ -425,6 +466,17 @@ We need to cleanup a few things in this branch:
     5c33c42 Initial commit
     ```
 
+    What is the meaning of origin/main, origin/HEAD, main and HEAD?
+    <details>
+    <summary>Show solution</summary>
+    | Reference    | Description                                                                   |
+    |--------------|-------------------------------------------------------------------------------|
+    | origin/main  | the main branch on the 'origin' points to commit e731eea                   |
+    | main         | the local main branch points to the same commit!                               |
+    | origin/HEAD  | default branch (like main or master)                                           |
+    | HEAD         | a pointer to the current branch's latest commit. Used to track branch/commit   |
+    </details>
+
 3. call `git rebase -i e731ee`
 
     What is **e731ee** and why does it make sense to call this?
@@ -432,7 +484,7 @@ We need to cleanup a few things in this branch:
     <details>
     <summary>Show solution</summary>
      **e731ee** is the commit on the main branch which is the common base to this branch
-</details>
+    </details>
 
     * merge 5b57df2 and 3b4586e
     * merge 00d29f0 and 3f569e0 (this will kill the secret from the file)
@@ -467,6 +519,8 @@ So do this:
     <details>
     <summary>Show solution</summary>
      There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good!
+
+     It looks ugly...
 </details>
 
 3. First, we'll work on a copy on top of that branch so we can always go back easily, how to do this?
@@ -478,7 +532,7 @@ So do this:
 
 4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
   
-    ```bash
+    ```
     # s, squash <commit> = use commit, but meld into previous commit
     # f, fixup [-C | -c] 
     ```
@@ -487,13 +541,15 @@ So do this:
 
     <details>
     <summary>Show solution</summary>
-     `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8` returns a error. You can now do all these conflict resolution manually or use a different strategy.
-</details>
+    `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8` returns an error. 
+     
+    You can now resolve all these conflicts manually or use a different strategy.
+    </details>
 
-5. This failed! But why?
+5. First let's recap, why did the rebase fail?
 
-    See <https://www.reddit.com/r/git/comments/p9x33m/linearize_a_git_history_wo_merge_conflicts_to/>!
-
+    <details>
+    <summary>Show solution</summary>
     > GPT5: Short answer: rebase replays every commit one-by-one on a new base (and drops/linearizes merges), so conflicts that were previously resolved inside old merge commits reappear during the replay. merge --squash computes one combined tree diff from the branch tip (vs merge-base) and applies it once, so it often avoids those per-commit conflicts.
     > 
     > Ways to achieve your goal and avoid the pain:
@@ -505,7 +561,17 @@ So do this:
     Enable rerere to auto-reuse recorded conflict resolutions across attempts: git config --global rerere.enabled true git config --global rerere.autoupdate true
     Rule of thumb: for “final tree = tip-of-branch, single commit,” prefer merge --squash (or a soft-reset-based squash). Use rebase only if you need a linearized history of individual commits.
 
-6. So sometimes a simple `git checkout main; git checkout -b 3_wild_merges_rebase_squashed; git merge --squash 3_wild_merges_rebase` is the better option.
+    See <https://www.reddit.com/r/git/comments/p9x33m/linearize_a_git_history_wo_merge_conflicts_to/>!
+    </details>
+
+6. This is the easy and recommended alternative to the problem above:
+
+    ```
+    git checkout main
+    git checkout -b 3_wild_merges_rebase_squashed
+    git merge --squash 3_wild_merges_rebase
+    ```
+    is the better option.
 
 **Main lecture: Don't use traditional merges, use rebases on pull.** It makes history reading easier, it makes git bisect easier. It sometimes makes merges harder though...
 
@@ -513,22 +579,38 @@ So do this:
 ### Command `git cherry-pick`
 
 1. find out what commit **fb8cb9** is all about
+
+    <details>
+    <summary>Show solution</summary>
+    `git show fb8cb9` displays the change which updates the LICENSE file content.
+    </details>
+
 2. checkout the branch: **3_revert_cherry_pick**
+
+    <details>
+    <summary>Show solution</summary>
+    `git checkout origin/3_revert_cherry_pick -b 3_revert_cherry_pick`
+    </details>
+
 3. `git cherry-pick fb8cb9`
 
-    this resulted in an error. what is this error and how to resolve it?
+    This resulted in an error. What is this about and how to resolve it?
 
     <details>
     <summary>Show solution</summary>
-     we don't have a LICENSE file and the commit changes one so instead of a modificaton we have to add it.
-</details>
+    We don't have a LICENSE file yet and the commit is a 'change' thus it fails. As a solution we have to add it.
+    </details>
   
-4. how to add it? `git status` shows we are still in a cherry-pick state, we could exit using `git cherry-pick --abort` but we don't want to! fix the cherry pick. what are the commands?
+4. How to add it? `git status` shows we are still in a cherry-pick state, we could exit using `git cherry-pick --abort` but we don't want to! fix the cherry pick. what are the commands?
 
     <details>
     <summary>Show solution</summary>
-     one has to do a `git add LICENSE` and `git cherry-pick --continue`
-</details>
+    We have to continue and finish the cherry-pick. Don't just do a `git commit`!
+    ```
+    git add LICENSE
+    git cherry-pick --continue
+    ```
+    </details>
 
 ### Command `git revert` 
 
@@ -561,10 +643,13 @@ The command "git submodule" is used for languages which don't have a package man
 
     <details>
     <summary>Show solution</summary>
-     Error: submodule/README.md does not exist
+    ```
+    python main.py
+    Error: submodule/README.md does not exist
+    ```
     </details>
 
-3. next we need to add the required submodule, please add [git-training](https://github.com/nixcloud/git-training) main branch into ./submodule! what is the command?
+3. next we need to add the required submodule, please add **https://github.com/nixcloud/git-training** with branch **main** into the folder **./submodule**! What is the command?
 
     <details>
     <summary>Show solution</summary>
@@ -575,13 +660,18 @@ The command "git submodule" is used for languages which don't have a package man
 
     <details>
     <summary>Show solution</summary>
-     Number of chickens: 1
+    ```
+    python main.py
+    Number of chickens: 1
+    ```
     </details>
 
-5. it added the branch **main** but we should have used **1_branch_with_many_commits**,
+5. it added the branch **main** but we want **1_branch_with_many_commits**! how do we get that?
 
     <details>
     <summary style="color: blue; text-decoration: underline; cursor: pointer;">Show solution</summary>
+    We need to go into the ./submodule directory and checkout a different revision...
+
     ```bash
     pushd submodule
     git branch -r
@@ -600,13 +690,15 @@ The command "git submodule" is used for languages which don't have a package man
             new file:   .gitmodules
             new file:   submodule
     ```
-    In essence we have a git repository inside a git repository where the outer manages the inner.
+    In essence we have a git repository inside a git repository where the outer manages the inner on with commands like `git submodule update --init`.
     </details>
 
 6. observe the difference between `git status` in directory **git-training/** and **git-training/submodule**
 
     <details>
     <summary>Show solution</summary>
+    You see that the git program in both directories returns different results. This is unusual! If `git` is called from a subdirectory inside a git repository it usually traverses upwards to the first `.git/config` directory and assumes this is the parent. Git submodules break with this assumption, see `.gitmodules` in the main repo for instance.
+
     ```bash
     [nix-shell:~/git-training]$ git status
     On branch 7_submodule
@@ -622,6 +714,30 @@ The command "git submodule" is used for languages which don't have a package man
     nothing to commit, working tree clean
     ```
     </details>
+
+7. Finally, after we added branch **7_submodule** in the step before, run `python main.py` again, what does it say now?    
+
+    <details>
+    <summary>Show solution</summary>
+    ```
+    python main.py
+    Number of chickens: 4
+    Congratulations, you made it!
+    ```
+    </details>
+
+Note: The example uses ./submodule as folder-name but you can use whatever you like.
+
+Do you like to work with `git submodules`?
+
+<details>
+<summary>Show solution</summary>
+The correct answer is **NO**. 
+
+Yet we have to, but it makes everything a pain. Try to use HTTPS urls over SSH urls as the build nodes might only have access to the HTTPS checkout.
+
+Complicated git merges/rebases sometimes make you pick the wrong git submodule update resulting in adventurous scenarios.
+</details>
 
 ## Lecture 8: github.com training
 
@@ -666,14 +782,31 @@ So do this:
 
     <details>
     <summary>Show solution</summary>
-    The commands are:
+    ```bash
+    Commands
 
-        's' to get into staging area
-        'u' to toggle selected file between 'modified' and 'staged for commit'
+    's' to get into staging area
+    'u' to toggle selected file between 'modified' and 'staged for commit'
+    ```    
     </details>
 
-* `gitui` - command line tool, very handy
-* 
+* `intellij` best git integration, see <https://www.jetbrains.com/idea/>
+
+* permalink
+
+    1. visit <https://github.com/nixcloud/cargo/blob/master-libnix/Cargo.lock>
+    2. create a link on line 13 (open it in a new tab)
+
+        <details>
+        <summary>Show solution</summary>
+        <https://github.com/nixcloud/cargo/blob/master-libnix/Cargo.lock#L13>
+        </details>
+    3. now create a perma link on line 13 (open it in a new tab)
+
+        <details>
+        <summary>Show solution</summary>
+        <https://github.com/nixcloud/cargo/blob/8ca2cffb58c09ff186c5746be794f482af3f221f/Cargo.lock#L13>
+        </details>
 
 ## Summary
 
