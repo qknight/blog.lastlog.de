@@ -81,10 +81,11 @@
 * worktree
 * git view comparison
 * git merge tool (meld)
+* rework with git switch
 
 # What is this about?
 
-Todays introduction into `git` features all you need for daily work.
+Today's introduction to git features.
 
 <details>
 <summary>Show solution</summary>
@@ -465,6 +466,8 @@ We need to cleanup a few things in this branch:
 * The LICENSE file has two commits, this should be merged
 * We leaked a password, nobody noticed it yet so we have to act fast!
 
+So do this:
+
 1. checkout branch: **3_rebase_commits**
 2. see the logs with `tig`
 
@@ -479,14 +482,16 @@ We need to cleanup a few things in this branch:
     ```
 
     What is the meaning of origin/main, origin/HEAD, main and HEAD?
+
     <details>
     <summary>Show solution</summary>
-    | Reference    | Description                                                                   |
+
+    | Reference    |  Description                                                                  |
     |--------------|-------------------------------------------------------------------------------|
-    | origin/main  | the main branch on the 'origin' points to commit e731eea                   |
-    | main         | the local main branch points to the same commit!                               |
-    | origin/HEAD  | default branch (like main or master)                                           |
-    | HEAD         | a pointer to the current branch's latest commit. Used to track branch/commit   |
+    | origin/main  | the main branch on the 'origin' points to commit e731eea                      |
+    | main         | the local main branch points to the same commit!                              |
+    | origin/HEAD  | default branch (like main or master)                                          |
+    | HEAD         | a pointer to the current branch's latest commit. Used to track branch/commit  |
     </details>
 
 3. call `git rebase -i e731ee`
@@ -511,6 +516,8 @@ We need to cleanup a few things in this branch:
     git checkout -b 3_rebase_commits_yourname
     git push
     ```
+
+Technically you would now have to call: `git gc --prune=now` on the client and server.
 
 ### Squashing commits
 
