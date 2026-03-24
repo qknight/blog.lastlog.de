@@ -76,10 +76,6 @@
   });
 </script>
 
-# new ideas
-
-* Windows encoding vs. Linux
-
 # What is this about?
 
 Todays introduction into `git` features all you need for daily work.
@@ -889,6 +885,14 @@ Complicated git merges/rebases sometimes make you pick the wrong git submodule u
         <summary>Show solution</summary>
         <https://github.com/nixcloud/cargo/blob/8ca2cffb58c09ff186c5746be794f482af3f221f/Cargo.lock#L13>
         </details>
+
+* Line endings encoding Windows vs. Linux
+  
+  When installing git-scm on windows, select this:
+
+        [x] Checkout Windows-style, commit Unix-stle line endings
+        [ ] Checkout as-is, commit Unix-style line endings
+        [ ] Checkout as-is, commit as-is
 
 ## Summary
 
