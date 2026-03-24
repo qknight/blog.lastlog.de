@@ -6,7 +6,7 @@
 
 <style>
   details {
-    background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='128' viewBox='0 0 32 32'><text x='5' y='15' font-size='11' opacity='0.3'>?</text><text x='18' y='12' font-size='10' opacity='0.2'>?</text><text x='10' y='8' font-size='10' opacity='0.1'>?</text></svg>");
+    background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='128' viewBox='0 0 32 32' ><text x='25' y='15' font-size='11' opacity='0.3'>?</text><text x='38' y='12' font-size='10' opacity='0.2'>?</text><text x='30' y='5' font-size='10' opacity='0.1'>?</text></svg>");
     border: 1px solid #ccc; /* Add a border */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Add a soft shadow */
     padding: 10px;
@@ -22,6 +22,8 @@
   }
 
   summary {
+    display: block; /* Make summary fill the width of parent */
+    width: 100%;    /* Ensure it's 100% of the parent's width */
     color: blue; 
     text-decoration: underline; 
     cursor: pointer;
@@ -77,15 +79,10 @@
 # new ideas
 
 * Windows encoding vs. Linux
-* git authentication (tokens)
-* worktree
-* git view comparison
-* git merge tool (meld)
-* rework with git switch
 
 # What is this about?
 
-Today's introduction to git features.
+Todays introduction into `git` features all you need for daily work.
 
 <details>
 <summary>Show solution</summary>
@@ -122,16 +119,6 @@ Online resources:
 * <https://gitimmersion.com/lab_12.html>
 * <https://learngitbranching.js.org/>
 
-## Workflows
-
-* **fork** & **PRs** (Pull Requests), 
-* **issues** (markdown) and 
-* **documentation** (README.md/LICENSE)
-
-* rename of git repo (implications)
-
-* Gitflow|GitHub|GitLab Flow <https://nvie.com/posts/a-successful-git-branching-model/>
-
 ## Lecture 1: Looking into existing git repositorries
 
 Call this command:
@@ -146,7 +133,7 @@ git clone https://github.com/nixcloud/git-training
     
     <details>
     <summary>Show solution</summary>
-     You are in **main**, this is the default branch set in this repo. It could also be any other branch name...
+     You are in **main**, this is the default branch set in this repo. The default branch can differ between repositories.
     </details>
 
 * `git branch` 
@@ -162,12 +149,12 @@ git clone https://github.com/nixcloud/git-training
 
     <details>
     <summary>Show solution</summary>
-    `git checkout 1_branch_with_many_commits`
+    `git checkout -b 1_branch_with_many_commits origin/1_branch_with_many_commits`
     </details>
 
 * `git log` - Shows the commit history. Options: `--oneline`!
 
-  * What is the commit hash of the commit with the message: **adding new_file**?
+  * What is the commit hash of the commit with the message: "**adding new_file**"?
 
     <details>
     <summary>Show solution</summary>
@@ -176,39 +163,145 @@ git clone https://github.com/nixcloud/git-training
     ```
     </details>
 
-* `git blame README.md`
+* `git blame README.md` - Shows the file and the respective editors per line.
 
-  * The **README.md** had many changes, identify the user who added the top most fox!
+  * The **README.md** had many changes, identify the user who added the top most fox in the README.md!
 
     <details>
     <summary>Show solution</summary>
-     a1389ad9 (Foxhunt         2026-03-18 14:27:44 +0000  8) 🦊 U+1F98A Fox Face Unicode Character
+    ```
+    a1389ad9 (Foxhunt         2026-03-18 14:27:44 +0000  8) 🦊 U+1F98A Fox Face Unicode Character
+    ```
     </details>
 
 * `git diff` - Shows changes between commits. 
 
-  * Figure out what happened between commit **1397c7** and **5c33c4**
+  Sometimes you have a branch with many commits but you need to see it as one change to understand the effect it has.
+
+  * Figure out what happened between commit **1397c7** and **5c33c4** using `git diff ...?...`, what is the command?
 
     <details>
     <summary>Show solution</summary>
-     The chicken army got erased by the fox! `git diff 1397c7..5c33c4` is the command to see what happened!
+    You can see all the changes as one change using `git diff 1397c7..5c33c4`.
+
+    When you look at the change you realize this: The chicken army got erased by the fox! - oh no!
     </details>
 
-## Lecture 2: Initializes a new Git repository
+## Lecture 2: github.com
+
+Github is a very popular platform for open source projects and it made a few concepts like PRs popular.
+
+1. Create a github account at [https://github.com/signup](https://github.com/signup)
+
+   Mine is <https://github.com/qknight>
+
+2. (or) login to GH if you already have an account
+
+### We create a Pull request
+
+1. fork <https://github.com/nixcloud/git-training> using the web UI (make it a public repository)
+2. create a branch "0_new_chick" from the "main" branch using the web UI
+3. edit the README.md and add a 🐔 to it and commit the change
+4. Create a PR with your "0_new_chick" to https://github.com/nixcloud/git-training branch "main"
+
+Reflection time:
+
+* where does the PR appear?
+
+    <details>
+    <summary>Show solution</summary>
+    If you did it right it should appear at <https://github.com/nixcloud/git-training/pulls>
+    </details>
+
+* is your fork a private or public repo?
+
+    <details>
+    <summary>Show solution</summary>
+    If you did it right it should appear at <https://github.com/nixcloud/git-training/pulls>
+    </details>
+
+### We create an issue
+
+<https://github.com/nixcloud/git-training/issues> is currently empty but we need to create a "Cucco storm"! 
+
+1. **Create an issue** with proper markdown and ask for some ultra-stupid request, feel free to use your 'AI slop' generator of choice.
+2. Wait for upstream to react to your request
+
+### Creating a PAT (for auth)
+
+A Personal Access Token (PAT) is the recommended way to work with git from the command line.
+
+1. visit <https://github.com/settings/personal-access-tokens>
+2. create a 'Fine-grained personal access tokens'
+
+  * Repository access 'All repositories'
+  * Permissions 
+
+    * Add **'Read and write'** 
+    * For **Contents (Repository contents, commits, branches, downloads, releases, and merges.**
+
+  * Expiration date: A few days  
+
+  * Write down the token:
+  
+      ```
+      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
+      ```
+
+### Using the PAT (token)
+
+On a client with git installed do:
+
+1. `git clone https://github.com/<your-name-here>/git-training`
+2. update the **.git/config** with this url: 
+
+    ```
+    https://<username>:<token>@github.com/username/repository.git
+    ```
+
+3. create a new branch: 
+
+    `git checkout -b 0_push_test`
+
+4. and push it to your your new remote: 
+
+    `git push`
+
+Reflection time:
+
+* where else could you store the PAT other than it in the .git/config `url` parameter as we just did?
+
+    <details>
+    <summary>Show solution</summary>
+    The credential helper from git, commands like:
+
+    `git config --global credential.helper cache`
+    </details>
+
+* Why are PATs better than username/password for login?
+
+    <details>
+    <summary>Show solution</summary>
+    You can use them on partially compromised environments and if stolen they only allow access to code and not automatically all your github settings.
+
+    Ideally you have PATs for groups of code and not, as we did, one PAT for all the repositories.
+    </details>
+
+## Lecture 3: Initializes a new Git repository
 
 There are a few ways to do this:
 
-1. You create a repository with a README.md on the server, on the client you usually type:
+1. You create a new repository on the server, then with your client you usually type:
 
     ```bash
     git clone https://github.com/nixcloud/git-training
     ```
 
-    We already did this!
+    But we already have a clone of this.
 
-2. Local git repo first, then add remote:
+2. You create a local git repository, then you initialize an empty server with it:
 
-    * create a new directory and `cd` into it
+    * create a new directory `mkdir my_git_repo` and `cd my_git_repo` into it
     * `git init` - Initializes a new Git repository
     * Next create an **new empty git repo** on your server
     * Finally add the remote (we skip this for now)
@@ -232,9 +325,11 @@ There are a few ways to do this:
     the answer is: it is **6** git commits and the other SVN revisions are probably used for SVN branches.
     </details>
 
-## Lecture 3: `git commit`, `add`, `unadd`, `push`, `push -f` and `reset`
+## Lecture 4: `git commit`, `add`, `unadd`, `push`, `push -f` and `reset`
 
-`git add a_file` adds a file into the staging area. A following `git commit` converts it into **git object**, see [Git-Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects).
+### Command `git add a_file`
+
+Adds a file into the staging area. A following `git commit` converts it into **git object**, see [Git-Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects).
 
 Now do this:
 
@@ -262,7 +357,7 @@ There are two options now:
   When is this a good idea and when to not do it? Research using google or AI!
     <details>
     <summary>Show solution</summary>
-     `git push -f` breaks history, if someone else already checked this out and work on top of it, his later push will fail - repaiable but bad.
+     `git push -f` breaks history. Say you pushed your code and someone is already working with it you can't use a force push. Most often force push is a bad idea.
     </details>
 
 * you can undo your commit and return to the previous commit
@@ -318,7 +413,7 @@ And call `git pull` or even better, just always use:
 git rebase origin/main
 ```
 
-## Lecture 4: git branches
+## Lecture 5: git branches
 
 Switch to a different local branch:
 
@@ -373,36 +468,24 @@ Compare `git remote -v` with the content of `cat .git/config`. What do you see?
 `git remote -v` only lists remote branches while `.git/config` lists all branches and the repo configuration.  
 </details>
 
-A fairly common problem is this: 
+A fairly common problem is this: You **forked a git repository**, someone else did the same and now you need his commits locally:
 
-You **forked a git repository**, someone else did the same and now you need his commits locally.
-
-1. visit <https://github.com/qknight/git-training> (note: this is a different url as before!)
+1. visit https://github.com/qknight/git-training
 2. see the branch **4_a_new_feature**
 3. add the **github.com/qknight/git-training** as a new remote, what is the command?
     <details>
     <summary>Show solution</summary>
-
     ```
-    git remote add qknight https://github.com/qknight/git-training.git
-    git fetch qknight
-    git checkout -b 4_a_new_feature_qknight qknight/4_a_new_feature
-    ```
+     git remote add qknight https://github.com/qknight/git-training.git
+     git fetch qknight
+     git checkout -b flu qknight/4_a_new_feature
+     ```
     </details>
 4. finally you want this change in your "main" branch, how to do that?    
     <details>
     <summary>Show solution</summary>
-
-    ```
-    git rebase main
-    git checkout main
-    git merge --ff-only 4_a_new_feature_qknight
-    ```
-
-    The important bit is the `--ff-only` to prevent a merge commit. We hate merge commits, they are to be avoide like KFC 🐔! 
+    to be done
     </details>
-
-    There are many variants to get the same result. 
 
 ### Command `git tag`
 
@@ -420,7 +503,7 @@ How to upload the tags?
 
 Note: If you ever set a tag, never, _NEVER_ change it, just add a new one with an increased version number.
 
-## Lecture 5: The `git bisect` command
+## Lecture 6: The `git bisect` command
 
 We have a branch with many commits but weeks later a fault was detected running `python main.py`. For some reason it stopped working but we don't know when nor why. **We need to find the commit which caused the issue!**
 
@@ -443,7 +526,7 @@ What needs to be done if one of the commits does not compile and we can't decide
      We can use `git bisect skip` and this will select a commit next to the one we skipped so we can continue.
 </details>
 
-## Lecture 6: git history & rewrite
+## Lecture 7: git history & rewrite
 
 History in git can be rewritten when:
 
@@ -466,8 +549,6 @@ We need to cleanup a few things in this branch:
 * The LICENSE file has two commits, this should be merged
 * We leaked a password, nobody noticed it yet so we have to act fast!
 
-So do this:
-
 1. checkout branch: **3_rebase_commits**
 2. see the logs with `tig`
 
@@ -482,16 +563,14 @@ So do this:
     ```
 
     What is the meaning of origin/main, origin/HEAD, main and HEAD?
-
     <details>
     <summary>Show solution</summary>
-
-    | Reference    |  Description                                                                  |
+    | Reference    | Description                                                                   |
     |--------------|-------------------------------------------------------------------------------|
-    | origin/main  | the main branch on the 'origin' points to commit e731eea                      |
-    | main         | the local main branch points to the same commit!                              |
-    | origin/HEAD  | default branch (like main or master)                                          |
-    | HEAD         | a pointer to the current branch's latest commit. Used to track branch/commit  |
+    | origin/main  | the main branch on the 'origin' points to commit e731eea                   |
+    | main         | the local main branch points to the same commit!                               |
+    | origin/HEAD  | default branch (like main or master)                                           |
+    | HEAD         | a pointer to the current branch's latest commit. Used to track branch/commit   |
     </details>
 
 3. call `git rebase -i e731ee`
@@ -517,8 +596,6 @@ So do this:
     git push
     ```
 
-Technically you would now have to call: `git gc --prune=now` on the client and server.
-
 ### Squashing commits
 
 Squashing **multiple commits** into **one commit** can be very helpful. But when is commit smashing safe?
@@ -531,33 +608,23 @@ git rebase -i ...some-hash...
 So do this:
 
 1. checkout branch **3_wild_merges**
+2. check the content of the new branch!
+
+  * What do you see?
 
     <details>
     <summary>Show solution</summary>
-    ```
-    git checkout -b 3_wild_merges origin/3_wild_merges
-    ```
-    </details>
+     There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good!
 
-2. check the content of the new branch!
-
-    * What do you see?
-
-      <details>
-      <summary>Show solution</summary>
-      There are many merges between 3 users: UserA, UserB and Joachim. everything is on top of branch 'main' which is good!
-
-      It looks ugly...
-      </details>
+     It looks ugly...
+</details>
 
 3. First, we'll work on a copy on top of that branch so we can always go back easily, how to do this?
 
     <details>
     <summary>Show solution</summary>
-    ```
-    git checkout -b 3_wild_merges_rebase
-    ```
-    </details>
+     `git checkout 3_wild_merges; git checkout -b 3_wild_merges_rebase`
+</details>
 
 4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
   
@@ -597,13 +664,12 @@ So do this:
 
     ```
     git checkout main
-    git checkout -b 3_wild_merges_squashed
-    git merge --squash 3_wild_merges
-    git commit -m "Squashed changes from 3_wild_merges"
+    git checkout -b 3_wild_merges_rebase_squashed
+    git merge --squash 3_wild_merges_rebase
     ```
     is the better option.
 
-**Main lecture: Don't use traditional merges, use rebases on pull.** It makes history reading easier, it makes git bisect easier. It sometimes makes merges harder though...
+    **Main lecture: Don't use traditional merges, use rebases on pull.** It makes history reading easier, it makes git bisect easier. It sometimes makes merges harder though...
 
 
 ### Command `git cherry-pick`
@@ -644,21 +710,25 @@ So do this:
 
 ### Command `git revert` 
 
- 1. git revert this commit 5c33c42438aca368464f9ebc47d607641d7cd19a   
+ 1. create a new branch **3_revert_commit** from *origin/3_wild_merges*
+ 
+    `git checkout -b 3_revert_commit origin/3_wild_merges`
 
-     <details>
+ 2. use `git revert` on revert commit **5c33c4**. What is the problem and how did you solve it?
+
+    <details>
     <summary>Show solution</summary>
-     The initial commit 5c33c4 added the README.md and running this command ends up in a problem where it gets modified later. So you have to decide what should happen. We just remove the REAME.md and `git rm README.md` and `git revert ...?` what?
-</details>
+    The initial commit 5c33c4 added the README.md and running `git revert 5c33c4` results in the conflict that the next commit modifies the README.md. Since we don't want the README.md to ever have existed, we do a `git rm README.md` and then a `git revert --continue` to finish the operation.
+    </details>
 
- 2. Now that you have finished he revert, see the top most commit again. How to do that?
+ Compare the `git log --oneline` to `git log origin/3_wild_merges --oneline`, what is the difference?
 
-     <details>
-    <summary>Show solution</summary>
-     `git show HEAD` or `git show`. Are you happy now?
-</details>
+  <details>
+  <summary>Show solution</summary>
+  You see there is one more commit in the local branch on top of **3_revert_commit** which reverted the initial commit.
+  </details>
 
-## Lecture 7: git submodule
+## Lecture 8: git submodule
 
 The command "git submodule" is used for languages which don't have a package manager like c / c++ / qt. In modern languages like rust (cargo) this is not used anymore and modified dependencies are integrated using Cargo.toml instead on the source code level with 'git submodule'.
 
@@ -769,46 +839,23 @@ Yet we have to, but it makes everything a pain. Try to use HTTPS urls over SSH u
 Complicated git merges/rebases sometimes make you pick the wrong git submodule update resulting in adventurous scenarios.
 </details>
 
-## Lecture 8: github.com training
-
-* Create a github account at [https://github.com/signup](https://github.com/signup)
-* The login using your new account
-
-### Organizations
-
-* Create an organization: `training-org-2026-yourname` where yourname is something unique like "qknight"
-
-### We make a PR
-
-* fork <https://github.com/nixcloud/git-training> into your organization
-* clone git-training to your local computer
-* create a branch "new_chick" from branch "main"
-* Add a 🐔 to the README.md and commit your change
-* Then push the branch "new_chick" to your forked git-training repository
-* Visit https://github.com/training-org-2026-yourname/git-training and do a PR to https://github.com/nixcloud/git-training
-
-### We create an issue
-
-<https://github.com/nixcloud/git-training/issues> is currently empty but we need to create a "Cucco storm"! 
-
-* **Create an issue** with proper markdown and ask for some ultra-stupid request, feel free to use your 'AI slop' generator of choice.
-* Wait for upstream to react to your request
 
 ## Lecture 9: azure devops training
 
 * There are **no ego-centric namespaces like github.com/qknight** nor are there organizations
 * All we are left with is git repositories and branches
-* As a consequence, PRs look very differently
+* As a consequence, PRs look very differently from most workflows
 
-So do this:
+## Lecture 10: Typical git workflows
 
-* create an empty repository
-* push the git-trainig repository there
-* create a branch `branchibranch` and do a PR, as a reviewer set someone from your team
+1. **fork** & **PRs** (Pull Requests)
+2. **issues** (markdown) <https://github.com/nixcloud/cargo/issues>
+3. **documentation** (README.md/LICENSE)
+4. Gitflow|GitHub|GitLab Flow <https://nvie.com/posts/a-successful-git-branching-model/>
 
-## Lecture 10: git editors
+## Lecture 11: misc
 
-* `tig` execute the program in a 
+* `tig` how to use this tool to add files from the **working area** into the **staging area** (like `git add a_file`)?
 
     <details>
     <summary>Show solution</summary>
@@ -818,9 +865,14 @@ So do this:
     's' to get into staging area
     'u' to toggle selected file between 'modified' and 'staged for commit'
     ```    
+    <https://devhints.io/tig>
     </details>
 
 * `intellij` best git integration, see <https://www.jetbrains.com/idea/>
+
+* `meld` best open source 3-way merger, see <https://meldmerge.org/>
+
+  integrates into GIT using the command `git mergetool`
 
 * permalink
 
@@ -841,3 +893,6 @@ So do this:
 ## Summary
 
 With all these lectures done you have a solid education how to work with GIT and replace SVN where possible.
+
+## Questions
+
