@@ -115,6 +115,20 @@ Online resources:
 * <https://gitimmersion.com/lab_12.html>
 * <https://learngitbranching.js.org/>
 
+## Requirements
+
+* working internet connection & working email address for gh signup
+* git / git-svn
+* python 3
+* tig
+* AI tools like gpt 4o
+
+links:
+
+* <https://git-training.nixcloud.io/ttyd/>
+* <https://gemini.google.com/app>
+* <https://chatgpt.com>
+
 ## Lecture 1: Looking into existing git repositorries
 
 Call this command:
@@ -196,9 +210,9 @@ Github is a very popular platform for open source projects and it made a few con
 ### We create a Pull request
 
 1. fork <https://github.com/nixcloud/git-training> using the web UI (make it a public repository)
-2. create a branch "0_new_chick" from the "main" branch using the web UI
-3. edit the README.md and add a 🐔 to it and commit the change
-4. Create a PR with your "0_new_chick" to https://github.com/nixcloud/git-training branch "main"
+2. create a branch "**0_new_chick**" from the "main" branch using the web UI
+3. edit the **README.md** and add a 🐔 to it and commit the change
+4. Create a PR with your "**0_new_chick**" to https://github.com/nixcloud/git-training branch "**main**"
 
 Reflection time:
 
@@ -209,11 +223,11 @@ Reflection time:
     If you did it right it should appear at <https://github.com/nixcloud/git-training/pulls>
     </details>
 
-* is your fork a private or public repo?
+* is your fork a private or public repo (this is specific to github, not git in general)?
 
     <details>
     <summary>Show solution</summary>
-    If you did it right it should appear at <https://github.com/nixcloud/git-training/pulls>
+    By default forking a repo inherits the public/private setting from the parent.
     </details>
 
 ### We create an issue
@@ -283,6 +297,53 @@ Reflection time:
     Ideally you have PATs for groups of code and not, as we did, one PAT for all the repositories.
     </details>
 
+### A gist
+
+1. when you open the git-training there is also a gist linked, open it and figure out what it is about
+
+    <details>
+    <summary>Show solution</summary>
+    The link <https://gist.github.com/qknight/0231bce88b1b32b4efbcb8e44557cd8c> is a documentation
+    how to easily spin up such an environment.
+
+    </details>
+
+2. create a short snippet of text
+3. publish snippet as a 'secret gist'. What makes a secret gist 'secret'?
+
+    <details>
+    <summary>Show solution</summary>
+    The secret is basically the url part and if known everyone can read it.
+
+    <https://gist.github.com/qknight/f342fad470d30a036eb09d7b85c70146>
+    </details>
+
+4. why does it make sense to fork a gist from someone? why does git forking in general make sense?
+
+    <details>
+    <summary>Show solution</summary>
+    A git repo, similar to a gist can disappear and a fork let's you archive it for yourself. It helps upstream track popularity and community and you can make modifications to the code.
+    </details>
+
+### Permalink
+
+In communication it is important to talk about the same things, obviously, so:
+
+  1. visit <https://github.com/nixcloud/cargo/blob/master-libnix/Cargo.lock>
+  2. create a link on **line 13** (open it in a new tab)
+
+      <details>
+      <summary>Show solution</summary>
+      <https://github.com/nixcloud/cargo/blob/master-libnix/Cargo.lock#L13>
+      </details>
+
+  3. now create a perma link on **line 13** (open it in a new tab)
+
+      <details>
+      <summary>Show solution</summary>
+      <https://github.com/nixcloud/cargo/blob/8ca2cffb58c09ff186c5746be794f482af3f221f/Cargo.lock#L13>
+      </details>
+
 ## Lecture 3: Initializes a new Git repository
 
 There are a few ways to do this:
@@ -327,19 +388,39 @@ There are a few ways to do this:
 
 Adds a file into the staging area. A following `git commit` converts it into **git object**, see [Git-Objects](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects).
 
-Now do this:
+Now do this in branch **main**:
 
-1. modify the README.md, add some section
+1. modify the **README.md**, add some section with a duck 🦆 or 🐤
 2. call `git add README.md`
-3. finally figure out how to undo this `git add` (sadly not `git unadd`)
+3. call `git commit -m 'Updated README.md'`
+
+    use `tig` or `git log --oneline` to see you change
+
+4. next add another section to README.md
+5. call `git add README.md` and then you notic that we actually don't want that section in there!
+6. finally figure out how to undo a `git add a_file` (sadly not `git unadd`). what is the command?
     <details>
     <summary>Show solution</summary>
-     `git reset README.md`, afterwards check that `git status` still shows changes and that your lines edited are still there
+    * `git restore --staged a_file` is recommended new default
+    * `git reset a_file` is what i learnt
+    
+    afterwards check that `git status` still shows changes and that your lines edited are still there. again - we do not want to get rid of the change but we want it in a different commit.
     </details>
+
+7. (optional) if you feel adventurous, try this:
+
+   1. in the README.md add a top section and a bottom section
+   2. use `git add -p README.md` (only add the top section)
+   3. use `git commit README.md`, what just happened with the bottom section?
+
+       <details>
+      <summary>Show solution</summary>
+      `git add -p` can be used to only commit parts of a file into the **staging area**, the not selected parts remain in the **working area**.
+      </details>
 
 ### Command `git push -f`
 
-Sometimes, after a commit & push you find out that you forgot something. You could add another commit but ... maybe it would be nice to not have a broken history. 
+Sometimes, after a commit & push you find out that you forgot something. You can now add another commit but ... sometimes a correct history is important.
 
 Typical scenario: 
 
@@ -378,18 +459,33 @@ It force-pushes only if the remote branch hasn’t changed since you last fetche
 
 A traditional 'git pull' uses the merge strategy, which works remarkably well but renders the commit history hard to read, makes rebasing a nightmere.
 
-1. first clone `git clone https://github.com/sumantabose/git-playground`
+1. first clone https://github.com/sumantabose/git-playground
+
+    `git clone https://github.com/sumantabose/git-playground`
+
 2. cd git-playground
 3. `tig`
 
-  How many merge(s) do you see?
+    How many merge(s) do you see?
 
-  <details>
+    <details>
     <summary>Show solution</summary>
-     With top commit **38922f** it should be 6 M merge commits
-</details>
+    With top commit **38922f** it should be 6 M merge commits
+    </details>
 
-So a typical scenario: Two devs clone the same commit in `main` and start working. Dev A commits first with `git add files` and `git commit -m 'change'` and `git push`.
+    Are merges commits easy to read?
+
+    <details>
+    <summary>Show solution</summary>
+    A merge commit (vs. a fast forward) commit adds an additional commit and the interwinding of branches it is hard to follow what is going on.
+
+    If possible try to keep git history without merges.
+    </details>
+
+So a typical scenario: 
+
+* Two devs clone the same commit in `main` and start working. 
+* Dev A commits first with `git add files` and `git commit -m 'change'` and `git push`.
 
 However, dev B needs to do something before pushing:
 
@@ -405,9 +501,21 @@ git config --global pull.rebase true
 
 And call `git pull` or even better, just always use:
 
-```
-git rebase origin/main
-```
+1. `git pull --ff`
+
+    What does --ff do?
+
+    <details>
+    <summary>Show solution</summary>
+    Compare to Default
+
+    * Default `git pull` (without --ff): If a fast-forward is not possible, Git creates a merge commit.
+    * With `git pull --ff`, it strictly avoids merge commits and only fast-forwards if possible.
+    </details>
+
+    or
+
+2. `git rebase origin/main`
 
 ## Lecture 5: git branches
 
@@ -510,16 +618,16 @@ We use `git bisect` for this. It is controlled with a few helper commands `start
 
 Which commit introduced the issue? Verify the source code with `python main.py`, it must always show **Success**, then it is good. Otherwise it is bad!
 
- <details>
-    <summary>Show solution</summary>
-     The problem started with commit **49f23ea3df2bd04a4ff323c63a2849907c0a30bb**
+<details>
+<summary>Show solution</summary>
+The problem started with commit **49f23ea3df2bd04a4ff323c63a2849907c0a30bb**
 </details>
 
 What needs to be done if one of the commits does not compile and we can't decided if it is `good` or `bad`?
 
 <details>
-    <summary>Show solution</summary>
-     We can use `git bisect skip` and this will select a commit next to the one we skipped so we can continue.
+<summary>Show solution</summary>
+We can use `git bisect skip` and this will select a commit next to the one we skipped so we can continue.
 </details>
 
 ## Lecture 7: git history & rewrite
@@ -527,16 +635,24 @@ What needs to be done if one of the commits does not compile and we can't decide
 History in git can be rewritten when:
 
 * **The branch you work on belongs to you and you are the only one working with it**.
-* **You are forced to do the braking change for legal reasons**, like removing a cusomer name or a password which git into the repo somehow.
+* **You are forced to do the breaking change for legal reasons**, like removing a customer name or a password which git into the repo somehow.
 
 A change like this means that everyone else who works on the same base will have huge trouble pushing his changes later one so use with care.
 
 ### Changing the top most commit
 
-  ```bash
-  git add next.py
-  git commit --amend
-  ```
+```bash
+git checkout -b tests origin/main  
+git add next.py
+git commit --amend
+```
+
+Use `tig` to see the history, use `git diff tests..origin/main` to see what is going on?
+
+<details>
+<summary>Show solution</summary>
+You created a new branch on top of origin/main and changed the top-most commit thus you need to force push because your local branch can't be merged anymore since there is no common base anymore.
+</details>
 
 ### Rearranging commits
 
@@ -866,25 +982,12 @@ Complicated git merges/rebases sometimes make you pick the wrong git submodule u
 
 * `intellij` best git integration, see <https://www.jetbrains.com/idea/>
 
+  if you have to do complex rebases, this is the editor! the 3-way-merge is excellent.
+
 * `meld` best open source 3-way merger, see <https://meldmerge.org/>
 
-  integrates into GIT using the command `git mergetool`
+  integrates into GIT using the command `git mergetool` but is much harder to integrate.
 
-* permalink
-
-    1. visit <https://github.com/nixcloud/cargo/blob/master-libnix/Cargo.lock>
-    2. create a link on line 13 (open it in a new tab)
-
-        <details>
-        <summary>Show solution</summary>
-        <https://github.com/nixcloud/cargo/blob/master-libnix/Cargo.lock#L13>
-        </details>
-    3. now create a perma link on line 13 (open it in a new tab)
-
-        <details>
-        <summary>Show solution</summary>
-        <https://github.com/nixcloud/cargo/blob/8ca2cffb58c09ff186c5746be794f482af3f221f/Cargo.lock#L13>
-        </details>
 
 * Line endings encoding Windows vs. Linux
   
