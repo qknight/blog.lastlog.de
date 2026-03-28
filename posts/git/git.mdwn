@@ -521,7 +521,7 @@ And call `git pull` or even better, just always use:
 
 Switch to a different local branch:
 
- `git checkout <branch-name>`
+ `git switch <branch-name>`
 
 How to list local branches?
 
@@ -530,13 +530,13 @@ How to list local branches?
 `git branch -l`
 </details>
 
-### Command `git stash`
+### Command `git stash` 1/2
 
 Sometimes we made many changes but don't feel it is good enough for a commit YET we have to checkout something for a collegue.
 
 We similate this now:
 
-1. `git status` should show it is an git branch with no modifications
+1. `git status` should show it is an git branch **main** with no modifications
 2. Modify a file like README.md, add a few lines
 3. Now type `git status` to verify changed files!
 4. Next type `git stash`
@@ -590,6 +590,25 @@ A fairly common problem is this: You **forked a git repository**, someone else d
     <summary>Show solution</summary>
     to be done
     </details>
+
+### Command `git stash` 2/2
+
+Sometimes one starts to work on the wrong branch, makes changes, even stages files and then realizes that some patch is missing. Then the changes need to be moved to the other branch with `git stash`.
+
+1. `git status` should show it is an git branch **main** with no modifications
+2. create a new file "new_file"
+3. modify README.md, for example with `echo "appending to the end, since the end is near 🐤" >> README.md`
+4. type `git stash`
+4. use `git switch 1_branch_with_many_commits`
+
+That didn't work! What do you have to fix in order to make the **git stash** work?
+
+<details>
+<summary>Show solution</summary>
+The `git stash` is missing the new_file since it was never ever commited before it is ignored by `git stash`, we can simply do a `git add new_file` and then run git stash.
+
+After switching to the new branch and after running `git stash apply` we have to solve a merge conflict on README.md, depending where you made your change.
+</details>
 
 ### Command `git tag`
 
