@@ -1,0 +1,24 @@
+[[!meta date="2025-01-10 20:53"]]
+[[!tag nix nixos libnix]]
+[[!series libnix]]
+[[!summary libnix status update for 2025]]
+
+[[!Draft]]
+[[SpecialPage]]
+
+[[!img media/nlnet-logo.gif class="noFancy" style="float: right"]]
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# motivation
+
+* future of libnix
+
+  idea still valid, no funding
+
+* results of linux and windows efforts
+
+* status on nix development (no cooperation with nix devs)
+
+* feeling: less and less use nix, next ai workflows
+
+# summary

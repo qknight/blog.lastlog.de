@@ -93,8 +93,20 @@ drwxr-x---  7 127 127 4096 Feb 13  2020 nixos-monitoring.git
   * Finder 385.170.240.050 385170240050 Koppelrelais 6,2 mm, Blau
     * https://www.amazon.de/FINDER-385-170-240-050-385170240050-Koppelrelais-n/dp/B01185UBDG/ref=sr_1_5?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&sr=8-5
 
+* Schaltnetzteil 24 V 12 W für OPTA PRL
+  * ~50 euro
 
+* Spannung zu Strom Modul 0-2,5 V 0-3,3 V 0-5 V 0-10 V 0-15 V 0-24 V zu 0 -20 mA/4 -20 mA Strom Sender Signal Konverter Modul
+  * https://de.aliexpress.com/item/1005002960048002.html?spm=a2g0o.order_list.order_list_main.5.57db5c5fX6YjFL&gatewayAdapt=glo2deu
+    * 0.17 euro
 
+=============
+
+166
+280
+ 50
+---------
+496
 
 # motor
 
