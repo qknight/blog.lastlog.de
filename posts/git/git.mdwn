@@ -206,9 +206,11 @@ git clone https://github.com/nixcloud/git-training
 ## Lecture 2: github.com
 
 <div class="alert alert-warning" role="alert">
-Github is a very popular platform with 100 million developers both for open source and closed source projects. 
+Github is a **very popular platform with 100 million developers** both for open source and closed source projects. A lot of todays 'best practices' were created there so we'll use it to learn them.
 
-A lot of todays 'best practices' were created there so we'll use it to learn them.
+The diagram below shows a typical GH workflow for how to contribute to a project using git and pull requests (PR).
+
+[[!img posts/git/git-local-remote-workflow.svg class="noFancy" width="600px"]]
 </div>
 
 1. Create a github account at [https://github.com/signup](https://github.com/signup)
