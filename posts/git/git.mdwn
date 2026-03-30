@@ -131,6 +131,12 @@ links:
 
 ## Lecture 1: Looking into existing git repositorries
 
+<div class="alert alert-warning" role="alert">
+Looking at commands which help you to get insight into repositories.
+
+`git clone / branch / log / blame / diff`
+</div>
+
 Call this command:
 
 ```sh
@@ -199,7 +205,11 @@ git clone https://github.com/nixcloud/git-training
 
 ## Lecture 2: github.com
 
-Github is a very popular platform for open source projects and it made a few concepts like PRs popular.
+<div class="alert alert-warning" role="alert">
+Github is a very popular platform with 100 million developers both for open source and closed source projects. 
+
+A lot of todays 'best practices' were created there so we'll use it to learn them.
+</div>
 
 1. Create a github account at [https://github.com/signup](https://github.com/signup)
 
@@ -258,24 +268,92 @@ A Personal Access Token (PAT) is the recommended way to work with git from the c
       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
       ```
 
+We'll use the PAT later so note it down.
+
 ### Using the PAT (token)
 
-On a client with git installed do:
+We already cloned git-training using `https://github.com/nixcloud/git-training`, we reuse this here.
 
-1. `git clone https://github.com/<your-name-here>/git-training`
-2. update the **.git/config** with this url: 
+1. `git switch main` to go back to the main branch
+2. now we connect to 'our' newly crated forked repository on github
 
     ```
-    https://<username>:<token>@github.com/username/repository.git
+    git remote add qknightmt https://github.com/qknightMT/git-training
     ```
 
-3. create a new branch: 
+    instead of using `git remote add ...` you can also edit the **.git/config** with `nano .git/config`.
+
+3. check the configuration
+
+    ```
+    git remote -v
+    origin          https://github.com/nixcloud/git-training  (fetch)
+    origin          https://github.com/nixcloud/git-training  (push)
+    qknightmt       https://github.com/qknightMT/git-training (fetch)
+    qknightmt       https://github.com/qknightMT/git-training (push)
+    ```
+
+3. create a new branch
 
     `git checkout -b 0_push_test`
 
-4. and push it to your your new remote: 
+    Does this create a local or remote branch? What is the difference?
 
-    `git push`
+    <details>
+    <summary>Show solution</summary>
+    It creates a local branch and you need to push it so it becomes also a remote branch. The difference is where the branch 'lives'.
+    </details>
+
+4. and push it to your your new remote using 
+
+    ```
+    git push qknightmt 0_push_test
+    ```
+
+    Git will ask for your **username** and **password**, use your username you created. Mine is:
+    
+    * **username**: qknightmt
+    * **token**: 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
+
+    ```
+    git push qknightmt 0_push_test
+    Username for 'https://github.com': qknightmt
+    Password for 'https://qknightmt@github.com': 
+    Total 0 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+    remote: 
+    remote: Create a pull request for '0_push_test' on GitHub by visiting:
+    remote:      https://github.com/qknightMT/git-training/pull/new/0_push_test
+    remote: 
+    To https://github.com/qknightMT/git-training
+    * [new branch]      0_push_test -> 0_push_test
+    ```
+
+5. do the same push again
+
+    `git push qknightmt 0_push_test`
+
+    You have to login again, oh no! Enter your credentials again and see this:
+
+    ```
+    git push qknightmt 1_branch_with_many_commits
+    Everything up-to-date
+    ```
+
+6. storing credentials
+
+    We do not want to type the user / password each time, so type:
+
+    `git config --global credential.helper cache`
+
+    Now push again with user / password:
+    
+    `git push qknightmt 1_branch_with_many_commits`
+
+    And then do it again, you should not be prompted for another password. 
+
+    Note: You can flush the credentials cache for testing:
+
+    `git credential-cache exit`
 
 Reflection time:
 
@@ -297,9 +375,12 @@ Reflection time:
     Ideally you have PATs for groups of code and not, as we did, one PAT for all the repositories.
     </details>
 
-### A gist
 
-1. when you open the git-training there is also a gist linked, open it and figure out what it is about
+### A 'gist'
+
+Often you need to share a snippet of code or configuration with others. An easy and persistent way is to use github gits for this!
+
+1. when you open the **git-training** there is also a gist linked, open it and speculate what it is about!?
 
     <details>
     <summary>Show solution</summary>
@@ -346,6 +427,10 @@ In communication it is important to talk about the same things, obviously, so:
 
 ## Lecture 3: Initializes a new Git repository
 
+<div class="alert alert-warning" role="alert">
+Creating git-repositories is easy and you gonna do this a lot. This section introduces a few different concepts.
+</div>
+
 There are a few ways to do this:
 
 1. You create a new repository on the server, then with your client you usually type:
@@ -369,7 +454,7 @@ There are a few ways to do this:
         git push -u origin master
         ```
 
-3. From SVN: `git svn clone <repository-url>` - Imports an SVN repository into a new directory.
+3. From SVN: `git svn clone <repository-url>` - Imports an SVN repository into a new git repository with full history.
 
     ```bash
     git svn clone https://svn.code.sf.net/p/svnexample/code/trunk svnexample
@@ -383,6 +468,10 @@ There are a few ways to do this:
     </details>
 
 ## Lecture 4: `git commit`, `add`, `unadd`, `push`, `push -f` and `reset`
+
+<div class="alert alert-warning" role="alert">
+Git introduces more flexible and granular commit handling compared to SVN, allowing selective commits and easy reordering of changes. However, it also necessitates careful management to avoid complex history and conflicts, which can be more challenging than SVN’s straightforward commit system.
+</div>
 
 ### Command `git add a_file`
 
@@ -519,6 +608,11 @@ And call `git pull` or even better, just always use:
 
 ## Lecture 5: git branches
 
+<div class="alert alert-warning" role="alert">
+Git provides flexible mechanisms like branching and stashing that allow for non-linear workflows, which is a contrast to SVN's more linear approach. While these features enhance workflow versatility, they also require more attention and understanding to manage effectively compared to SVN.
+</div>
+
+
 Switch to a different local branch:
 
  `git switch <branch-name>`
@@ -628,6 +722,10 @@ Note: If you ever set a tag, never, _NEVER_ change it, just add a new one with a
 
 ## Lecture 6: The `git bisect` command
 
+<div class="alert alert-warning" role="alert">
+In this section, the process of pinpointing a fault using git bisect is discussed, which involves marking commits as "good" or "bad" while running python main.py to determine which commit introduced an issue.
+</div>
+
 We have a branch with many commits but weeks later a fault was detected running `python main.py`. For some reason it stopped working but we don't know when nor why. **We need to find the commit which caused the issue!**
 
 1. checkout the branch: `git checkout 2_bisect`
@@ -650,6 +748,10 @@ We can use `git bisect skip` and this will select a commit next to the one we sk
 </details>
 
 ## Lecture 7: git history & rewrite
+
+<div class="alert alert-warning" role="alert">
+In this section, it is explained how Git allows history rewriting, but it should be done cautiously since it can disrupt others' work. Key actions like amending the latest commit, merging, squashing, cherry-picking, and reverting commits are demonstrated, with a focus on handling conflicts and making clear and concise commit histories, which are different from SVN practices.
+</div>
 
 History in git can be rewritten when:
 
@@ -861,6 +963,10 @@ So do this:
 
 ## Lecture 8: git submodule
 
+<div class="alert alert-warning" role="alert">
+This section discusses the use of git submodule for managing dependencies in projects lacking package managers, such as C/C++ projects, whereas modern languages like Rust use dependency files such as Cargo.toml.
+</div>
+
 The command "git submodule" is used for languages which don't have a package manager like c / c++ / qt. In modern languages like rust (cargo) this is not used anymore and modified dependencies are integrated using Cargo.toml instead on the source code level with 'git submodule'.
 
 1. checkout branch **7_submodule**, type `git branch`, what does it show?
@@ -973,11 +1079,19 @@ Complicated git merges/rebases sometimes make you pick the wrong git submodule u
 
 ## Lecture 9: azure devops training
 
+<div class="alert alert-warning" role="alert">
+This section highlights the lack of structured namespaces or organizational structures in certain Git workflows compared to platforms like GitHub. Consequently, pull requests (PRs) are handled differently, focusing purely on repositories and branches without the typical user-centric organization.
+</div>
+
 * There are **no ego-centric namespaces like github.com/qknight** nor are there organizations
 * All we are left with is git repositories and branches
 * As a consequence, PRs look very differently from most workflows
 
 ## Lecture 10: Typical git workflows
+
+<div class="alert alert-warning" role="alert">
+This section enumerates key elements of modern version control practices, including forking and creating pull requests (PRs), managing issues using markdown, maintaining documentation with README.md and LICENSE files, and the different branching models such as Gitflow, GitHub Flow, and GitLab Flow.
+</div>
 
 1. **fork** & **PRs** (Pull Requests)
 2. **issues** (markdown) <https://github.com/nixcloud/cargo/issues>
@@ -985,6 +1099,10 @@ Complicated git merges/rebases sometimes make you pick the wrong git submodule u
 4. Gitflow|GitHub|GitLab Flow <https://nvie.com/posts/a-successful-git-branching-model/>
 
 ## Lecture 11: misc
+
+<div class="alert alert-warning" role="alert">
+This section provides insights into useful tools and settings for version control. It suggests using tig for staging files with specific keystrokes, recommends IntelliJ for its robust Git integration, especially for complex rebases, and mentions meld as a great open-source 3-way merge tool. Additionally, it advises on proper line-ending settings during Git installation on Windows to maintain consistency with Unix-style line endings.
+</div>
 
 * `tig` how to use this tool to add files from the **working area** into the **staging area** (like `git add a_file`)?
 
