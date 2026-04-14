@@ -858,7 +858,10 @@ So do this:
 
     <details>
     <summary>Show solution</summary>
-     `git checkout 3_wild_merges; git checkout -b 3_wild_merges_rebase`
+    ```
+    git checkout 3_wild_merges
+    git checkout -b 3_wild_merges_rebase
+    ``` 
 </details>
 
 4. Next, the rebase! Use `git rebase -i e731eea7db433dd7371d54c6b676191f308bd6a8`, smash all the 20 commits into one with "s":
@@ -899,8 +902,9 @@ So do this:
 
     ```
     git checkout main
-    git checkout -b 3_wild_merges_rebase_squashed
     git merge --squash 3_wild_merges_rebase
+    ...
+    git commit -m "Your new commit message"
     ```
     is the better option.
 
