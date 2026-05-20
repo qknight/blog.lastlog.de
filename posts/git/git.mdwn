@@ -833,7 +833,7 @@ We need to cleanup a few things in this branch:
 
 ### Squashing commits
 
-Squashing **multiple commits** into **one commit** can be very helpful. But when is commit smashing safe?
+Squashing **multiple commits** into **one commit** can be very helpful. But when is commit squashing safe?
 
 **Yes, using `git rebase` we loose history but gain clearity!** 
 

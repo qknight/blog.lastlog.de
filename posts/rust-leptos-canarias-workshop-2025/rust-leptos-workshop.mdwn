@@ -48,7 +48,7 @@ if interested in participating in the workshop, please join this telegram channe
 
 i'm [joachim schiele](https://lastlog.de/blog/CurriculumVitae.html) and i've been doing rust/leptos fulltime for a year now. 
 
-* <https://klimabilanzklaeranlage.de/tool> is a WASM based rust/leptos base for CO2/N2O/CH4 management [source code](https://codeberg.org/slowtec/klick)
+* <https://klimabilanz.dwa.de/tool> is a WASM based rust/leptos base for CO2/N2O/CH4 management [source code](https://codeberg.org/slowtec/klick)
 * i held a similar workshop already and it was pretty popular
 
 # contact

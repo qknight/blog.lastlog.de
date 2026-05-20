@@ -90,7 +90,7 @@ use this documentation as a basis <https://book.leptos.dev/getting_started/lepto
 
 ## inspiration
 
-1. open <https://klimabilanzklaeranlage.de/tool>
+1. open <https://klimabilanz.dwa.de/tool>
 2. scroll up and change language to english or press shortcut `F2` instead 
 3. use the `Project` menu and click `Load example`
 4. play with the inuts, graphs and ui-controls -> this is all done in leptos!

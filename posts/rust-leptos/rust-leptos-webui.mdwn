@@ -1,10 +1,10 @@
 [[!meta date="2024-03-21 20:53"]]
 [[!tag rust leptos wasm vscode]]
-[[!summary my experiences using leptos with rust to create klimabilanzklaeranlage.de]]
+[[!summary my experiences using leptos with rust to create klimabilanz.dwa.de]]
 
 # motivation
 
-wanted to share my experiences using [leptos](https://leptos.dev/) with [rust](https://www.rust-lang.org/) to create [klimabilanzklaeranlage.de](https://klimabilanzklaeranlage.de/).
+wanted to share my experiences using [leptos](https://leptos.dev/) with [rust](https://www.rust-lang.org/) to create [klimabilanz.dwa.de](https://klimabilanz.dwa.de/).
 
 # rust
 
@@ -349,7 +349,7 @@ we are using nixos on hetzner.cloud and we basically have a container like workf
        recommendedOptimisation = true;
        virtualHosts = {
          klimabilanzklaeranlage = {
-           serverName = "klimabilanzklaeranlage.de";
+           serverName = "klimabilanz.dwa.de";
            forceSSL = true;
            enableACME = true;
            locations = {
@@ -364,7 +364,7 @@ we are using nixos on hetzner.cloud and we basically have a container like workf
            serverName = "klimabilanzklaeranlagen.de";
            forceSSL = true;
            enableACME = true;
-           globalRedirect = "klimabilanzklaeranlage.de";
+           globalRedirect = "klimabilanz.dwa.de";
          };
        };
      };
