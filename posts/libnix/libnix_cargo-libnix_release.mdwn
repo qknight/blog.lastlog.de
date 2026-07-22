@@ -238,5 +238,5 @@ if you like this work, your support is needed!
 
 * **consider a star** at <https://github.com/nixcloud/cargo/stargazers> to show your support.
 * **comments** are welcome in <https://discourse.nixos.org/t/libnix-feedback/75193>
-* if you're interested in **supporting this development**, please reach out to me, see <https://lastlog.de/blog/CurriculumVitae.html> for details.
+* if you're interested in **supporting this development**, please reach out to me, see <https://lastlog.de/cv> for details.
 </div>

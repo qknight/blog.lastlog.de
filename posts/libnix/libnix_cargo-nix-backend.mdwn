@@ -608,7 +608,7 @@ in the future, when nix becomes available on windows, we could make the code gen
 <div class="alert alert-warning" role="alert">
 **curiously, developing this backend took several months, posing a significant engineering challenge. nevertheless, thanks to the thoughtful design of cargo/rust by talented individuals, it was achievable.**
 
-if you're interested in **supporting this development**, please reach out to me via x, linkedin, or email. refer to <https://lastlog.de/blog/CurriculumVitae.html> for further details.
+if you're interested in **supporting this development**, please reach out to me via x, linkedin, or email. refer to <https://lastlog.de/cv> for further details.
 
 your support is needed!
 </div>
