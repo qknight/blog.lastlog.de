@@ -7,7 +7,7 @@ solution using markdown syntax.
 
 ## author
 
-joachim schiele. for details, see [curriculum vitae](CurriculumVitae.html).
+joachim schiele. for details, see [curriculum vitae](https://lastlog.de/cv).
 
 ## language advice
 
