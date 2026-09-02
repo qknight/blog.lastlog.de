@@ -684,7 +684,8 @@ A fairly common problem is this: You **forked a git repository**, someone else d
 4. finally you want this change in your "main" branch, how to do that?    
     <details>
     <summary>Show solution</summary>
-    to be done
+    git checkout main
+    git merge 4_a_new_feature
     </details>
 
 ### Command `git stash` 2/2
