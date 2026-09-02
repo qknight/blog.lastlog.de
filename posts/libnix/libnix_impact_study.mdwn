@@ -1,0 +1,385 @@
+[[!meta date="2026-08-17 15:53"]]
+[[!tag nix nixos libnix fixPath]]
+[[!series libnix]]
+[[!summary libnix impact study for rust eco system and beyond]]
+[[!draft]]
+
+[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+
+# motivation
+
+this series focuses on an impact study when libnix integration takes off. the key assumption is that nix works on all major platforms (windows, linux, macos) and libnix is integrated into PMs like cargo.
+
+see series [libnix](https://lastlog.de/blog/timeline.html?filter=series::libnix)
+
+# impact
+
+## source / binary downloads
+
+if Cargo were routinely paired with libnix so that Hydra retained the intermediate build artifacts for foundational crates (syn, rand, libc, hashbrown, proc-macro2 and the rest of the usual dependency spine), almost every subsequent cargo build would resolve those crates from the shared binary cache instead of crates.io. download volume on crates.io for those packages would collapse toward zero while the load on hydra.nixos.org would rise sharply, turning the NixOS continuous-build infrastructure into the de-facto global cache for the majority of Rust compilations.
+
+
+* cargo, like nix, is also source deployment but it mainly uses a local cache, the famous ./target folder.
+* a library like https://crates.io/crates/hashbrown which has about 8M downloads/day will drop to zero when using libnix in cargo as it will most likely been built by hydra at some point.
+
+## build times
+
+* when using a cargo/rustc version currently in use on nixpkgs, expect most dependencies to be just binary substitutes instead of source downloads and source builds.
+* when using bleeding edge / specialized settings of cargo/rustc, expect a +30% overall build time because of the build isolation coming with nix
+
+the biggest impact on build time will be the current cargo handling of build.rs which currently comes with lax requirements on dependency outlining causing lots of rebuilds, see https://github.com/nixcloud/cargo/issues/3
+
+
+## security
+
+## nixpkgs statistics
+
+in nixpkgs 1c3d5a53f03f2eb5677f6f3b34f0ef31261ba485 we find **2574** rust programs compiled via `buildRustPackage`. in this section we'll look at all their crate.io dependencies and want to learn details about them like:
+
+* how many crate.io deps are used in total
+* how many crate.io deps are unique
+* how many crate.io deps are shared with idential version+features and what the most shared ones are
+
+```nix
+# filter-rust.nix
+{ pkgs ? import <nixpkgs> { config.allowUnfree = true; config.allowBroken = true; } }:
+
+let
+  lib = pkgs.lib;
+
+  isBuildRustPackage = drv:
+    let
+      try = builtins.tryEval (
+        lib.isDerivation drv
+        && (
+             (drv ? cargoHash   && drv.cargoHash   != null)
+          || (drv ? cargoSha256 && drv.cargoSha256 != null)
+          || (drv ? cargoDeps   && drv.cargoDeps   != null)
+          || (drv ? cargoLock   && drv.cargoLock   != null)
+          || (drv ? cargoVendorDir && drv.cargoVendorDir != null)
+        )
+      );
+    in try.success && try.value;
+
+in
+  # Safely map over the attribute set – skip anything that throws
+  lib.mapAttrs (name: value:
+    let try = builtins.tryEval value;
+    in if try.success && isBuildRustPackage try.value
+       then try.value
+       else null
+  ) pkgs
+```
+
+```bash
+nix run nixpkgs#nix-eval-jobs -- \
+  --workers 4 \
+  --max-memory-size 8192 \
+  --force-recurse \
+  --gc-roots-dir /tmp/gcroots \
+  -E 'import ./filter-rust.nix { pkgs = import /home/nixos/nixpkgs { config.allowUnfree = true; config.allowBroken = true; }; }' \
+  > rust-eval.jsonl
+```
+
+```bash
+jq -r 'select(.error == null and .drvPath != null) | .attr' rust-eval.jsonl \
+  | sort -u > rust-packages.txt
+```
+
+```bash
+cat rust-packages.txt| wc -l
+2574
+```
+
+```
+head -n 1000 ../rust-packages.txt | xargs -n 1 -I {} bash ./download-src.sh {}
+```
+
+```nix
+# extract-one.nix
+{ nixpkgsPath ? /home/nixos/nixpkgs
+, attr
+, outDir ? ./cargo-locks
+}:
+
+let
+  pkgs = import nixpkgsPath {
+    config.allowUnfree = true;
+    config.allowBroken = true;
+  };
+
+  original = pkgs.${attr};
+
+  extractor = original.overrideAttrs (old: {
+    dontBuild = false;
+    doCheck   = false;
+    doInstall = false;
+
+    buildPhase = ''
+      runHook preBuild
+
+      mkdir -p $out
+
+      echo "=== Cargo.lock extractor for ${attr} ==="
+
+      if [ -f Cargo.lock ]; then
+        echo "Found Cargo.lock in $PWD"
+        cp -v Cargo.lock $out/Cargo.lock
+      elif [ -f "$cargoRoot/Cargo.lock" ]; then
+        echo "Found Cargo.lock in cargoRoot"
+        cp -v "$cargoRoot/Cargo.lock" $out/Cargo.lock
+      else
+        echo "ERROR: Cargo.lock not found" >&2
+        find . -name 'Cargo.lock' || true
+        exit 1
+      fi
+
+      echo "Lock file extracted – exiting early"
+      exit 0
+
+      runHook postBuild
+    '';
+  });
+
+in
+  extractor
+```
+
+```bash
+nix-build extract-one.nix --argstr attr aba -o aba
+```
+
+
+in ~/nixpkgs-datamining/extract-one/result-aba
+
+```bash
+#!/usr/bin/env sh
+set -e
+
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 <input-dir> <output-stats-file>" >&2
+  exit 1
+fi
+
+INPUT_DIR="$1"
+OUTPUT_FILE="$2"
+LOCK_FILE="${INPUT_DIR%/}/Cargo.lock"
+
+if [ ! -f "$LOCK_FILE" ]; then
+  echo "Error: Cargo.lock not found in $INPUT_DIR" >&2
+  exit 1
+fi
+
+nix-shell -p python3 --run "python3 - <<EOF
+import tomllib, hashlib, sys
+from pathlib import Path
+
+lock_path = Path(\"$LOCK_FILE\")
+out_path  = Path(\"$OUTPUT_FILE\")
+
+if not lock_path.is_file():
+    print(f\"Error: {lock_path} does not exist\", file=sys.stderr)
+    sys.exit(1)
+
+data = tomllib.loads(lock_path.read_text())
+
+lines = []
+for pkg in data.get(\"package\", []):
+    name     = pkg[\"name\"]
+    version  = pkg[\"version\"]
+    checksum = pkg.get(\"checksum\", \"\")
+    deps     = sorted(pkg.get(\"dependencies\", []))
+    features = sorted(pkg.get(\"features\", pkg.get(\"feature\", [])))
+
+    fingerprint = f\"{checksum}|{deps}|{features}\".encode()
+    new_hash = hashlib.sha256(fingerprint).hexdigest()[:16]
+
+    lines.append(f\"{name} {new_hash}\")
+
+out_path.write_text(\"\\n\".join(lines) + \"\\n\")
+EOF"
+```
+
+```
+./deps2stats.sh result-aaa aaa.stats
+```
+
+```
+unicode-ident: 1.0.12 c7db7731e6bdba59
+utf8parse: 0.2.1 332d96e3149afc0f
+wasi: 0.11.0+wasi-snapshot-preview1 dbdeb6ef1b493c32
+windows-sys: 0.48.0 1b16286f4ec15a4d
+windows-targets: 0.48.5 9f4bca46ce6d87f2
+windows_aarch64_gnullvm: 0.48.5 af37c62067679834
+windows_aarch64_msvc: 0.48.5 cf13f371bbdd0fba
+windows_i686_gnu: 0.48.5 1f2df0b952114bf5
+windows_i686_msvc: 0.48.5 ae20f7963c6c4ae0
+windows_x86_64_gnu: 0.48.5 b2e4ac79d0895844
+windows_x86_64_gnullvm: 0.48.5 212cf4b7faaa53a5
+windows_x86_64_msvc: 0.48.5 ea90e53b8a86ba9a
+winnow: 0.5.18 23a09b90a008f666
+```
+
+```python
+#!/usr/bin/env python3
+"""
+Aggregate dependency statistics from multiple *.stats files.
+
+Usage:
+    ./aggregate-stats.py <directory-with-stats-files> [output-file]
+
+If output-file is omitted the result is written to stdout.
+"""
+
+import sys
+from pathlib import Path
+from collections import Counter
+
+def main():
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print(f"Usage: {sys.argv[0]} <stats-directory> [output-file]", file=sys.stderr)
+        sys.exit(1)
+
+    stats_dir = Path(sys.argv[1])
+    output_path = Path(sys.argv[2]) if len(sys.argv) == 3 else None
+
+    if not stats_dir.is_dir():
+        print(f"Error: {stats_dir} is not a directory", file=sys.stderr)
+        sys.exit(1)
+
+    counter = Counter()
+
+    stats_files = sorted(stats_dir.glob("*.stats"))
+    if not stats_files:
+        print(f"Error: no *.stats files found in {stats_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    for stats_file in stats_files:
+        with stats_file.open() as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                # expected format: "name hash"
+                parts = line.split()
+                if len(parts) >= 2:
+                    key = f"{parts[0]} {parts[1]}"
+                    counter[key] += 1
+
+    # sort by count descending, then by name
+    lines = [
+        f"{count} {key}"
+        for key, count in sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+    ]
+
+    result = "\n".join(lines) + "\n"
+
+    if output_path:
+        output_path.write_text(result)
+    else:
+        print(result, end="")
+
+if __name__ == "__main__":
+    main()
+```
+
+```bash
+nix-shell -p python3 python3Packages.squarify python3Packages.matplotlib
+```
+
+```bash
+./aggregate-stats.py . combined.stats
+```
+
+```bash
+head -n 1000 ../rust-packages.txt | xargs -n 1 -I {} ./deps2stats.sh result-{} {}.stats
+```
+
+```python
+#!/usr/bin/env python3
+import sys
+import matplotlib.pyplot as plt
+import squarify
+import matplotlib.colors as mcolors
+from collections import defaultdict
+
+def load_data(filename=None):
+    """
+    Expects lines:  <count> <name> [<hash>]
+    Returns list of (count, label)
+    """
+    data = []
+    source = open(filename) if filename else sys.stdin
+    for line in source:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(maxsplit=2)
+        if len(parts) >= 2:
+            try:
+                count = int(parts[0])
+                name  = parts[1]
+                data.append((count, name))
+            except ValueError:
+                continue
+    if filename:
+        source.close()
+    # keep only positive counts and sort descending (nice for colouring)
+    data = [(c, n) for c, n in data if c > 0]
+    data.sort(key=lambda x: x[0], reverse=True)
+    return data
+
+def make_treemap(data, outfile="treemap.png", title="Identical rlib configurations",
+                 max_labels=40, min_size_for_label=5):
+    if not data:
+        print("No data")
+        return
+
+    sizes  = [d[0] for d in data]
+    labels = [d[1] for d in data]
+
+    # Colour by size (bigger = more intense)
+    norm = mcolors.Normalize(vmin=min(sizes), vmax=max(sizes))
+    cmap = plt.cm.Blues
+    colors = [cmap(norm(s)) for s in sizes]
+
+    # Only put text on the larger rectangles so the image stays readable
+    display_labels = []
+    for s, lab in zip(sizes, labels):
+        if s >= min_size_for_label and len(display_labels) < max_labels:
+            display_labels.append(f"{lab}\n{s}")
+        else:
+            display_labels.append("")
+
+    fig = plt.figure(figsize=(16, 10))
+    ax = fig.add_subplot(111)
+
+    squarify.plot(sizes=sizes,
+                  label=display_labels,
+                  color=colors,
+                  alpha=0.85,
+                  text_kwargs={"fontsize": 7, "color": "black"},
+                  ax=ax,
+                  pad=True)
+
+    ax.set_title(title, fontsize=14, pad=12)
+    ax.axis("off")
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=160, bbox_inches="tight")
+    print(f"Saved → {outfile}")
+    print(f"Total items: {len(data)}   |   Top size: {sizes[0]}")
+
+if __name__ == "__main__":
+    filename = sys.argv[1] if len(sys.argv) > 1 else None
+    data = load_data(filename)
+    make_treemap(data)
+```
+
+
+```bash
+python treemap_stats.py combined.stats
+```
+
+# summary
+
+boak
