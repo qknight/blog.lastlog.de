@@ -1,385 +1,365 @@
-[[!meta date="2026-08-17 15:53"]]
-[[!tag nix nixos libnix fixPath]]
+[[!meta date="2026-09-22 16:22"]]
+[[!tag nix nixos libnix nixpkgs]]
 [[!series libnix]]
 [[!summary libnix impact study for rust eco system and beyond]]
-[[!draft]]
 
-[[!img posts/libnix/Nix_snowflake_windows.svg class="noFancy" style="float: right" width="200px"]]
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
 
 # motivation
 
-this series focuses on an impact study when libnix integration takes off. the key assumption is that nix works on all major platforms (windows, linux, macos) and libnix is integrated into PMs like cargo.
+**libnix can be added to any package manager (PM) so consider this also a direction PMs will be heading in general with libnix.**
 
-see series [libnix](https://lastlog.de/blog/timeline.html?filter=series::libnix)
+this post looks into the cargo+libnix impact, i.e. using the prototype discussed in the previous post [cargo-libnix](https://lastlog.de/blog/libnix_cargo-libnix_release.html), and we use:
 
-# impact
+* nixpkgs revision [1c3d5a53f03f2eb5677f6f3b34f0ef31261ba485](https://github.com/NixOS/nixpkgs/commit/1c3d5a53f03f2eb5677f6f3b34f0ef31261ba485), from **Sat Dec 13 13:17:29 2025 +0000**
+* see full details here: [nixpkgs-datamining](https://github.com/qknight/nixpkgs-datamining)
 
-## source / binary downloads
+# rust & crates.io
 
-if Cargo were routinely paired with libnix so that Hydra retained the intermediate build artifacts for foundational crates (syn, rand, libc, hashbrown, proc-macro2 and the rest of the usual dependency spine), almost every subsequent cargo build would resolve those crates from the shared binary cache instead of crates.io. download volume on crates.io for those packages would collapse toward zero while the load on hydra.nixos.org would rise sharply, turning the NixOS continuous-build infrastructure into the de-facto global cache for the majority of Rust compilations.
+a rust project usually uses crates.io dependencies like serde, syn and similar. these can be visualized with [cargo-depgraph](https://sr.ht/~jplatte/cargo-depgraph/):
 
+[[!img posts/libnix/cargo-depgraph.png class="noFancy" style="width: 920px;"]]
 
-* cargo, like nix, is also source deployment but it mainly uses a local cache, the famous ./target folder.
-* a library like https://crates.io/crates/hashbrown which has about 8M downloads/day will drop to zero when using libnix in cargo as it will most likely been built by hydra at some point.
+these rust libraries (rlibs) are statically compiled into the final binary but during build time they are seperate entities. especially, since `cargo-libnix` shares crates.io dependency builds beyond the ./target/ folder, we can check what the speedup would look like, when it would be used for building software in `buildRustPackage`.
 
-## build times
+## `cargo` revisions in nixpkgs
 
-* when using a cargo/rustc version currently in use on nixpkgs, expect most dependencies to be just binary substitutes instead of source downloads and source builds.
-* when using bleeding edge / specialized settings of cargo/rustc, expect a +30% overall build time because of the build isolation coming with nix
+[cargo in nixmultiverse](https://nixmultiverse.com/?pkg=cargo) lists 10 to 15 revision bumps per year from 2018 to 2026 but `cargo` is only one gear in a huge set of dependencies, we need 
+ to study a better metric: `buildRustPackage` implementation changes!
 
-the biggest impact on build time will be the current cargo handling of build.rs which currently comes with lax requirements on dependency outlining causing lots of rebuilds, see https://github.com/nixcloud/cargo/issues/3
+## `buildRustPackage` implementation changes
 
+<script src="posts/libnix/plotly-4.0.0.min.js" charset="utf-8"></script>
 
-## security
+<div id='myDiv' style="width:100%;height:30vh"><!-- Plotly chart will be drawn inside this DIV --></div>
+<div id="stats" style="margin-top:8px;font:14px/1.4 system-ui, sans-serif;"></div>
 
-## nixpkgs statistics
+<script>
 
-in nixpkgs 1c3d5a53f03f2eb5677f6f3b34f0ef31261ba485 we find **2574** rust programs compiled via `buildRustPackage`. in this section we'll look at all their crate.io dependencies and want to learn details about them like:
+// Parse release data (timestamp, commit, path); extract date only (YYYY-MM-DD)
+const raw = `
+2025-01-01T12:34:07+01:00 6973e1eb89501397cc5c2b78171d939250a5929e /nix/store/x6jyjcw4aaab9m4vs1l2nq716w1bjpk1-rust-platform-probe-1.drv
+2025-01-16T10:28:36-08:00 94c4a62efb54a64344d8add9730826ca638a1398 /nix/store/4zpk87f29lcza5a9m5pbbn8f25a00l8s-rust-platform-probe-1.drv
+2025-01-18T13:43:10-05:00 af961427abc6c1ce7bda0a04d8e9cb8fe1b04439 /nix/store/bwza1lszj2xrxgif6n90pxmqc04j22jd-rust-platform-probe-1.drv
+2025-01-19T09:16:51+01:00 50165c4f7eb48ce82bd063e1fb8047a0f515f8ce /nix/store/zlfx0nx9ywz1i6dpis36khf3210l6v04-rust-platform-probe-1.drv
+2025-01-27T05:23:23-08:00 e43d648ac1a41143237ea433867c6e61d7778e56 /nix/store/6a9b1d3xdxan06hxjial6ky4jl9a0sqa-rust-platform-probe-1.drv
+2025-02-06T07:43:42+01:00 550e11f27ba790351d390d9eca3b80ad0f0254e7 /nix/store/s9jgipjvc3fxx8zg8c083f5whiml1di3-rust-platform-probe-1.drv
+2025-02-15T18:30:00+08:00 90ca0500a33ac0331d8f14fed7da5cf0d1b63a72 /nix/store/cyzl9p1v2v3f1pqy29xwpykg9kykl419-rust-platform-probe-1.drv
+2025-02-20T11:52:15+01:00 e493a167e1e3b7c1de669ce78dad0bd93295a83f /nix/store/v7yix0l10hhrqf0nak3qxkhdgg9z7lpq-rust-platform-probe-1.drv
+2025-03-11T18:52:14+01:00 0d534853a55b5d02a4ababa1d71921ce8f0aee4c /nix/store/af5v7gcvay8yg3sk6pi28bh5c0ayg396-rust-platform-probe-1.drv
+2025-03-22T17:39:24+01:00 3fcae17eabac8fdc6599d1c67d89726af3682613 /nix/store/vfv5n135x2ark8lc68aj43xkj9bi99fy-rust-platform-probe-1.drv
+2025-04-02T12:08:35+03:00 41b4f451f5f6a5511cbabefdd5d0d876311ed5ef /nix/store/xxfxh75h6jg7jiyxa244br6j9rrzs5sq-rust-platform-probe-1.drv
+2025-04-05T14:35:00-07:00 0a5ad4cd68209823f5c70b4bdb173529c8b027ac /nix/store/j6wif51p67aswchb6yr7ggy44ad2n0yj-rust-platform-probe-1.drv
+2025-04-07T17:25:40+02:00 17b84e0b9d560f27cfd30e8ac69d87aa5a27c706 /nix/store/r3hs8z595qiidv1261pb95xagfjh6yjz-rust-platform-probe-1.drv
+2025-04-08T10:00:22+03:00 68116eead86a8eb1f827024fe214f471817e931c /nix/store/j6wif51p67aswchb6yr7ggy44ad2n0yj-rust-platform-probe-1.drv
+2025-04-13T16:07:22+02:00 a61952af35b8f0117238de39cdef524957d45320 /nix/store/kz5iv1y4sy8fgx9d6v2m2sqyizapil9a-rust-platform-probe-1.drv
+2025-04-13T16:08:14+02:00 25d869451e1261d4aa3b2d4ed0bf0b9dc017f4c0 /nix/store/3jbi7yfnb3gb3h9rrbk4ai2balmbcsdj-rust-platform-probe-1.drv
+2025-04-15T06:30:02-07:00 b05c2997b1c7e04b41dd7219e2317334c0c0726c /nix/store/lw9mp960q9k8ym4bvinhv9dmg73dy4m7-rust-platform-probe-1.drv
+2025-04-27T17:15:39+03:00 0be1fa1a463efc640cddd633de966247529ead8f /nix/store/qk5l4518ds8npspr73h0qxkqbanm7wyg-rust-platform-probe-1.drv
+2025-04-27T18:37:41+02:00 f739b57401a0ca4f899f4095de9edb9d9e9cc3fe /nix/store/lw9mp960q9k8ym4bvinhv9dmg73dy4m7-rust-platform-probe-1.drv
+2025-05-05T09:58:25+02:00 a9245b8f22bb81675d374aed93736930f5109503 /nix/store/vjanmdig2cd823db8j1y1m92f9rnzpsn-rust-platform-probe-1.drv
+2025-05-06T10:12:24-07:00 3fd3d5bc7bbfed0386efe38b8dfe9f11065ecbb6 /nix/store/j6gn8dwfy6b6likl7ix4hqrsn7szpr9m-rust-platform-probe-1.drv
+2025-05-08T23:51:26-04:00 19452031ea7333974022beda3866f288d1afeaf1 /nix/store/sjq5aqzwrxd33nqw8plfgjnj2gyv8ibq-rust-platform-probe-1.drv
+2025-05-14T15:30:23-04:00 add885ec41bb81260176e3368c1e2b6e3212d451 /nix/store/v5rp1pq35d6cfidv5pnsf3r3z4ihsdk8-rust-platform-probe-1.drv
+2025-05-14T15:32:44-04:00 21552fcf49294c3ded07cc53db6ff2fed3044d11 /nix/store/sjq5aqzwrxd33nqw8plfgjnj2gyv8ibq-rust-platform-probe-1.drv
+2025-05-15T18:42:40+02:00 e06158e58f3adee28b139e9c2bcfcc41f8625b46 /nix/store/18ca7m2j5wp2zgr4fd60jr9y955qlp6-rust-platform-probe-1.drv
+2025-05-16T19:21:55+02:00 e56e0beed4312a89b60fe312ee2241f7a1627f76 /nix/store/znga7bgr2hxs12cp6ch93hxy80qq5kjx-rust-platform-probe-1.drv
+2025-05-29T11:19:19-07:00 7f8ad4ffb25cbd66a69326d442c1b5d9fcbb1945 /nix/store/xbjckq9qq3kqpy7d6sx2y2xv689walk4-rust-platform-probe-1.drv
+2025-06-03T08:20:49-07:00 ae61cffc494295f2e188cc53233ef066f45d6aea /nix/store/9axz452kdp1cvs9ik1w68j2xawn755hx-rust-platform-probe-1.drv
+2025-06-18T10:46:23+02:00 a03f275babf1205b99825636c470a87f763f0f3f /nix/store/pgx72fjnnvvgwgfjmn4j3y740pdzdijy-rust-platform-probe-1.drv
+2025-07-13T19:33:14+02:00 b47d4f01d4213715a1f09b999bab96bb6a5b675e /nix/store/hdhn1x67fnc65wjdp4748rhyb0spiszq-rust-platform-probe-1.drv
+2025-07-14T20:50:13-07:00 01b8aae902554069268c0b920d84741459280c7b /nix/store/clzlgi8k8p9k2ar6myx7qrbvzwpy1l9m-rust-platform-probe-1.drv
+2025-07-17T12:49:04-07:00 d1508f6f54f38660ce9e0d6e5ae73b94de246d76 /nix/store/gwalzaqa1r21h4lzsihd59plry5zq51l-rust-platform-probe-1.drv
+2025-07-20T03:18:22-07:00 838a9352f8f7650a65cf2a754922c6d707b7b76d /nix/store/7rx30cwfs9mzw0sk39c45lhk62dzch5p-rust-platform-probe-1.drv
+2025-07-25T15:16:39-07:00 0ca32f3372d04505fb0e6d34c2588ef0d9566ce8 /nix/store/ym30n6xp3q5injqzd604gw5fkxg6ns68-rust-platform-probe-1.drv
+2025-07-26T18:59:46+02:00 17f6bd177404d6d43017595c5264756764444ab8 /nix/store/wsbg9i32cs7ncirs9r7f67lcb95s7s0n-rust-platform-probe-1.drv
+2025-08-10T17:38:43-07:00 754ee2fc40577285d31fa14b895a3cf55103a925 /nix/store/a3dg7nsfp9yh5448iaqj4fi4ps7piwwm-rust-platform-probe-1.drv
+2025-08-23T09:01:50+02:00 c58ada2eda15d0576e9a2ad74bd8f2318509a40f /nix/store/k9qvrqyr8v531y5a5kw5ssr6w183xrnv-rust-platform-probe-1.drv
+2025-09-06T15:30:18+02:00 c773622bea64e20608b04e17b89e2288e0e19f60 /nix/store/mgkyz9xgkmg3g5hir935bdw9j5ypgkd6-rust-platform-probe-1.drv
+2025-09-09T22:31:26+02:00 1779f9e0d8b45d88d7525665dd4d2a5b65041248 /nix/store/0aap1mmk6w0pd8wvgs2aw70kq2mp3qql-rust-platform-probe-1.drv
+2025-09-17T12:36:21Z bc76734d04054899c71c4fd060c85a545afa7e14 /nix/store/6d6zlij6bagyq51lg7wnr28iwdbn12xx-rust-platform-probe-1.drv
+2025-09-29T12:31:02Z 285ba51661a27645a252e48e7306686b8260ba94 /nix/store/bdphv02acq8rp8x74b8jp920bydkrsnl-rust-platform-probe-1.drv
+2025-09-29T23:00:28Z 386f53551cfbae340edfcd6938b8d806bd8a8ddb /nix/store/qs4mn5p53py2jd1h9f5whqf4bs0zys35-rust-platform-probe-1.drv
+2025-10-05T13:28:34Z 15ed8f7638116135ac9d3bd4353c482e7c539e0f /nix/store/y7cqvjrnpn51gyw97wnxifswx3b44khg-rust-platform-probe-1.drv
+2025-10-13T15:25:34Z b34ad61c9c52a12ae5be284727731cf91575c4d8 /nix/store/7gd9mhp8wnm4anrsn9zmj245pkpv46cl-rust-platform-probe-1.drv
+2025-10-21T07:16:28Z a91dd3189a51bbb5c7239e5790a947f9f31cb2d1 /nix/store/d0xf8dxwf4pl5swk463rcl8b4j2r6znn-rust-platform-probe-1.drv
+2025-10-28T16:35:28Z 81f2a1169e23859bbc7ad6e1a4aef589b9e52a26 /nix/store/h024zbdjh81i4ld4xx18hdbvf3phiv5z-rust-platform-probe-1.drv
+2025-11-05T01:00:57Z 37a08bae321cc90dfb0ce76f665853614fc507a9 /nix/store/qhyz3b09h9xgnkawksysjmw15vf5sy4y-rust-platform-probe-1.drv
+2025-11-12T18:00:23Z de21549a840be528ef4763dd7dca2006caf9c11f /nix/store/ghdapsi71xxqnkd7ssy7mcdkr4nwc22c-rust-platform-probe-1.drv
+2025-11-22T18:13:15Z 3dd12c46719c52e75d9f86998de15db82d27a6df /nix/store/l34nzahbf2plyfxjki681dydy0r9vk0n-rust-platform-probe-1.drv
+2025-11-24T21:17:44+01:00 2493002b10ccef0880f72d7720538f91fb4f7434 /nix/store/85r7nhs9b4cjlfm6w8c0gs3fgz60xh10-rust-platform-probe-1.drv
+2025-12-09T17:23:43Z 0e21d4f7e395782dbd13691d703f1b3bd662b24a /nix/store/brk00d8sycg24r36y5fszyihac10cnq3-rust-platform-probe-1.drv
+2025-12-11T18:25:29Z 689380e02995917eebdadff09ff21b2ec76dfd56 /nix/store/s1j90wp1r7zlg1gjq6zl5qk4yly778yb-rust-platform-probe-1.drv
+2025-12-13T16:25:28Z 9c4147152d359d797881d1e11c71bf8c2178fa7b /nix/store/9c4w34xgiyppapp6axg93hnpv767cnd6-rust-platform-probe-1.drv
+2025-12-13T16:26:47Z 35aa794e296168546b020d8705c76fb415217648 /nix/store/k5ixi53rm7r04hhsgg1hb34b1rrvga15-rust-platform-probe-1.drv
+2025-12-13T22:07:46Z e9af69fbc52aef7423e0ffb4366184cce475e575 /nix/store/603l3fjd5ddby02cfda0wcjcw0s1dcpw-rust-platform-probe-1.drv
+2025-12-15T13:05:38Z 860a8446fce35924d49809a0a61b61afaf13f325 /nix/store/mkz9jgbidw6pbc8f7hy1b88zmkngz967-rust-platform-probe-1.drv
+2025-12-17T19:41:13Z cca4ec8008dbbb571575a0aa7f044ceeb0288fb6 /nix/store/xkal0fadl99c0fbah9wdgnmxm1fnjb0n-rust-platform-probe-1.drv
+2025-12-17T23:41:11Z c2884c4afb8f1ecd15a0cd16340e5cc58f17f535 /nix/store/h0h0x9qlnnvxdfwmr5858ncs5pxmsnbz-rust-platform-probe-1.drv
+2025-12-21T17:59:51Z 553fe897108708abbe85dff364f9b9146e229a76 /nix/store/k7dkljs80xvf27wc8314iz4r9d1wrkw6-rust-platform-probe-1.drv
+2025-12-26T00:30:06Z 57e5df3a3ab57f1d96655e30fa96f54c6748c1b5 /nix/store/nnbfcj5hz6n05jf72vg0z7shzfmbdxhd-rust-platform-probe-1.drv
+2025-12-26T14:03:21Z d7aae780b39d4cbb9df69d183a70b845d97bb154 /nix/store/2xv8pq7bgi0dxh236615v34hvdan8ln8-rust-platform-probe-1.drv
+2025-12-30T17:40:09Z cad22e7d996aea55ecab064e84834289143e44a0 /nix/store/946mskn8fa7wnwwwfl06q4m04w4far0z-rust-platform-probe-1.drv
+`.trim();
 
-* how many crate.io deps are used in total
-* how many crate.io deps are unique
-* how many crate.io deps are shared with idential version+features and what the most shared ones are
+const lines = raw.split('\n');
 
-```nix
-# filter-rust.nix
-{ pkgs ? import <nixpkgs> { config.allowUnfree = true; config.allowBroken = true; } }:
-
-let
-  lib = pkgs.lib;
-
-  isBuildRustPackage = drv:
-    let
-      try = builtins.tryEval (
-        lib.isDerivation drv
-        && (
-             (drv ? cargoHash   && drv.cargoHash   != null)
-          || (drv ? cargoSha256 && drv.cargoSha256 != null)
-          || (drv ? cargoDeps   && drv.cargoDeps   != null)
-          || (drv ? cargoLock   && drv.cargoLock   != null)
-          || (drv ? cargoVendorDir && drv.cargoVendorDir != null)
-        )
-      );
-    in try.success && try.value;
-
-in
-  # Safely map over the attribute set – skip anything that throws
-  lib.mapAttrs (name: value:
-    let try = builtins.tryEval value;
-    in if try.success && isBuildRustPackage try.value
-       then try.value
-       else null
-  ) pkgs
-```
-
-```bash
-nix run nixpkgs#nix-eval-jobs -- \
-  --workers 4 \
-  --max-memory-size 8192 \
-  --force-recurse \
-  --gc-roots-dir /tmp/gcroots \
-  -E 'import ./filter-rust.nix { pkgs = import /home/nixos/nixpkgs { config.allowUnfree = true; config.allowBroken = true; }; }' \
-  > rust-eval.jsonl
-```
-
-```bash
-jq -r 'select(.error == null and .drvPath != null) | .attr' rust-eval.jsonl \
-  | sort -u > rust-packages.txt
-```
-
-```bash
-cat rust-packages.txt| wc -l
-2574
-```
-
-```
-head -n 1000 ../rust-packages.txt | xargs -n 1 -I {} bash ./download-src.sh {}
-```
-
-```nix
-# extract-one.nix
-{ nixpkgsPath ? /home/nixos/nixpkgs
-, attr
-, outDir ? ./cargo-locks
-}:
-
-let
-  pkgs = import nixpkgsPath {
-    config.allowUnfree = true;
-    config.allowBroken = true;
+const releases = lines.map((line, i) => {
+  const m = line.match(/^(\S+)\s+([0-9a-f]{40})\s+(\S+)$/i);
+  if (!m) return null;
+  const [_, ts, commit, path] = m;
+  return {
+    idx: i + 1,              // line number (y-axis)
+    ts,                      // full timestamp
+    date: ts.slice(0, 10),   // extract date only (YYYY-MM-DD)
+    commit,
+    path
   };
+}).filter(Boolean);
 
-  original = pkgs.${attr};
+// Build horizontal segments: from this date to next date at constant y = line number
+const x = [];
+const y = [];
+const hover = [];
+for (let i = 0; i < releases.length; i++) {
+  const start = releases[i].date;
+  const end = (i < releases.length - 1) ? releases[i + 1].date : '2025-12-31';
+  const yy = releases[i].idx;
 
-  extractor = original.overrideAttrs (old: {
-    dontBuild = false;
-    doCheck   = false;
-    doInstall = false;
+  x.push(start, end, null);
+  y.push(yy, yy, null);
+  const ht = `#${yy} ${releases[i].commit}<br>${releases[i].path}<br>${releases[i].ts}`;
+  hover.push(ht, ht, null);
+}
 
-    buildPhase = ''
-      runHook preBuild
+const data = [{
+  type: 'scatter',
+  mode: 'lines',
+  x,
+  y,
+  text: hover,
+  hovertemplate: 'release %{y}<br>%{x}<br>%{text}<extra></extra>',
+  line: { width: 4 },
+  showlegend: false
+}];
+var config = {responsive: true}
 
-      mkdir -p $out
+const layout = {
+  title: { text: 'Release timeline (2025)' },
+  xaxis: {
+    type: 'date',
+    range: ['2025-01-01', '2025-12-31'],
+    tickformat: '%b',
+    dtick: 'M1',
+    title: { text: '2025' }
+  },
+  yaxis: {
+    title: { text: 'release' },
+    tick0: 0,   // align ticks at 0, 10, 20, ...
+    dtick: 10,  // step of 10
+    rangemode: 'tozero'
+  },
+  autosize: true,
 
-      echo "=== Cargo.lock extractor for ${attr} ==="
+  margin: { l: 70, r: 20, t: 60, b: 50 }
+};
 
-      if [ -f Cargo.lock ]; then
-        echo "Found Cargo.lock in $PWD"
-        cp -v Cargo.lock $out/Cargo.lock
-      elif [ -f "$cargoRoot/Cargo.lock" ]; then
-        echo "Found Cargo.lock in cargoRoot"
-        cp -v "$cargoRoot/Cargo.lock" $out/Cargo.lock
-      else
-        echo "ERROR: Cargo.lock not found" >&2
-        find . -name 'Cargo.lock' || true
-        exit 1
-      fi
+Plotly.newPlot('myDiv', data, layout, config);
 
-      echo "Lock file extracted – exiting early"
-      exit 0
+// --- Stats: days in use per release ---
+  function toUTCDate(yyyyMmDd) {
+    const [Y, M, D] = yyyyMmDd.split('-').map(Number);
+    return new Date(Date.UTC(Y, M - 1, D));
+  }
 
-      runHook postBuild
-    '';
+  // Difference in calendar days (end exclusive)
+  function daysBetween(startStr, endStr) {
+    const ms = toUTCDate(endStr) - toUTCDate(startStr);
+    return Math.max(0, ms / 86400000);
+  }
+
+  const durations = releases.map((r, i) => {
+    const end = (i < releases.length - 1) ? releases[i + 1].date : '2025-12-31';
+    return { idx: r.idx, days: daysBetween(r.date, end) };
   });
 
-in
-  extractor
-```
+  const vals = durations.map(d => d.days);
+  const n = vals.length;
+  const sorted = [...vals].sort((a, b) => a - b);
+  const mean = vals.reduce((a, b) => a + b, 0) / n;
+  function percentile(p) {
+    if (!n) return NaN;
+    const pos = (n - 1) * p;
+    const b = Math.floor(pos), r = pos - b;
+    return sorted[b + 1] !== undefined ? sorted[b] + r * (sorted[b + 1] - sorted[b]) : sorted[b];
+  }
+  const median = percentile(0.5);
+  const p25 = percentile(0.25);
+  const p75 = percentile(0.75);
+  const p90 = percentile(0.90);
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+  const variance = vals.reduce((a, v) => a + Math.pow(v - mean, 2), 0) / (n - 1);
+  const stdev = Math.sqrt(variance);
+  const releasesPerMonth = n / 12;
 
-```bash
-nix-build extract-one.nix --argstr attr aba -o aba
-```
+  const statsDiv = document.getElementById('stats');
+  statsDiv.innerHTML = `
+    <b>Usage-days between releases <abbr title="We measure each release’s duration from its date up to (but not including) the next release date; the last runs to 2025‑12‑31.">(end exclusive)</abbr></b><br>
+    <abbr title="Total number of releases included">count</abbr>=${n},
+    <abbr title="Arithmetic mean of days in use">avg</abbr>=${mean.toFixed(2)}d,
+    <abbr title="50th percentile; half the releases are shorter, half longer">median</abbr>=${median.toFixed(1)}d,
+    <abbr title="25th percentile (first quartile); 25% are shorter">p25</abbr>=${p25.toFixed(1)}d,
+    <abbr title="75th percentile (third quartile); 25% are longer">p75</abbr>=${p75.toFixed(1)}d,
+    <abbr title="90th percentile; only 10% lasted longer">p90</abbr>=${p90.toFixed(1)}d,
+    <abbr title="Shortest days-in-use gap">min</abbr>=${min.toFixed(0)}d,
+    <abbr title="Longest days-in-use gap">max</abbr>=${max.toFixed(0)}d,
+    <abbr title="Sample standard deviation; higher means more variable cadence">std</abbr>=${stdev.toFixed(2)}d<br>
+    <abbr title="Average number of releases per month in 2025 (count ÷ 12)">cadence</abbr> ≈ ${releasesPerMonth.toFixed(2)} releases/month
+  `;
+</script>
 
+## nixpkgs architectures
 
-in ~/nixpkgs-datamining/extract-one/result-aba
+nixpkgs and `buildRustPackage` is used with these 4 different architectures (with different nixpkgs revision than below):
 
-```bash
-#!/usr/bin/env sh
-set -e
+<table class="table table-striped table-bordered">
+  <thead class="thead-dark">
+    <tr>
+      <th>Architecture</th>
+      <th>Packages</th>
+      <th>% of total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>x86_64-linux</td>
+      <td>2555</td>
+      <td>28.1%</td>
+    </tr>
+    <tr>
+      <td>aarch64-linux</td>
+      <td>2517</td>
+      <td>27.6%</td>
+    </tr>
+    <tr>
+      <td>x86_64-darwin</td>
+      <td>2008</td>
+      <td>22.0%</td>
+    </tr>
+    <tr>
+      <td>aarch64-darwin</td>
+      <td>2007</td>
+      <td>22.0%</td>
+    </tr>
+    <tr>
+      <td><strong>Total</strong></td>
+      <td><strong>9087</strong></td>
+      <td><strong>100%</strong></td>
+    </tr>
+  </tbody>
+</table>
 
-if [ $# -ne 2 ]; then
-  echo "Usage: $0 <input-dir> <output-stats-file>" >&2
-  exit 1
-fi
-
-INPUT_DIR="$1"
-OUTPUT_FILE="$2"
-LOCK_FILE="${INPUT_DIR%/}/Cargo.lock"
-
-if [ ! -f "$LOCK_FILE" ]; then
-  echo "Error: Cargo.lock not found in $INPUT_DIR" >&2
-  exit 1
-fi
-
-nix-shell -p python3 --run "python3 - <<EOF
-import tomllib, hashlib, sys
-from pathlib import Path
-
-lock_path = Path(\"$LOCK_FILE\")
-out_path  = Path(\"$OUTPUT_FILE\")
-
-if not lock_path.is_file():
-    print(f\"Error: {lock_path} does not exist\", file=sys.stderr)
-    sys.exit(1)
-
-data = tomllib.loads(lock_path.read_text())
-
-lines = []
-for pkg in data.get(\"package\", []):
-    name     = pkg[\"name\"]
-    version  = pkg[\"version\"]
-    checksum = pkg.get(\"checksum\", \"\")
-    deps     = sorted(pkg.get(\"dependencies\", []))
-    features = sorted(pkg.get(\"features\", pkg.get(\"feature\", [])))
-
-    fingerprint = f\"{checksum}|{deps}|{features}\".encode()
-    new_hash = hashlib.sha256(fingerprint).hexdigest()[:16]
-
-    lines.append(f\"{name} {new_hash}\")
-
-out_path.write_text(\"\\n\".join(lines) + \"\\n\")
-EOF"
-```
-
-```
-./deps2stats.sh result-aaa aaa.stats
-```
-
-```
-unicode-ident: 1.0.12 c7db7731e6bdba59
-utf8parse: 0.2.1 332d96e3149afc0f
-wasi: 0.11.0+wasi-snapshot-preview1 dbdeb6ef1b493c32
-windows-sys: 0.48.0 1b16286f4ec15a4d
-windows-targets: 0.48.5 9f4bca46ce6d87f2
-windows_aarch64_gnullvm: 0.48.5 af37c62067679834
-windows_aarch64_msvc: 0.48.5 cf13f371bbdd0fba
-windows_i686_gnu: 0.48.5 1f2df0b952114bf5
-windows_i686_msvc: 0.48.5 ae20f7963c6c4ae0
-windows_x86_64_gnu: 0.48.5 b2e4ac79d0895844
-windows_x86_64_gnullvm: 0.48.5 212cf4b7faaa53a5
-windows_x86_64_msvc: 0.48.5 ea90e53b8a86ba9a
-winnow: 0.5.18 23a09b90a008f666
-```
-
-```python
-#!/usr/bin/env python3
-"""
-Aggregate dependency statistics from multiple *.stats files.
-
-Usage:
-    ./aggregate-stats.py <directory-with-stats-files> [output-file]
-
-If output-file is omitted the result is written to stdout.
-"""
-
-import sys
-from pathlib import Path
-from collections import Counter
-
-def main():
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print(f"Usage: {sys.argv[0]} <stats-directory> [output-file]", file=sys.stderr)
-        sys.exit(1)
-
-    stats_dir = Path(sys.argv[1])
-    output_path = Path(sys.argv[2]) if len(sys.argv) == 3 else None
-
-    if not stats_dir.is_dir():
-        print(f"Error: {stats_dir} is not a directory", file=sys.stderr)
-        sys.exit(1)
-
-    counter = Counter()
-
-    stats_files = sorted(stats_dir.glob("*.stats"))
-    if not stats_files:
-        print(f"Error: no *.stats files found in {stats_dir}", file=sys.stderr)
-        sys.exit(1)
-
-    for stats_file in stats_files:
-        with stats_file.open() as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                # expected format: "name hash"
-                parts = line.split()
-                if len(parts) >= 2:
-                    key = f"{parts[0]} {parts[1]}"
-                    counter[key] += 1
-
-    # sort by count descending, then by name
-    lines = [
-        f"{count} {key}"
-        for key, count in sorted(counter.items(), key=lambda x: (-x[1], x[0]))
-    ]
-
-    result = "\n".join(lines) + "\n"
-
-    if output_path:
-        output_path.write_text(result)
-    else:
-        print(result, end="")
-
-if __name__ == "__main__":
-    main()
-```
-
-```bash
-nix-shell -p python3 python3Packages.squarify python3Packages.matplotlib
-```
-
-```bash
-./aggregate-stats.py . combined.stats
-```
-
-```bash
-head -n 1000 ../rust-packages.txt | xargs -n 1 -I {} ./deps2stats.sh result-{} {}.stats
-```
-
-```python
-#!/usr/bin/env python3
-import sys
-import matplotlib.pyplot as plt
-import squarify
-import matplotlib.colors as mcolors
-from collections import defaultdict
-
-def load_data(filename=None):
-    """
-    Expects lines:  <count> <name> [<hash>]
-    Returns list of (count, label)
-    """
-    data = []
-    source = open(filename) if filename else sys.stdin
-    for line in source:
-        line = line.strip()
-        if not line:
-            continue
-        parts = line.split(maxsplit=2)
-        if len(parts) >= 2:
-            try:
-                count = int(parts[0])
-                name  = parts[1]
-                data.append((count, name))
-            except ValueError:
-                continue
-    if filename:
-        source.close()
-    # keep only positive counts and sort descending (nice for colouring)
-    data = [(c, n) for c, n in data if c > 0]
-    data.sort(key=lambda x: x[0], reverse=True)
-    return data
-
-def make_treemap(data, outfile="treemap.png", title="Identical rlib configurations",
-                 max_labels=40, min_size_for_label=5):
-    if not data:
-        print("No data")
-        return
-
-    sizes  = [d[0] for d in data]
-    labels = [d[1] for d in data]
-
-    # Colour by size (bigger = more intense)
-    norm = mcolors.Normalize(vmin=min(sizes), vmax=max(sizes))
-    cmap = plt.cm.Blues
-    colors = [cmap(norm(s)) for s in sizes]
-
-    # Only put text on the larger rectangles so the image stays readable
-    display_labels = []
-    for s, lab in zip(sizes, labels):
-        if s >= min_size_for_label and len(display_labels) < max_labels:
-            display_labels.append(f"{lab}\n{s}")
-        else:
-            display_labels.append("")
-
-    fig = plt.figure(figsize=(16, 10))
-    ax = fig.add_subplot(111)
-
-    squarify.plot(sizes=sizes,
-                  label=display_labels,
-                  color=colors,
-                  alpha=0.85,
-                  text_kwargs={"fontsize": 7, "color": "black"},
-                  ax=ax,
-                  pad=True)
-
-    ax.set_title(title, fontsize=14, pad=12)
-    ax.axis("off")
-    plt.tight_layout()
-    plt.savefig(outfile, dpi=160, bbox_inches="tight")
-    print(f"Saved → {outfile}")
-    print(f"Total items: {len(data)}   |   Top size: {sizes[0]}")
-
-if __name__ == "__main__":
-    filename = sys.argv[1] if len(sys.argv) > 1 else None
-    data = load_data(filename)
-    make_treemap(data)
-```
+**total package/architecture combinations:** **9087**
 
 
-```bash
-python treemap_stats.py combined.stats
-```
+
+when changing the nix implementation of `buildRustPackage`, like when updating `rustc`/`cargo` or the toolchain, this can multiply the rebuild workload across the architectures.
+
+## direct and indirect dependencies of the 2312 buildRustPackage rust projects
+
+[[!img posts/libnix/crate-type-distribution.jpg class="noFancy" ]]
+
+[📊 interactive plotly graph](https://qknight.github.io/nixpkgs-datamining/crate-type-distribution.html)
+
+<section class="stats-section">
+        <h5>Project Analysis</h5>
+        <ul>
+          <li><strong>Total Projects Analyzed:</strong> 2300</li>
+          <li><strong>Average Internal Crates per Project:</strong> 3.8</li>
+          <li><strong>Average Direct Dependencies per Project:</strong> 15.7</li>
+          <li><strong>Average Transitive Dependencies per Project:</strong> 138.8</li>
+        </ul>
+
+        <h5>Overall Dependency Count</h5>
+        <ul>
+          <li><strong>Total Internal Crates:</strong> 8759</li>
+          <li><strong>Total Direct Dependencies:</strong> 36080</li>
+          <li><strong>Total Transitive Dependencies:</strong> 319137</li>
+        </ul>
+
+        <h5>Total &amp; Percentage Breakdown</h5>
+        <ul>
+          <li><strong>Total Crates Count:</strong> 363976</li>
+          <li><strong>Internal Crates:</strong> 2.4% of Total</li>
+          <li><strong>Direct Dependencies:</strong> 9.9% of Total</li>
+          <li><strong>Transitive Dependencies:</strong> 87.7% of Total</li>
+          <li><strong>Combined Direct and Transitive Dependencies:</strong> 97.59% of Total</li>
+        </ul>
+
+        <h5>Direct Dependencies Distribution</h5>
+        <ul>
+          <li>
+            <abbr title="50th percentile; half the projects use fewer direct dependencies">median</abbr>=12.0,
+            <abbr title="25th percentile; 25% of projects use fewer direct dependencies">p25</abbr>=6.0,
+            <abbr title="75th percentile; 25% of projects use more direct dependencies">p75</abbr>=21.0,
+            <abbr title="90th percentile; only 10% of projects use more direct dependencies">p90</abbr>=32.0,
+            <abbr title="Minimum number of direct dependencies across projects">min</abbr>=0d,
+            <abbr title="Maximum number of direct dependencies across projects">max</abbr>=162d
+          </li>
+          <li>
+            <abbr title="75th percentile">p75</abbr> of projects use &lt;= 21.0 direct dependencies
+          </li>
+        </ul>
+
+        <h5>Internal Crates Distribution</h5>
+        <ul>
+          <li>
+            <abbr title="50th percentile; half the projects have fewer internal crates">median</abbr>=1.0,
+            <abbr title="25th percentile; 25% of projects have fewer internal crates">p25</abbr>=1.0,
+            <abbr title="75th percentile; 25% of projects have more internal crates">p75</abbr>=2.0,
+            <abbr title="90th percentile; only 10% of projects have more internal crates">p90</abbr>=7.0,
+            <abbr title="Minimum number of internal crates across projects">min</abbr>=1d,
+            <abbr title="Maximum number of internal crates across projects">max</abbr>=257d
+          </li>
+          <li>
+            <abbr title="75th percentile">p75</abbr> of projects use &lt;= 2.0 main crates
+          </li>
+        </ul>
+      </section>
+
+## finding identical crates.io dependencies in 2312 buildRustPackage rust projects
+
+a graph showing similar crates.io dependencie configurations in 2312 buildRustPackage rust projects.
+
+[[!img posts/libnix/libnix-cargo-nixpkgs-study.jpg class="noFancy" ]]
+
+[📊 interactive d3 graph (30s load time)](https://qknight.github.io/nixpkgs-datamining/index.html)
+
+findings:
+
+* nixpkgs [1c3d5a53f03f2eb5677f6f3b34f0ef31261ba485](https://github.com/NixOS/nixpkgs/commit/1c3d5a53f03f2eb5677f6f3b34f0ef31261ba485) we find **2574** rust programs compiled via `buildRustPackage`.
+
+* with **2312** (out of the 2574) i could use for statistics (that is 90% of all `buildRustPackages` usages)
+
+* these **2312 rust projects** have **360909 crates.io dependencies** and on average each project has **360909/2312 = 158 dependencies**
+
+* out of 360909 crates.io dependencies, only **44248 are unique crates.io dependencies**, meaning there is a huge set of crates which are compiled with an identical configuration
+
+# hypothesis
+
+`cargo-libnix` already is capable of reusing compiled libraries and thus we would have to build **8.1 times less dependencies**! it remains to be seen if this 8.1 factor translates in 8.1 compile time and it could be more or even less.
+
+* hydra.nixos.org on average, would then only have to compile **158/8 = ~20** dependencies per rust project when picking up a new project and start working on them and instead they would use binary substitudes
+
+* in the **age of AI** `cargo+libnix` could speed up things even more as agents are far more wasteful with repository checkouts and rebuilds than humans are (a hunch of mine, needs proper backing)
+
+* rustc supports incremental builds and we could even wrap that into dynamic derivations
+
+it would be interesting to compile a list of *build times*, *source code checkout size* and *binary store path size* for each of the 44248 unique crates.io crates and then use these build statistics to get a measurement on the actual combined build times and disk space impacts.
 
 # summary
 
-boak
+using the integration of `cargo+libnix` could lead to **improved build efficiency**, **faster onboarding**, and a **more streamlined developer experiences**.
+
+shoutout to the nixpkgs maintainers: excellent work! without your diligent efforts in maintaining this extensive collection of software, i wouldn't have been able to gather such valuable data.
