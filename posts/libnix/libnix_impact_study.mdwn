@@ -304,8 +304,8 @@ when changing the nix implementation of `buildRustPackage`, like when updating `
             <abbr title="25th percentile; 25% of projects use fewer direct dependencies">p25</abbr>=6.0,
             <abbr title="75th percentile; 25% of projects use more direct dependencies">p75</abbr>=21.0,
             <abbr title="90th percentile; only 10% of projects use more direct dependencies">p90</abbr>=32.0,
-            <abbr title="Minimum number of direct dependencies across projects">min</abbr>=0d,
-            <abbr title="Maximum number of direct dependencies across projects">max</abbr>=162d
+            <abbr title="Minimum number of direct dependencies across projects">min</abbr>=0,
+            <abbr title="Maximum number of direct dependencies across projects">max</abbr>=162
           </li>
           <li>
             <abbr title="75th percentile">p75</abbr> of projects use &lt;= 21.0 direct dependencies
@@ -319,8 +319,8 @@ when changing the nix implementation of `buildRustPackage`, like when updating `
             <abbr title="25th percentile; 25% of projects have fewer internal crates">p25</abbr>=1.0,
             <abbr title="75th percentile; 25% of projects have more internal crates">p75</abbr>=2.0,
             <abbr title="90th percentile; only 10% of projects have more internal crates">p90</abbr>=7.0,
-            <abbr title="Minimum number of internal crates across projects">min</abbr>=1d,
-            <abbr title="Maximum number of internal crates across projects">max</abbr>=257d
+            <abbr title="Minimum number of internal crates across projects">min</abbr>=1,
+            <abbr title="Maximum number of internal crates across projects">max</abbr>=257
           </li>
           <li>
             <abbr title="75th percentile">p75</abbr> of projects use &lt;= 2.0 main crates
