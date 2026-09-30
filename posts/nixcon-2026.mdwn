@@ -1,0 +1,388 @@
+[[!meta date="2026-09-30 15:35"]]
+[[!tag nixcon-2026 nix nixos]]
+[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!summary summary of nixcon 2026]]
+[[!series nixcloud]]
+
+# motivation
+
+i've been to this years [nixcon 2026](https://talks.nixcon.org/nixcon-2026/) in krakow, see [schedule](https://talks.nixcon.org/nixcon-2026/schedule/).
+
+## presentations
+
+nixcon 2026 had **two speaker rooms called Aula Duza A and Aula Duza B** and **two days with talks namely saturday and sunday**.
+
+<div class="schedule">
+<table style="border-collapse: collapse; width: 100%;">
+  <thead>
+    <tr>
+      <th style="padding: 8px;">Start</th>
+      <th style="padding: 8px;">Topic</th>
+      <th style="padding: 8px;">Speakers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><th colspan="3">NixCon 2026 - Saturday - Aula Duza A (1/2)</th></tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=300s">5:00</a></td>
+      <td>Opening ceremony</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=2760s">46:00</a></td>
+      <td>Nix State of the Union 2026</td>
+      <td>Ron Efroni</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=6300s">1:45:00</a></td>
+      <td>NGI Forge</td>
+      <td>Ivan Minčík, Daniel Ramirez, Fedi Jamoussi, Phani Rithvij</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=8100s">2:15:00</a></td>
+      <td>Lazy Nix Store</td>
+      <td>Srini, Zhaofeng Li</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=9900s">2:45:00</a></td>
+      <td>Advanced NixOS Integration Tests</td>
+      <td>Lukas Beierlieb</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=12600s">3:30:00</a></td>
+      <td>Lunch</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=16200s">4:30:00</a></td>
+      <td>Mainstream Nix (Windows + language backends)</td>
+      <td>Joachim Schiele</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=19800s">5:30:00</a></td>
+      <td>Nixception: incremental builds</td>
+      <td>Guillaume Maudoux</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=23400s">6:30:00</a></td>
+      <td>NixOS in the Corporate Trenches</td>
+      <td>Nicolas Goudry</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=27000s">7:30:00</a></td>
+      <td>NixOS on RISC-V</td>
+      <td>liberodark</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=27600s">7:40:00</a></td>
+      <td>The future of code collaboration</td>
+      <td>Tangled</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=28200s">7:50:00</a></td>
+      <td>Lightning: PDT Partners</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=28800s">8:00:00</a></td>
+      <td>How Long Until It's Done? Build farm dashboards</td>
+      <td>Kierán Meinhardt</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=29400s">8:10:00</a></td>
+      <td>Automated function/package/scope creation</td>
+      <td>Yifei Sun</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=Gvowg0c5w2E/watch?v=Gvowg0c5w2E&amp;t=30000s">8:20:00</a></td>
+      <td>Lightning: Cyberus</td>
+      <td></td>
+    </tr>
+
+    <tr><th colspan="3">NixCon 2026 - Saturday - Aula Duza B (1/2)</th></tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=2160s">0:36:00</a></td>
+      <td>finix making space for multiple nix operating systems</td>
+      <td>aanderse</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=4500s">1:15:00</a></td>
+      <td>Nix panel</td>
+      <td>Jörg Thalheim, Lisanna Dettwyler, Eelco Dolstra</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=7620s">2:07:00</a></td>
+      <td>Nix Foundation and Steering Committee Panel</td>
+      <td>Ron Efroni</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=13080s">3:38:00</a></td>
+      <td>DeltaNAR space-efficient Nix deployments</td>
+      <td>adisbladis</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=14820s">4:07:00</a></td>
+      <td>Declarative Hardware Architectures using Nix</td>
+      <td>Tristan Ross</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=16500s">4:35:00</a></td>
+      <td>Nix &amp; the EU Cyber Resilience Act</td>
+      <td>Florian Pester</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=18420s">5:07:00</a></td>
+      <td>netbox-nixos</td>
+      <td>Kierán Meinhardt, Jacek Galowicz</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=20100s">5:35:00</a></td>
+      <td>Statix: stratified module configuration for humans</td>
+      <td>bme</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=22020s">6:07:00</a></td>
+      <td>Nixing Artificial Intelligence</td>
+      <td>Ron Efroni</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=23700s">6:35:00</a></td>
+      <td>NixNet: declare network experiments as a flake</td>
+      <td>Benedikt Spies</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=25560s">7:06:00</a></td>
+      <td>Peering Declaratively: a small AS on NixOS</td>
+      <td>Dionysis Grigoropoulos</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=27300s">7:35:00</a></td>
+      <td>Running NixOS Integration Tests on Real Hardware</td>
+      <td>Markus Napierkowski</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=x04kHEOabtw/watch?v=x04kHEOabtw&amp;t=29040s">8:04:00</a></td>
+      <td>Scaling Nix</td>
+      <td>Eeelco Dolstra</td>
+    </tr>
+
+    <tr><th colspan="3">NixCon 2026 - Sunday - Aula Duza A (2/2)</th></tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=31s">0:31</a></td>
+      <td>Morning intro</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=62s">1:02</a></td>
+      <td>Why I changed my mind about flakes</td>
+      <td>Valentin Gagarin</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=2375s">39:35</a></td>
+      <td>Break</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=3600s">1:00:00</a></td>
+      <td>Untangling the undead spaghetti</td>
+      <td>Molly Miller</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=7199s">1:59:59</a></td>
+      <td>Unprivileged Privileged Nix</td>
+      <td>Artemis Tosini</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=9382s">2:36:22</a></td>
+      <td>Lunch</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=15328s">4:15:28</a></td>
+      <td>Staging Ground: building for upstream in clan.lol</td>
+      <td>lassulus, Qubasa</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=18918s">5:15:18</a></td>
+      <td>Trampolining Nix</td>
+      <td>Mika Bohinen</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=22343s">6:12:23</a></td>
+      <td>Spontaneous lightning talks</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=22557s">6:15:57</a></td>
+      <td>NixOS on PowerPC 64 Linux</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=22907s">6:21:47</a></td>
+      <td>Nix on OpenBSD</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=23153s">6:25:53</a></td>
+      <td>Hydra update</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=23502s">6:31:42</a></td>
+      <td>Mobile NixOS</td>
+      <td>Matt</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=23844s">6:37:24</a></td>
+      <td>dots Home Manager mutable dotfiles</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=24117s">6:41:57</a></td>
+      <td>Flake Edit</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=24340s">6:45:40</a></td>
+      <td>Don't use specialArgs</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=25213s">7:00:13</a></td>
+      <td>The Thunk Trap</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=25803s">7:10:03</a></td>
+      <td>Smaller Python artifacts with Nix</td>
+      <td>Kyle</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=26399s">7:19:59</a></td>
+      <td>Nix Singularity</td>
+      <td>Fernando</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=26991s">7:29:51</a></td>
+      <td>Biting Your Own Tail Off</td>
+      <td>Winter</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=27585s">7:39:45</a></td>
+      <td>We deserve a control plane</td>
+      <td>nick novitski</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=28194s">7:49:54</a></td>
+      <td>Determinate Systems</td>
+      <td>Luke Perkins</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=28781s">7:59:41</a></td>
+      <td>Hardware testing with Nix</td>
+      <td>Shiv</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=29384s">8:09:44</a></td>
+      <td>Introducing Nix at work via Flox</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=wtw3O-ZX5Uk/watch?v=wtw3O-ZX5Uk&amp;t=30608s">8:30:08</a></td>
+      <td>Closing</td>
+      <td></td>
+    </tr>
+
+    <tr><th colspan="3">NixCon 2026 - Sunday - Aula Duza B (2/2)</th></tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg">0:00</a></td>
+      <td>Stream start</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=26s">0:26</a></td>
+      <td>The State NixOS Won't Manage</td>
+      <td>Alexander Foremny</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=1807s">30:07</a></td>
+      <td>The Ministry of Silly Builds</td>
+      <td>Aleksander Gondek, Artur Stachecki</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=2971s">49:31</a></td>
+      <td>Distributing trust with laut</td>
+      <td>Martin Schwaighofer</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=4790s">1:19:50</a></td>
+      <td>Nix store is my favorite database</td>
+      <td>Anuj More</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=6628s">1:50:28</a></td>
+      <td>The new .devShell interface for nix develop</td>
+      <td>Lisanna Dettwyler</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=10140s">2:49:00</a></td>
+      <td>When the Honeymoon Ends</td>
+      <td>Martin Messer</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=17250s">4:47:30</a></td>
+      <td>Build It All Yourself: air-gapped nixpkgs</td>
+      <td>Kierán Meinhardt</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=19162s">5:19:22</a></td>
+      <td>Kubernetes on RISC-V with NixOS</td>
+      <td>Bruce Gain, Liang Yuning</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=20843s">5:47:23</a></td>
+      <td>Server apps commodified</td>
+      <td>Kiara Grouwstra</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=22625s">6:17:05</a></td>
+      <td>Implementing the NixOS STIG</td>
+      <td>Alexander Foremny</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=24431s">6:47:11</a></td>
+      <td>Nix for cloud-native platform engineering</td>
+      <td>Arik Grahl</td>
+    </tr>
+    <tr>
+      <td><a href="https://www.youtube.com/watch?v=0eewzkKgwFg/watch?v=0eewzkKgwFg&amp;t=26241s">7:17:21</a></td>
+      <td>Two architectures, twice the fun: the Nix Badge</td>
+      <td>Morgan Jones</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+# summary NixCon 2026 talk days, in short
+
+created a short summary using **grok** i'd like to share:
+
+NixCon 2026’s two talk days split roughly into **core Nix / NixOS internals**, **packaging and stores**, **testing and hardware**, **corporate/compliance adoption**, and **community tooling**.
+
+* **saturday A** was foundation-facing: State of the Union, NGI packaging, lazy stores, integration tests, Windows/language backends, incremental builds, and a corporate NixOS war story, plus sponsor lightnings (finance, collab forges, RISC-V). 
+
+* **saturday B** was more experimental and operational: alternate OS designs (finix), governance panels, space-efficient deploys, declarative hardware, the EU Cyber Resilience Act, NetBox→NixOS, module UX (Statix), network experiments, BGP homelabs, hardware-in-the-loop tests, and Eelco on scaling evaluation.
+
+* **sunday A** was language, networking, sandboxing, and Clan/upstream work, then a long lightning block (PowerPC, OpenBSD, Hydra, Mobile NixOS, Home Manager, flakes UX, evaluator pitfalls, Python artifacts, HPC/Singularity, control planes, Determinate, Flox onboarding). 
+
+* **sunday B** was runtime state, Bazel↔Nix, supply-chain trust (laut), store-as-database, `nix develop`, CVMFS at scale, five-year product support, air-gapped Hydra, Kubernetes on RISC-V, “apps for non-Nix users,” DISA STIG hardening, cloud-native manifests, and the DEF CON Nix badge.
+
+presenters were mostly **Nix consultants and product companies** (Flox, Tweag, Applicative Systems, Nixcademy/Cyberus), **core/foundation people** (Eelco, Lisanna, Valentin, Ron), **hosting/SRE** (Flying Circus, Google), plus a thinner slice of **finance sponsors**, **EU/NGI**, **space/embedded**, and **hobby hardware**.
+
+target audience was not beginners: talks assume flakes, modules, Hydra, and store semantics. the practical audience is packagers, NixOS module authors, platform/SRE teams taking Nix into regulated or air-gapped shops, and contributors fighting the evaluator and test driver. a secondary audience is orgs that want Nix without teaching everyone Nix (containers, Clan, Flox, commodified server apps).
+
+## AI summary
+
+**AI:** only Ron’s “Nixing Artificial Intelligence” treated it as a first-class topic, and even that was Nix *under* AI stacks (CUDA, agents, reproducible sandboxes), not AI writing Nix. elsewhere AI barely appeared to be mentioned in talks. there was a nice vibe-coded nix game.
+
+estimate: **low on-stage AI hype, moderate acceptance of Nix as AI infrastructure**.
