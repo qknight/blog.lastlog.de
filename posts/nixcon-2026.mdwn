@@ -2,7 +2,6 @@
 [[!tag nixcon-2026 nix nixos]]
 [[!img media/nixos-lores.png class="noFancy" style="float: right"]]
 [[!summary summary of nixcon 2026]]
-[[!series nixcloud]]
 
 # motivation
 
