@@ -1,6 +1,6 @@
 [[!meta date="2026-09-30 15:35"]]
 [[!tag nixcon-2026 nix nixos]]
-[[!img media/nixos-lores.png class="noFancy" style="float: right"]]
+[[!img media/nixcon26.svg class="noFancy" width="200px" style="float: right"]]
 [[!summary summary of nixcon 2026]]
 
 # motivation
